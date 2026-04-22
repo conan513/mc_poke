@@ -172,6 +172,9 @@ async function install() {
     // Extract overrides (prioritize server-overrides, then overrides)
     for (const entry of zip.getEntries()) {
       if (entry.isDirectory) continue
+      const lowerName = entry.entryName.toLowerCase()
+      if (lowerName.includes('no hunger') || lowerName.includes('mobsbegone') || lowerName.includes('no ender dragon') || lowerName.includes('soundsbegone')) continue
+      
       let destPath = null
       if (entry.entryName.startsWith('server-overrides/')) {
         destPath = path.join(SERVER_DIR, entry.entryName.slice('server-overrides/'.length))
@@ -186,9 +189,14 @@ async function install() {
       }
     }
 
-    // Download mods that are NOT client-only
+    // Download mods that are NOT client-only and filter out unwanted mods
     const files = index.files || []
-    const serverFiles = files.filter(f => !f.env || f.env.server !== 'unsupported')
+    const serverFiles = files.filter(f => {
+      if (f.env && f.env.server === 'unsupported') return false
+      const lowerPath = f.path.toLowerCase()
+      if (lowerPath.includes('no hunger') || lowerPath.includes('mobsbegone') || lowerPath.includes('no ender dragon') || lowerPath.includes('soundsbegone')) return false
+      return true
+    })
     console.log(`[Installer] Szerver modok letöltése (${serverFiles.length} db)...`)
 
     const baseFilenames = []
