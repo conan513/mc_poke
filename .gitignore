@@ -6,6 +6,7 @@ dist/
 build/
 out/
 .vite/
+dist-electron/
 
 # Környezeti változók
 .env
