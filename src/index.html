@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="hu">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CobbleLauncher – COBBLEVERSE</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="./style.css" />
+</head>
+<body>
+  <!-- Custom title bar -->
+  <div class="titlebar" id="titlebar">
+    <div class="titlebar-logo">
+      <span class="pokeball-icon">⚽</span>
+      <span class="titlebar-title">CobbleLauncher</span>
+    </div>
+    <div class="titlebar-controls">
+      <button class="tb-btn minimize" id="btn-minimize" title="Minimalizálás">─</button>
+      <button class="tb-btn close" id="btn-close" title="Bezárás">✕</button>
+    </div>
+  </div>
+
+  <!-- Animated background -->
+  <canvas id="particles-canvas"></canvas>
+
+  <!-- Main content -->
+  <main class="app">
+
+    <!-- ── SCREEN 1: Welcome / Account Setup ── -->
+    <div class="screen active" id="screen-welcome">
+      <div class="welcome-layout">
+        <!-- Left panel: logo & info -->
+        <div class="welcome-left">
+          <div class="logo-area">
+            <div class="logo-glow"></div>
+            <div class="logo-pokeball">
+              <div class="ball-top"></div>
+              <div class="ball-middle"></div>
+              <div class="ball-bottom"></div>
+              <div class="ball-button"></div>
+            </div>
+          </div>
+          <h1 class="brand-title">COBBLE<span class="brand-accent">VERSE</span></h1>
+          <p class="brand-subtitle">Pokémon Adventure · Minecraft 1.21.1</p>
+          <div class="info-badges">
+            <span class="badge">🎮 Cobblemon 1.7.3</span>
+            <span class="badge">🐉 1025 Pokémon</span>
+            <span class="badge">🗺️ 4 Régió</span>
+          </div>
+          <div class="info-badges" style="margin-top: 8px;">
+            <span class="badge">✨ 93 Mega Evolúció</span>
+            <span class="badge">⚡ Raid Dennek</span>
+          </div>
+        </div>
+
+        <!-- Right panel: account form -->
+        <div class="welcome-right">
+          <div class="card">
+            <h2 class="card-title">Üdvözöljük, Edző!</h2>
+            <p class="card-desc">Add meg a felhasználóneved az offline játékhoz, majd válaszd ki a memóriakorlátot.</p>
+
+            <div class="form-group">
+              <label class="form-label" for="input-username">
+                <span class="label-icon">👤</span> Felhasználónév
+              </label>
+              <input
+                class="form-input"
+                id="input-username"
+                type="text"
+                placeholder="pl. AshKetchum"
+                maxlength="16"
+                autocomplete="off"
+                spellcheck="false"
+              />
+              <span class="form-hint">Offline mód – nem szükséges Microsoft fiók</span>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="select-ram">
+                <span class="label-icon">💾</span> RAM foglalás
+              </label>
+              <div class="ram-options" id="ram-options">
+                <button class="ram-btn" data-val="2048">2 GB</button>
+                <button class="ram-btn active" data-val="4096">4 GB</button>
+                <button class="ram-btn" data-val="6144">6 GB</button>
+                <button class="ram-btn" data-val="8192">8 GB</button>
+              </div>
+              <span class="form-hint">Ajánlott: legalább 4 GB (6 GB+ a legjobb élményért)</span>
+            </div>
+
+            <button class="btn-primary" id="btn-install">
+              <span class="btn-icon">🚀</span>
+              <span class="btn-text">Telepítés &amp; Játék</span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── SCREEN 2: Installing ── -->
+    <div class="screen" id="screen-install">
+      <div class="install-layout">
+        <div class="install-header">
+          <div class="install-logo-mini">
+            <div class="mini-pokeball spinning"></div>
+          </div>
+          <div>
+            <h2 class="install-title">Telepítés folyamatban...</h2>
+            <p class="install-subtitle">Ez csak az első alkalommal szükséges. Kérjük, várj!</p>
+          </div>
+        </div>
+
+        <div class="steps-list" id="steps-list">
+          <div class="step" id="step-java">
+            <div class="step-icon">☕</div>
+            <div class="step-info">
+              <span class="step-name">Java 21</span>
+              <span class="step-status">Várakozás...</span>
+            </div>
+            <div class="step-indicator idle"></div>
+          </div>
+          <div class="step" id="step-minecraft">
+            <div class="step-icon">🟩</div>
+            <div class="step-info">
+              <span class="step-name">Minecraft 1.21.1</span>
+              <span class="step-status">Várakozás...</span>
+            </div>
+            <div class="step-indicator idle"></div>
+          </div>
+          <div class="step" id="step-fabric">
+            <div class="step-icon">🧵</div>
+            <div class="step-info">
+              <span class="step-name">Fabric Loader</span>
+              <span class="step-status">Várakozás...</span>
+            </div>
+            <div class="step-indicator idle"></div>
+          </div>
+          <div class="step" id="step-modpack">
+            <div class="step-icon">📦</div>
+            <div class="step-info">
+              <span class="step-name">COBBLEVERSE Modpack</span>
+              <span class="step-status">Várakozás...</span>
+            </div>
+            <div class="step-indicator idle"></div>
+          </div>
+        </div>
+
+        <div class="progress-area">
+          <div class="progress-bar-bg">
+            <div class="progress-bar-fill" id="progress-fill"></div>
+          </div>
+          <div class="progress-labels">
+            <span id="progress-msg">Előkészítés...</span>
+            <span id="progress-pct">0%</span>
+          </div>
+        </div>
+
+        <div class="install-note">
+          <span class="note-icon">💡</span>
+          Az első indítás kb. 10-20 percig tarthat az internetkapcsolattól függően.
+        </div>
+      </div>
+    </div>
+
+    <!-- ── SCREEN 3: Ready / Home ── -->
+    <div class="screen" id="screen-home">
+      <div class="home-layout">
+        <!-- Background art panel -->
+        <div class="home-art">
+          <div class="art-overlay"></div>
+          <div class="art-content">
+            <h1 class="game-title">COBBLE<br /><span>VERSE</span></h1>
+            <p class="game-tagline">Pokémon Adventure in Minecraft</p>
+          </div>
+        </div>
+
+        <!-- Right control panel -->
+        <div class="home-panel">
+          <div class="home-top">
+            <div class="player-card">
+              <div class="player-avatar" id="player-avatar">?</div>
+              <div class="player-info">
+                <span class="player-name" id="player-name-display">Edző</span>
+                <span class="player-mode">Offline mód</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="version-info">
+            <div class="vi-row"><span>Verzió</span><span class="vi-val" id="home-modpack-version">COBBLEVERSE</span></div>
+            <div class="vi-row"><span>Minecraft</span><span class="vi-val">1.21.1</span></div>
+            <div class="vi-row"><span>Loader</span><span class="vi-val" id="home-fabric-version">Fabric</span></div>
+            <div class="vi-row"><span>RAM</span><span class="vi-val" id="home-ram-display">4096 MB</span></div>
+            
+            <div class="server-input-wrapper">
+              <label for="input-server-url">Saját Mod Sync Szerver (opcionális):</label>
+              <input type="text" id="input-server-url" class="server-input" placeholder="http://192.168.1.100:7878" />
+            </div>
+          </div>
+
+          <!-- Update notification -->
+          <div class="update-banner hidden" id="update-banner">
+            <div class="update-icon">🔄</div>
+            <div class="update-text">
+              <span class="update-title" id="update-title">Frissítés elérhető!</span>
+              <span class="update-sub" id="update-sub">Letöltés szükséges</span>
+            </div>
+            <button class="btn-update" id="btn-update">Frissítés</button>
+          </div>
+
+          <div class="home-actions">
+            <button class="btn-play" id="btn-play">
+              <span class="play-icon">▶</span>
+              <span>JÁTÉK INDÍTÁSA</span>
+            </button>
+            <button class="btn-secondary" id="btn-console-toggle">
+              <span>📋 Konzol</span>
+            </button>
+          </div>
+
+          <div class="home-links">
+            <button class="link-btn" id="link-modrinth">🌐 Modrinth oldal</button>
+            <button class="link-btn" id="link-discord">💬 Discord</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Console overlay -->
+      <div class="console-overlay hidden" id="console-overlay">
+        <div class="console-header">
+          <span>📋 Játék Konzol</span>
+          <button class="console-close" id="console-close">✕</button>
+        </div>
+        <div class="console-log" id="console-log"></div>
+      </div>
+    </div>
+
+  </main>
+
+  <script type="module" src="./main.js"></script>
+</body>
+</html>

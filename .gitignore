@@ -1,0 +1,40 @@
+# Függőségek
+node_modules/
+
+# Épített fájlok (Vite / Electron)
+dist/
+build/
+out/
+.vite/
+
+# Környezeti változók
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# CobbleServer (Minecraft szerver adatok)
+# Ezek nem képezik a forráskód részét, nagy méretűek lennének és folyamatosan változnak
+cobble-server/server-data/
+
+# Naplófájlok
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Rendszer fájlok
+.DS_Store
+Thumbs.db
+Desktop.ini
+
+# IDE / Szerkesztő mappák
+.vscode/
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?

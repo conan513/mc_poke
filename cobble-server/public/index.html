@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="hu">
+<head>
+  <meta charset="UTF-8">
+  <title>CobbleServer Admin</title>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;700;800&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  
+  <div class="sidebar">
+    <div class="brand">
+      <div class="brand-icon">📦</div>
+      CobbleServer
+    </div>
+    
+    <nav>
+      <a href="#" class="nav-item active" data-tab="status">Szerver Állapot</a>
+      <a href="#" class="nav-item" data-tab="mods">Telepített Modok</a>
+      <a href="#" class="nav-item" data-tab="search">Mod Kereső</a>
+    </nav>
+  </div>
+
+  <div class="main-content">
+    <!-- Status Tab -->
+    <div class="tab-content active" id="tab-status">
+      <div class="page-header">
+        <h1>Áttekintés</h1>
+        <p>A Minecraft szerver jelenlegi állapota.</p>
+      </div>
+      
+      <div class="status-card">
+        <div class="status-row">
+          <span>Státusz</span>
+          <span class="badge badge-success" id="server-status">Fut</span>
+        </div>
+        <div class="status-row">
+          <span>RAM Használat</span>
+          <span id="server-ram">-- MB</span>
+        </div>
+        <div class="status-row">
+          <span>Telepített Modok</span>
+          <span id="server-mod-count">--</span>
+        </div>
+        <div class="status-row">
+          <span>LAN IP / Sync URL</span>
+          <span id="server-ip">--</span>
+        </div>
+      </div>
+      
+      <div class="status-actions">
+        <button id="btn-start" class="btn-success">Indítás</button>
+        <button id="btn-restart" class="btn-warning">Újraindítás</button>
+        <button id="btn-stop" class="btn-danger">Leállítás</button>
+      </div>
+    </div>
+
+    <!-- Installed Mods Tab -->
+    <div class="tab-content" id="tab-mods">
+      <div class="page-header">
+        <h1>Telepített Modok</h1>
+        <p>A szerveren található összes mod. Az alap modpack fájljait nem tudod innen törölni.</p>
+      </div>
+
+      <div class="filter-bar">
+        <input type="text" id="mods-filter-input" class="filter-search-input" placeholder="🔍 Szűrés név alapján...">
+        <div class="filter-types">
+          <button class="filter-btn active" data-filter="all">Összes</button>
+          <button class="filter-btn" data-filter="custom">Saját</button>
+          <button class="filter-btn" data-filter="base">Modpack Alap</button>
+          <button class="filter-btn" data-filter="update">Frissíthető</button>
+        </div>
+        <span id="mods-filter-count" class="filter-count"></span>
+      </div>
+      
+      <div class="mod-list" id="installed-mods-list">
+        <!-- JS fills this -->
+      </div>
+    </div>
+
+    <!-- Search Tab -->
+    <div class="tab-content" id="tab-search">
+      <div class="page-header">
+        <h1>Mod Kereső</h1>
+        <p>Modok keresése és telepítése a Modrinth-ről (Fabric 1.21.1)</p>
+      </div>
+      
+      <div class="search-controls">
+        <div class="search-box">
+          <input type="text" id="search-input" placeholder="Keress egy modot...">
+          <button id="btn-search">Keresés</button>
+        </div>
+        <div class="search-options">
+          <label for="search-sort">Rendezés:</label>
+          <select id="search-sort">
+            <option value="relevance">Relevancia</option>
+            <option value="downloads">Legtöbb letöltés</option>
+            <option value="newest">Legújabb</option>
+            <option value="updated">Frissebb</option>
+          </select>
+        </div>
+      </div>
+
+      <div id="search-loading" class="hidden">Keresés...</div>
+      
+      <div class="search-results" id="search-results">
+        <!-- JS fills this -->
+      </div>
+
+      <div id="search-pagination" class="pagination hidden"></div>
+    </div>
+  </div>
+
+  <!-- Mod Detail Modal -->
+  <div id="mod-detail-modal" class="modal-overlay hidden">
+    <div class="modal-card">
+      <button class="modal-close" id="modal-close">✕</button>
+      <div class="modal-header">
+        <img id="modal-icon" class="modal-icon-large" src="" alt="">
+        <div class="modal-header-info">
+          <h2 id="modal-name"></h2>
+          <div id="modal-author" class="modal-author"></div>
+          <div id="modal-badges" class="modal-badges"></div>
+        </div>
+      </div>
+      <p id="modal-desc" class="modal-desc"></p>
+      <div id="modal-gallery" class="modal-gallery"></div>
+      <div class="modal-meta">
+        <div class="modal-meta-item">
+          <span class="meta-label">⬇ Letöltések</span>
+          <span id="modal-downloads" class="meta-value"></span>
+        </div>
+        <div class="modal-meta-item">
+          <span class="meta-label">🏷 Kategóriák</span>
+          <span id="modal-categories" class="meta-value"></span>
+        </div>
+        <div class="modal-meta-item">
+          <span class="meta-label">🎮 Verziók</span>
+          <span id="modal-versions" class="meta-value"></span>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <div class="modal-actions" id="modal-actions"></div>
+        <a id="modal-modrinth-link" href="#" target="_blank" class="modrinth-link">🔗 Modrinth oldal</a>
+      </div>
+    </div>
+  </div>
+
+  <div id="toast" class="toast"></div>
+
+  <script src="app.js"></script>
+</body>
+</html>

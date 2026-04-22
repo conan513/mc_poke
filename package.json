@@ -1,0 +1,25 @@
+{
+  "name": "cobble-launcher",
+  "version": "1.0.0",
+  "description": "COBBLEVERSE Minecraft Launcher",
+  "main": "electron/main.js",
+  "scripts": {
+    "dev": "concurrently \"vite\" \"wait-on tcp:5173 && electron .\"",
+    "build": "vite build",
+    "electron": "electron .",
+    "start": "electron ."
+  },
+  "dependencies": {
+    "minecraft-launcher-core": "^3.17.0",
+    "node-fetch": "^3.3.2",
+    "extract-zip": "^2.0.1",
+    "adm-zip": "^0.5.16",
+    "fs-extra": "^11.2.0"
+  },
+  "devDependencies": {
+    "concurrently": "^9.1.2",
+    "electron": "^31.7.7",
+    "vite": "^5.4.19",
+    "wait-on": "^8.0.3"
+  }
+}
