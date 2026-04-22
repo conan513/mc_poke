@@ -69,10 +69,16 @@
             "x64",
             "arm64"
           ]
+        },
+        {
+          "target": "pacman",
+          "arch": [
+            "x64"
+          ]
         }
       ],
       "category": "Game",
-      "icon": "build-assets/icon.png",
+      "icon": "build-assets/icons",
       "synopsis": "COBBLEVERSE Minecraft Launcher"
     },
     "win": {
