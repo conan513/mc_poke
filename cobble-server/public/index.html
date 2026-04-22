@@ -7,7 +7,37 @@
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  
+
+  <!-- Auth Overlay -->
+  <div id="auth-overlay" class="auth-overlay">
+    <div class="auth-card">
+      <div class="auth-logo">📦</div>
+      <h1 class="auth-title">CobbleServer Admin</h1>
+
+      <!-- Setup mode -->
+      <div id="auth-setup" class="hidden">
+        <p class="auth-subtitle">Első indítás – állíts be egy jelszót a panel védelméhez.</p>
+        <div class="auth-fields">
+          <input type="password" id="setup-pw1" placeholder="Jelszó (min. 6 karakter)" autocomplete="new-password">
+          <input type="password" id="setup-pw2" placeholder="Jelszó megerősítése" autocomplete="new-password">
+        </div>
+        <button id="btn-setup" class="auth-btn">🔐 Jelszó beállítása</button>
+        <p id="setup-error" class="auth-error hidden"></p>
+      </div>
+
+      <!-- Login mode -->
+      <div id="auth-login" class="hidden">
+        <p class="auth-subtitle">Jelentkezz be az admin felület eléréséhez.</p>
+        <div class="auth-fields">
+          <input type="password" id="login-pw" placeholder="Jelszó" autocomplete="current-password">
+        </div>
+        <button id="btn-login" class="auth-btn">🔑 Bejelentkezés</button>
+        <p id="login-error" class="auth-error hidden"></p>
+      </div>
+    </div>
+  </div>
+
+  <div id="main-app" class="main-app hidden">
   <div class="sidebar">
     <div class="brand">
       <div class="brand-icon">📦</div>
@@ -19,6 +49,9 @@
       <a href="#" class="nav-item" data-tab="mods">Telepített Modok</a>
       <a href="#" class="nav-item" data-tab="search">Mod Kereső</a>
     </nav>
+    <div class="sidebar-footer">
+      <button id="btn-logout" class="logout-btn">🔓 Kijelentkezés</button>
+    </div>
   </div>
 
   <div class="main-content">
@@ -110,6 +143,8 @@
       <div id="search-pagination" class="pagination hidden"></div>
     </div>
   </div>
+
+  </div><!-- /main-app -->
 
   <!-- Mod Detail Modal -->
   <div id="mod-detail-modal" class="modal-overlay hidden">

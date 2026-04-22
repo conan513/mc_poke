@@ -478,3 +478,95 @@ select option { background: #1a1a2e; }
   z-index: 2000;
 }
 .toast.show { transform: translateY(0); opacity: 1; }
+
+/* ── Auth Overlay ───────────────────────────────────────────────── */
+.main-app { display: flex; width: 100%; height: 100vh; overflow: hidden; }
+.main-app.hidden { display: none !important; }
+
+.auth-overlay {
+  position: fixed;
+  inset: 0;
+  background: var(--bg-dark);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+  animation: fade-in 0.3s ease-out;
+}
+.auth-overlay.hidden { display: none !important; }
+
+.auth-card {
+  background: rgba(255,255,255,0.03);
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 24px;
+  padding: 48px 40px;
+  width: 90%;
+  max-width: 420px;
+  text-align: center;
+  animation: modal-in 0.3s ease-out;
+}
+
+.auth-logo { font-size: 48px; margin-bottom: 12px; }
+.auth-title { font-size: 26px; font-weight: 800; margin-bottom: 4px; }
+.auth-subtitle { color: var(--text-muted); font-size: 14px; margin-bottom: 24px; line-height: 1.5; }
+
+.auth-fields {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-bottom: 20px;
+}
+.auth-fields input {
+  background: rgba(255,255,255,0.05);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 14px 16px;
+  color: var(--text-primary);
+  font-family: inherit;
+  font-size: 15px;
+  outline: none;
+  transition: border-color 0.2s;
+  text-align: center;
+}
+.auth-fields input:focus { border-color: var(--accent-blue); }
+
+.auth-btn {
+  width: 100%;
+  padding: 14px;
+  font-size: 16px;
+  font-weight: 700;
+  border-radius: 12px;
+  background: var(--accent-blue);
+  color: white;
+  border: none;
+  cursor: pointer;
+  transition: 0.2s;
+}
+.auth-btn:hover { filter: brightness(1.15); }
+
+.auth-error {
+  color: var(--accent-red);
+  font-size: 13px;
+  margin-top: 12px;
+  min-height: 20px;
+}
+
+/* ── Sidebar footer (kijelentkezés) ─────────────────────────────── */
+.sidebar-footer {
+  margin-top: auto;
+  padding: 12px;
+  border-top: 1px solid var(--border);
+}
+.logout-btn {
+  width: 100%;
+  background: transparent;
+  color: var(--text-muted);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 10px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: 0.2s;
+}
+.logout-btn:hover { color: var(--accent-red); border-color: rgba(239,68,68,0.4); background: rgba(239,68,68,0.05); filter: none; }

@@ -2,6 +2,79 @@ const $id = id => document.getElementById(id)
 let installedModsCache = []
 let hitsMap = {} // projectId → hit object (fixes onclick JSON issues)
 
+// -- Auth -------------------------------------------------------
+function getToken() { return sessionStorage.getItem('admin_token') || '' }
+function setToken(t) { sessionStorage.setItem('admin_token', t) }
+function clearToken() { sessionStorage.removeItem('admin_token') }
+
+async function initAuth() {
+  const res = await fetch('/admin/api/auth/status')
+  const { hasPassword } = await res.json()
+  if (!hasPassword) { showAuthOverlay('setup'); return }
+  if (getToken()) {
+    const check = await fetch('/admin/api/mods', { headers: { Authorization: `Bearer ${getToken()}` } })
+    if (check.status === 200) { showMainApp(); return }
+    clearToken()
+  }
+  showAuthOverlay('login')
+}
+
+function showAuthOverlay(mode) {
+  document.getElementById('auth-overlay').classList.remove('hidden')
+  document.getElementById('main-app').classList.add('hidden')
+  document.getElementById('auth-setup').classList.add('hidden')
+  document.getElementById('auth-login').classList.add('hidden')
+  if (mode === 'setup') document.getElementById('auth-setup').classList.remove('hidden')
+  else document.getElementById('auth-login').classList.remove('hidden')
+}
+
+function showMainApp() {
+  document.getElementById('auth-overlay').classList.add('hidden')
+  document.getElementById('main-app').classList.remove('hidden')
+  loadStatus()
+}
+
+document.getElementById('btn-setup').addEventListener('click', async () => {
+  const pw1 = document.getElementById('setup-pw1').value
+  const pw2 = document.getElementById('setup-pw2').value
+  const err = document.getElementById('setup-error')
+  err.classList.add('hidden')
+  if (pw1.length < 6) { err.textContent = 'A jelszó legalább 6 karakter kell legyen!'; err.classList.remove('hidden'); return }
+  if (pw1 !== pw2) { err.textContent = 'A két jelszó nem egyezik!'; err.classList.remove('hidden'); return }
+  try {
+    const res = await fetch('/admin/api/auth/setup', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ password: pw1 })
+    })
+    const data = await res.json()
+    if (!res.ok) { err.textContent = data.error; err.classList.remove('hidden'); return }
+    setToken(data.token); showMainApp()
+  } catch (e) { err.textContent = 'Hiba: ' + e.message; err.classList.remove('hidden') }
+})
+document.getElementById('setup-pw2').addEventListener('keydown', e => { if (e.key === 'Enter') document.getElementById('btn-setup').click() })
+
+document.getElementById('btn-login').addEventListener('click', async () => {
+  const pw = document.getElementById('login-pw').value
+  const err = document.getElementById('login-error')
+  err.classList.add('hidden')
+  try {
+    const res = await fetch('/admin/api/auth/login', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ password: pw })
+    })
+    const data = await res.json()
+    if (!res.ok) { err.textContent = data.error; err.classList.remove('hidden'); return }
+    setToken(data.token); showMainApp()
+  } catch (e) { err.textContent = 'Hiba: ' + e.message; err.classList.remove('hidden') }
+})
+document.getElementById('login-pw').addEventListener('keydown', e => { if (e.key === 'Enter') document.getElementById('btn-login').click() })
+
+document.getElementById('btn-logout').addEventListener('click', async () => {
+  await fetch('/admin/api/auth/logout', { method: 'POST', headers: { Authorization: `Bearer ${getToken()}` } }).catch(() => {})
+  clearToken(); showAuthOverlay('login')
+})
+
+
 // ── UI Navigation ────────────────────────────────────────────────
 document.querySelectorAll('.nav-item').forEach(el => {
   el.addEventListener('click', e => {
@@ -26,7 +99,10 @@ function showToast(msg) {
 
 // ── API Helpers ──────────────────────────────────────────────────
 async function fetchApi(path, options = {}) {
+  options.headers = options.headers || {}
+  options.headers['Authorization'] = `Bearer ${getToken()}`
   const res = await fetch(path, options)
+  if (res.status === 401) { clearToken(); showAuthOverlay('login'); throw new Error('Munkamenet lejárt.') }
   if (!res.ok) throw new Error(await res.text())
   return res.json()
 }
@@ -460,5 +536,5 @@ $id('modal-close').addEventListener('click', closeModal)
 $id('mod-detail-modal').addEventListener('click', e => { if (e.target === $id('mod-detail-modal')) closeModal() })
 document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal() })
 
-// Init
-loadStatus()
+// Init – hitelesítés indítása
+initAuth()

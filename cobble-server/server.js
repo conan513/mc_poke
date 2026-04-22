@@ -35,6 +35,49 @@ let activeJavaPath = null
 // Ensure mods directory exists
 fs.mkdirSync(MODS_DIR, { recursive: true })
 
+// ── Auth ──────────────────────────────────────────────────────────
+const AUTH_FILE = path.join(DATA_DIR, '.admin-auth.json')
+const authTokens = new Map() // token → expiry ms
+
+function loadAuth() {
+  try { return JSON.parse(fs.readFileSync(AUTH_FILE, 'utf8')) } catch { return null }
+}
+function saveAuth(data) {
+  fs.writeFileSync(AUTH_FILE, JSON.stringify(data))
+}
+function hashPassword(password) {
+  const salt = crypto.randomBytes(32).toString('hex')
+  const hash = crypto.pbkdf2Sync(password, salt, 100000, 64, 'sha512').toString('hex')
+  return { salt, hash }
+}
+function verifyPassword(password, salt, storedHash) {
+  try {
+    const h = crypto.pbkdf2Sync(password, salt, 100000, 64, 'sha512').toString('hex')
+    return crypto.timingSafeEqual(Buffer.from(h, 'hex'), Buffer.from(storedHash, 'hex'))
+  } catch { return false }
+}
+function generateToken() {
+  return crypto.randomBytes(32).toString('hex')
+}
+function checkAuth(req, res) {
+  const auth = loadAuth()
+  if (!auth) return true // nincs jelszó beállítva, szabad a hozzáférés
+  const token = (req.headers['authorization'] || '').replace('Bearer ', '').trim()
+  const expiry = authTokens.get(token)
+  if (!expiry || Date.now() > expiry) {
+    res.writeHead(401, { 'Content-Type': 'application/json' })
+    res.end(JSON.stringify({ error: 'Nincs bejelentkezve.' }))
+    return false
+  }
+  authTokens.set(token, Date.now() + 24 * 3600 * 1000) // session meghosszabbítás
+  return true
+}
+// Lejárt tokenek törlése
+setInterval(() => {
+  const now = Date.now()
+  for (const [t, exp] of authTokens) if (now > exp) authTokens.delete(t)
+}, 60000)
+
 // ── Minecraft Process Management ─────────────────────────────
 
 function startMinecraft() {
@@ -93,9 +136,86 @@ function buildManifest() {
 function handleRequest(req, res) {
   // CORS – allow the Electron renderer / LAN clients
   res.setHeader('Access-Control-Allow-Origin', '*')
-  res.setHeader('Access-Control-Allow-Headers', 'Content-Type')
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization')
+  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS')
+  if (req.method === 'OPTIONS') { res.writeHead(204); res.end(); return }
 
   const url = req.url.split('?')[0]
+
+  // ── Auth API (nem igényel tokent) ────────────────────────────
+  if (url === '/admin/api/auth/status') {
+    const auth = loadAuth()
+    res.writeHead(200, { 'Content-Type': 'application/json' })
+    res.end(JSON.stringify({ hasPassword: !!auth }))
+    return
+  }
+
+  if (url === '/admin/api/auth/setup' && req.method === 'POST') {
+    let body = ''
+    req.on('data', c => body += c)
+    req.on('end', () => {
+      try {
+        const { password } = JSON.parse(body)
+        if (!password || password.length < 6) {
+          res.writeHead(400, { 'Content-Type': 'application/json' })
+          return res.end(JSON.stringify({ error: 'A jelszónak legalább 6 karakter hosszúnak kell lennie.' }))
+        }
+        if (loadAuth()) {
+          res.writeHead(409, { 'Content-Type': 'application/json' })
+          return res.end(JSON.stringify({ error: 'Jelszó már be van állítva.' }))
+        }
+        saveAuth(hashPassword(password))
+        const token = generateToken()
+        authTokens.set(token, Date.now() + 24 * 3600 * 1000)
+        res.writeHead(200, { 'Content-Type': 'application/json' })
+        res.end(JSON.stringify({ success: true, token }))
+      } catch (e) {
+        res.writeHead(400, { 'Content-Type': 'application/json' })
+        res.end(JSON.stringify({ error: e.message }))
+      }
+    })
+    return
+  }
+
+  if (url === '/admin/api/auth/login' && req.method === 'POST') {
+    let body = ''
+    req.on('data', c => body += c)
+    req.on('end', () => {
+      try {
+        const { password } = JSON.parse(body)
+        const auth = loadAuth()
+        if (!auth) {
+          res.writeHead(400, { 'Content-Type': 'application/json' })
+          return res.end(JSON.stringify({ error: 'Nincs beállítva jelszó.' }))
+        }
+        if (!verifyPassword(password, auth.salt, auth.hash)) {
+          res.writeHead(401, { 'Content-Type': 'application/json' })
+          return res.end(JSON.stringify({ error: 'Hibás jelszó!' }))
+        }
+        const token = generateToken()
+        authTokens.set(token, Date.now() + 24 * 3600 * 1000)
+        res.writeHead(200, { 'Content-Type': 'application/json' })
+        res.end(JSON.stringify({ success: true, token }))
+      } catch (e) {
+        res.writeHead(400, { 'Content-Type': 'application/json' })
+        res.end(JSON.stringify({ error: e.message }))
+      }
+    })
+    return
+  }
+
+  if (url === '/admin/api/auth/logout' && req.method === 'POST') {
+    const token = (req.headers['authorization'] || '').replace('Bearer ', '').trim()
+    authTokens.delete(token)
+    res.writeHead(200, { 'Content-Type': 'application/json' })
+    res.end(JSON.stringify({ success: true }))
+    return
+  }
+
+  // ── Auth guard – minden /admin/api/* végpont védelme ─────────
+  if (url.startsWith('/admin/api/')) {
+    if (!checkAuth(req, res)) return
+  }
 
   // ── Root status ──────────────────────────────────────────
   if (url === '/' || url === '') {
