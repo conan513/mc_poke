@@ -1,0 +1,28 @@
+type = fancymenu_layout
+
+{layout-meta}
+
+identifier = cobbleverse_title_screen
+universally_unique_identifier = cobbleverse-title-001
+target_screen_identifier = net.minecraft.client.gui.screens.TitleScreen
+menu_bar = false
+
+{/layout-meta}
+
+{customization}
+
+action = add_element
+element_type = vanillabutton
+x = center
+y = 220
+width = 200
+height = 20
+anchor_point = mid
+element_anchor_point = mid
+label = Csatlakozás - [SPP]Cobbleverse
+click_action = connect_to_server_via_direct_connect
+click_action_value = 94.72.100.43
+orientation = top-center
+button_id = cobbleverse_connect_btn
+
+{/customization}

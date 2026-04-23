@@ -100,12 +100,14 @@ async function syncServerMods(serverUrl, instanceDir, onLog) {
   // 1. TÖRLÉS: Ami a localState-ben benne van, de a szerveren már nincs
   for (const key in localState) {
     if (!serverFilenames.includes(key)) {
+      const info = localState[key]
+      
       // PROTECTION: Never delete DefaultOptions or FancyMenu critical files
-      const lowerPath = info.path.toLowerCase()
+      const lowerPath = (info.path || '').toLowerCase()
       const isProtected = lowerPath.includes('defaultoptions') || lowerPath.includes('fancymenu')
       
       if (isProtected) {
-        delete localState[key]
+        // Keep the state entry intact so we don't re-download and overwrite next time
         continue
       }
 

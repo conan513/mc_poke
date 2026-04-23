@@ -16,40 +16,6 @@ const os = require('os')
 const { app } = require('electron')
 const { syncServerMods } = require('./sync')
 
-/**
- * Creates a valid Minecraft servers.dat NBT buffer with a single server entry.
- */
-function createServersDatBuffer(name, ip) {
-  const writeString = (s) => {
-    const b = Buffer.from(s, 'utf8')
-    const len = Buffer.alloc(2)
-    len.writeUInt16BE(b.length)
-    return Buffer.concat([len, b])
-  }
-  const parts = []
-  parts.push(Buffer.from([10, 0, 0])) // Root Compound (unnamed)
-  parts.push(Buffer.from([9]))         // Tag List
-  parts.push(writeString("servers"))   // List name
-  parts.push(Buffer.from([10]))        // List element type: Compound
-  const count = Buffer.alloc(4)
-  count.writeInt32BE(1)
-  parts.push(count)                    // List size: 1
-  
-  // Server Compound
-  parts.push(Buffer.from([8]))         // String
-  parts.push(writeString("name"))
-  parts.push(writeString(name))
-  parts.push(Buffer.from([8]))         // String
-  parts.push(writeString("ip"))
-  parts.push(writeString(ip))
-  parts.push(Buffer.from([1]))         // Byte
-  parts.push(writeString("hidden"))
-  parts.push(Buffer.from([0]))
-  parts.push(Buffer.from([0]))         // End Compound (server)
-  
-  parts.push(Buffer.from([0]))         // End Compound (root)
-  return Buffer.concat(parts)
-}
 
 // ── Constants ────────────────────────────────────────────────
 
@@ -620,23 +586,6 @@ async function installModpack(serverUrl = '') {
     }
   }
 
-  // ── 8. Custom Asset Injection ─────────────────────────────────
-  try {
-    const serverName = '[SPP]Cobbleverse'
-    const serverIp   = '94.72.100.43'
-    const serversBuf = createServersDatBuffer(serverName, serverIp)
-    
-    const defaultOptionsPath = path.join(instanceDir, 'config', 'defaultoptions', 'servers.dat')
-    const rootServersPath    = path.join(instanceDir, 'servers.dat')
-    
-    fse.ensureDirSync(path.dirname(defaultOptionsPath))
-    fs.writeFileSync(defaultOptionsPath, serversBuf)
-    fs.writeFileSync(rootServersPath, serversBuf)
-    
-    console.log('[Launcher] Egyedi szerverlista sikeresen injektálva.')
-  } catch (e) {
-    console.error('[Launcher] Hiba az egyedi szerverlista injektálásakor:', e.message)
-  }
 }
 
 // ── Public API ───────────────────────────────────────────────
@@ -677,35 +626,8 @@ async function launch({ username, ram, serverUrl }, onLog, onClose) {
     }
   }
 
-  // ── Sync Minecraft Language ──────────────────────────────────
-  try {
-    const locale = app.getLocale().toLowerCase().split(/[-_]/)[0]
-    const mapping = {
-      hu: 'hu_hu', de: 'de_de', fr: 'fr_fr', es: 'es_es', it: 'it_it',
-      pt: 'pt_br', nl: 'nl_nl', ru: 'ru_ru', ja: 'ja_jp', ko: 'ko_kr',
-      zh: 'zh_cn', pl: 'pl_pl', tr: 'tr_tr', ro: 'ro_ro', sv: 'sv_se',
-      da: 'da_dk', no: 'nb_no', fi: 'fi_fi', cs: 'cs_cz'
-    }
-    const mcLang = mapping[locale] || 'en_us'
-    
-    const optionsPath = path.join(instanceDir, 'options.txt')
-    let optionsContent = ''
-    if (fs.existsSync(optionsPath)) {
-      optionsContent = fs.readFileSync(optionsPath, 'utf8')
-    }
-
-    if (optionsContent.includes('lang:')) {
-      optionsContent = optionsContent.replace(/lang:[a-z_]+/, `lang:${mcLang}`)
-    } else {
-      optionsContent += `\nlang:${mcLang}\n`
-    }
-    fs.writeFileSync(optionsPath, optionsContent)
-    onLog?.(`[Launcher] Minecraft nyelv beállítva: ${mcLang}`)
-  } catch (e) {
-    console.warn('[Launcher] Nem sikerült beállítani a Minecraft nyelvet:', e.message)
-  }
-
   const client = new Client()
+
 
   const opts = {
     authorization: Authenticator.getAuth(username),

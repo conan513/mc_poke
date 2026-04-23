@@ -30,40 +30,6 @@ function getJavaExecutable() {
   return path.join(javaDir, 'bin', 'java')
 }
 
-/**
- * Creates a valid Minecraft servers.dat NBT buffer with a single server entry.
- */
-function createServersDatBuffer(name, ip) {
-  const writeString = (s) => {
-    const b = Buffer.from(s, 'utf8')
-    const len = Buffer.alloc(2)
-    len.writeUInt16BE(b.length)
-    return Buffer.concat([len, b])
-  }
-  const parts = []
-  parts.push(Buffer.from([10, 0, 0])) // Root Compound (unnamed)
-  parts.push(Buffer.from([9]))         // Tag List
-  parts.push(writeString("servers"))   // List name
-  parts.push(Buffer.from([10]))        // List element type: Compound
-  const count = Buffer.alloc(4)
-  count.writeInt32BE(1)
-  parts.push(count)                    // List size: 1
-  
-  // Server Compound
-  parts.push(Buffer.from([8]))         // String
-  parts.push(writeString("name"))
-  parts.push(writeString(name))
-  parts.push(Buffer.from([8]))         // String
-  parts.push(writeString("ip"))
-  parts.push(writeString(ip))
-  parts.push(Buffer.from([1]))         // Byte
-  parts.push(writeString("hidden"))
-  parts.push(Buffer.from([0]))
-  parts.push(Buffer.from([0]))         // End Compound (server)
-  
-  parts.push(Buffer.from([0]))         // End Compound (root)
-  return Buffer.concat(parts)
-}
 
 async function installJava() {
   const javaDir = path.join(SERVER_DIR, 'java21')
@@ -298,26 +264,35 @@ async function install() {
     console.log('[Installer] EULA automatikusan elfogadva.')
   }
 
-  console.log('[Installer] Telepítés sikeres! Minden készen áll.')
-  
-  // Tartós megoldás: Szerver lista felülírása a kért szerverre
+  // 4. Custom assets inject (FancyMenu) for Sync Server
   try {
-    const serverName = '[SPP]Cobbleverse'
-    const serverIp   = '94.72.100.43'
-    const serversBuf = createServersDatBuffer(serverName, serverIp)
+    const customFancymenuDir = path.join(__dirname, '..', 'build-assets', 'fancymenu')
+    const destFancymenuDir = path.join(SERVER_DIR, 'config', 'fancymenu')
     
-    const defaultOptionsPath = path.join(SERVER_DIR, 'config', 'defaultoptions', 'servers.dat')
-    const rootServersPath    = path.join(SERVER_DIR, 'servers.dat')
-    
-    fs.mkdirSync(path.dirname(defaultOptionsPath), { recursive: true })
-    fs.writeFileSync(defaultOptionsPath, serversBuf)
-    console.log(`[Installer] Szerver lista frissítve a forrásban: ${serverName} (${serverIp})`)
-    
-    // Ha már létezik a gyökérben, azt is felülírjuk, hogy azonnal látszódjon
-    fs.writeFileSync(rootServersPath, serversBuf)
+    if (fs.existsSync(customFancymenuDir)) {
+      console.log('[Installer] Egyedi FancyMenu konfig másolása a szerver adatai közé (szinkronizáláshoz)...')
+      
+      const copyRecursive = (src, dest) => {
+        fs.mkdirSync(dest, { recursive: true })
+        for (const entry of fs.readdirSync(src, { withFileTypes: true })) {
+          const srcPath = path.join(src, entry.name)
+          const destPath = path.join(dest, entry.name)
+          if (entry.isDirectory()) {
+            copyRecursive(srcPath, destPath)
+          } else {
+            fs.copyFileSync(srcPath, destPath)
+          }
+        }
+      }
+      
+      copyRecursive(customFancymenuDir, destFancymenuDir)
+      console.log('[Installer] FancyMenu konfig sikeresen átmásolva.')
+    }
   } catch (err) {
-    console.error(`[Installer] Hiba a szerver lista frissítésekor: ${err.message}`)
+    console.error(`[Installer] Hiba a FancyMenu konfig másolásakor: ${err.message}`)
   }
+
+  console.log('[Installer] Telepítés sikeres! Minden készen áll.')
 
   return javaPath
 }
