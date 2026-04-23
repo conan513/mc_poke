@@ -25,15 +25,24 @@ const https   = require('https')
 
 const PORT       = parseInt(process.env.PORT || '7878', 10)
 const DATA_DIR   = path.join(__dirname, 'server-data')
-const MODS_DIR   = path.join(DATA_DIR, 'mods')
+const SYNC_FOLDERS = ['mods', 'datapacks', 'config', 'resourcepacks', 'shaderpacks']
+
+// Map of folder names to their full paths
+const DIRS = {}
+SYNC_FOLDERS.forEach(f => {
+  DIRS[f] = path.join(DATA_DIR, f)
+})
+
 const PUBLIC_DIR = path.join(__dirname, 'public')
 
 let mcProcess = null
 let mcStatus = 'stopped'
 let activeJavaPath = null
 
-// Ensure mods directory exists
-fs.mkdirSync(MODS_DIR, { recursive: true })
+// Ensure sync directories exist
+SYNC_FOLDERS.forEach(f => {
+  fs.mkdirSync(DIRS[f], { recursive: true })
+})
 
 // ── Auth ──────────────────────────────────────────────────────────
 const AUTH_FILE = path.join(DATA_DIR, '.admin-auth.json')
@@ -106,29 +115,42 @@ function stopMinecraft() {
 // ── Manifest builder ─────────────────────────────────────────
 
 function buildManifest() {
-  let files
-  try {
-    files = fs.readdirSync(MODS_DIR).filter(f =>
-      f.endsWith('.jar') || f.endsWith('.zip')
-    )
-  } catch (_) {
-    files = []
+  const getFilesRecursive = (dir, baseDir = dir) => {
+    let results = []
+    try {
+      const list = fs.readdirSync(dir)
+      list.forEach(file => {
+        const fullPath = path.join(dir, file)
+        const stat = fs.statSync(fullPath)
+        if (stat && stat.isDirectory()) {
+          results = results.concat(getFilesRecursive(fullPath, baseDir))
+        } else {
+          results.push(path.relative(baseDir, fullPath))
+        }
+      })
+    } catch { return [] }
+    return results
   }
 
-  const mods = files.map(filename => {
-    const filePath = path.join(MODS_DIR, filename)
+  const mapFiles = (files, dir) => files.map(relPath => {
+    const filePath = path.join(dir, relPath)
     const buf  = fs.readFileSync(filePath)
     const hash = crypto.createHash('sha256').update(buf).digest('hex')
-    const sha1 = crypto.createHash('sha1').update(buf).digest('hex')
-    return { filename, hash, sha1, size: buf.length }
+    return { filename: relPath, hash, size: buf.length }
   })
 
-  return {
-    mods,
-    modCount: mods.length,
+  const manifest = {
     generatedAt: new Date().toISOString(),
-    serverVersion: '1.0',
+    serverVersion: '1.3',
+    folders: {}
   }
+
+  SYNC_FOLDERS.forEach(f => {
+    manifest[f] = mapFiles(getFilesRecursive(DIRS[f]), DIRS[f])
+    manifest.folders[f] = manifest[f].length
+  })
+
+  return manifest
 }
 
 // ── Request handler ──────────────────────────────────────────
@@ -249,38 +271,20 @@ function handleRequest(req, res) {
     return
   }
 
-  // ── Mod file download ─────────────────────────────────────
-  if (url.startsWith('/mods/')) {
-    const rawName = url.slice(6)                     // strip '/mods/'
-    const filename = decodeURIComponent(rawName)
-
-    // Security: prevent path traversal
-    if (filename.includes('..') || filename.includes('/') || filename.includes('\\')) {
-      res.writeHead(400, { 'Content-Type': 'application/json' })
-      res.end(JSON.stringify({ error: 'Invalid filename' }))
+  // ── Sync File download ─────────────────────────────────────
+  for (const folder of SYNC_FOLDERS) {
+    if (url.startsWith(`/${folder}/`)) {
+      const relPath = decodeURIComponent(url.slice(folder.length + 2))
+      const filePath = path.join(DIRS[folder], relPath)
+      if (fs.existsSync(filePath) && fs.statSync(filePath).isFile()) {
+        res.writeHead(200, { 'Content-Type': 'application/octet-stream' })
+        fs.createReadStream(filePath).pipe(res)
+      } else {
+        res.writeHead(404, { 'Content-Type': 'application/json' })
+        res.end(JSON.stringify({ error: 'File not found' }))
+      }
       return
     }
-
-    const filePath = path.join(MODS_DIR, filename)
-    if (!fs.existsSync(filePath)) {
-      res.writeHead(404, { 'Content-Type': 'application/json' })
-      res.end(JSON.stringify({ error: `Nem található: ${filename}` }))
-      return
-    }
-
-    const stat = fs.statSync(filePath)
-    res.writeHead(200, {
-      'Content-Type': 'application/java-archive',
-      'Content-Length': stat.size,
-      'Content-Disposition': `attachment; filename="${filename}"`,
-    })
-    const stream = fs.createReadStream(filePath)
-    stream.pipe(res)
-    stream.on('error', (err) => {
-      console.error(`[${ts()}] Stream hiba (${filename}):`, err.message)
-    })
-    console.log(`[${ts()}] GET /mods/${filename} → ${Math.round(stat.size / 1024)} KB`)
-    return
   }
 
   // ── Admin UI Static Files ──────────────────────────────────

@@ -1,8 +1,23 @@
 const { app, BrowserWindow, ipcMain, shell } = require('electron')
 const path = require('path')
+const fs = require('fs')
 const launcher = require('./launcher')
 
 const isDev = process.env.NODE_ENV === 'development' || !app.isPackaged
+
+// Suppress punycode deprecation warning from dependencies
+const originalEmit = process.emit;
+process.emit = function (name, data, ...args) {
+  if (
+    name === 'warning' &&
+    typeof data === 'object' &&
+    data.name === 'DeprecationWarning' &&
+    data.message.includes('punycode')
+  ) {
+    return false;
+  }
+  return originalEmit.apply(process, [name, data, ...args]);
+};
 
 let mainWindow
 
@@ -52,10 +67,10 @@ ipcMain.on('window-close', () => {
 
 ipcMain.handle('get-app-path', () => app.getPath('userData'))
 
-// Install: Java + Minecraft + Modpack
-ipcMain.handle('install', async (event, { username, ram }) => {
+// Install / First Setup
+ipcMain.handle('install', async (event, { username, ram, serverUrl }) => {
   try {
-    await launcher.install({ username, ram }, (progress) => {
+    await launcher.install({ username, ram, serverUrl }, (progress) => {
       mainWindow.webContents.send('install-progress', progress)
     })
     return { success: true }
@@ -74,9 +89,9 @@ ipcMain.handle('check-updates', async () => {
 })
 
 // Run update (same as install, but always runs through modpack+fabric steps)
-ipcMain.handle('run-update', async (event, { username, ram }) => {
+ipcMain.handle('run-update', async (event, { username, ram, serverUrl }) => {
   try {
-    await launcher.install({ username, ram }, (progress) => {
+    await launcher.install({ username, ram, serverUrl }, (progress) => {
       mainWindow.webContents.send('install-progress', progress)
     })
     return { success: true }
@@ -106,4 +121,14 @@ ipcMain.handle('check-installed', async () => {
 
 ipcMain.on('open-external', (event, url) => {
   shell.openExternal(url)
+})
+
+ipcMain.on('open-game-folder', () => {
+  const folder = launcher.getModpackDir()
+  if (fs.existsSync(folder)) {
+    shell.openPath(folder)
+  } else {
+    // If modpack dir doesn't exist yet, open the base game dir
+    shell.openPath(path.join(app.getPath('userData'), 'cobbleverse'))
+  }
 })

@@ -97,7 +97,7 @@ async function installJava() {
     zip.extractAllTo(javaDir, true)
   } else {
     await new Promise((resolve, reject) => {
-      exec(`tar -xzf "${javaDl}" -C "${javaDir}" --strip-components=1`, (err) => {
+      execFile('tar', ['-xzf', javaDl, '-C', javaDir, '--strip-components=1'], (err) => {
         if (err) reject(err)
         else resolve()
       })
@@ -270,10 +270,18 @@ async function install() {
     await downloadFile(installerUrl, installerJar)
 
     await new Promise((resolve, reject) => {
-      exec(`"${javaPath}" -jar "${installerJar}" server -mcversion ${MC_VERSION} -loader ${fv.loader} -downloadMinecraft`, { cwd: SERVER_DIR }, (err, stdout, stderr) => {
-        if (err && !fs.existsSync(launchJar)) reject(new Error('Fabric server telepítés hiba: ' + (stderr || err.message)))
-        else resolve()
-      })
+      execFile(
+        javaPath,
+        ['-jar', installerJar, 'server', '-mcversion', MC_VERSION, '-loader', fv.loader, '-downloadMinecraft'],
+        { cwd: SERVER_DIR },
+        (err, stdout, stderr) => {
+          if (err && !fs.existsSync(launchJar)) {
+            reject(new Error('Fabric server telepítés hiba: ' + (stderr || err.message)))
+          } else {
+            resolve()
+          }
+        }
+      )
     })
 
     if (fs.existsSync(installerJar)) fs.unlinkSync(installerJar)

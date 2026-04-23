@@ -26,4 +26,5 @@ contextBridge.exposeInMainWorld('cobble', {
 
   // External links
   openExternal: (url) => ipcRenderer.send('open-external', url),
+  openGameFolder: () => ipcRenderer.send('open-game-folder'),
 })

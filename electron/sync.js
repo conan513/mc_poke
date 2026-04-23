@@ -54,6 +54,13 @@ function fetchManifest(serverUrl) {
   })
 }
 
+// List of files that should ALWAYS be removed from the mods folder if they exist.
+// This runs even if the sync server is unreachable.
+const FORCED_REMOVALS = [
+  'DefaultOptions-Fabric-1.21.1-20.0.1.jar', // Example: mod that keeps adding sponsor servers
+  'SponsorMod.jar', // Placeholder for other unwanted mods
+]
+
 /**
  * Szinkronizálja a mods mappát a megadott szerverrel.
  * @param {string} serverUrl A szerver címe (pl. http://localhost:7878)
@@ -61,7 +68,9 @@ function fetchManifest(serverUrl) {
  * @param {function} onLog Logoló callback
  */
 async function syncServerMods(serverUrl, modsDir, onLog) {
-  if (!serverUrl) return
+  // 0. Forced cleanup (runs even if no serverUrl or if server is offline)
+async function syncServerMods(serverUrl, instanceDir, onLog) {
+  if (!serverUrl || serverUrl.trim() === '') return
 
   onLog(`[Sync] Kapcsolódás a szerverhez: ${serverUrl}`)
   
@@ -69,15 +78,12 @@ async function syncServerMods(serverUrl, modsDir, onLog) {
   try {
     manifest = await fetchManifest(serverUrl)
   } catch (err) {
-    onLog(`[Sync-Hiba] Nem sikerült lekérni a szerver modokat: ${err.message}`)
+    onLog(`[Sync-Hiba] Nem sikerült lekérni a manifestet: ${err.message}`)
     return
   }
 
-  const serverMods = manifest.mods || []
-  onLog(`[Sync] Szerveren talált modok: ${serverMods.length} db`)
-
-  const stateFile = path.join(modsDir, '.server-mods-state.json')
-  let localState = []
+  const stateFile = path.join(instanceDir, '.server-sync-state.json')
+  let localState = {} // { filename: { path: string, type: string } }
   try {
     if (fs.existsSync(stateFile)) {
       localState = JSON.parse(fs.readFileSync(stateFile, 'utf8'))
@@ -86,56 +92,78 @@ async function syncServerMods(serverUrl, modsDir, onLog) {
     onLog('[Sync] Állapotfájl hiba, újraépítés...')
   }
 
-  const currentServerFilenames = serverMods.map(m => m.filename)
+  // Összegyűjtjük a szerver aktuális fájljait dinamikusan a manifest alapján
+  const SYNC_FOLDERS = ['mods', 'datapacks', 'config', 'resourcepacks', 'shaderpacks']
+  const serverItems = []
+  
+  SYNC_FOLDERS.forEach(folder => {
+    if (manifest[folder] && Array.isArray(manifest[folder])) {
+      manifest[folder].forEach(item => {
+        serverItems.push({ ...item, type: folder })
+      })
+    }
+  })
 
-  // 1. Töröljük azokat, amiket a szerverről szedtünk le régen, de már nincsenek ott
-  for (const filename of localState) {
-    if (!currentServerFilenames.includes(filename)) {
-      const filePath = path.join(modsDir, filename)
-      if (fs.existsSync(filePath)) {
-        fs.unlinkSync(filePath)
-        onLog(`[Sync] Törölve (már nincs a szerveren): ${filename}`)
+  const serverFilenames = serverItems.map(m => m.filename + m.type) // unique key
+
+  // 1. TÖRLÉS: Ami a localState-ben benne van, de a szerveren már nincs
+  for (const key in localState) {
+    if (!serverFilenames.includes(key)) {
+      const info = localState[key]
+      if (fs.existsSync(info.path)) {
+        fs.unlinkSync(info.path)
+        onLog(`[Sync] Törölve (már nincs a szerveren): ${path.basename(info.path)} (${info.type})`)
       }
+      delete localState[key]
     }
   }
 
-  // 2. Letöltjük az új vagy módosult modokat
+  // 2. LETÖLTÉS / FRISSÍTÉS
   let downloadedCount = 0
   const baseUrl = serverUrl.replace(/\/+$/, '')
 
-  for (const mod of serverMods) {
-    const filePath = path.join(modsDir, mod.filename)
+  for (const item of serverItems) {
+    const fullFolderPath = path.join(instanceDir, item.type, path.dirname(item.filename))
+    if (!fs.existsSync(fullFolderPath)) fs.mkdirSync(fullFolderPath, { recursive: true })
+    
+    const filePath = path.join(instanceDir, item.type, item.filename)
+    const stateKey = item.filename + item.type
     let needsDownload = false
 
     if (!fs.existsSync(filePath)) {
       needsDownload = true
     } else {
       const hash = await getHash(filePath)
-      if (hash !== mod.hash) {
-        onLog(`[Sync] Fájl változott, frissítés: ${mod.filename}`)
+      if (hash !== item.hash) {
+        onLog(`[Sync] Változás: ${item.filename} (${item.type})`)
         needsDownload = true
       }
     }
 
     if (needsDownload) {
-      onLog(`[Sync] Letöltés: ${mod.filename} (${Math.round(mod.size / 1024)} KB)`)
-      const downloadUrl = `${baseUrl}/mods/${encodeURIComponent(mod.filename)}`
+      onLog(`[Sync] Letöltés: ${item.filename}`)
+      const downloadUrl = `${baseUrl}/${item.type}/${encodeURIComponent(item.filename)}`
       try {
         await downloadFile(downloadUrl, filePath)
+        localState[stateKey] = { path: filePath, type: item.type }
         downloadedCount++
       } catch (e) {
-        onLog(`[Sync-Hiba] Nem sikerült letölteni: ${mod.filename} -> ${e.message}`)
+        onLog(`[Sync-Hiba] Hiba: ${item.filename} -> ${e.message}`)
+      }
+    } else {
+      if (!localState[stateKey]) {
+        localState[stateKey] = { path: filePath, type: item.type }
       }
     }
   }
 
-  // 3. Elmentjük az új állapotot
-  fs.writeFileSync(stateFile, JSON.stringify(currentServerFilenames, null, 2))
-
+  // 3. Mentés
+  fs.writeFileSync(stateFile, JSON.stringify(localState, null, 2))
+  
   if (downloadedCount > 0) {
-    onLog(`[Sync] Szinkronizáció kész! Frissült/Letöltve: ${downloadedCount} mod.`)
+    onLog(`[Sync] Szinkronizáció kész! Frissítve: ${downloadedCount} fájl.`)
   } else {
-    onLog(`[Sync] Minden szerver mod naprakész.`)
+    onLog(`[Sync] Minden fájl naprakész.`)
   }
 }
 

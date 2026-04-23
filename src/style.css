@@ -752,21 +752,24 @@ html, body {
 /* Links */
 .home-links {
   display: flex;
-  gap: 8px;
+  gap: 6px;
   margin-top: auto;
 }
 .link-btn {
   flex: 1;
-  padding: 10px 8px;
+  padding: 8px 4px;
   background: transparent;
   border: 1px solid var(--border);
   border-radius: var(--radius-sm);
-  font-size: 12px;
+  font-size: 11px;
   font-family: 'Outfit', sans-serif;
   color: var(--text-muted);
   cursor: pointer;
   transition: all 0.2s;
   text-align: center;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 .link-btn:hover { border-color: var(--accent-blue); color: var(--accent-blue); }
 

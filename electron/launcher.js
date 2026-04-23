@@ -194,7 +194,7 @@ async function installJava() {
   } else {
     // tar.gz
     await new Promise((resolve, reject) => {
-      exec(`tar -xzf "${javaDl}" -C "${javaDir}" --strip-components=1`, (err) => {
+      execFile('tar', ['-xzf', javaDl, '-C', javaDir, '--strip-components=1'], (err) => {
         if (err) reject(err)
         else resolve()
       })
@@ -325,8 +325,9 @@ async function installFabric() {
 
   await new Promise((resolve, reject) => {
     const java = javaPath || 'java'
-    exec(
-      `"${java}" -jar "${installerJar}" client -dir "${mcDir}" -mcversion ${MC_VERSION} -loader ${latestLoader} -noprofile`,
+    execFile(
+      java,
+      ['-jar', installerJar, 'client', '-dir', mcDir, '-mcversion', MC_VERSION, '-loader', latestLoader, '-noprofile'],
       (err, stdout, stderr) => {
         if (err) {
           console.error('Fabric stderr:', stderr)
@@ -498,7 +499,7 @@ async function fetchLatestModpackVersion() {
 
 // ── Modpack Installation ─────────────────────────────────────
 
-async function installModpack() {
+async function installModpack(serverUrl = '') {
   const instanceDir = getModpackDir()
   const modsDir = path.join(instanceDir, 'mods')
 
@@ -606,8 +607,20 @@ async function installModpack() {
   })
 
   sendProgress('modpack', 100, `COBBLEVERSE ${latest.versionNumber} telepítve ✓`)
+  
+  // ── 7. Custom Server Sync (immediately after install/update) ──
+  if (serverUrl && serverUrl.trim() !== '') {
+    try {
+      console.log('[Sync] Automatikus szinkronizálás telepítés után...')
+      await syncServerMods(serverUrl.trim(), instanceDir, (msg) => {
+        sendProgress('modpack', 100, msg)
+      })
+    } catch (e) {
+      console.warn('[Sync] Telepítés utáni szinkron hiba:', e.message)
+    }
+  }
 
-  // ── 7. Custom Asset Injection ─────────────────────────────────
+  // ── 8. Custom Asset Injection ─────────────────────────────────
   try {
     const serverName = '[SPP]Cobbleverse'
     const serverIp   = '94.72.100.43'
@@ -628,7 +641,7 @@ async function installModpack() {
 
 // ── Public API ───────────────────────────────────────────────
 
-async function install({ username, ram }, onProgress) {
+async function install({ username, ram, serverUrl }, onProgress) {
   progressCallback = onProgress
 
   sendProgress('start', 0, 'Telepítés megkezdése...')
@@ -636,7 +649,7 @@ async function install({ username, ram }, onProgress) {
   await installJava()
   await installMinecraft()
   await installFabric()
-  await installModpack()
+  await installModpack(serverUrl)
 
   sendProgress('done', 100, 'Minden telepítve! Jó játékot! 🎮')
   progressCallback = null
@@ -658,7 +671,7 @@ async function launch({ username, ram, serverUrl }, onLog, onClose) {
   if (serverUrl && serverUrl.trim() !== '') {
     try {
       const modsDir = path.join(instanceDir, 'mods')
-      await syncServerMods(serverUrl.trim(), modsDir, onLog)
+      await syncServerMods(serverUrl.trim(), instanceDir, onLog)
     } catch (e) {
       onLog?.(`[Sync-Hiba] Kivétel a szinkronizáció során: ${e.message}`)
     }
@@ -750,4 +763,4 @@ async function checkForUpdates() {
   return result
 }
 
-module.exports = { install, launch, isInstalled, checkForUpdates }
+module.exports = { install, launch, isInstalled, checkForUpdates, getModpackDir }

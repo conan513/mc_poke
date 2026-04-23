@@ -156,7 +156,8 @@ async function startInstall() {
   $id('progress-msg').textContent = 'Előkészítés...'
   $id('progress-pct').textContent = '0%'
 
-  const result = await window.cobble.install({ username, ram: selectedRam })
+  const serverUrl = $id('input-server-url').value.trim()
+  const result = await window.cobble.install({ username, ram: selectedRam, serverUrl })
 
   if (!result.success) {
     showToast(`❌ Telepítési hiba: ${result.error}`)
@@ -235,7 +236,8 @@ $id('btn-update').addEventListener('click', async () => {
   $id('progress-msg').textContent = 'Frissítés indítása...'
   $id('progress-pct').textContent = '0%'
 
-  const result = await window.cobble.runUpdate({ username, ram: selectedRam })
+  const serverUrl = $id('input-server-url').value.trim()
+  const result = await window.cobble.runUpdate({ username, ram: selectedRam, serverUrl })
   if (!result.success) {
     showToast(`❌ Frissítési hiba: ${result.error}`)
     showScreen('home')
@@ -290,6 +292,9 @@ $id('link-modrinth').addEventListener('click', () => {
 })
 $id('link-discord').addEventListener('click', () => {
   window.cobble.openExternal('https://discord.lumy.fun')
+})
+$id('link-folder').addEventListener('click', () => {
+  window.cobble.openGameFolder()
 })
 
 // ── Particle Animation ─────────────────────────────────────────
