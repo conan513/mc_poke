@@ -357,7 +357,11 @@ animateParticles()
     if (saved) $id('input-username').value = saved
 
     const savedUrl = localStorage.getItem('cobble_server_url')
-    if (savedUrl) $id('input-server-url').value = savedUrl
+    if (savedUrl) {
+      $id('input-server-url').value = savedUrl
+    } else {
+      $id('input-server-url').value = 'http://94.72.100.43:7878'
+    }
 
     const savedRam = localStorage.getItem('cobble_ram')
     if (savedRam) {
