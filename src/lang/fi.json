@@ -1,0 +1,50 @@
+{
+  "welcome": {
+    "title": "Tervetuloa Cobbleverseen",
+    "subtitle": "Lopullinen Pokémon-kokemus Minecraftissa",
+    "username_label": "Valitse käyttäjänimi:",
+    "username_placeholder": "Käyttäjänimi",
+    "ram_label": "Muisti (RAM):",
+    "install_btn": "ASENNA JA PELAA",
+    "disclaimer": "Napsauttamalla asenna hyväksyt n. 2 Gt:n datan lataamisen."
+  },
+  "install": {
+    "title": "Asennus",
+    "preparing": "Valmistellaan...",
+    "java": "Ladataan Java 21...",
+    "minecraft": "Ladataan Minecraft...",
+    "fabric": "Asennetaan Fabric...",
+    "modpack": "Ladataan modipakettia...",
+    "waiting": "Odotetaan...",
+    "done": "Kaikki asennettu! Hauskaa peliä! 🎮",
+    "error": "Asennusvirhe: "
+  },
+  "home": {
+    "player_status": "Offline-tila",
+    "play_btn": "KÄYNNISTÄ PELI",
+    "launching": "KÄYNNISTETÄÄN...",
+    "running": "PELI KÄYNNISSÄ",
+    "version": "Versio",
+    "ram": "RAM",
+    "sync_label": "Mukautettu Mod Sync -palvelin (valinnainen):",
+    "update_available": "Päivitys saatavilla!",
+    "download_required": "Lataus vaaditaan",
+    "update_btn": "Päivitä",
+    "console_btn": "📋 Konsoli",
+    "files_btn": "📂 Tiedostot"
+  },
+  "sync": {
+    "connecting": "Yhdistetään palvelimeen: ",
+    "deleting": "Poistetaan vanhoja synkronoituja tiedostoja...",
+    "downloading": "Ladataan: ",
+    "error": "Synkronointivirhe: ",
+    "up_to_date": "Kaikki tiedostot ovat ajan tasalla.",
+    "finished": "Synkronointi valmis! Ladattu: "
+  },
+  "toast": {
+    "username_short": "⚠️ Käyttäjänimen on oltava vähintään 3 merkkiä pitkä!",
+    "username_chars": "⚠️ Vain kirjaimet, numerot ja _ ovat sallittuja!",
+    "install_error": "❌ Asennusvirhe: ",
+    "update_error": "❌ Päivitysvirhe: "
+  }
+}

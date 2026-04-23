@@ -165,37 +165,95 @@
 
     <!-- ── SCREEN 3: Ready / Home ── -->
     <div class="screen" id="screen-home">
-      <div class="home-layout">
-        <!-- Background art panel -->
-        <div class="home-art">
-          <div class="art-overlay"></div>
-          <div class="art-content">
-            <h1 class="game-title">COBBLE<br /><span>VERSE</span></h1>
-            <p class="game-tagline">Pokémon Adventure in Minecraft</p>
+    <!-- Screen: Welcome (Login / Install) -->
+    <div class="screen welcome active" id="screen-welcome">
+      <div class="hero-section">
+        <h1 data-i18n="welcome.title">Üdvözlünk a Cobbleverse-ben</h1>
+        <p data-i18n="welcome.subtitle">A végső Pokémon élmény Minecraftban</p>
+      </div>
+      
+      <div class="login-box">
+        <div class="input-group">
+          <label for="input-username" data-i18n="welcome.username_label">Válassz egy felhasználónevet:</label>
+          <input type="text" id="input-username" placeholder="Felhasználónév" data-i18n-placeholder="welcome.username_placeholder" />
+        </div>
+
+        <div class="ram-selector">
+          <label data-i18n="welcome.ram_label">Memória (RAM):</label>
+          <div class="ram-options">
+            <button class="ram-btn" data-val="2048">2 GB</button>
+            <button class="ram-btn active" data-val="4096">4 GB</button>
+            <button class="ram-btn" data-val="6144">6 GB</button>
+            <button class="ram-btn" data-val="8192">8 GB</button>
           </div>
         </div>
 
-        <!-- Right control panel -->
-        <div class="home-panel">
-          <div class="home-top">
-            <div class="player-card">
-              <div class="player-avatar" id="player-avatar">?</div>
-              <div class="player-info">
-                <span class="player-name" id="player-name-display">Edző</span>
-                <span class="player-mode">Offline mód</span>
-              </div>
+        <button class="btn-primary" id="btn-install" data-i18n="welcome.install_btn">TELEPÍTÉS ÉS JÁTÉK</button>
+        <p class="disclaimer" data-i18n="welcome.disclaimer">A telepítésre kattintva elfogadod kb. 2GB adat letöltését.</p>
+      </div>
+    </div>
+
+    <!-- Screen: Installation Progress -->
+    <div class="screen install" id="screen-install" style="display: none;">
+      <h2 data-i18n="install.title">Telepítés</h2>
+      
+      <div class="steps-container">
+        <div class="step" id="step-java">
+          <div class="step-indicator idle"></div>
+          <span class="step-label" data-i18n="install.java">Java 21 letöltése...</span>
+          <span class="step-status">Várakozás...</span>
+        </div>
+        <div class="step" id="step-minecraft">
+          <div class="step-indicator idle"></div>
+          <span class="step-label" data-i18n="install.minecraft">Minecraft letöltése...</span>
+          <span class="step-status">Várakozás...</span>
+        </div>
+        <div class="step" id="step-fabric">
+          <div class="step-indicator idle"></div>
+          <span class="step-label" data-i18n="install.fabric">Fabric telepítése...</span>
+          <span class="step-status">Várakozás...</span>
+        </div>
+        <div class="step" id="step-modpack">
+          <div class="step-indicator idle"></div>
+          <span class="step-label" data-i18n="install.modpack">Modpack letöltése...</span>
+          <span class="step-status">Várakozás...</span>
+        </div>
+      </div>
+
+      <div class="progress-section">
+        <div class="progress-bar">
+          <div class="progress-fill" id="progress-fill"></div>
+        </div>
+        <div class="progress-info">
+          <span id="progress-msg" data-i18n="install.preparing">Előkészítés...</span>
+          <span id="progress-pct">0%</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Screen: Home (Post-Install) -->
+    <div class="screen home" id="screen-home" style="display: none;">
+      <div class="home-container">
+        <div class="sidebar">
+          <div class="player-card">
+            <div class="player-avatar" id="player-avatar">?</div>
+            <div class="player-info">
+              <span class="player-name" id="player-name-display">Edző</span>
+              <span class="player-mode" data-i18n="home.player_status">Offline mód</span>
             </div>
           </div>
+        </div>
 
+        <div class="main-content">
           <div class="version-info">
-            <div class="vi-row"><span>Verzió</span><span class="vi-val" id="home-modpack-version">COBBLEVERSE</span></div>
+            <div class="vi-row"><span data-i18n="home.version">Verzió</span><span class="vi-val" id="home-modpack-version">COBBLEVERSE</span></div>
             <div class="vi-row"><span>Minecraft</span><span class="vi-val">1.21.1</span></div>
             <div class="vi-row"><span>Loader</span><span class="vi-val" id="home-fabric-version">Fabric</span></div>
-            <div class="vi-row"><span>RAM</span><span class="vi-val" id="home-ram-display">4096 MB</span></div>
+            <div class="vi-row"><span data-i18n="home.ram">RAM</span><span class="vi-val" id="home-ram-display">4096 MB</span></div>
             
             <div class="server-input-wrapper">
-              <label for="input-server-url">Saját Mod Sync Szerver (opcionális):</label>
-              <input type="text" id="input-server-url" class="server-input" placeholder="http://94.72.100.43:7878" />
+              <label for="input-server-url" data-i18n="home.sync_label">Saját Mod Sync Szerver (opcionális):</label>
+              <input type="text" id="input-server-url" class="server-input" placeholder="http://94.72.100.43:7878" data-i18n-placeholder="home.sync_placeholder" />
             </div>
           </div>
 
@@ -203,18 +261,18 @@
           <div class="update-banner hidden" id="update-banner">
             <div class="update-icon">🔄</div>
             <div class="update-text">
-              <span class="update-title" id="update-title">Frissítés elérhető!</span>
-              <span class="update-sub" id="update-sub">Letöltés szükséges</span>
+              <span class="update-title" id="update-title" data-i18n="home.update_available">Frissítés elérhető!</span>
+              <span class="update-sub" id="update-sub" data-i18n="home.download_required">Letöltés szükséges</span>
             </div>
-            <button class="btn-update" id="btn-update">Frissítés</button>
+            <button class="btn-update" id="btn-update" data-i18n="home.update_btn">Frissítés</button>
           </div>
 
           <div class="home-actions">
             <button class="btn-play" id="btn-play">
               <span class="play-icon">▶</span>
-              <span>JÁTÉK INDÍTÁSA</span>
+              <span data-i18n="home.play_btn">JÁTÉK INDÍTÁSA</span>
             </button>
-            <button class="btn-secondary" id="btn-console-toggle">
+            <button class="btn-secondary" id="btn-console-toggle" data-i18n="home.console_btn">
               <span>📋 Konzol</span>
             </button>
           </div>
@@ -222,7 +280,7 @@
           <div class="home-links">
             <button class="link-btn" id="link-modrinth">🌐 Modrinth</button>
             <button class="link-btn" id="link-discord">💬 Discord</button>
-            <button class="link-btn" id="link-folder">📂 Fájlok</button>
+            <button class="link-btn" id="link-folder" data-i18n="home.files_btn">📂 Fájlok</button>
           </div>
         </div>
       </div>
@@ -230,7 +288,7 @@
       <!-- Console overlay -->
       <div class="console-overlay hidden" id="console-overlay">
         <div class="console-header">
-          <span>📋 Játék Konzol</span>
+          <span data-i18n="home.console_btn">📋 Játék Konzol</span>
           <button class="console-close" id="console-close">✕</button>
         </div>
         <div class="console-log" id="console-log"></div>

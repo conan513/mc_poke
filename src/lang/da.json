@@ -1,0 +1,50 @@
+{
+  "welcome": {
+    "title": "Velkommen til Cobbleverse",
+    "subtitle": "Den ultimative Pokémon-oplevelse i Minecraft",
+    "username_label": "Vælg et brugernavn:",
+    "username_placeholder": "Brugernavn",
+    "ram_label": "Hukommelse (RAM):",
+    "install_btn": "INSTALLER & SPIL",
+    "disclaimer": "Ved at klikke på installer accepterer du download af ca. 2 GB data."
+  },
+  "install": {
+    "title": "Installation",
+    "preparing": "Forbereder...",
+    "java": "Downloader Java 21...",
+    "minecraft": "Downloader Minecraft...",
+    "fabric": "Installerer Fabric...",
+    "modpack": "Downloader modpakke...",
+    "waiting": "Venter...",
+    "done": "Alt er installeret! God fornøjelse! 🎮",
+    "error": "Installationsfejl: "
+  },
+  "home": {
+    "player_status": "Offline-tilstand",
+    "play_btn": "START SPIL",
+    "launching": "STARTER...",
+    "running": "SPIL KØRER",
+    "version": "Version",
+    "ram": "RAM",
+    "sync_label": "Brugerdefineret Mod Sync-server (valgfrit):",
+    "update_available": "Opdatering tilgængelig!",
+    "download_required": "Download påkrævet",
+    "update_btn": "Opdater",
+    "console_btn": "📋 Konsol",
+    "files_btn": "📂 Filer"
+  },
+  "sync": {
+    "connecting": "Forbinder til server: ",
+    "deleting": "Sletter gamle synkroniserede filer...",
+    "downloading": "Downloader: ",
+    "error": "Synkroniseringsfejl: ",
+    "up_to_date": "Alle filer er opdaterede.",
+    "finished": "Synkronisering færdig! Downloadet: "
+  },
+  "toast": {
+    "username_short": "⚠️ Brugernavn skal være mindst 3 tegn langt!",
+    "username_chars": "⚠️ Kun bogstaver, tal og _ er tilladt!",
+    "install_error": "❌ Installationsfejl: ",
+    "update_error": "❌ Opdateringsfejl: "
+  }
+}

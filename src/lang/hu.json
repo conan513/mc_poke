@@ -1,0 +1,50 @@
+{
+  "welcome": {
+    "title": "Üdvözlünk a Cobbleverse-ben",
+    "subtitle": "A végső Pokémon élmény Minecraftban",
+    "username_label": "Válassz egy felhasználónevet:",
+    "username_placeholder": "Felhasználónév",
+    "ram_label": "Memória (RAM):",
+    "install_btn": "TELEPÍTÉS ÉS JÁTÉK",
+    "disclaimer": "A telepítésre kattintva elfogadod kb. 2GB adat letöltését."
+  },
+  "install": {
+    "title": "Telepítés",
+    "preparing": "Előkészítés...",
+    "java": "Java 21 letöltése...",
+    "minecraft": "Minecraft letöltése...",
+    "fabric": "Fabric telepítése...",
+    "modpack": "Modpack letöltése...",
+    "waiting": "Várakozás...",
+    "done": "Minden telepítve! Jó játékot! 🎮",
+    "error": "Telepítési hiba: "
+  },
+  "home": {
+    "player_status": "Offline mód",
+    "play_btn": "JÁTÉK INDÍTÁSA",
+    "launching": "INDÍTÁS...",
+    "running": "JÁTÉK FUT",
+    "version": "Verzió",
+    "ram": "RAM",
+    "sync_label": "Saját Mod Sync Szerver (opcionális):",
+    "update_available": "Frissítés elérhető!",
+    "download_required": "Letöltés szükséges",
+    "update_btn": "Frissítés",
+    "console_btn": "📋 Konzol",
+    "files_btn": "📂 Fájlok"
+  },
+  "sync": {
+    "connecting": "Kapcsolódás a szerverhez: ",
+    "deleting": "Régi fájlok törlése...",
+    "downloading": "Letöltés: ",
+    "error": "Szinkron hiba: ",
+    "up_to_date": "Minden fájl naprakész.",
+    "finished": "Szinkron kész! Letöltve: "
+  },
+  "toast": {
+    "username_short": "⚠️ Adj meg legalább 3 karakteres felhasználónevet!",
+    "username_chars": "⚠️ Csak betűk, számok és _ engedélyezett!",
+    "install_error": "❌ Telepítési hiba: ",
+    "update_error": "❌ Frissítési hiba: "
+  }
+}

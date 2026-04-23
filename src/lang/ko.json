@@ -1,0 +1,50 @@
+{
+  "welcome": {
+    "title": "Cobbleverse에 오신 것을 환영합니다",
+    "subtitle": "마인크래프트에서 즐기는 최고의 포켓몬 경험",
+    "username_label": "사용자 이름 선택:",
+    "username_placeholder": "사용자 이름",
+    "ram_label": "메모리 (RAM):",
+    "install_btn": "설치 및 플레이",
+    "disclaimer": "설치를 클릭하면 약 2GB의 데이터 다운로드에 동의하게 됩니다."
+  },
+  "install": {
+    "title": "설치",
+    "preparing": "준비 중...",
+    "java": "Java 21 다운로드 중...",
+    "minecraft": "마인크래프트 다운로드 중...",
+    "fabric": "Fabric 설치 중...",
+    "modpack": "모드팩 다운로드 중...",
+    "waiting": "대기 중...",
+    "done": "모든 설치가 완료되었습니다! 즐거운 시간 되세요! 🎮",
+    "error": "설치 오류: "
+  },
+  "home": {
+    "player_status": "오프라인 모드",
+    "play_btn": "게임 실행",
+    "launching": "실행 중...",
+    "running": "게임 실행 중",
+    "version": "버전",
+    "ram": "RAM",
+    "sync_label": "커스텀 모드 동기화 서버 (선택 사항):",
+    "update_available": "업데이트 가능!",
+    "download_required": "다운로드 필요",
+    "update_btn": "업데이트",
+    "console_btn": "📋 콘솔",
+    "files_btn": "📂 파일"
+  },
+  "sync": {
+    "connecting": "서버 연결 중: ",
+    "deleting": "이전 동기화 파일 삭제 중...",
+    "downloading": "다운로드 중: ",
+    "error": "동기화 오류: ",
+    "up_to_date": "모든 파일이 최신 상태입니다.",
+    "finished": "동기화 완료! 다운로드됨: "
+  },
+  "toast": {
+    "username_short": "⚠️ 사용자 이름은 최소 3자 이상이어야 합니다!",
+    "username_chars": "⚠️ 영문, 숫자, _만 사용할 수 있습니다!",
+    "install_error": "❌ 설치 오류: ",
+    "update_error": "❌ 업데이트 오류: "
+  }
+}

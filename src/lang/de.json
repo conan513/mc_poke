@@ -1,0 +1,50 @@
+{
+  "welcome": {
+    "title": "Willkommen bei Cobbleverse",
+    "subtitle": "Das ultimative Pokémon-Erlebnis in Minecraft",
+    "username_label": "Wähle einen Benutzernamen:",
+    "username_placeholder": "Benutzername",
+    "ram_label": "Speicher (RAM):",
+    "install_btn": "INSTALLIEREN & SPIELEN",
+    "disclaimer": "Mit dem Klicken auf Installieren stimmst du dem Download von ca. 2GB Daten zu."
+  },
+  "install": {
+    "title": "Installation",
+    "preparing": "Vorbereitung...",
+    "java": "Java 21 herunterladen...",
+    "minecraft": "Minecraft herunterladen...",
+    "fabric": "Fabric installieren...",
+    "modpack": "Modpack herunterladen...",
+    "waiting": "Warten...",
+    "done": "Alles installiert! Viel Spaß! 🎮",
+    "error": "Installationsfehler: "
+  },
+  "home": {
+    "player_status": "Offline-Modus",
+    "play_btn": "SPIEL STARTEN",
+    "launching": "STARTET...",
+    "running": "SPIEL LÄUFT",
+    "version": "Version",
+    "ram": "RAM",
+    "sync_label": "Eigener Mod Sync Server (optional):",
+    "update_available": "Update verfügbar!",
+    "download_required": "Download erforderlich",
+    "update_btn": "Update",
+    "console_btn": "📋 Konsole",
+    "files_btn": "📂 Dateien"
+  },
+  "sync": {
+    "connecting": "Verbindung zum Server: ",
+    "deleting": "Alte synchronisierte Dateien löschen...",
+    "downloading": "Herunterladen: ",
+    "error": "Sync-Fehler: ",
+    "up_to_date": "Alle Dateien aktuell.",
+    "finished": "Sync fertig! Heruntergeladen: "
+  },
+  "toast": {
+    "username_short": "⚠️ Benutzername muss mindestens 3 Zeichen lang sein!",
+    "username_chars": "⚠️ Nur Buchstaben, Zahlen und _ erlaubt!",
+    "install_error": "❌ Installationsfehler: ",
+    "update_error": "❌ Update-Fehler: "
+  }
+}

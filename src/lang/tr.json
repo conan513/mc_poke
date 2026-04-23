@@ -1,0 +1,50 @@
+{
+  "welcome": {
+    "title": "Cobbleverse'e Hoş Geldiniz",
+    "subtitle": "Minecraft'taki en üst düzey Pokémon deneyimi",
+    "username_label": "Bir kullanıcı adı seçin:",
+    "username_placeholder": "Kullanıcı adı",
+    "ram_label": "Bellek (RAM):",
+    "install_btn": "YÜKLE VE OYNA",
+    "disclaimer": "Yükle'ye tıklayarak yaklaşık 2 GB veri indirmeyi kabul etmiş olursunuz."
+  },
+  "install": {
+    "title": "Kurulum",
+    "preparing": "Hazırlanıyor...",
+    "java": "Java 21 indiriliyor...",
+    "minecraft": "Minecraft indiriliyor...",
+    "fabric": "Fabric kuruluyor...",
+    "modpack": "Mod paketi indiriliyor...",
+    "waiting": "Bekleniyor...",
+    "done": "Her şey yüklendi! İyi eğlenceler! 🎮",
+    "error": "Kurulum hatası: "
+  },
+  "home": {
+    "player_status": "Çevrimdışı mod",
+    "play_btn": "OYUNU BAŞLAT",
+    "launching": "BAŞLATILIYOR...",
+    "running": "OYUN ÇALIŞIYOR",
+    "version": "Sürüm",
+    "ram": "RAM",
+    "sync_label": "Özel Mod Senkronizasyon Sunucusu (isteğe bağlı):",
+    "update_available": "Güncelleme mevcut!",
+    "download_required": "İndirme gerekli",
+    "update_btn": "Güncelle",
+    "console_btn": "📋 Konsol",
+    "files_btn": "📂 Dosyalar"
+  },
+  "sync": {
+    "connecting": "Sunucuya bağlanılıyor: ",
+    "deleting": "Eski senkronize edilmiş dosyalar siliniyor...",
+    "downloading": "İndiriliyor: ",
+    "error": "Senkronizasyon hatası: ",
+    "up_to_date": "Tüm dosyalar güncel.",
+    "finished": "Senkronizasyon tamamlandı! İndirilen: "
+  },
+  "toast": {
+    "username_short": "⚠️ Kullanıcı adı en az 3 karakter olmalıdır!",
+    "username_chars": "⚠️ Sadece harf, rakam ve _ karakterlerine izin verilir!",
+    "install_error": "❌ Kurulum hatası: ",
+    "update_error": "❌ Güncelleme hatası: "
+  }
+}

@@ -677,6 +677,34 @@ async function launch({ username, ram, serverUrl }, onLog, onClose) {
     }
   }
 
+  // ── Sync Minecraft Language ──────────────────────────────────
+  try {
+    const locale = app.getLocale().toLowerCase().split(/[-_]/)[0]
+    const mapping = {
+      hu: 'hu_hu', de: 'de_de', fr: 'fr_fr', es: 'es_es', it: 'it_it',
+      pt: 'pt_br', nl: 'nl_nl', ru: 'ru_ru', ja: 'ja_jp', ko: 'ko_kr',
+      zh: 'zh_cn', pl: 'pl_pl', tr: 'tr_tr', ro: 'ro_ro', sv: 'sv_se',
+      da: 'da_dk', no: 'nb_no', fi: 'fi_fi', cs: 'cs_cz'
+    }
+    const mcLang = mapping[locale] || 'en_us'
+    
+    const optionsPath = path.join(instanceDir, 'options.txt')
+    let optionsContent = ''
+    if (fs.existsSync(optionsPath)) {
+      optionsContent = fs.readFileSync(optionsPath, 'utf8')
+    }
+
+    if (optionsContent.includes('lang:')) {
+      optionsContent = optionsContent.replace(/lang:[a-z_]+/, `lang:${mcLang}`)
+    } else {
+      optionsContent += `\nlang:${mcLang}\n`
+    }
+    fs.writeFileSync(optionsPath, optionsContent)
+    onLog?.(`[Launcher] Minecraft nyelv beállítva: ${mcLang}`)
+  } catch (e) {
+    console.warn('[Launcher] Nem sikerült beállítani a Minecraft nyelvet:', e.message)
+  }
+
   const client = new Client()
 
   const opts = {

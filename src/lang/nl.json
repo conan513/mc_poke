@@ -1,0 +1,50 @@
+{
+  "welcome": {
+    "title": "Welkom bij Cobbleverse",
+    "subtitle": "De ultieme Pokémon-ervaring in Minecraft",
+    "username_label": "Kies een gebruikersnaam:",
+    "username_placeholder": "Gebruikersnaam",
+    "ram_label": "Geheugen (RAM):",
+    "install_btn": "INSTALLEREN & SPELEN",
+    "disclaimer": "Door op installeren te klikken, ga je akkoord met het downloaden van ca. 2GB aan gegevens."
+  },
+  "install": {
+    "title": "Installatie",
+    "preparing": "Voorbereiden...",
+    "java": "Java 21 downloaden...",
+    "minecraft": "Minecraft downloaden...",
+    "fabric": "Fabric installeren...",
+    "modpack": "Modpack downloaden...",
+    "waiting": "Wachten...",
+    "done": "Alles geïnstalleerd! Veel plezier! 🎮",
+    "error": "Installatiefout: "
+  },
+  "home": {
+    "player_status": "Offline modus",
+    "play_btn": "SPEL STARTEN",
+    "launching": "STARTEN...",
+    "running": "SPEL DRAAIT",
+    "version": "Versie",
+    "ram": "RAM",
+    "sync_label": "Aangepaste Mod Sync Server (optioneel):",
+    "update_available": "Update beschikbaar!",
+    "download_required": "Download vereist",
+    "update_btn": "Update",
+    "console_btn": "📋 Console",
+    "files_btn": "📂 Bestanden"
+  },
+  "sync": {
+    "connecting": "Verbinden met server: ",
+    "deleting": "Oude gesynchroniseerde bestanden verwijderen...",
+    "downloading": "Downloaden: ",
+    "error": "Sync-fout: ",
+    "up_to_date": "Alle bestanden zijn up-to-date.",
+    "finished": "Sync voltooid! Gedownload: "
+  },
+  "toast": {
+    "username_short": "⚠️ Gebruikersnaam moet minimaal 3 tekens bevatten!",
+    "username_chars": "⚠️ Alleen letters, cijfers en _ zijn toegestaan!",
+    "install_error": "❌ Installatiefout: ",
+    "update_error": "❌ Updatefout: "
+  }
+}

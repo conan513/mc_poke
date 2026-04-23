@@ -1,0 +1,50 @@
+{
+  "welcome": {
+    "title": "Cobbleverse へようこそ",
+    "subtitle": "Minecraft で究極のポケモン体験を",
+    "username_label": "ユーザー名を選択:",
+    "username_placeholder": "ユーザー名",
+    "ram_label": "メモリ (RAM):",
+    "install_btn": "インストールしてプレイ",
+    "disclaimer": "インストールをクリックすると、約 2GB のデータのダウンロードに同意したことになります。"
+  },
+  "install": {
+    "title": "インストール",
+    "preparing": "準備中...",
+    "java": "Java 21 をダウンロード中...",
+    "minecraft": "Minecraft をダウンロード中...",
+    "fabric": "Fabric をインストール中...",
+    "modpack": "Modpack をダウンロード中...",
+    "waiting": "待機中...",
+    "done": "すべてインストールされました！楽しんでください！🎮",
+    "error": "インストールエラー: "
+  },
+  "home": {
+    "player_status": "オフラインモード",
+    "play_btn": "ゲームを起動",
+    "launching": "起動中...",
+    "running": "実行中",
+    "version": "バージョン",
+    "ram": "RAM",
+    "sync_label": "カスタム Mod 同期サーバー (任意):",
+    "update_available": "アップデートがあります！",
+    "download_required": "ダウンロードが必要です",
+    "update_btn": "更新",
+    "console_btn": "📋 コンソール",
+    "files_btn": "📂 ファイル"
+  },
+  "sync": {
+    "connecting": "サーバーに接続中: ",
+    "deleting": "古い同期ファイルを削除中...",
+    "downloading": "ダウンロード中: ",
+    "error": "同期エラー: ",
+    "up_to_date": "すべてのファイルが最新です。",
+    "finished": "同期完了！ダウンロード数: "
+  },
+  "toast": {
+    "username_short": "⚠️ ユーザー名は3文字以上である必要があります！",
+    "username_chars": "⚠️ 英数字とアンダースコア (_) のみ使用できます！",
+    "install_error": "❌ インストールエラー: ",
+    "update_error": "❌ アップデートエラー: "
+  }
+}

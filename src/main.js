@@ -7,6 +7,43 @@
 let selectedRam = 4096
 let username = ''
 let isGameRunning = false
+let currentLang = 'en'
+let translations = {}
+
+// ── Translation Engine ───────────────────────────────────────
+async function loadLanguage() {
+  try {
+    const locale = await window.cobble.getLocale()
+    // Handle both "hu-HU" and "hu_HU" formats across different OS
+    const langCode = locale.split(/[-_]/)[0].toLowerCase()
+    
+    // Check if translation exists, otherwise fallback to English
+    const available = ['hu', 'en', 'de', 'fr', 'es', 'it', 'pt', 'nl', 'ru', 'ja', 'ko', 'zh', 'pl', 'tr', 'ro', 'sv', 'da', 'no', 'fi', 'cs']
+    currentLang = available.includes(langCode) ? langCode : 'en'
+    
+    const response = await fetch(`./lang/${currentLang}.json`)
+    translations = await response.json()
+    
+    updateUI()
+  } catch (e) {
+    console.error('Nyelv betöltési hiba:', e)
+  }
+}
+
+function t(key) {
+  return key.split('.').reduce((o, i) => o?.[i], translations) || key
+}
+
+function updateUI() {
+  document.querySelectorAll('[data-i18n]').forEach(el => {
+    const key = el.getAttribute('data-i18n')
+    el.innerHTML = t(key)
+  })
+  document.querySelectorAll('[data-i18n-placeholder]').forEach(el => {
+    const key = el.getAttribute('data-i18n-placeholder')
+    el.placeholder = t(key)
+  })
+}
 
 // ── DOM refs ─────────────────────────────────────────────────
 const screens = {
@@ -64,12 +101,12 @@ $id('btn-install').addEventListener('click', async () => {
   username = input.value.trim()
 
   if (!username || username.length < 3) {
-    showToast('⚠️ Adj meg legalább 3 karakteres felhasználónevet!')
+    showToast(t('toast.username_short'))
     input.focus()
     return
   }
   if (!/^[a-zA-Z0-9_]+$/.test(username)) {
-    showToast('⚠️ Csak betűk, számok és _ engedélyezett!')
+    showToast(t('toast.username_chars'))
     input.focus()
     return
   }
@@ -160,7 +197,7 @@ async function startInstall() {
   const result = await window.cobble.install({ username, ram: selectedRam, serverUrl })
 
   if (!result.success) {
-    showToast(`❌ Telepítési hiba: ${result.error}`)
+    showToast(t('toast.install_error') + result.error)
     showScreen('welcome')
   }
 }
@@ -204,7 +241,7 @@ async function runUpdateCheck() {
     }
 
     if (parts.length > 0) {
-      title.textContent = `Frissítés elérhető!`
+      title.textContent = t('home.update_available')
       sub.textContent = parts.join(' | ')
       banner.classList.remove('hidden')
       window._pendingUpdate = updates
@@ -228,21 +265,21 @@ $id('btn-update').addEventListener('click', async () => {
     const el = $id(id)
     if (el) {
       el.className = 'step'
-      el.querySelector('.step-status').textContent = 'Várakozás...'
+      el.querySelector('.step-status').textContent = t('install.waiting')
       el.querySelector('.step-indicator').className = 'step-indicator idle'
     }
   })
   $id('progress-fill').style.width = '0%'
-  $id('progress-msg').textContent = 'Frissítés indítása...'
+  $id('progress-msg').textContent = t('install.preparing')
   $id('progress-pct').textContent = '0%'
 
   const serverUrl = $id('input-server-url').value.trim()
   const result = await window.cobble.runUpdate({ username, ram: selectedRam, serverUrl })
   if (!result.success) {
-    showToast(`❌ Frissítési hiba: ${result.error}`)
+    showToast(t('toast.update_error') + result.error)
     showScreen('home')
     btn.disabled = false
-    btn.textContent = 'Frissítés'
+    btn.textContent = t('update.label')
   }
   // On success, onProgress 'done' callback will call goToHome()
 })
@@ -351,6 +388,8 @@ animateParticles()
 
 // ── Init: check installation on start ────────────────────────
 ;(async () => {
+  await loadLanguage()
+  
   // Try to restore saved username and server url
   try {
     const saved = localStorage.getItem('cobble_username')

@@ -66,6 +66,7 @@ ipcMain.on('window-close', () => {
 })
 
 ipcMain.handle('get-app-path', () => app.getPath('userData'))
+ipcMain.handle('get-locale', () => app.getLocale())
 
 // Install / First Setup
 ipcMain.handle('install', async (event, { username, ram, serverUrl }) => {
