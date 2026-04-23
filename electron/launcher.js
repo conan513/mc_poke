@@ -16,6 +16,41 @@ const os = require('os')
 const { app } = require('electron')
 const { syncServerMods } = require('./sync')
 
+/**
+ * Creates a valid Minecraft servers.dat NBT buffer with a single server entry.
+ */
+function createServersDatBuffer(name, ip) {
+  const writeString = (s) => {
+    const b = Buffer.from(s, 'utf8')
+    const len = Buffer.alloc(2)
+    len.writeUInt16BE(b.length)
+    return Buffer.concat([len, b])
+  }
+  const parts = []
+  parts.push(Buffer.from([10, 0, 0])) // Root Compound (unnamed)
+  parts.push(Buffer.from([9]))         // Tag List
+  parts.push(writeString("servers"))   // List name
+  parts.push(Buffer.from([10]))        // List element type: Compound
+  const count = Buffer.alloc(4)
+  count.writeInt32BE(1)
+  parts.push(count)                    // List size: 1
+  
+  // Server Compound
+  parts.push(Buffer.from([8]))         // String
+  parts.push(writeString("name"))
+  parts.push(writeString(name))
+  parts.push(Buffer.from([8]))         // String
+  parts.push(writeString("ip"))
+  parts.push(writeString(ip))
+  parts.push(Buffer.from([1]))         // Byte
+  parts.push(writeString("hidden"))
+  parts.push(Buffer.from([0]))
+  parts.push(Buffer.from([0]))         // End Compound (server)
+  
+  parts.push(Buffer.from([0]))         // End Compound (root)
+  return Buffer.concat(parts)
+}
+
 // ── Constants ────────────────────────────────────────────────
 
 const MODPACK_PROJECT_ID = 'Jkb29YJU'
@@ -571,6 +606,24 @@ async function installModpack() {
   })
 
   sendProgress('modpack', 100, `COBBLEVERSE ${latest.versionNumber} telepítve ✓`)
+
+  // ── 7. Custom Asset Injection ─────────────────────────────────
+  try {
+    const serverName = '[SPP]Cobbleverse'
+    const serverIp   = '94.72.100.43'
+    const serversBuf = createServersDatBuffer(serverName, serverIp)
+    
+    const defaultOptionsPath = path.join(instanceDir, 'config', 'defaultoptions', 'servers.dat')
+    const rootServersPath    = path.join(instanceDir, 'servers.dat')
+    
+    fse.ensureDirSync(path.dirname(defaultOptionsPath))
+    fs.writeFileSync(defaultOptionsPath, serversBuf)
+    fs.writeFileSync(rootServersPath, serversBuf)
+    
+    console.log('[Launcher] Egyedi szerverlista sikeresen injektálva.')
+  } catch (e) {
+    console.error('[Launcher] Hiba az egyedi szerverlista injektálásakor:', e.message)
+  }
 }
 
 // ── Public API ───────────────────────────────────────────────
