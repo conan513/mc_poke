@@ -42,7 +42,7 @@
             </div>
           </div>
           <h1 class="brand-title">COBBLE<span class="brand-accent">VERSE</span></h1>
-          <p class="brand-subtitle">Pokémon Adventure · Minecraft 1.21.1</p>
+          <p class="brand-subtitle" data-i18n="welcome.subtitle">Pokémon Adventure · Minecraft 1.21.1</p>
           <div class="info-badges">
             <span class="badge">🎮 Cobblemon 1.7.3</span>
             <span class="badge">🐉 1025 Pokémon</span>
@@ -57,28 +57,29 @@
         <!-- Right panel: account form -->
         <div class="welcome-right">
           <div class="card">
-            <h2 class="card-title">Üdvözöljük, Edző!</h2>
-            <p class="card-desc">Add meg a felhasználóneved az offline játékhoz, majd válaszd ki a memóriakorlátot.</p>
+            <h2 class="card-title" data-i18n="welcome.title">Üdvözöljük, Edző!</h2>
+            <p class="card-desc" data-i18n="welcome.disclaimer">Add meg a felhasználóneved az offline játékhoz, majd válaszd ki a memóriakorlátot.</p>
 
             <div class="form-group">
               <label class="form-label" for="input-username">
-                <span class="label-icon">👤</span> Felhasználónév
+                <span class="label-icon">👤</span> <span data-i18n="welcome.username_label">Felhasználónév</span>
               </label>
               <input
                 class="form-input"
                 id="input-username"
                 type="text"
                 placeholder="pl. AshKetchum"
+                data-i18n-placeholder="welcome.username_placeholder"
                 maxlength="16"
                 autocomplete="off"
                 spellcheck="false"
               />
-              <span class="form-hint">Offline mód – nem szükséges Microsoft fiók</span>
+              <span class="form-hint" data-i18n="welcome.offline_hint">Offline mód – nem szükséges Microsoft fiók</span>
             </div>
 
             <div class="form-group">
-              <label class="form-label" for="select-ram">
-                <span class="label-icon">💾</span> RAM foglalás
+              <label class="form-label">
+                <span class="label-icon">💾</span> <span data-i18n="welcome.ram_label">RAM foglalás</span>
               </label>
               <div class="ram-options" id="ram-options">
                 <button class="ram-btn" data-val="2048">2 GB</button>
@@ -86,12 +87,11 @@
                 <button class="ram-btn" data-val="6144">6 GB</button>
                 <button class="ram-btn" data-val="8192">8 GB</button>
               </div>
-              <span class="form-hint">Ajánlott: legalább 4 GB (6 GB+ a legjobb élményért)</span>
             </div>
 
             <button class="btn-primary" id="btn-install">
               <span class="btn-icon">🚀</span>
-              <span class="btn-text">Telepítés &amp; Játék</span>
+              <span class="btn-text" data-i18n="welcome.install_btn">Telepítés &amp; Játék</span>
             </button>
           </div>
         </div>
@@ -106,8 +106,8 @@
             <div class="mini-pokeball spinning"></div>
           </div>
           <div>
-            <h2 class="install-title">Telepítés folyamatban...</h2>
-            <p class="install-subtitle">Ez csak az első alkalommal szükséges. Kérjük, várj!</p>
+            <h2 class="install-title" data-i18n="install.title">Telepítés folyamatban...</h2>
+            <p class="install-subtitle" data-i18n="install.subtitle">Ez csak az első alkalommal szükséges. Kérjük, várj!</p>
           </div>
         </div>
 
@@ -116,7 +116,7 @@
             <div class="step-icon">☕</div>
             <div class="step-info">
               <span class="step-name">Java 21</span>
-              <span class="step-status">Várakozás...</span>
+              <span class="step-status" data-i18n="install.waiting">Várakozás...</span>
             </div>
             <div class="step-indicator idle"></div>
           </div>
@@ -124,7 +124,7 @@
             <div class="step-icon">🟩</div>
             <div class="step-info">
               <span class="step-name">Minecraft 1.21.1</span>
-              <span class="step-status">Várakozás...</span>
+              <span class="step-status" data-i18n="install.waiting">Várakozás...</span>
             </div>
             <div class="step-indicator idle"></div>
           </div>
@@ -132,7 +132,7 @@
             <div class="step-icon">🧵</div>
             <div class="step-info">
               <span class="step-name">Fabric Loader</span>
-              <span class="step-status">Várakozás...</span>
+              <span class="step-status" data-i18n="install.waiting">Várakozás...</span>
             </div>
             <div class="step-indicator idle"></div>
           </div>
@@ -140,7 +140,7 @@
             <div class="step-icon">📦</div>
             <div class="step-info">
               <span class="step-name">COBBLEVERSE Modpack</span>
-              <span class="step-status">Várakozás...</span>
+              <span class="step-status" data-i18n="install.waiting">Várakozás...</span>
             </div>
             <div class="step-indicator idle"></div>
           </div>
@@ -151,109 +151,46 @@
             <div class="progress-bar-fill" id="progress-fill"></div>
           </div>
           <div class="progress-labels">
-            <span id="progress-msg">Előkészítés...</span>
+            <span id="progress-msg" data-i18n="install.preparing">Előkészítés...</span>
             <span id="progress-pct">0%</span>
           </div>
-        </div>
-
-        <div class="install-note">
-          <span class="note-icon">💡</span>
-          Az első indítás kb. 10-20 percig tarthat az internetkapcsolattól függően.
         </div>
       </div>
     </div>
 
     <!-- ── SCREEN 3: Ready / Home ── -->
     <div class="screen" id="screen-home">
-    <!-- Screen: Welcome (Login / Install) -->
-    <div class="screen welcome active" id="screen-welcome">
-      <div class="hero-section">
-        <h1 data-i18n="welcome.title">Üdvözlünk a Cobbleverse-ben</h1>
-        <p data-i18n="welcome.subtitle">A végső Pokémon élmény Minecraftban</p>
-      </div>
-      
-      <div class="login-box">
-        <div class="input-group">
-          <label for="input-username" data-i18n="welcome.username_label">Válassz egy felhasználónevet:</label>
-          <input type="text" id="input-username" placeholder="Felhasználónév" data-i18n-placeholder="welcome.username_placeholder" />
-        </div>
-
-        <div class="ram-selector">
-          <label data-i18n="welcome.ram_label">Memória (RAM):</label>
-          <div class="ram-options">
-            <button class="ram-btn" data-val="2048">2 GB</button>
-            <button class="ram-btn active" data-val="4096">4 GB</button>
-            <button class="ram-btn" data-val="6144">6 GB</button>
-            <button class="ram-btn" data-val="8192">8 GB</button>
+      <div class="home-layout">
+        <!-- Background art panel -->
+        <div class="home-art">
+          <div class="art-overlay"></div>
+          <div class="art-content">
+            <h1 class="game-title">COBBLE<br /><span>VERSE</span></h1>
+            <p class="game-tagline">Pokémon Adventure in Minecraft</p>
           </div>
         </div>
 
-        <button class="btn-primary" id="btn-install" data-i18n="welcome.install_btn">TELEPÍTÉS ÉS JÁTÉK</button>
-        <p class="disclaimer" data-i18n="welcome.disclaimer">A telepítésre kattintva elfogadod kb. 2GB adat letöltését.</p>
-      </div>
-    </div>
-
-    <!-- Screen: Installation Progress -->
-    <div class="screen install" id="screen-install" style="display: none;">
-      <h2 data-i18n="install.title">Telepítés</h2>
-      
-      <div class="steps-container">
-        <div class="step" id="step-java">
-          <div class="step-indicator idle"></div>
-          <span class="step-label" data-i18n="install.java">Java 21 letöltése...</span>
-          <span class="step-status">Várakozás...</span>
-        </div>
-        <div class="step" id="step-minecraft">
-          <div class="step-indicator idle"></div>
-          <span class="step-label" data-i18n="install.minecraft">Minecraft letöltése...</span>
-          <span class="step-status">Várakozás...</span>
-        </div>
-        <div class="step" id="step-fabric">
-          <div class="step-indicator idle"></div>
-          <span class="step-label" data-i18n="install.fabric">Fabric telepítése...</span>
-          <span class="step-status">Várakozás...</span>
-        </div>
-        <div class="step" id="step-modpack">
-          <div class="step-indicator idle"></div>
-          <span class="step-label" data-i18n="install.modpack">Modpack letöltése...</span>
-          <span class="step-status">Várakozás...</span>
-        </div>
-      </div>
-
-      <div class="progress-section">
-        <div class="progress-bar">
-          <div class="progress-fill" id="progress-fill"></div>
-        </div>
-        <div class="progress-info">
-          <span id="progress-msg" data-i18n="install.preparing">Előkészítés...</span>
-          <span id="progress-pct">0%</span>
-        </div>
-      </div>
-    </div>
-
-    <!-- Screen: Home (Post-Install) -->
-    <div class="screen home" id="screen-home" style="display: none;">
-      <div class="home-container">
-        <div class="sidebar">
-          <div class="player-card">
-            <div class="player-avatar" id="player-avatar">?</div>
-            <div class="player-info">
-              <span class="player-name" id="player-name-display">Edző</span>
-              <span class="player-mode" data-i18n="home.player_status">Offline mód</span>
+        <!-- Right control panel -->
+        <div class="home-panel">
+          <div class="home-top">
+            <div class="player-card">
+              <div class="player-avatar" id="player-avatar">?</div>
+              <div class="player-info">
+                <span class="player-name" id="player-name-display">Edző</span>
+                <span class="player-mode" data-i18n="home.player_status">Offline mód</span>
+              </div>
             </div>
           </div>
-        </div>
 
-        <div class="main-content">
           <div class="version-info">
             <div class="vi-row"><span data-i18n="home.version">Verzió</span><span class="vi-val" id="home-modpack-version">COBBLEVERSE</span></div>
             <div class="vi-row"><span>Minecraft</span><span class="vi-val">1.21.1</span></div>
             <div class="vi-row"><span>Loader</span><span class="vi-val" id="home-fabric-version">Fabric</span></div>
             <div class="vi-row"><span data-i18n="home.ram">RAM</span><span class="vi-val" id="home-ram-display">4096 MB</span></div>
             
-            <div class="server-input-wrapper">
-              <label for="input-server-url" data-i18n="home.sync_label">Saját Mod Sync Szerver (opcionális):</label>
-              <input type="text" id="input-server-url" class="server-input" placeholder="http://94.72.100.43:7878" data-i18n-placeholder="home.sync_placeholder" />
+            <div class="server-input-wrapper" style="margin-top: 15px;">
+              <label for="input-server-url" style="display:block; margin-bottom:5px; font-size:12px; opacity:0.7;" data-i18n="home.sync_label">Saját Mod Sync Szerver (opcionális):</label>
+              <input type="text" id="input-server-url" class="server-input" placeholder="http://94.72.100.43:7878" style="width:100%; padding:8px; background: rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.1); border-radius:4px; color:white; font-size:12px;" />
             </div>
           </div>
 
@@ -272,15 +209,15 @@
               <span class="play-icon">▶</span>
               <span data-i18n="home.play_btn">JÁTÉK INDÍTÁSA</span>
             </button>
-            <button class="btn-secondary" id="btn-console-toggle" data-i18n="home.console_btn">
-              <span>📋 Konzol</span>
+            <button class="btn-secondary" id="btn-console-toggle">
+              <span data-i18n="home.console_btn">📋 Konzol</span>
             </button>
           </div>
 
           <div class="home-links">
             <button class="link-btn" id="link-modrinth">🌐 Modrinth</button>
             <button class="link-btn" id="link-discord">💬 Discord</button>
-            <button class="link-btn" id="link-folder" data-i18n="home.files_btn">📂 Fájlok</button>
+            <button class="link-btn" id="link-folder"><span data-i18n="home.files_btn">📂 Fájlok</span></button>
           </div>
         </div>
       </div>

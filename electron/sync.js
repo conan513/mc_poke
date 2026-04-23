@@ -57,18 +57,9 @@ function fetchManifest(serverUrl) {
 // List of files that should ALWAYS be removed from the mods folder if they exist.
 // This runs even if the sync server is unreachable.
 const FORCED_REMOVALS = [
-  'DefaultOptions-Fabric-1.21.1-20.0.1.jar', // Example: mod that keeps adding sponsor servers
-  'SponsorMod.jar', // Placeholder for other unwanted mods
+  // Add files here that should be blacklisted from the mods folder
 ]
 
-/**
- * Szinkronizálja a mods mappát a megadott szerverrel.
- * @param {string} serverUrl A szerver címe (pl. http://localhost:7878)
- * @param {string} modsDir A mods mappa elérési útja
- * @param {function} onLog Logoló callback
- */
-async function syncServerMods(serverUrl, modsDir, onLog) {
-  // 0. Forced cleanup (runs even if no serverUrl or if server is offline)
 async function syncServerMods(serverUrl, instanceDir, onLog) {
   if (!serverUrl || serverUrl.trim() === '') return
 
@@ -109,7 +100,15 @@ async function syncServerMods(serverUrl, instanceDir, onLog) {
   // 1. TÖRLÉS: Ami a localState-ben benne van, de a szerveren már nincs
   for (const key in localState) {
     if (!serverFilenames.includes(key)) {
-      const info = localState[key]
+      // PROTECTION: Never delete DefaultOptions or FancyMenu critical files
+      const lowerPath = info.path.toLowerCase()
+      const isProtected = lowerPath.includes('defaultoptions') || lowerPath.includes('fancymenu')
+      
+      if (isProtected) {
+        delete localState[key]
+        continue
+      }
+
       if (fs.existsSync(info.path)) {
         fs.unlinkSync(info.path)
         onLog(`[Sync] Törölve (már nincs a szerveren): ${path.basename(info.path)} (${info.type})`)
