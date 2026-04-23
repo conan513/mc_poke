@@ -264,6 +264,38 @@ async function install() {
     console.log('[Installer] EULA automatikusan elfogadva.')
   }
 
+  // 3b. server.properties – online-mode=false (offline mód) biztosítása
+  const serverPropsPath = path.join(SERVER_DIR, 'server.properties')
+  if (!fs.existsSync(serverPropsPath)) {
+    // A fájl még nem létezik (első indítás előtt) – létrehozzuk a minimális beállításokkal
+    fs.writeFileSync(serverPropsPath, [
+      '# Minecraft server properties',
+      '# Automatikusan generálva a CobbleServer telepítője által',
+      'online-mode=false',
+      'server-port=25565',
+      'difficulty=normal',
+      'gamemode=survival',
+      'max-players=20',
+      'motd=CobbleVerse Server',
+      'spawn-protection=0',
+    ].join('\n') + '\n')
+    console.log('[Installer] server.properties létrehozva (online-mode=false).')
+  } else {
+    // A fájl már létezik – meggyőzödünk róla, hogy online-mode=false
+    let props = fs.readFileSync(serverPropsPath, 'utf8')
+    if (/^online-mode\s*=\s*true/m.test(props)) {
+      props = props.replace(/^online-mode\s*=\s*true/m, 'online-mode=false')
+      fs.writeFileSync(serverPropsPath, props)
+      console.log('[Installer] server.properties: online-mode=true → false (offline mód bekapcsolva).')
+    } else if (!/^online-mode\s*=/m.test(props)) {
+      // Nincs benne online-mode sor egyáltalán – hozzáadjuk
+      fs.writeFileSync(serverPropsPath, props.trimEnd() + '\nonline-mode=false\n')
+      console.log('[Installer] server.properties: online-mode=false sor hozzáadva.')
+    } else {
+      console.log('[Installer] server.properties: online-mode már false, nincs teendő.')
+    }
+  }
+
   // 4. Custom assets inject (FancyMenu) for Sync Server
   try {
     const customFancymenuDir = path.join(__dirname, '..', 'build-assets', 'fancymenu')
