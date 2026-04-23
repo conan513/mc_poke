@@ -95,27 +95,61 @@ async function syncServerMods(serverUrl, instanceDir, onLog) {
     }
   })
 
-  const serverFilenames = serverItems.map(m => m.filename + m.type) // unique key
+  // Szerver oldalon lévő fájlok halmaza (mappa/fájlnév alapján)
+  const serverFileSet = new Set(serverItems.map(m => m.type + '/' + m.filename))
 
-  // 1. TÖRLÉS: Ami a localState-ben benne van, de a szerveren már nincs
-  for (const key in localState) {
-    if (!serverFilenames.includes(key)) {
-      const info = localState[key]
-      
-      // PROTECTION: Never delete DefaultOptions or FancyMenu critical files
-      const lowerPath = (info.path || '').toLowerCase()
-      const isProtected = lowerPath.includes('defaultoptions') || lowerPath.includes('fancymenu')
-      
-      if (isProtected) {
-        // Keep the state entry intact so we don't re-download and overwrite next time
-        continue
+
+  // Helper: egy mappán belüli összes fájl rekurzív listázása
+  function listFilesRecursive(dir, baseDir = dir) {
+    const results = []
+    try {
+      for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
+        const fullPath = path.join(dir, entry.name)
+        if (entry.isDirectory()) {
+          results.push(...listFilesRecursive(fullPath, baseDir))
+        } else {
+          results.push(path.relative(baseDir, fullPath))
+        }
       }
+    } catch (_) {}
+    return results
+  }
 
+  // 1a. TÖRLÉS – state-alapú: ami localState-ben van, de a szerveren már nincs
+  for (const key in localState) {
+    const info = localState[key]
+    const folderFilename = info.type + '/' + (info.filename || path.basename(info.path || ''))
+    if (!serverFileSet.has(folderFilename)) {
       if (fs.existsSync(info.path)) {
         fs.unlinkSync(info.path)
-        onLog(`[Sync] Törölve (már nincs a szerveren): ${path.basename(info.path)} (${info.type})`)
+        onLog(`[Sync] Törölve (state, nincs a szerveren): ${path.basename(info.path)} (${info.type})`)
       }
       delete localState[key]
+    }
+  }
+
+  // 1b. TÖRLÉS – fizikai scan: minden szinkronizált mappát végigolvasunk és
+  //     törlünk minden fájlt, ami nincs benne a szerver manifestjében.
+  //     Ez kezeli azt az esetet, amikor a fájl még nem volt a localState-ben
+  //     (pl. modpack telepítésekor kerültek oda, de a szerver azóta eltávolította).
+  for (const folder of SYNC_FOLDERS) {
+    const folderPath = path.join(instanceDir, folder)
+    if (!fs.existsSync(folderPath)) continue
+    const localFiles = listFilesRecursive(folderPath)
+    for (const relFile of localFiles) {
+      const key = folder + '/' + relFile
+      if (!serverFileSet.has(key)) {
+        const fullPath = path.join(folderPath, relFile)
+        try {
+          fs.unlinkSync(fullPath)
+          onLog(`[Sync] Törölve (scan, nincs a szerveren): ${relFile} (${folder})`)
+          // Töröljük a state-ből is, ha ott volt
+          const stateKey = relFile + folder
+          delete localState[stateKey]
+        } catch (e) {
+          onLog(`[Sync-Hiba] Nem törölhető: ${relFile} -> ${e.message}`)
+        }
+      }
     }
   }
 
