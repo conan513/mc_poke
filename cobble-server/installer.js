@@ -3,7 +3,7 @@ const fse = require('fs')
 const path = require('path')
 const https = require('https')
 const http = require('http')
-const { exec } = require('child_process')
+const { exec, execFile } = require('child_process')
 const AdmZip = require('adm-zip')
 
 const MODPACK_PROJECT_ID = 'Jkb29YJU'
