@@ -90,7 +90,9 @@ async function syncServerMods(serverUrl, instanceDir, onLog) {
   SYNC_FOLDERS.forEach(folder => {
     if (manifest[folder] && Array.isArray(manifest[folder])) {
       manifest[folder].forEach(item => {
-        serverItems.push({ ...item, type: folder })
+        // Normalizáljuk a szerverről jövő útvonalat ( \ -> / )
+        const normalizedFilename = item.filename.replace(/\\/g, '/')
+        serverItems.push({ ...item, filename: normalizedFilename, type: folder })
       })
     }
   })
@@ -98,56 +100,40 @@ async function syncServerMods(serverUrl, instanceDir, onLog) {
   // Szerver oldalon lévő fájlok halmaza (mappa/fájlnév alapján)
   const serverFileSet = new Set(serverItems.map(m => m.type + '/' + m.filename))
 
-
-  // Helper: egy mappán belüli összes fájl rekurzív listázása
+  // Helper: egy mappán belüli összes fájl rekurzív listázása (normalizált utakkal)
   function listFilesRecursive(dir, baseDir = dir) {
     const results = []
     try {
-      for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
+      if (!fs.existsSync(dir)) return []
+      const entries = fs.readdirSync(dir, { withFileTypes: true })
+      for (const entry of entries) {
         const fullPath = path.join(dir, entry.name)
         if (entry.isDirectory()) {
           results.push(...listFilesRecursive(fullPath, baseDir))
         } else {
-          results.push(path.relative(baseDir, fullPath))
+          // Normalizáljuk a helyi útvonalat is
+          const relPath = path.relative(baseDir, fullPath).replace(/\\/g, '/')
+          results.push({ relPath, fullPath })
         }
       }
     } catch (_) {}
     return results
   }
 
-  // 1a. TÖRLÉS – state-alapú: ami localState-ben van, de a szerveren már nincs
-  for (const key in localState) {
-    const info = localState[key]
-    const folderFilename = info.type + '/' + (info.filename || path.basename(info.path || ''))
-    if (!serverFileSet.has(folderFilename)) {
-      if (fs.existsSync(info.path)) {
-        fs.unlinkSync(info.path)
-        onLog(`[Sync] Törölve (state, nincs a szerveren): ${path.basename(info.path)} (${info.type})`)
-      }
-      delete localState[key]
-    }
-  }
-
-  // 1b. TÖRLÉS – fizikai scan: minden szinkronizált mappát végigolvasunk és
-  //     törlünk minden fájlt, ami nincs benne a szerver manifestjében.
-  //     Ez kezeli azt az esetet, amikor a fájl még nem volt a localState-ben
-  //     (pl. modpack telepítésekor kerültek oda, de a szerver azóta eltávolította).
+  // 1. TÖRLÉS – Fizikai scan alapú teljes szinkronizáció
+  // Végigmegyünk a mappákon és törlünk mindent, ami nincs a szerveren.
   for (const folder of SYNC_FOLDERS) {
     const folderPath = path.join(instanceDir, folder)
-    if (!fs.existsSync(folderPath)) continue
     const localFiles = listFilesRecursive(folderPath)
-    for (const relFile of localFiles) {
-      const key = folder + '/' + relFile
+    
+    for (const file of localFiles) {
+      const key = folder + '/' + file.relPath
       if (!serverFileSet.has(key)) {
-        const fullPath = path.join(folderPath, relFile)
         try {
-          fs.unlinkSync(fullPath)
-          onLog(`[Sync] Törölve (scan, nincs a szerveren): ${relFile} (${folder})`)
-          // Töröljük a state-ből is, ha ott volt
-          const stateKey = relFile + folder
-          delete localState[stateKey]
+          fs.unlinkSync(file.fullPath)
+          onLog(`[Sync] Törölve (nincs a szerveren): ${folder}/${file.relPath}`)
         } catch (e) {
-          onLog(`[Sync-Hiba] Nem törölhető: ${relFile} -> ${e.message}`)
+          onLog(`[Sync-Hiba] Nem törölhető: ${folder}/${file.relPath} -> ${e.message}`)
         }
       }
     }
@@ -158,42 +144,76 @@ async function syncServerMods(serverUrl, instanceDir, onLog) {
   const baseUrl = serverUrl.replace(/\/+$/, '')
 
   for (const item of serverItems) {
-    const fullFolderPath = path.join(instanceDir, item.type, path.dirname(item.filename))
+    const filePath = path.join(instanceDir, item.type, item.filename)
+    const fullFolderPath = path.dirname(filePath)
+    
     if (!fs.existsSync(fullFolderPath)) fs.mkdirSync(fullFolderPath, { recursive: true })
     
-    const filePath = path.join(instanceDir, item.type, item.filename)
-    const stateKey = item.filename + item.type
     let needsDownload = false
-
     if (!fs.existsSync(filePath)) {
       needsDownload = true
     } else {
-      const hash = await getHash(filePath)
-      if (hash !== item.hash) {
-        onLog(`[Sync] Változás: ${item.filename} (${item.type})`)
+      try {
+        const hash = await getHash(filePath)
+        if (hash !== item.hash) {
+          onLog(`[Sync] Frissítés: ${item.type}/${item.filename}`)
+          needsDownload = true
+        }
+      } catch (e) {
         needsDownload = true
       }
     }
 
     if (needsDownload) {
-      onLog(`[Sync] Letöltés: ${item.filename}`)
-      const downloadUrl = `${baseUrl}/${item.type}/${encodeURIComponent(item.filename)}`
+      onLog(`[Sync] Letöltés: ${item.type}/${item.filename}`)
+      const downloadUrl = `${baseUrl}/${item.type}/${encodeURIComponent(item.filename).replace(/%2F/g, '/')}`
       try {
         await downloadFile(downloadUrl, filePath)
-        localState[stateKey] = { path: filePath, type: item.type }
         downloadedCount++
       } catch (e) {
-        onLog(`[Sync-Hiba] Hiba: ${item.filename} -> ${e.message}`)
-      }
-    } else {
-      if (!localState[stateKey]) {
-        localState[stateKey] = { path: filePath, type: item.type }
+        onLog(`[Sync-Hiba] Hiba a letöltésnél: ${item.type}/${item.filename} -> ${e.message}`)
       }
     }
   }
 
-  // 3. Mentés
-  fs.writeFileSync(stateFile, JSON.stringify(localState, null, 2))
+  // 3. ÜRES MAPPÁK TAKARÍTÁSA
+  function cleanEmptyDirs(dir) {
+    if (!fs.existsSync(dir)) return
+    const entries = fs.readdirSync(dir, { withFileTypes: true })
+    if (entries.length === 0) {
+      // Ne töröljük a fő szinkron mappákat, csak az almappáikat
+      const isBaseFolder = SYNC_FOLDERS.some(f => path.join(instanceDir, f) === dir)
+      if (!isBaseFolder) {
+        fs.rmdirSync(dir)
+        return true
+      }
+      return false
+    }
+    
+    let allCleared = true
+    for (const entry of entries) {
+      if (entry.isDirectory()) {
+        const wasDeleted = cleanEmptyDirs(path.join(dir, entry.name))
+        if (!wasDeleted) allCleared = false
+      } else {
+        allCleared = false
+      }
+    }
+
+    if (allCleared) {
+      const isBaseFolder = SYNC_FOLDERS.some(f => path.join(instanceDir, f) === dir)
+      if (!isBaseFolder) {
+        fs.rmdirSync(dir)
+        return true
+      }
+    }
+    return false
+  }
+
+  SYNC_FOLDERS.forEach(f => cleanEmptyDirs(path.join(instanceDir, f)))
+
+  // 4. Állapot mentése (opcionális, de a manifestet eltárolhatjuk későbbre)
+  fs.writeFileSync(stateFile, JSON.stringify({ lastSync: new Date().toISOString(), serverUrl }, null, 2))
   
   if (downloadedCount > 0) {
     onLog(`[Sync] Szinkronizáció kész! Frissítve: ${downloadedCount} fájl.`)
