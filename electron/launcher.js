@@ -159,7 +159,7 @@ async function installJava() {
     zip.extractAllTo(javaDir, true)
   } else {
     // tar.gz
-    await new Promise((resolve, reject) => {
+    await new Promise(async (resolve, reject) => {
       execFile('tar', ['-xzf', javaDl, '-C', javaDir, '--strip-components=1'], (err) => {
         if (err) reject(err)
         else resolve()
