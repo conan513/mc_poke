@@ -1,5 +1,5 @@
 const fs = require('fs')
-const fse = require('fs')
+const fse = require('fs-extra')
 const path = require('path')
 const https = require('https')
 const http = require('http')
