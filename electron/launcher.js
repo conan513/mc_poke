@@ -340,7 +340,7 @@ async function installFabric() {
   sendProgress('fabric', 42, `Fabric Loader ${latestLoader} telepítése...`)
   fse.ensureDirSync(mcDir)
 
-  await new Promise((resolve, reject) => {
+  await new Promise(async (resolve, reject) => {
     const java = javaPath || getJavaExecutable() || 'java'
 
     // If a custom CA PEM was provided, import it into a PKCS12 truststore
@@ -362,7 +362,7 @@ async function installFabric() {
         truststorePath = path.join(getGameDir(), 'custom-truststore.p12')
 
         if (fs.existsSync(keytool)) {
-          await new Promise((kresolve, kreject) => {
+          await new Promise(async (kresolve, kreject) => {
             const ktArgs = ['-importcert', '-file', pemPath, '-alias', 'cobble_ca', '-keystore', truststorePath, '-storepass', truststorePass, '-storetype', 'PKCS12', '-noprompt']
             execFile(keytool, ktArgs, { cwd: getGameDir() }, (kerr, kstdout, kstderr) => {
               if (kerr) {
@@ -420,17 +420,18 @@ async function installFabric() {
         const jarCmd = fs.existsSync(jarCandidate) ? jarCandidate : 'jar'
 
         // Compile
-        await new Promise((kresolve) => {
+        await new Promise(async (kresolve) => {
+          // Try to compile with javac; if javac not available, skip silently
           execFile(javac, [src], { cwd: agentDir }, (cerr, cout, cerrout) => {
             if (cerr) {
-              console.warn('[InsecureAgent] javac failed or not available:', cerr.message)
+              console.warn('[InsecureAgent] javac failed or not available:', cerr && cerr.message ? cerr.message : String(cerr))
               return kresolve()
             }
             // Create JAR
             // jar cvfm agent.jar MANIFEST.MF TrustAllAgent.class
             execFile(jarCmd, ['cvfm', agentJar, manifest, 'TrustAllAgent.class'], { cwd: agentDir }, (jerr, jout, jerrout) => {
               if (jerr) {
-                console.warn('[InsecureAgent] jar creation failed:', jerr.message)
+                console.warn('[InsecureAgent] jar creation failed:', jerr && jerr.message ? jerr.message : String(jerr))
                 return kresolve()
               }
               if (fs.existsSync(agentJar)) {
