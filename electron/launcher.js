@@ -168,10 +168,43 @@ async function installJava() {
   }
 
   fs.unlinkSync(javaDl)
-  javaPath = getJavaExecutable()
+  // After extraction, try to robustly find the java executable (handle
+  // archives that extract into a top-level directory like jdk-21.../)
+  function findJavaExecutableFromDir(dir) {
+    const candidates = []
+    if (process.platform === 'win32') {
+      candidates.push(path.join(dir, 'bin', 'java.exe'))
+    } else if (process.platform === 'darwin') {
+      candidates.push(path.join(dir, 'Contents', 'Home', 'bin', 'java'))
+      candidates.push(path.join(dir, 'bin', 'java'))
+    } else {
+      candidates.push(path.join(dir, 'bin', 'java'))
+    }
+
+    for (const c of candidates) if (fs.existsSync(c)) return c
+
+    try {
+      const entries = fs.readdirSync(dir)
+      for (const e of entries) {
+        const candidateDir = path.join(dir, e)
+        const alt = process.platform === 'win32'
+          ? path.join(candidateDir, 'bin', 'java.exe')
+          : path.join(candidateDir, 'bin', 'java')
+        if (fs.existsSync(alt)) return alt
+        if (process.platform === 'darwin') {
+          const alt2 = path.join(candidateDir, 'Contents', 'Home', 'bin', 'java')
+          if (fs.existsSync(alt2)) return alt2
+        }
+      }
+    } catch (e) {}
+
+    return candidates[0]
+  }
+
+  javaPath = findJavaExecutableFromDir(getJavaDir())
 
   // Make executable on unix
-  if (process.platform !== 'win32') {
+  if (process.platform !== 'win32' && fs.existsSync(javaPath)) {
     fs.chmodSync(javaPath, 0o755)
   }
 
@@ -308,23 +341,20 @@ async function installFabric() {
   fse.ensureDirSync(mcDir)
 
   await new Promise((resolve, reject) => {
-    const java = javaPath || 'java'
-    execFile(
-      java,
-      ['-jar', installerJar, 'client', '-dir', mcDir, '-mcversion', MC_VERSION, '-loader', latestLoader, '-noprofile'],
-      (err, stdout, stderr) => {
-        if (err) {
-          console.error('Fabric stderr:', stderr)
-          if (fs.existsSync(versionJson)) {
-            resolve()
-          } else {
-            reject(new Error('Fabric telepítés sikertelen: ' + (stderr || err.message)))
-          }
-        } else {
-          resolve()
+    const java = javaPath || getJavaExecutable() || 'java'
+    const args = ['-jar', installerJar, 'client', '-dir', mcDir, '-mcversion', MC_VERSION, '-loader', latestLoader, '-noprofile']
+    execFile(java, args, { cwd: mcDir, windowsHide: true }, (err, stdout, stderr) => {
+      if (stdout && stdout.trim()) console.log('[Fabric installer stdout]\n' + stdout)
+      if (stderr && stderr.trim()) console.error('[Fabric installer stderr]\n' + stderr)
+      if (err) {
+        if (fs.existsSync(versionJson)) {
+          // Installer reported error but version already exists — treat as success
+          return resolve()
         }
+        return reject(new Error('Fabric telepítés sikertelen: ' + (stderr || err.message)))
       }
-    )
+      return resolve()
+    })
   })
 
   if (fs.existsSync(installerJar)) fs.unlinkSync(installerJar)
