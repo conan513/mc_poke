@@ -342,7 +342,57 @@ async function installFabric() {
 
   await new Promise((resolve, reject) => {
     const java = javaPath || getJavaExecutable() || 'java'
-    const args = ['-jar', installerJar, 'client', '-dir', mcDir, '-mcversion', MC_VERSION, '-loader', latestLoader, '-noprofile']
+
+    // If a custom CA PEM was provided, import it into a PKCS12 truststore
+    // and pass it to the JVM via -Djavax.net.ssl.trustStore.
+    const pemPath = process.env.COBBLE_CA_PEM || path.join(getGameDir(), 'custom_ca.pem')
+    let truststorePath = null
+    const truststorePass = 'changeit'
+    if (fs.existsSync(pemPath)) {
+      try {
+        // derive keytool path from java executable
+        const getKeytoolPath = (javaExe) => {
+          // common layouts: .../bin/java  -> .../bin/keytool(.exe)
+          const binDir = path.dirname(javaExe)
+          const kt = process.platform === 'win32' ? path.join(binDir, 'keytool.exe') : path.join(binDir, 'keytool')
+          return kt
+        }
+
+        const keytool = getKeytoolPath(java)
+        truststorePath = path.join(getGameDir(), 'custom-truststore.p12')
+
+        if (fs.existsSync(keytool)) {
+          await new Promise((kresolve, kreject) => {
+            const ktArgs = ['-importcert', '-file', pemPath, '-alias', 'cobble_ca', '-keystore', truststorePath, '-storepass', truststorePass, '-storetype', 'PKCS12', '-noprompt']
+            execFile(keytool, ktArgs, { cwd: getGameDir() }, (kerr, kstdout, kstderr) => {
+              if (kerr) {
+                console.error('[Truststore] keytool failed:', kstderr || kerr.message)
+                truststorePath = null
+                return kresolve()
+              }
+              console.log('[Truststore] custom truststore created at', truststorePath)
+              return kresolve()
+            })
+          })
+        } else {
+          console.warn('[Truststore] keytool not found next to java; cannot create truststore automatically.')
+          truststorePath = null
+        }
+      } catch (e) {
+        console.warn('[Truststore] Error creating truststore:', e.message)
+        truststorePath = null
+      }
+    }
+
+    // Prepare JVM args; if we have a truststore, pass it as a JVM system property
+    const jvmOptions = []
+    if (truststorePath) {
+      jvmOptions.push(`-Djavax.net.ssl.trustStore=${truststorePath}`)
+      jvmOptions.push(`-Djavax.net.ssl.trustStorePassword=${truststorePass}`)
+    }
+
+    const args = [...jvmOptions, '-jar', installerJar, 'client', '-dir', mcDir, '-mcversion', MC_VERSION, '-loader', latestLoader, '-noprofile']
+
     execFile(java, args, { cwd: mcDir, windowsHide: true }, (err, stdout, stderr) => {
       if (stdout && stdout.trim()) console.log('[Fabric installer stdout]\n' + stdout)
       if (stderr && stderr.trim()) console.error('[Fabric installer stderr]\n' + stderr)
