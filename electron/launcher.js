@@ -391,6 +391,61 @@ async function installFabric() {
       jvmOptions.push(`-Djavax.net.ssl.trustStorePassword=${truststorePass}`)
     }
 
+    // Optional insecure Java-level "trust-all" agent for installer debugging.
+    // Enabled by setting INSTALLER_INSECURE_JAVA_AGENT=1 or INSTALLER_INSECURE=java-agent
+    const insecureAgentEnabled = process.env.INSTALLER_INSECURE_JAVA_AGENT === '1' || process.env.INSTALLER_INSECURE === 'java-agent'
+    if (insecureAgentEnabled) {
+      try {
+        const agentDir = path.join(getGameDir(), 'insecure-agent')
+        fse.ensureDirSync(agentDir)
+
+        const src = path.join(agentDir, 'TrustAllAgent.java')
+        const manifest = path.join(agentDir, 'MANIFEST.MF')
+        const agentJar = path.join(agentDir, 'trust-all-agent.jar')
+
+        // Java agent source: sets a permissive TrustManager + HostnameVerifier
+        const srcCode = `import java.lang.instrument.Instrumentation;\nimport javax.net.ssl.*;\npublic class TrustAllAgent {\n  public static void premain(String agentArgs, Instrumentation inst) {\n    try {\n      TrustManager tm = new X509TrustManager() {\n        public java.security.cert.X509Certificate[] getAcceptedIssuers(){return new java.security.cert.X509Certificate[0];}\n        public void checkClientTrusted(java.security.cert.X509Certificate[] c, String s) {}\n        public void checkServerTrusted(java.security.cert.X509Certificate[] c, String s) {}\n      };\n      SSLContext sc = SSLContext.getInstance("TLS");\n      sc.init(null, new TrustManager[]{tm}, new java.security.SecureRandom());\n      HttpsURLConnection.setDefaultSSLSocketFactory(sc.getSocketFactory());\n      HttpsURLConnection.setDefaultHostnameVerifier((h, s) -> true);\n    } catch (Throwable t) { t.printStackTrace(); }\n  }\n}\n`
+
+        const manifestData = `Manifest-Version: 1.0\nPremain-Class: TrustAllAgent\nCan-Redefine-Classes: true\nCan-Retransform-Classes: true\n`;
+
+        fs.writeFileSync(src, srcCode, 'utf8')
+        fs.writeFileSync(manifest, manifestData, 'utf8')
+
+        // Derive javac and jar from the java executable if possible
+        const javaExeForTools = java || getJavaExecutable() || 'java'
+        const binDir = path.dirname(javaExeForTools)
+        const javacCandidate = process.platform === 'win32' ? path.join(binDir, 'javac.exe') : path.join(binDir, 'javac')
+        const jarCandidate = process.platform === 'win32' ? path.join(binDir, 'jar.exe') : path.join(binDir, 'jar')
+        const javac = fs.existsSync(javacCandidate) ? javacCandidate : 'javac'
+        const jarCmd = fs.existsSync(jarCandidate) ? jarCandidate : 'jar'
+
+        // Compile
+        await new Promise((kresolve) => {
+          execFile(javac, [src], { cwd: agentDir }, (cerr, cout, cerrout) => {
+            if (cerr) {
+              console.warn('[InsecureAgent] javac failed or not available:', cerr.message)
+              return kresolve()
+            }
+            // Create JAR
+            // jar cvfm agent.jar MANIFEST.MF TrustAllAgent.class
+            execFile(jarCmd, ['cvfm', agentJar, manifest, 'TrustAllAgent.class'], { cwd: agentDir }, (jerr, jout, jerrout) => {
+              if (jerr) {
+                console.warn('[InsecureAgent] jar creation failed:', jerr.message)
+                return kresolve()
+              }
+              if (fs.existsSync(agentJar)) {
+                jvmOptions.unshift(`-javaagent:${agentJar}`)
+                console.warn('[InsecureAgent] Built and enabled trust-all javaagent for installer (INSECURE)')
+              }
+              return kresolve()
+            })
+          })
+        })
+      } catch (e) {
+        console.warn('[InsecureAgent] Error creating java agent:', e.message)
+      }
+    }
+
     const args = [...jvmOptions, '-jar', installerJar, 'client', '-dir', mcDir, '-mcversion', MC_VERSION, '-loader', latestLoader, '-noprofile']
 
     execFile(java, args, { cwd: mcDir, windowsHide: true }, (err, stdout, stderr) => {
