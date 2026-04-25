@@ -33,6 +33,9 @@ SYNC_FOLDERS.forEach(f => {
   DIRS[f] = path.join(DATA_DIR, f)
 })
 
+// Convenience constant for the mods folder used in several handlers
+const MODS_DIR = DIRS['mods']
+
 const PUBLIC_DIR = path.join(__dirname, 'public')
 
 let mcProcess = null
@@ -149,6 +152,9 @@ function buildManifest() {
     manifest[f] = mapFiles(getFilesRecursive(DIRS[f]), DIRS[f])
     manifest.folders[f] = manifest[f].length
   })
+
+  // Provide a convenient modCount property (number of files in the 'mods' folder)
+  manifest.modCount = (manifest['mods'] || []).length
 
   return manifest
 }
