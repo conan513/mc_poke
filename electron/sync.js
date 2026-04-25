@@ -120,20 +120,44 @@ async function syncServerMods(serverUrl, instanceDir, onLog) {
     return results
   }
 
-  // 1. TÖRLÉS – Fizikai scan alapú teljes szinkronizáció
-  // Végigmegyünk a mappákon és törlünk mindent, ami nincs a szerveren.
+  // --- Fancymenu teljes törlés kezdete ---
+  // A felhasználó kérésére teljes törlés történik a tiszta másoláshoz
+  const fmDir = path.join(instanceDir, 'config', 'fancymenu')
+  if (fs.existsSync(fmDir)) {
+    try {
+      fs.rmSync(fmDir, { recursive: true, force: true })
+      onLog('[Sync] Fancymenu mappa teljesen törölve a tiszta cseréhez.')
+    } catch (e) {
+      onLog(`[Sync-Hiba] Nem sikerült törölni a fancymenu mappát: ${e.message}`)
+    }
+  }
+  // --- Fancymenu teljes törlés vége ---
+
+  // 1. TÖRLÉS – Fizikai scan alapú szinkronizáció
+  // Meghatározzuk, mely mappákban/útvonalakon kötelező a teljes egyezés (törlés)
+  const FULL_SYNC_FOLDERS = ['mods', 'datapacks']
+  
   for (const folder of SYNC_FOLDERS) {
     const folderPath = path.join(instanceDir, folder)
     const localFiles = listFilesRecursive(folderPath)
     
     for (const file of localFiles) {
       const key = folder + '/' + file.relPath
+      
+      // Akkor törlünk, ha:
+      // 1. Nincs a szerveren a fájl
+      // ÉS
+      // 2. A mappa a FULL_SYNC_FOLDERS-ben van VAGY speciális kivétel (pl. config/fancymenu)
       if (!serverFileSet.has(key)) {
-        try {
-          fs.unlinkSync(file.fullPath)
-          onLog(`[Sync] Törölve (nincs a szerveren): ${folder}/${file.relPath}`)
-        } catch (e) {
-          onLog(`[Sync-Hiba] Nem törölhető: ${folder}/${file.relPath} -> ${e.message}`)
+        let shouldDelete = FULL_SYNC_FOLDERS.includes(folder)
+
+        if (shouldDelete) {
+          try {
+            fs.unlinkSync(file.fullPath)
+            onLog(`[Sync] Törölve (nincs a szerveren): ${folder}/${file.relPath}`)
+          } catch (e) {
+            onLog(`[Sync-Hiba] Nem törölhető: ${folder}/${file.relPath} -> ${e.message}`)
+          }
         }
       }
     }
@@ -210,7 +234,12 @@ async function syncServerMods(serverUrl, instanceDir, onLog) {
     return false
   }
 
-  SYNC_FOLDERS.forEach(f => cleanEmptyDirs(path.join(instanceDir, f)))
+  SYNC_FOLDERS.forEach(f => {
+    const p = path.join(instanceDir, f)
+    if (fs.existsSync(p)) {
+      cleanEmptyDirs(p)
+    }
+  })
 
   // 4. Állapot mentése (opcionális, de a manifestet eltárolhatjuk későbbre)
   fs.writeFileSync(stateFile, JSON.stringify({ lastSync: new Date().toISOString(), serverUrl }, null, 2))

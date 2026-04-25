@@ -317,6 +317,12 @@ async function install() {
         }
       }
       
+      // Régi fájlok teljes törlése másolás előtt
+      if (fs.existsSync(destFancymenuDir)) {
+        fs.rmSync(destFancymenuDir, { recursive: true, force: true })
+        console.log('[Installer] Korábbi FancyMenu konfig teljesen törölve a tiszta cseréhez.')
+      }
+
       copyRecursive(customFancymenuDir, destFancymenuDir)
       console.log('[Installer] FancyMenu konfig sikeresen átmásolva.')
     }
