@@ -81,7 +81,7 @@ function getJavaDir() {
 }
 
 function getModpackDir() {
-  return path.join(getGameDir(), 'cobbleverse-instance')
+  return getGameDir()
 }
 
 function sendProgress(step, percent, message) {
@@ -180,8 +180,26 @@ async function installJava() {
 
 function getJavaExecutable() {
   const javaDir = getJavaDir()
+  if (!fs.existsSync(javaDir)) {
+    if (process.platform === 'win32') return path.join(javaDir, 'bin', 'java.exe')
+    if (process.platform === 'darwin') return path.join(javaDir, 'Contents', 'Home', 'bin', 'java')
+    return path.join(javaDir, 'bin', 'java')
+  }
+
   if (process.platform === 'win32') {
-    return path.join(javaDir, 'bin', 'java.exe')
+    const binJava = path.join(javaDir, 'bin', 'java.exe')
+    if (fs.existsSync(binJava)) return binJava
+    
+    try {
+      const entries = fs.readdirSync(javaDir)
+      for (const entry of entries) {
+        const fullPath = path.join(javaDir, entry, 'bin', 'java.exe')
+        if (fs.existsSync(fullPath)) return fullPath
+      }
+    } catch (e) {
+      console.warn('[Java] Hiba a könyvtár olvasásakor:', e.message)
+    }
+    return binJava
   } else if (process.platform === 'darwin') {
     return path.join(javaDir, 'Contents', 'Home', 'bin', 'java')
   } else {

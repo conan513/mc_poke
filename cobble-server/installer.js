@@ -55,7 +55,7 @@ async function installJava() {
     process.stdout.write(`\r[Java] Letöltés: ${Math.round(p * 100)}%`)
   })
   console.log('\n[Java] Java 21 kicsomagolása...')
-  
+
   fs.mkdirSync(javaDir, { recursive: true })
 
   if (ext === '.zip') {
@@ -71,7 +71,7 @@ async function installJava() {
   }
 
   fs.unlinkSync(javaDl)
-  
+
   if (process.platform !== 'win32') fs.chmodSync(javaExe, 0o755)
   console.log('[Java] Java 21 telepítése sikeres.')
   return javaExe
@@ -110,7 +110,7 @@ function fetchJson(url) {
         let data = ''
         res.on('data', c => data += c)
         res.on('end', () => {
-          try { resolve(JSON.parse(data)) } catch(e) { reject(e) }
+          try { resolve(JSON.parse(data)) } catch (e) { reject(e) }
         })
         res.on('error', reject)
       }).on('error', reject)
@@ -133,10 +133,10 @@ async function getLatestFabric() {
 
 async function install() {
   console.log('[Installer] Indítás...')
-  
+
   // 0. Java 21
   const javaPath = await installJava()
-  
+
   fs.mkdirSync(MODS_DIR, { recursive: true })
 
   // 1. Modpack check & download
@@ -145,7 +145,7 @@ async function install() {
   const latestPack = versions.filter(v => v.version_type === 'release')[0] || versions[0]
   const file = latestPack.files.find(f => f.primary) || latestPack.files[0]
   const stateFile = path.join(SERVER_DIR, '.server-install-state.json')
-  
+
   let state = {}
   if (fs.existsSync(stateFile)) state = JSON.parse(fs.readFileSync(stateFile, 'utf8'))
 
@@ -154,7 +154,7 @@ async function install() {
   } else {
     console.log(`[Installer] Új modpack telepítése: ${latestPack.version_number}`)
     const mrpackPath = path.join(SERVER_DIR, 'modpack.mrpack')
-    
+
     // Clean old mods to prevent conflicts
     if (fs.existsSync(MODS_DIR)) {
       fs.readdirSync(MODS_DIR).forEach(f => {
@@ -166,7 +166,7 @@ async function install() {
       process.stdout.write(`\r[Installer] Modpack letöltése: ${Math.round(p * 100)}%`)
     })
     console.log('\n[Installer] Kicsomagolás...')
-    
+
     const zip = new AdmZip(mrpackPath)
     const index = JSON.parse(zip.readAsText('modrinth.index.json'))
 
@@ -175,7 +175,7 @@ async function install() {
       if (entry.isDirectory) continue
       const lowerName = entry.entryName.toLowerCase()
       if (lowerName.includes('no hunger') || lowerName.includes('mobsbegone') || lowerName.includes('no ender dragon') || lowerName.includes('soundsbegone')) continue
-      
+
       let destPath = null
       if (entry.entryName.startsWith('server-overrides/')) {
         destPath = path.join(SERVER_DIR, entry.entryName.slice('server-overrides/'.length))
@@ -209,14 +209,14 @@ async function install() {
         baseFilenames.push(path.basename(f.path))
         const downloadUrl = f.downloads?.[0]
         if (downloadUrl) {
-          await downloadFile(downloadUrl, dest).catch(() => {})
+          await downloadFile(downloadUrl, dest).catch(() => { })
         }
         done++
       }))
       process.stdout.write(`\r[Installer] Modok: ${done}/${serverFiles.length}`)
     }
     console.log()
-    
+
     // Save base modpack filenames so the Admin UI doesn't touch them
     fs.writeFileSync(path.join(SERVER_DIR, '.modpack-files.json'), JSON.stringify(baseFilenames, null, 2))
 
@@ -228,7 +228,7 @@ async function install() {
   // 2. Fabric Server Install
   const fv = await getLatestFabric()
   const launchJar = path.join(SERVER_DIR, 'fabric-server-launch.jar')
-  
+
   if (state.fabricLoader !== fv.loader || !fs.existsSync(launchJar)) {
     console.log(`[Installer] Fabric Server ${fv.loader} telepítése...`)
     const installerJar = path.join(SERVER_DIR, 'fabric-installer.jar')
@@ -300,10 +300,10 @@ async function install() {
   try {
     const customFancymenuDir = path.join(__dirname, '..', 'build-assets', 'fancymenu')
     const destFancymenuDir = path.join(SERVER_DIR, 'config', 'fancymenu')
-    
+
     if (fs.existsSync(customFancymenuDir)) {
       console.log('[Installer] Egyedi FancyMenu konfig másolása a szerver adatai közé (szinkronizáláshoz)...')
-      
+
       const copyRecursive = (src, dest) => {
         fs.mkdirSync(dest, { recursive: true })
         for (const entry of fs.readdirSync(src, { withFileTypes: true })) {
@@ -316,7 +316,7 @@ async function install() {
           }
         }
       }
-      
+
       // Régi fájlok teljes törlése másolás előtt
       if (fs.existsSync(destFancymenuDir)) {
         fs.rmSync(destFancymenuDir, { recursive: true, force: true })
