@@ -72,9 +72,57 @@ async function installJava() {
 
   fs.unlinkSync(javaDl)
 
-  if (process.platform !== 'win32') fs.chmodSync(javaExe, 0o755)
+  // After extraction, the layout for the JDK may include a top-level directory
+  // (e.g. "jdk-21.0.5+11/") which means javaExe may not exist at the
+  // expected path. Try to locate the real executable in common locations.
+  function findJavaExecutableFromDir(dir) {
+    // Direct expected paths
+    const candidates = []
+    if (process.platform === 'win32') {
+      candidates.push(path.join(dir, 'bin', 'java.exe'))
+    } else if (process.platform === 'darwin') {
+      candidates.push(path.join(dir, 'Contents', 'Home', 'bin', 'java'))
+      candidates.push(path.join(dir, 'bin', 'java'))
+    } else {
+      candidates.push(path.join(dir, 'bin', 'java'))
+    }
+
+    for (const c of candidates) if (fs.existsSync(c)) return c
+
+    // Search one level deep for a folder that contains bin/java
+    try {
+      const entries = fs.readdirSync(dir)
+      for (const e of entries) {
+        const candidateDir = path.join(dir, e)
+        for (const c of candidates) {
+          const cand = c.replace(dir + path.sep, path.join(candidateDir, ''))
+          if (fs.existsSync(cand)) return cand
+        }
+        // check candidateDir/bin/java(.exe)
+        const alt = process.platform === 'win32'
+          ? path.join(candidateDir, 'bin', 'java.exe')
+          : path.join(candidateDir, 'bin', 'java')
+        if (fs.existsSync(alt)) return alt
+        if (process.platform === 'darwin') {
+          const alt2 = path.join(candidateDir, 'Contents', 'Home', 'bin', 'java')
+          if (fs.existsSync(alt2)) return alt2
+        }
+      }
+    } catch (e) {
+      // ignore
+    }
+    // Fallback to original expected path
+    return candidates[0]
+  }
+
+  const resolvedJavaExe = findJavaExecutableFromDir(javaDir)
+  if (!fs.existsSync(resolvedJavaExe)) {
+    throw new Error(`Java executable not found after extraction: ${resolvedJavaExe}`)
+  }
+
+  if (process.platform !== 'win32') fs.chmodSync(resolvedJavaExe, 0o755)
   console.log('[Java] Java 21 telepítése sikeres.')
-  return javaExe
+  return resolvedJavaExe
 }
 
 function downloadFile(url, dest, onProgress) {
@@ -236,9 +284,13 @@ async function install() {
     await downloadFile(installerUrl, installerJar)
 
     await new Promise((resolve, reject) => {
+      // Pass explicit -dir on Windows and other platforms to ensure the
+      // Fabric installer writes files to the expected SERVER_DIR. Some
+      // installer versions ignore cwd on Windows when resolving paths.
+      const args = ['-jar', installerJar, 'server', '-dir', SERVER_DIR, '-mcversion', MC_VERSION, '-loader', fv.loader, '-downloadMinecraft']
       execFile(
         javaPath,
-        ['-jar', installerJar, 'server', '-mcversion', MC_VERSION, '-loader', fv.loader, '-downloadMinecraft'],
+        args,
         { cwd: SERVER_DIR },
         (err, stdout, stderr) => {
           if (err && !fs.existsSync(launchJar)) {
