@@ -305,7 +305,7 @@ async function updateModsFromModrinth() {
  * Ensures specific extra mods are present.
  */
 async function ensureExtraMods() {
-  const extraMods = ['chipped', 'terrablender'];
+  const extraMods = ['chipped', 'terrablender', 'skinsrestorer'];
   console.log(`[Modrinth] Extra modok ellenőrzése: ${extraMods.join(', ')}...`);
 
   for (const slug of extraMods) {
