@@ -3,6 +3,7 @@ const fse = require('fs-extra')
 const path = require('path')
 const https = require('https')
 const http = require('http')
+const crypto = require('crypto')
 const { exec, execFile } = require('child_process')
 const AdmZip = require('adm-zip')
 
@@ -149,6 +150,209 @@ function downloadFile(url, dest, onProgress) {
   })
 }
 
+/**
+ * Calculates a file hash (default SHA1 for Modrinth).
+ */
+function getFileHash(filePath, algorithm = 'sha1') {
+  return new Promise((resolve, reject) => {
+    const hash = crypto.createHash(algorithm)
+    const stream = fs.createReadStream(filePath)
+    stream.on('data', chunk => hash.update(chunk))
+    stream.on('end', () => resolve(hash.digest('hex')))
+    stream.on('error', reject)
+  })
+}
+
+/**
+ * Generic Modrinth API request helper.
+ */
+async function modrinthRequest(path, method = 'GET', body = null) {
+  return new Promise((resolve, reject) => {
+    const options = {
+      hostname: 'api.modrinth.com',
+      path: path,
+      method: method,
+      headers: {
+        'User-Agent': 'CobbleServer/1.0',
+        ...(body ? { 'Content-Type': 'application/json' } : {})
+      }
+    }
+    const req = https.request(options, (res) => {
+      let data = ''
+      res.on('data', chunk => data += chunk)
+      res.on('end', () => {
+        try {
+          if (res.statusCode >= 400) {
+            console.error(`[Modrinth-API] Error ${res.statusCode} on ${path}: ${data}`)
+            return reject(new Error(`Modrinth API hiba: ${res.statusCode}`))
+          }
+          resolve(JSON.parse(data))
+        } catch (e) { reject(e) }
+      })
+    })
+    req.on('error', reject)
+    if (body) req.write(JSON.stringify(body))
+    req.end()
+  })
+}
+
+/**
+ * Scans the mods folder and checks Modrinth for newer versions
+ * compatible with the current MC version and Fabric.
+ */
+async function updateModsFromModrinth() {
+  if (!fs.existsSync(MODS_DIR)) {
+    console.log('[Modrinth] Mods mappa nem létezik, kihagyás.');
+    return;
+  }
+
+  console.log('[Modrinth] Modok frissítéseinek ellenőrzése (MC 1.21.1)...');
+
+  try {
+    const files = fs.readdirSync(MODS_DIR).filter(f => f.endsWith('.jar'));
+    console.log(`[Modrinth] ${files.length} .jar fájl találva a mods mappában.`);
+    
+    const hashes = [];
+    const fileToInfo = {};
+
+    for (const file of files) {
+      const fullPath = path.join(MODS_DIR, file);
+      try {
+        const hash = await getFileHash(fullPath, 'sha1');
+        hashes.push(hash);
+        fileToInfo[hash] = { file, fullPath };
+      } catch (e) {
+        console.warn(`[Modrinth] Hiba a hash kiszámításakor (${file}): ${e.message}`);
+      }
+    }
+
+    if (hashes.length === 0) {
+      console.log('[Modrinth] Nem sikerült hash-elni egyetlen fájlt sem.');
+      return;
+    }
+
+    console.log(`[Modrinth] Azonosítás a Modrinth API-val...`);
+    const versionMap = await modrinthRequest('/v2/version_files', 'POST', {
+      hashes: hashes,
+      algorithm: 'sha1'
+    });
+
+    const projectsToCheck = new Set();
+    const hashToVersion = {};
+    for (const hash in versionMap) {
+      const v = versionMap[hash];
+      hashToVersion[hash] = v;
+      projectsToCheck.add(v.project_id);
+    }
+
+    console.log(`[Modrinth] ${projectsToCheck.size} projekt azonosítva a Modrinth-en.`);
+
+    let updatedCount = 0;
+    for (const projectId of projectsToCheck) {
+      try {
+        const query = `loaders=${encodeURIComponent('["fabric"]')}&game_versions=${encodeURIComponent(`["${MC_VERSION}"]`)}`
+        const versions = await modrinthRequest(`/v2/project/${projectId}/version?${query}`);
+        const releases = versions.filter(v => v.version_type === 'release');
+        const latest = releases[0] || versions[0];
+        
+        if (!latest) {
+          console.log(`[Modrinth] Nincs kompatibilis verzió a projekthez: ${projectId}`);
+          continue;
+        }
+
+        const currentVersionsForProject = Object.values(hashToVersion).filter(v => v.project_id === projectId);
+        
+        // Find if any local version of this project is older than the latest version
+        const needsUpdate = currentVersionsForProject.some(v => {
+            const currentDate = new Date(v.date_published);
+            const latestDate = new Date(latest.date_published);
+            return latestDate > currentDate;
+        });
+
+        if (needsUpdate) {
+          const newestFile = latest.files.find(f => f.primary) || latest.files[0];
+          const oldVersion = currentVersionsForProject[0];
+          const oldHash = Object.keys(hashToVersion).find(h => hashToVersion[h].id === oldVersion.id);
+          const oldFileInfo = fileToInfo[oldHash];
+
+          if (oldFileInfo) {
+            console.log(`[Modrinth] FRISSÍTÉS: ${oldFileInfo.file} -> ${newestFile.filename} (${latest.version_number})`);
+            const dest = path.join(MODS_DIR, newestFile.filename);
+            
+            await downloadFile(newestFile.url, dest);
+            if (fs.existsSync(oldFileInfo.fullPath) && oldFileInfo.fullPath !== dest) {
+              fs.unlinkSync(oldFileInfo.fullPath);
+            }
+            updatedCount++;
+          }
+        }
+      } catch (e) {
+        console.error(`[Modrinth-Hiba] Hiba a projekt ellenőrzésekor (${projectId}): ${e.message}`);
+      }
+    }
+
+    if (updatedCount > 0) {
+      console.log(`[Modrinth] Szinkronizáció kész! ${updatedCount} mod frissítve.`);
+    } else {
+      console.log('[Modrinth] Minden mod naprakész.');
+    }
+  } catch (err) {
+    console.error(`[Modrinth-Hiba] Végzetes hiba az ellenőrzés során: ${err.message}`);
+  }
+}
+
+/**
+ * Ensures specific extra mods are present.
+ */
+async function ensureExtraMods() {
+  const extraMods = ['chipped', 'terrablender'];
+  console.log(`[Modrinth] Extra modok ellenőrzése: ${extraMods.join(', ')}...`);
+
+  for (const slug of extraMods) {
+    try {
+      const query = `loaders=${encodeURIComponent('["fabric"]')}&game_versions=${encodeURIComponent(`["${MC_VERSION}"]`)}`
+      const versions = await modrinthRequest(`/v2/project/${slug}/version?${query}`);
+      const latest = versions.filter(v => v.version_type === 'release')[0] || versions[0];
+      
+      if (!latest) continue;
+
+      const file = latest.files.find(f => f.primary) || latest.files[0];
+      const dest = path.join(MODS_DIR, file.filename);
+
+      const files = fs.readdirSync(MODS_DIR);
+      const isPresent = files.some(f => f.toLowerCase().includes(slug.toLowerCase()));
+      
+      if (!isPresent) {
+        console.log(`[Modrinth] Extra mod letöltése: ${slug} -> ${file.filename}`);
+        await downloadFile(file.url, dest);
+      }
+    } catch (e) {
+      console.error(`[Modrinth-Hiba] Extra mod hiba (${slug}): ${e.message}`);
+    }
+  }
+}
+
+/**
+ * Removes any mods that are on the blacklist from the mods folder.
+ */
+async function cleanupBlacklistedMods() {
+  const blacklist = ['no hunger', 'mobsbegone', 'no ender dragon', 'soundsbegone', 'interactic'];
+  if (fs.existsSync(MODS_DIR)) {
+    const files = fs.readdirSync(MODS_DIR);
+    for (const file of files) {
+      const lower = file.toLowerCase();
+      if (blacklist.some(b => lower.includes(b))) {
+        console.log(`[Installer] Feketelistás mod törlése: ${file}`);
+        try {
+          fs.unlinkSync(path.join(MODS_DIR, file));
+        } catch (e) {
+          console.warn(`[Installer-Hiba] Nem sikerült törölni a feketelistás modot (${file}): ${e.message}`);
+        }
+      }
+    }
+  }
+}
+
 function fetchJson(url) {
   return new Promise((resolve, reject) => {
     const request = (targetUrl) => {
@@ -222,7 +426,7 @@ async function install() {
     for (const entry of zip.getEntries()) {
       if (entry.isDirectory) continue
       const lowerName = entry.entryName.toLowerCase()
-      if (lowerName.includes('no hunger') || lowerName.includes('mobsbegone') || lowerName.includes('no ender dragon') || lowerName.includes('soundsbegone')) continue
+      if (lowerName.includes('no hunger') || lowerName.includes('mobsbegone') || lowerName.includes('no ender dragon') || lowerName.includes('soundsbegone') || lowerName.includes('interactic')) continue
 
       let destPath = null
       if (entry.entryName.startsWith('server-overrides/')) {
@@ -243,7 +447,7 @@ async function install() {
     const serverFiles = files.filter(f => {
       if (f.env && f.env.server === 'unsupported') return false
       const lowerPath = f.path.toLowerCase()
-      if (lowerPath.includes('no hunger') || lowerPath.includes('mobsbegone') || lowerPath.includes('no ender dragon') || lowerPath.includes('soundsbegone')) return false
+      if (lowerPath.includes('no hunger') || lowerPath.includes('mobsbegone') || lowerPath.includes('no ender dragon') || lowerPath.includes('soundsbegone') || lowerPath.includes('interactic')) return false
       return true
     })
     console.log(`[Installer] Szerver modok letöltése (${serverFiles.length} db)...`)
@@ -381,6 +585,15 @@ async function install() {
   } catch (err) {
     console.error(`[Installer] Hiba a FancyMenu konfig másolásakor: ${err.message}`)
   }
+
+  // 5. Extra Mods (Chipped, TerraBlender)
+  await ensureExtraMods()
+
+  // 6. Blacklist Cleanup (Ensure unwanted mods are gone)
+  await cleanupBlacklistedMods()
+
+  // 7. Modrinth Mod Updates
+  await updateModsFromModrinth()
 
   console.log('[Installer] Telepítés sikeres! Minden készen áll.')
 

@@ -124,6 +124,52 @@ function downloadFile(url, dest, onProgress) {
   })
 }
 
+/**
+ * Calculates a file hash (default SHA1 for Modrinth).
+ */
+function getFileHash(filePath, algorithm = 'sha1') {
+  return new Promise((resolve, reject) => {
+    const hash = crypto.createHash(algorithm)
+    const stream = fs.createReadStream(filePath)
+    stream.on('data', chunk => hash.update(chunk))
+    stream.on('end', () => resolve(hash.digest('hex')))
+    stream.on('error', reject)
+  })
+}
+
+/**
+ * Generic Modrinth API request helper.
+ */
+async function modrinthRequest(path, method = 'GET', body = null) {
+  return new Promise((resolve, reject) => {
+    const options = {
+      hostname: 'api.modrinth.com',
+      path: path,
+      method: method,
+      headers: {
+        'User-Agent': 'CobbleLauncher/1.0',
+        ...(body ? { 'Content-Type': 'application/json' } : {})
+      }
+    }
+    const req = https.request(options, (res) => {
+      let data = ''
+      res.on('data', chunk => data += chunk)
+      res.on('end', () => {
+        try {
+          if (res.statusCode >= 400) {
+            console.error(`[Modrinth-API] Error ${res.statusCode} on ${path}: ${data}`)
+            return reject(new Error(`Modrinth API hiba: ${res.statusCode}`))
+          }
+          resolve(JSON.parse(data))
+        } catch (e) { reject(e) }
+      })
+    })
+    req.on('error', reject)
+    if (body) req.write(JSON.stringify(body))
+    req.end()
+  })
+}
+
 // ── Java Installation ────────────────────────────────────────
 
 async function installJava() {
@@ -391,11 +437,16 @@ async function installFabric() {
       jvmOptions.push(`-Djavax.net.ssl.trustStorePassword=${truststorePass}`)
     }
 
+    // On Windows, instruct the JVM to use the native Windows certificate store
+    // so it trusts the same CAs as the OS (fixes PKIX / fabricmc.net SSL errors).
+    if (process.platform === 'win32') {
+      jvmOptions.push('-Djavax.net.ssl.trustStoreType=WINDOWS-ROOT')
+    }
+
     // Optional insecure Java-level "trust-all" agent for installer debugging.
     // Enabled by setting INSTALLER_INSECURE_JAVA_AGENT=1 or INSTALLER_INSECURE=java-agent
     const insecureAgentEnabled = process.env.INSTALLER_INSECURE_JAVA_AGENT === '1' || process.env.INSTALLER_INSECURE === 'java-agent'
     if (insecureAgentEnabled) {
-      try {
         // Prefer a prebuilt agent bundled with the app for reliability.
         const bundled = path.join(__dirname, 'insecure-resources', 'trust-all-agent.jar')
         const agentDir = path.join(getGameDir(), 'insecure-agent')
@@ -585,6 +636,105 @@ async function fetchLatestModpackVersion() {
   })
 }
 
+// ── Modrinth Individual Mod Updates ───────────────────────────
+
+/**
+ * Scans the mods folder and checks Modrinth for newer versions
+ * compatible with the current MC version and Fabric.
+ */
+async function updateModsFromModrinth(onLog) {
+  const instanceDir = getModpackDir()
+  const modsDir = path.join(instanceDir, 'mods')
+  if (!fs.existsSync(modsDir)) return
+
+  onLog?.('[Modrinth] Modok frissítéseinek ellenőrzése (MC 1.21.1)...')
+
+  try {
+    const files = fs.readdirSync(modsDir).filter(f => f.endsWith('.jar'))
+    const hashes = []
+    const fileToInfo = {} // hash -> { file, fullPath }
+
+    for (const file of files) {
+      const fullPath = path.join(modsDir, file)
+      try {
+        const hash = await getFileHash(fullPath, 'sha1')
+        hashes.push(hash)
+        fileToInfo[hash] = { file, fullPath }
+      } catch (e) {
+        console.warn(`[Modrinth] Nem sikerült hash-elni: ${file}`, e.message)
+      }
+    }
+
+    if (hashes.length === 0) return
+
+    // Identify versions on Modrinth using hashes
+    const versionMap = await modrinthRequest('/v2/version_files', 'POST', {
+      hashes: hashes,
+      algorithm: 'sha1'
+    })
+
+    const projectsToCheck = new Set()
+    const hashToVersion = {}
+    for (const hash in versionMap) {
+      const v = versionMap[hash]
+      hashToVersion[hash] = v
+      projectsToCheck.add(v.project_id)
+    }
+
+    let updatedCount = 0
+    for (const projectId of projectsToCheck) {
+      // Get all versions for this project for MC 1.21.1 and Fabric
+      const query = `loaders=${encodeURIComponent('["fabric"]')}&game_versions=${encodeURIComponent(`["${MC_VERSION}"]`)}`
+      const versions = await modrinthRequest(`/v2/project/${projectId}/version?${query}`)
+      // Sort by date (Modrinth usually does this, but to be sure)
+      const releases = versions.filter(v => v.version_type === 'release')
+      const latest = releases[0] || versions[0]
+      
+      if (!latest) continue
+
+      // Find which of our local versions belong to this project
+      const currentVersionsForProject = Object.values(hashToVersion).filter(v => v.project_id === projectId)
+      
+      // Check if we have an older version
+      const isOutdated = currentVersionsForProject.some(v => new Date(v.date_published) < new Date(latest.date_published))
+
+      if (isOutdated) {
+        const newestFile = latest.files.find(f => f.primary) || latest.files[0]
+        
+        // We might have multiple local jars for the same project (unlikely but possible)
+        // We'll replace the one that is oldest.
+        const oldVersion = currentVersionsForProject[0]
+        const oldHash = Object.keys(hashToVersion).find(h => hashToVersion[h].id === oldVersion.id)
+        const oldFileInfo = fileToInfo[oldHash]
+
+        if (oldFileInfo) {
+          onLog?.(`[Modrinth] Frissítés: ${oldFileInfo.file} → ${newestFile.filename}`)
+          const dest = path.join(modsDir, newestFile.filename)
+          
+          try {
+            await downloadFile(newestFile.url, dest)
+            // If the filename is different, remove the old one.
+            if (fs.existsSync(oldFileInfo.fullPath) && oldFileInfo.fullPath !== dest) {
+              fs.unlinkSync(oldFileInfo.fullPath)
+            }
+            updatedCount++
+          } catch (dlErr) {
+            onLog?.(`[Modrinth-Hiba] Nem sikerült letölteni: ${newestFile.filename}`)
+          }
+        }
+      }
+    }
+
+    if (updatedCount > 0) {
+      onLog?.(`[Modrinth] ${updatedCount} mod sikeresen frissítve.`)
+    } else {
+      onLog?.('[Modrinth] Minden mod naprakész.')
+    }
+  } catch (err) {
+    onLog?.(`[Modrinth-Hiba] Ellenőrzés sikertelen: ${err.message}`)
+  }
+}
+
 // ── Modpack Installation ─────────────────────────────────────
 
 async function installModpack(serverUrl = '') {
@@ -708,6 +858,15 @@ async function installModpack(serverUrl = '') {
     }
   }
 
+  // ── 8. Modrinth Mod Updates (ensure all mods are latest 1.21.1) ──
+  try {
+    await updateModsFromModrinth((msg) => {
+      sendProgress('modpack', 100, msg)
+    })
+  } catch (e) {
+    console.warn('[Modrinth] Hiba az egyedi modok frissítésekor:', e.message)
+  }
+
 }
 
 // ── Public API ───────────────────────────────────────────────
@@ -747,6 +906,9 @@ async function launch({ username, ram, serverUrl }, onLog, onClose) {
       onLog?.(`[Sync-Hiba] Kivétel a szinkronizáció során: ${e.message}`)
     }
   }
+
+  // ── Modrinth Individual Mod Updates ──────────────────────────
+  await updateModsFromModrinth(onLog)
 
   const client = new Client()
 
