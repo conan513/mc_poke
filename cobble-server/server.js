@@ -216,7 +216,7 @@ function handleRequest(req, res) {
               file.close()
               console.log(`[Skins] Skin letöltve: ${username}`)
               const skinUrl = `${publicBaseUrl}/skins/${username}.png`
-              sendCommand(`sr url ${username} "${skinUrl}"`)
+              sendCommand(`sr set ${username} url ${skinUrl}`)
               res.writeHead(200, { 'Content-Type': 'application/json' })
               res.end(JSON.stringify({ success: true, url: skinUrl }))
             })
@@ -230,7 +230,7 @@ function handleRequest(req, res) {
           fs.writeFileSync(savePath, base64, 'base64')
           console.log(`[Skins] Skin feltöltve: ${username}`)
           const skinUrl = `${publicBaseUrl}/skins/${username}.png`
-          sendCommand(`sr url ${username} "${skinUrl}"`)
+          sendCommand(`sr set ${username} url ${skinUrl}`)
           res.writeHead(200, { 'Content-Type': 'application/json' })
           res.end(JSON.stringify({ success: true, url: skinUrl }))
         }

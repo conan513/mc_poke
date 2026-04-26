@@ -305,7 +305,7 @@ async function updateModsFromModrinth() {
  * Ensures specific extra mods are present.
  */
 async function ensureExtraMods() {
-  const extraMods = ['chipped', 'terrablender', 'skinsrestorer'];
+  const extraMods = ['chipped', 'terrablender', 'skinrestorer'];
   console.log(`[Modrinth] Extra modok ellenőrzése: ${extraMods.join(', ')}...`);
 
   for (const slug of extraMods) {
@@ -325,6 +325,8 @@ async function ensureExtraMods() {
       if (!isPresent) {
         console.log(`[Modrinth] Extra mod letöltése: ${slug} -> ${file.filename}`);
         await downloadFile(file.url, dest);
+      } else {
+        console.log(`[Modrinth] Extra mod már jelen van: ${slug}`);
       }
     } catch (e) {
       console.error(`[Modrinth-Hiba] Extra mod hiba (${slug}): ${e.message}`);
