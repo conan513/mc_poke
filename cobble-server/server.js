@@ -202,6 +202,8 @@ function handleRequest(req, res) {
         const { username, skinData, isUrl } = JSON.parse(body)
         if (!username || !skinData) throw new Error('Hiányzó adatok.')
 
+        const host = req.headers.host || `localhost:${PORT}`
+        const publicBaseUrl = `http://${host}` // Assuming HTTP as per user info
         const savePath = path.join(SKINS_DIR, `${username}.png`)
         
         if (isUrl) {
@@ -213,9 +215,7 @@ function handleRequest(req, res) {
             file.on('finish', () => {
               file.close()
               console.log(`[Skins] Skin letöltve: ${username}`)
-              // Apply via SkinsRestorer command
-              // We use 0.0.0.0 or the public IP if possible, but for the command localhost is fine if it works
-              const skinUrl = `http://127.0.0.1:${PORT}/skins/${username}.png`
+              const skinUrl = `${publicBaseUrl}/skins/${username}.png`
               sendCommand(`sr url ${username} "${skinUrl}"`)
               res.writeHead(200, { 'Content-Type': 'application/json' })
               res.end(JSON.stringify({ success: true, url: skinUrl }))
@@ -229,7 +229,7 @@ function handleRequest(req, res) {
           const base64 = skinData.replace(/^data:image\/\w+;base64,/, "")
           fs.writeFileSync(savePath, base64, 'base64')
           console.log(`[Skins] Skin feltöltve: ${username}`)
-          const skinUrl = `http://127.0.0.1:${PORT}/skins/${username}.png`
+          const skinUrl = `${publicBaseUrl}/skins/${username}.png`
           sendCommand(`sr url ${username} "${skinUrl}"`)
           res.writeHead(200, { 'Content-Type': 'application/json' })
           res.end(JSON.stringify({ success: true, url: skinUrl }))
