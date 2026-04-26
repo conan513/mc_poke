@@ -1013,6 +1013,9 @@ async function launch({ username, ram, serverUrl }, onLog, onClose) {
     try {
       const modsDir = path.join(instanceDir, 'mods')
       await syncServerMods(serverUrl.trim(), instanceDir, onLog)
+      
+      // Setup local skin config for singleplayer (SkinsRestorer Fabric mod)
+      await prepareLocalSkinConfig(instanceDir, username, serverUrl.trim())
     } catch (e) {
       onLog?.(`[Sync-Hiba] Kivétel a szinkronizáció során: ${e.message}`)
     }
@@ -1109,6 +1112,35 @@ async function checkForUpdates() {
   } catch (_) {}
 
   return result
+}
+
+/**
+ * Prepares the local SkinsRestorer configuration for singleplayer.
+ */
+async function prepareLocalSkinConfig(instanceDir, username, serverUrl) {
+  try {
+    const srConfigDir = path.join(instanceDir, 'config', 'SkinsRestorer')
+    const playersDir = path.join(srConfigDir, 'players')
+    fse.ensureDirSync(playersDir)
+
+    // Construct the public skin URL (same logic as server-side)
+    const baseUrl = serverUrl.replace(/\/+$/, '')
+    const skinUrl = `${baseUrl}/skins/${username}.png`
+
+    // SkinsRestorer Fabric often uses <name>.json in the players folder
+    const playerFile = path.join(playersDir, `${username.toLowerCase()}.json`)
+    
+    const skinData = {
+      skin: skinUrl,
+      timestamp: Date.now(),
+      variant: 'CLASSIC'
+    }
+
+    fs.writeFileSync(playerFile, JSON.stringify(skinData, null, 2))
+    console.log(`[Launcher] Local skin config prepared for ${username} at ${skinUrl}`)
+  } catch (e) {
+    console.warn(`[Launcher-Warning] Failed to prepare local skin config: ${e.message}`)
+  }
 }
 
 module.exports = { install, launch, isInstalled, checkForUpdates, getModpackDir }
