@@ -19,7 +19,7 @@ const fs      = require('fs')
 const path    = require('path')
 const crypto  = require('crypto')
 const os      = require('os')
-const { spawn } = require('child_process')
+const { spawn, execFile } = require('child_process')
 const installer = require('./installer')
 const https   = require('https')
 
@@ -168,6 +168,36 @@ function buildManifest() {
   return manifest
 }
 
+function uploadToCatboxAndSetSkin(filePath, username, res) {
+  console.log(`[Skins] Feltöltés a webre (catbox.moe) a MineSkin API miatt...`);
+  execFile('curl', ['-F', 'reqtype=fileupload', '-F', `fileToUpload=@${filePath}`, 'https://catbox.moe/user/api.php'], (err, stdout, stderr) => {
+    if (err) {
+      console.error('[Skins] Catbox feltöltési hiba:', err);
+      if (!res.writableEnded) {
+        res.writeHead(500, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ error: 'Hiba a publikus skin URL generálása során: ' + err.message }));
+      }
+      return;
+    }
+    const publicUrl = stdout.trim();
+    if (!publicUrl.startsWith('http')) {
+      console.error('[Skins] Érvénytelen válasz a catbox.moe-tól:', publicUrl);
+      if (!res.writableEnded) {
+        res.writeHead(500, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ error: 'Érvénytelen válasz a publikus képmegosztótól.' }));
+      }
+      return;
+    }
+    
+    console.log(`[Skins] Publikus URL elkészült: ${publicUrl}`);
+    sendCommand(`sr url ${username} "${publicUrl}"`);
+    if (!res.writableEnded) {
+      res.writeHead(200, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ success: true, url: publicUrl }));
+    }
+  });
+}
+
 // ── Request handler ──────────────────────────────────────────
 
 function handleRequest(req, res) {
@@ -202,8 +232,6 @@ function handleRequest(req, res) {
         const { username, skinData, isUrl } = JSON.parse(body)
         if (!username || !skinData) throw new Error('Hiányzó adatok.')
 
-        const host = req.headers.host || `localhost:${PORT}`
-        const publicBaseUrl = `http://${host}` // Assuming HTTP as per user info
         const savePath = path.join(SKINS_DIR, `${username}.png`)
         
         if (isUrl) {
@@ -215,10 +243,7 @@ function handleRequest(req, res) {
             file.on('finish', () => {
               file.close()
               console.log(`[Skins] Skin letöltve: ${username}`)
-              const skinUrl = `${publicBaseUrl}/skins/${username}.png`
-              sendCommand(`sr set ${username} url ${skinUrl}`)
-              res.writeHead(200, { 'Content-Type': 'application/json' })
-              res.end(JSON.stringify({ success: true, url: skinUrl }))
+              uploadToCatboxAndSetSkin(savePath, username, res)
             })
           }).on('error', (e) => {
             res.writeHead(500)
@@ -229,10 +254,7 @@ function handleRequest(req, res) {
           const base64 = skinData.replace(/^data:image\/\w+;base64,/, "")
           fs.writeFileSync(savePath, base64, 'base64')
           console.log(`[Skins] Skin feltöltve: ${username}`)
-          const skinUrl = `${publicBaseUrl}/skins/${username}.png`
-          sendCommand(`sr set ${username} url ${skinUrl}`)
-          res.writeHead(200, { 'Content-Type': 'application/json' })
-          res.end(JSON.stringify({ success: true, url: skinUrl }))
+          uploadToCatboxAndSetSkin(savePath, username, res)
         }
       } catch (e) {
         res.writeHead(400, { 'Content-Type': 'application/json' })

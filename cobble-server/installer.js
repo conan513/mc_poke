@@ -305,12 +305,13 @@ async function updateModsFromModrinth() {
  * Ensures specific extra mods are present.
  */
 async function ensureExtraMods() {
-  const extraMods = ['chipped', 'terrablender', 'skinrestorer'];
+  const extraMods = ['chipped', 'terrablender', 'skinsrestorer'];
   console.log(`[Modrinth] Extra modok ellenőrzése: ${extraMods.join(', ')}...`);
 
   for (const slug of extraMods) {
     try {
-      const query = `loaders=${encodeURIComponent('["fabric"]')}&game_versions=${encodeURIComponent(`["${MC_VERSION}"]`)}`
+      const gameVersionQuery = slug === 'skinsrestorer' ? '' : `&game_versions=${encodeURIComponent(`["${MC_VERSION}"]`)}`
+      const query = `loaders=${encodeURIComponent('["fabric"]')}${gameVersionQuery}`
       const versions = await modrinthRequest(`/v2/project/${slug}/version?${query}`);
       const latest = versions.filter(v => v.version_type === 'release')[0] || versions[0];
       
