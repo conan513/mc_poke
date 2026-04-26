@@ -25,6 +25,7 @@ const https   = require('https')
 
 const PORT       = parseInt(process.env.PORT || '7878', 10)
 const DATA_DIR   = path.join(__dirname, 'server-data')
+const SKINS_DIR  = path.join(DATA_DIR, 'skins')
 const SYNC_FOLDERS = ['mods', 'datapacks', 'config', 'resourcepacks', 'shaderpacks']
 
 // Map of folder names to their full paths
@@ -46,6 +47,7 @@ let activeJavaPath = null
 SYNC_FOLDERS.forEach(f => {
   fs.mkdirSync(DIRS[f], { recursive: true })
 })
+fs.mkdirSync(SKINS_DIR, { recursive: true })
 
 // ── Auth ──────────────────────────────────────────────────────────
 const AUTH_FILE = path.join(DATA_DIR, '.admin-auth.json')
@@ -97,7 +99,7 @@ function startMinecraft() {
   console.log('[Minecraft] Szerver indítása (java -jar fabric-server-launch.jar nogui)...')
   mcProcess = spawn(activeJavaPath, ['-Xmx4G', '-Xms2G', '-jar', 'fabric-server-launch.jar', 'nogui'], {
     cwd: DATA_DIR,
-    stdio: 'inherit'
+    stdio: ['pipe', 'inherit', 'inherit']
   })
   mcStatus = 'running'
   
@@ -106,6 +108,13 @@ function startMinecraft() {
     mcStatus = 'stopped'
     mcProcess = null
   })
+}
+
+function sendCommand(cmd) {
+  if (mcProcess && mcStatus === 'running') {
+    mcProcess.stdin.write(cmd + '\n')
+    console.log(`[Minecraft-CMD] Sent: ${cmd}`)
+  }
 }
 
 function stopMinecraft() {
@@ -169,6 +178,69 @@ function handleRequest(req, res) {
   if (req.method === 'OPTIONS') { res.writeHead(204); res.end(); return }
 
   const url = req.url.split('?')[0]
+
+  // ── Skin Serving (GET /skins/:name.png) ───────────────────
+  if (req.method === 'GET' && url.startsWith('/skins/')) {
+    const fileName = path.basename(url)
+    const filePath = path.join(SKINS_DIR, fileName)
+    if (fs.existsSync(filePath)) {
+      res.writeHead(200, { 'Content-Type': 'image/png' })
+      return fs.createReadStream(filePath).pipe(res)
+    } else {
+      res.writeHead(404)
+      return res.end()
+    }
+  }
+
+  // ── Skin Upload (POST /api/upload-skin) ───────────────────
+  // Note: No auth for this specifically to allow launcher to upload without login
+  if (req.method === 'POST' && url === '/api/upload-skin') {
+    let body = ''
+    req.on('data', chunk => body += chunk)
+    req.on('end', () => {
+      try {
+        const { username, skinData, isUrl } = JSON.parse(body)
+        if (!username || !skinData) throw new Error('Hiányzó adatok.')
+
+        const savePath = path.join(SKINS_DIR, `${username}.png`)
+        
+        if (isUrl) {
+          // If it's a URL, we download it on the server
+          const mod = skinData.startsWith('https') ? https : http
+          mod.get(skinData, (sres) => {
+            const file = fs.createWriteStream(savePath)
+            sres.pipe(file)
+            file.on('finish', () => {
+              file.close()
+              console.log(`[Skins] Skin letöltve: ${username}`)
+              // Apply via SkinsRestorer command
+              // We use 0.0.0.0 or the public IP if possible, but for the command localhost is fine if it works
+              const skinUrl = `http://localhost:${PORT}/skins/${username}.png`
+              sendCommand(`sr set ${username} ${skinUrl}`)
+              res.writeHead(200, { 'Content-Type': 'application/json' })
+              res.end(JSON.stringify({ success: true, url: skinUrl }))
+            })
+          }).on('error', (e) => {
+            res.writeHead(500)
+            res.end(JSON.stringify({ error: e.message }))
+          })
+        } else {
+          // Base64 data
+          const base64 = skinData.replace(/^data:image\/\w+;base64,/, "")
+          fs.writeFileSync(savePath, base64, 'base64')
+          console.log(`[Skins] Skin feltöltve: ${username}`)
+          const skinUrl = `http://localhost:${PORT}/skins/${username}.png`
+          sendCommand(`sr set ${username} ${skinUrl}`)
+          res.writeHead(200, { 'Content-Type': 'application/json' })
+          res.end(JSON.stringify({ success: true, url: skinUrl }))
+        }
+      } catch (e) {
+        res.writeHead(400, { 'Content-Type': 'application/json' })
+        res.end(JSON.stringify({ error: e.message }))
+      }
+    })
+    return
+  }
 
   // ── Auth API (nem igényel tokent) ────────────────────────────
   if (url === '/admin/api/auth/status') {

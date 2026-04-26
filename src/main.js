@@ -426,3 +426,167 @@ animateParticles()
 
   showScreen('welcome')
 })()
+
+// ── Skin Management Logic ──────────────────────────────────────
+let currentSkinType = 'mojang'
+let currentSkinVal = ''
+
+function updateSkinPreview() {
+  const img = $id('skin-preview-img')
+  const val = $id('input-skin-val').value.trim() || 'Steve'
+  
+  if (currentSkinType === 'mojang') {
+    img.src = `https://mc-heads.net/body/front/${val}`
+  } else {
+    img.src = val // Assumes direct image URL
+  }
+}
+
+function applyAvatar() {
+  const avatar = $id('player-avatar')
+  const val = currentSkinVal || 'Steve'
+  
+  if (currentSkinType === 'mojang') {
+    avatar.style.backgroundImage = `url(https://mc-heads.net/avatar/${val})`
+    avatar.style.backgroundSize = 'cover'
+    avatar.textContent = ''
+  } else {
+    // For URL skins, we might not have a square avatar easily, 
+    // but we can try to use the same URL or fallback to first letter.
+    avatar.style.backgroundImage = `url(${val})`
+    avatar.style.backgroundSize = 'cover'
+    avatar.textContent = ''
+  }
+}
+
+// Event Listeners for Skin Modal
+$id('btn-change-skin').addEventListener('click', () => {
+  const modal = $id('modal-skin')
+  modal.classList.remove('hidden')
+  setTimeout(() => modal.classList.add('active'), 10)
+  
+  // Load current values into modal
+  $id('input-skin-val').value = currentSkinVal
+  updateSkinPreview()
+})
+
+$id('btn-close-skin').addEventListener('click', () => {
+  const modal = $id('modal-skin')
+  modal.classList.remove('active')
+  setTimeout(() => modal.classList.add('hidden'), 300)
+})
+
+document.querySelectorAll('[data-skin-type]').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('[data-skin-type]').forEach(b => b.classList.remove('active'))
+    btn.classList.add('active')
+    currentSkinType = btn.dataset.skinType
+    
+    // UI visibility
+    if (currentSkinType === 'file') {
+      $id('skin-input-container').classList.add('hidden')
+      $id('btn-browse-skin').classList.remove('hidden')
+    } else {
+      $id('skin-input-container').classList.remove('hidden')
+      $id('btn-browse-skin').classList.add('hidden')
+      $id('input-skin-val').placeholder = currentSkinType === 'mojang' ? 'pl. AshKetchum' : 'https://.../skin.png'
+    }
+    updateSkinPreview()
+  })
+})
+
+$id('btn-browse-skin').addEventListener('click', () => {
+  $id('input-skin-file').click()
+})
+
+$id('input-skin-file').addEventListener('change', (e) => {
+  const file = e.target.files[0]
+  if (!file) return
+  
+  const reader = new FileReader()
+  reader.onload = (ev) => {
+    const data = ev.target.result
+    $id('skin-preview-img').src = data
+    // Store temporarily in currentSkinVal so save button can use it
+    currentSkinVal = data 
+  }
+  reader.readAsDataURL(file)
+})
+
+$id('input-skin-val').addEventListener('input', updateSkinPreview)
+
+$id('btn-save-skin').addEventListener('click', async () => {
+  if (currentSkinType !== 'file') {
+    currentSkinVal = $id('input-skin-val').value.trim()
+  }
+  
+  if (!currentSkinVal) {
+    showToast('⚠️ Kérlek adj meg egy nevet, linket vagy válassz fájlt!')
+    return
+  }
+
+  try {
+    localStorage.setItem('cobble_skin_type', currentSkinType)
+    localStorage.setItem('cobble_skin_val', currentSkinVal)
+  } catch(e) {}
+  
+  applyAvatar()
+  
+  // Upload to server for SkinsRestorer integration
+  await uploadSkinToServer()
+
+  showToast('✅ Skin elmentve és feltöltve!')
+  $id('btn-close-skin').click()
+})
+
+async function uploadSkinToServer() {
+  const serverUrl = $id('input-server-url').value.trim()
+  if (!serverUrl) return
+
+  const payload = {
+    username: username,
+    skinData: currentSkinVal, // This is either name, url, or base64
+    isUrl: currentSkinType === 'url' || currentSkinType === 'mojang'
+  }
+  
+  // Actually, for mojang we might want the server to download it, 
+  // but let's just send the name and let the server handle 'isUrl'
+  // If currentSkinType is 'mojang', the server will try to download from mc-heads or similar
+  // Wait, let's refine the server logic: if it's a mojang name, let's treat it as a special case.
+  // Actually, my server logic handles 'isUrl'. If it starts with http, it downloads.
+  
+  if (currentSkinType === 'mojang') {
+    payload.skinData = `https://mc-heads.net/body/front/${currentSkinVal}.png`
+    payload.isUrl = true
+  }
+
+  try {
+    const response = await fetch(`${serverUrl.replace(/\/+$/, '')}/api/upload-skin`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    })
+    const res = await response.json()
+    if (res.success) {
+      console.log('[Skins] Skin sikeresen feltöltve a szerverre:', res.url)
+    }
+  } catch (e) {
+    console.warn('[Skins] Nem sikerült feltölteni a skint a szerverre:', e.message)
+  }
+}
+
+// Load saved skin on startup
+try {
+  const st = localStorage.getItem('cobble_skin_type')
+  const sv = localStorage.getItem('cobble_skin_val')
+  if (st) {
+    currentSkinType = st
+    document.querySelectorAll('[data-skin-type]').forEach(b => {
+      b.classList.toggle('active', b.dataset.skinType === st)
+    })
+  }
+  if (sv) {
+    currentSkinVal = sv
+    applyAvatar()
+  }
+} catch(e) {}

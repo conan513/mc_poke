@@ -57,7 +57,7 @@ function fetchManifest(serverUrl) {
 // List of files that should ALWAYS be removed from the mods folder if they exist.
 // This runs even if the sync server is unreachable.
 const FORCED_REMOVALS = [
-  // Add files here that should be blacklisted from the mods folder
+  'custom-splash-screen', 'customsplashscreen', 'mobsbegone', 'soundsbegone', 'interactic'
 ]
 
 async function syncServerMods(serverUrl, instanceDir, onLog) {

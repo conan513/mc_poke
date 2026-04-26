@@ -68,20 +68,95 @@ let gameDir
 let javaPath
 let progressCallback = null
 
+/**
+ * NEW DIRECTORY STRUCTURE (Prism Launcher style)
+ * ROOT (userData)
+ *   ├── assets/
+ *   ├── libraries/
+ *   ├── versions/
+ *   ├── java21/
+ *   └── instances/
+ *       └── cobbleverse/
+ *           └── minecraft/ (gameDirectory: mods, config, etc.)
+ */
+
+function getRootDataDir() {
+  return app.getPath('userData')
+}
+
+function getInstanceDir() {
+  return path.join(getRootDataDir(), 'instances', 'cobbleverse')
+}
+
+function getMinecraftDir() {
+  const dir = path.join(getInstanceDir(), 'minecraft')
+  fse.ensureDirSync(dir)
+  return dir
+}
+
 function getGameDir() {
-  if (gameDir) return gameDir
-  const userData = app.getPath('userData')
-  gameDir = path.join(userData, 'cobbleverse')
-  fse.ensureDirSync(gameDir)
-  return gameDir
+  // For MCLC 'root' (assets, libraries, versions)
+  return getRootDataDir()
 }
 
 function getJavaDir() {
-  return path.join(getGameDir(), 'java21')
+  return path.join(getRootDataDir(), 'java21')
 }
 
 function getModpackDir() {
-  return getGameDir()
+  // For mods, config, etc.
+  return getMinecraftDir()
+}
+
+/**
+ * Migrates old folder structure to new Prism-style structure if needed.
+ */
+function migrateStructure() {
+  const userData = getRootDataDir()
+  const oldBase = path.join(userData, 'cobbleverse')
+  const newInstance = getMinecraftDir()
+
+  if (fs.existsSync(oldBase) && !oldBase.includes('instances')) {
+    console.log('[Migration] Régi mappaszerkezet észlelt, költöztetés...')
+    try {
+      // 1. Move assets, libraries, versions from oldBase/minecraft to ROOT
+      const oldMc = path.join(oldBase, 'minecraft')
+      if (fs.existsSync(oldMc)) {
+        const entries = fs.readdirSync(oldMc)
+        for (const entry of entries) {
+          const src = path.join(oldMc, entry)
+          const dst = path.join(userData, entry)
+          if (!fs.existsSync(dst)) {
+            fse.moveSync(src, dst, { overwrite: false })
+          }
+        }
+        fse.removeSync(oldMc)
+      }
+
+      // 2. Move everything else from oldBase to newInstance
+      const entries = fs.readdirSync(oldBase)
+      for (const entry of entries) {
+        const src = path.join(oldBase, entry)
+        if (entry === 'java21') {
+          const dst = path.join(userData, 'java21')
+          if (!fs.existsSync(dst)) fse.moveSync(src, dst)
+          else fse.removeSync(src)
+        } else if (entry === 'launcher-state.json') {
+          const dst = path.join(userData, 'launcher-state.json')
+          if (!fs.existsSync(dst)) fse.moveSync(src, dst)
+          else fse.removeSync(src)
+        } else {
+          // Everything else (mods, config, saves, etc.) goes to newInstance
+          const dst = path.join(newInstance, entry)
+          fse.moveSync(src, dst, { overwrite: true })
+        }
+      }
+      fse.removeSync(oldBase)
+      console.log('[Migration] Költöztetés sikeres.')
+    } catch (e) {
+      console.error('[Migration-Hiba] Hiba a költöztetés során:', e.message)
+    }
+  }
 }
 
 function sendProgress(step, percent, message) {
@@ -328,7 +403,7 @@ async function fetchLatestFabricVersions() {
 }
 
 async function installFabric() {
-  const mcDir = path.join(getGameDir(), 'minecraft')
+  const mcDir = getGameDir()
 
   // ── 1. Resolve latest versions from Fabric API ──────────────
   sendProgress('fabric', 2, 'Fabric verzió ellenőrzése...')
@@ -499,7 +574,7 @@ async function installFabric() {
 async function installMinecraft() {
   sendProgress('minecraft', 0, 'Minecraft 1.21.1 letöltése...')
 
-  const mcDir = path.join(getGameDir(), 'minecraft')
+  const mcDir = getGameDir()
   const client = new Client()
 
   // We use MCLC to download assets & libs by launching with skip
@@ -637,6 +712,33 @@ async function fetchLatestModpackVersion() {
 }
 
 // ── Modrinth Individual Mod Updates ───────────────────────────
+
+/**
+ * BLACKLIST: Mods that are known to cause crashes or are unwanted on the client.
+ */
+const CLEANUP_BLACKLIST = ['custom-splash-screen', 'customsplashscreen', 'mobsbegone', 'soundsbegone', 'interactic'];
+
+/**
+ * Removes blacklisted mods from the mods folder.
+ */
+async function cleanupClientMods(onLog) {
+  const instanceDir = getModpackDir()
+  const modsDir = path.join(instanceDir, 'mods')
+  if (!fs.existsSync(modsDir)) return
+
+  const files = fs.readdirSync(modsDir)
+  for (const file of files) {
+    const lower = file.toLowerCase()
+    if (CLEANUP_BLACKLIST.some(b => lower.includes(b))) {
+      onLog?.(`[Cleanup] Hibás vagy tiltott mod eltávolítása: ${file}`)
+      try {
+        fs.unlinkSync(path.join(modsDir, file))
+      } catch (e) {
+        console.error(`[Cleanup-Hiba] Nem sikerült törölni: ${file}`, e.message)
+      }
+    }
+  }
+}
 
 /**
  * Scans the mods folder and checks Modrinth for newer versions
@@ -858,7 +960,12 @@ async function installModpack(serverUrl = '') {
     }
   }
 
-  // ── 8. Modrinth Mod Updates (ensure all mods are latest 1.21.1) ──
+  // 8. Cleanup Blacklisted/Broken Mods
+  await cleanupClientMods((msg) => {
+    sendProgress('modpack', 100, msg)
+  })
+
+  // 9. Modrinth Mod Updates (ensure all mods are latest 1.21.1) ──
   try {
     await updateModsFromModrinth((msg) => {
       sendProgress('modpack', 100, msg)
@@ -874,6 +981,8 @@ async function installModpack(serverUrl = '') {
 async function install({ username, ram, serverUrl }, onProgress) {
   progressCallback = onProgress
 
+  migrateStructure()
+
   sendProgress('start', 0, 'Telepítés megkezdése...')
 
   await installJava()
@@ -886,7 +995,9 @@ async function install({ username, ram, serverUrl }, onProgress) {
 }
 
 async function launch({ username, ram, serverUrl }, onLog, onClose) {
-  const mcDir = path.join(getGameDir(), 'minecraft')
+  migrateStructure()
+
+  const mcDir = getGameDir()
   const instanceDir = getModpackDir()
   const java = javaPath || getJavaExecutable()
 
@@ -906,6 +1017,9 @@ async function launch({ username, ram, serverUrl }, onLog, onClose) {
       onLog?.(`[Sync-Hiba] Kivétel a szinkronizáció során: ${e.message}`)
     }
   }
+
+  // ── Cleanup Blacklisted/Broken Mods ─────────────────────────
+  await cleanupClientMods(onLog)
 
   // ── Modrinth Individual Mod Updates ──────────────────────────
   await updateModsFromModrinth(onLog)

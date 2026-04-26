@@ -336,7 +336,7 @@ async function ensureExtraMods() {
  * Removes any mods that are on the blacklist from the mods folder.
  */
 async function cleanupBlacklistedMods() {
-  const blacklist = ['no hunger', 'mobsbegone', 'no ender dragon', 'soundsbegone', 'interactic'];
+  const blacklist = ['no hunger', 'mobsbegone', 'no ender dragon', 'soundsbegone', 'interactic', 'custom-splash-screen', 'customsplashscreen'];
   if (fs.existsSync(MODS_DIR)) {
     const files = fs.readdirSync(MODS_DIR);
     for (const file of files) {
@@ -426,7 +426,7 @@ async function install() {
     for (const entry of zip.getEntries()) {
       if (entry.isDirectory) continue
       const lowerName = entry.entryName.toLowerCase()
-      if (lowerName.includes('no hunger') || lowerName.includes('mobsbegone') || lowerName.includes('no ender dragon') || lowerName.includes('soundsbegone') || lowerName.includes('interactic')) continue
+      if (lowerName.includes('no hunger') || lowerName.includes('mobsbegone') || lowerName.includes('no ender dragon') || lowerName.includes('soundsbegone') || lowerName.includes('interactic') || lowerName.includes('custom-splash-screen') || lowerName.includes('customsplashscreen')) continue
 
       let destPath = null
       if (entry.entryName.startsWith('server-overrides/')) {
@@ -447,7 +447,7 @@ async function install() {
     const serverFiles = files.filter(f => {
       if (f.env && f.env.server === 'unsupported') return false
       const lowerPath = f.path.toLowerCase()
-      if (lowerPath.includes('no hunger') || lowerPath.includes('mobsbegone') || lowerPath.includes('no ender dragon') || lowerPath.includes('soundsbegone') || lowerPath.includes('interactic')) return false
+      if (lowerPath.includes('no hunger') || lowerPath.includes('mobsbegone') || lowerPath.includes('no ender dragon') || lowerPath.includes('soundsbegone') || lowerPath.includes('interactic') || lowerPath.includes('custom-splash-screen') || lowerPath.includes('customsplashscreen')) return false
       return true
     })
     console.log(`[Installer] Szerver modok letöltése (${serverFiles.length} db)...`)
