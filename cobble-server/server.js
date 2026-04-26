@@ -215,8 +215,8 @@ function handleRequest(req, res) {
               console.log(`[Skins] Skin letöltve: ${username}`)
               // Apply via SkinsRestorer command
               // We use 0.0.0.0 or the public IP if possible, but for the command localhost is fine if it works
-              const skinUrl = `http://localhost:${PORT}/skins/${username}.png`
-              sendCommand(`sr set ${username} ${skinUrl}`)
+              const skinUrl = `http://127.0.0.1:${PORT}/skins/${username}.png`
+              sendCommand(`sr url ${username} "${skinUrl}"`)
               res.writeHead(200, { 'Content-Type': 'application/json' })
               res.end(JSON.stringify({ success: true, url: skinUrl }))
             })
@@ -229,8 +229,8 @@ function handleRequest(req, res) {
           const base64 = skinData.replace(/^data:image\/\w+;base64,/, "")
           fs.writeFileSync(savePath, base64, 'base64')
           console.log(`[Skins] Skin feltöltve: ${username}`)
-          const skinUrl = `http://localhost:${PORT}/skins/${username}.png`
-          sendCommand(`sr set ${username} ${skinUrl}`)
+          const skinUrl = `http://127.0.0.1:${PORT}/skins/${username}.png`
+          sendCommand(`sr url ${username} "${skinUrl}"`)
           res.writeHead(200, { 'Content-Type': 'application/json' })
           res.end(JSON.stringify({ success: true, url: skinUrl }))
         }
