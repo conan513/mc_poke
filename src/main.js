@@ -425,6 +425,21 @@ animateParticles()
   })
 
   showScreen('welcome')
+
+  // Auto-launch handling from cobble:// protocol
+  window.cobble.onProtocolLaunch(() => {
+    console.log('Megérkezett a protocol-launch esemény!')
+    // Ha van mentett felhasználónév, próbáljunk meg automatikusan elindulni
+    if (username || $id('input-username').value.trim()) {
+      if (screens.home.classList.contains('active')) {
+        $id('btn-play').click()
+      } else if (screens.welcome.classList.contains('active')) {
+        $id('btn-install').click()
+      }
+    } else {
+      showToast('Kérlek add meg a felhasználóneved a játék elindításához!')
+    }
+  })
 })()
 
 // ── Skin Management Logic ──────────────────────────────────────

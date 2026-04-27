@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="hu">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Letöltés | CobbleLauncher</title>
+  <meta name="description" content="Töltsd le a CobbleLauncher-t és csatlakozz a szerverhez egyetlen kattintással.">
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;700;800&family=Inter:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <div class="container" id="main-container">
+    <div class="logo-container">
+      <span class="logo-icon">📦</span>
+    </div>
+    
+    <h1>CobbleLauncher</h1>
+    <p class="subtitle">A hivatalos kliens a szerverhez. Telepítsd és játssz azonnal!</p>
+
+    <div class="download-section">
+      <a href="cobble://launch" id="main-download-btn" class="btn-main loading">
+        <span id="btn-icon">⏳</span>
+        <span id="btn-text">Rendszer ellenőrzése...</span>
+      </a>
+      <div class="os-detected">
+        <span id="os-detected-text">Kérlek várj...</span>
+      </div>
+    </div>
+
+    <div class="instructions" id="install-instructions">
+      <!-- JS fills this -->
+      <h3>💡 Hogyan működik?</h3>
+      <p>Kattints a fenti gombra! Ha már telepítve van a kliens, a játék azonnal elindul. Ha még nincs, felkínáljuk a letöltést.</p>
+    </div>
+
+    <div class="alternatives">
+      <p>Másik platformra keresel letöltést?</p>
+      <div class="alt-links">
+        <a href="#" id="alt-win" class="alt-link">🪟 Windows (.exe)</a>
+        <a href="#" id="alt-linux-app" class="alt-link">🐧 Linux (.AppImage)</a>
+        <a href="#" id="alt-linux-deb" class="alt-link">📦 Ubuntu/Debian (.deb)</a>
+      </div>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>

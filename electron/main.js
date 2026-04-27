@@ -21,6 +21,56 @@ process.emit = function (name, data, ...args) {
 
 let mainWindow
 
+// Force single instance lock
+const gotTheLock = app.requestSingleInstanceLock()
+
+if (!gotTheLock) {
+  app.quit()
+} else {
+  app.on('second-instance', (event, commandLine, workingDirectory) => {
+    // Someone tried to run a second instance, we should focus our window.
+    if (mainWindow) {
+      if (mainWindow.isMinimized()) mainWindow.restore()
+      mainWindow.focus()
+    }
+    // Parse protocol from command line on Windows/Linux
+    const url = commandLine.find(arg => arg.startsWith('cobble://'))
+    if (url && mainWindow) {
+      handleProtocolUrl(url)
+    }
+  })
+}
+
+// Register protocol client for Windows/Linux
+if (process.defaultApp) {
+  if (process.argv.length >= 2) {
+    app.setAsDefaultProtocolClient('cobble', process.execPath, [path.resolve(process.argv[1])])
+  }
+} else {
+  app.setAsDefaultProtocolClient('cobble')
+}
+
+let deepLinkUrl = null
+
+function handleProtocolUrl(url) {
+  if (url === 'cobble://launch' || url === 'cobble://launch/') {
+    // Send event to renderer to auto-start the game
+    if (mainWindow && mainWindow.webContents) {
+      mainWindow.webContents.send('protocol-launch')
+    }
+  }
+}
+
+app.on('open-url', (event, url) => {
+  // macOS protocol handler
+  event.preventDefault()
+  if (app.isReady()) {
+    handleProtocolUrl(url)
+  } else {
+    deepLinkUrl = url
+  }
+})
+
 function createWindow() {
   mainWindow = new BrowserWindow({
     width: 1100,
@@ -49,6 +99,16 @@ function createWindow() {
 
 app.whenReady().then(() => {
   createWindow()
+  
+  // Check if opened via protocol on Windows/Linux
+  const url = process.argv.find(arg => arg.startsWith('cobble://'))
+  if (url) {
+    setTimeout(() => handleProtocolUrl(url), 1500) // Wait for UI to load
+  } else if (deepLinkUrl) {
+    // macOS
+    setTimeout(() => handleProtocolUrl(deepLinkUrl), 1500)
+  }
+
   app.on('activate', () => {
     if (BrowserWindow.getAllWindows().length === 0) createWindow()
   })

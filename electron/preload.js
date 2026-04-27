@@ -24,6 +24,7 @@ contextBridge.exposeInMainWorld('cobble', {
   onProgress: (cb) => ipcRenderer.on('install-progress', (_, data) => cb(data)),
   onGameLog: (cb) => ipcRenderer.on('game-log', (_, data) => cb(data)),
   onGameClosed: (cb) => ipcRenderer.on('game-closed', () => cb()),
+  onProtocolLaunch: (cb) => ipcRenderer.on('protocol-launch', () => cb()),
 
   // External links
   openExternal: (url) => ipcRenderer.send('open-external', url),
