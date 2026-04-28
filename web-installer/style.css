@@ -130,10 +130,17 @@ h1 {
   -webkit-text-fill-color: transparent;
 }
 
+.hero-content {
+  margin-bottom: 4rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
 .subtitle {
   font-size: 1.3rem;
   color: #ccc;
-  margin-bottom: 3rem;
+  margin-bottom: 2.5rem;
   max-width: 600px;
   margin-left: auto;
   margin-right: auto;
@@ -144,7 +151,7 @@ h1 {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 1.2rem;
+  gap: 1.5rem;
 }
 
 .btn-main {
