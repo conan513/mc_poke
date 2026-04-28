@@ -323,7 +323,6 @@ async function ensureExtraMods() {
     { slug: 'trainer-accessories',            loaders: ['fabric'], gameVersions: [MC_VERSION] },
     { slug: 'cobblemon-rankeds',              loaders: ['fabric'], gameVersions: [MC_VERSION] },
     { slug: 'more-cobblemon-stats',           loaders: ['fabric'], gameVersions: [MC_VERSION] },
-    { slug: 'cobblemon_battlecam',            loaders: ['fabric'], gameVersions: [MC_VERSION] },
     { slug: 'cobblemon-max-level-catch-cap',  loaders: ['fabric'], gameVersions: [MC_VERSION] },
     { slug: 'cobblemon-capture-notification', loaders: ['fabric'], gameVersions: [MC_VERSION] },
     { slug: 'cobblemon-rustling-spots',       loaders: ['fabric'], gameVersions: [MC_VERSION] },
@@ -382,7 +381,7 @@ async function ensureExtraMods() {
  * Removes any mods that are on the blacklist from the mods folder.
  */
 async function cleanupBlacklistedMods() {
-  const blacklist = ['no hunger', 'mobsbegone', 'no ender dragon', 'soundsbegone', 'interactic', 'custom-splash-screen', 'customsplashscreen'];
+  const blacklist = ['no hunger', 'mobsbegone', 'no ender dragon', 'soundsbegone', 'interactic', 'custom-splash-screen', 'customsplashscreen', 'battlecam'];
   if (fs.existsSync(MODS_DIR)) {
     const files = fs.readdirSync(MODS_DIR);
     for (const file of files) {

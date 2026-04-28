@@ -13,6 +13,7 @@ const http = require('http')
 const { execFile, exec } = require('child_process')
 const AdmZip = require('adm-zip')
 const os = require('os')
+const crypto = require('crypto')
 const { app } = require('electron')
 const { syncServerMods } = require('./sync')
 
@@ -716,7 +717,7 @@ async function fetchLatestModpackVersion() {
 /**
  * BLACKLIST: Mods that are known to cause crashes or are unwanted on the client.
  */
-const CLEANUP_BLACKLIST = ['custom-splash-screen', 'customsplashscreen', 'mobsbegone', 'soundsbegone', 'interactic'];
+const CLEANUP_BLACKLIST = ['custom-splash-screen', 'customsplashscreen', 'mobsbegone', 'soundsbegone', 'interactic', 'battlecam'];
 
 /**
  * Removes blacklisted mods from the mods folder.
