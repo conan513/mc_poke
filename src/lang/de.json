@@ -37,6 +37,25 @@
     "username_short": "Benutzername muss mindestens 3 Zeichen lang sein!",
     "username_chars": "Nur Buchstaben, Zahlen und _ erlaubt!",
     "install_error": "Installationsfehler: ",
-    "update_error": "Updatefehler: "
+    "update_error": "Updatefehler: ",
+    "launch_error": "Startfehler: "
+  },
+  "titlebar": {
+    "lang_title": "Sprache ändern",
+    "minimize": "Minimieren",
+    "close": "Schließen"
+  },
+  "skin": {
+    "modal_title": "Skin-Einstellungen",
+    "rotate_hint": "Zum Drehen ziehen",
+    "source_label": "Skin-Quelle",
+    "type_mojang": "Mojang Name",
+    "type_url": "Benutzerdefinierte URL",
+    "type_file": "Lokale Datei",
+    "browse_btn": "Datei auswählen...",
+    "save_btn": "Speichern & Übernehmen",
+    "toast_empty": "⚠️ Bitte einen Namen, Link oder eine Datei angeben!",
+    "toast_saved": "✅ Skin gespeichert und auf Server hochgeladen!",
+    "toast_upload_error": "⚠️ Skin-Upload fehlgeschlagen (keine Serververbindung)"
   }
 }

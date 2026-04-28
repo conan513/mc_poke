@@ -6,10 +6,14 @@
     "username_placeholder": "用户名",
     "ram_label": "内存 (RAM)：",
     "install_btn": "安装并开始游戏",
-    "disclaimer": "点击安装即表示您同意下载约 2GB 的数据。"
+    "disclaimer": "点击安装即表示您同意下载约 2GB 的数据。",
+    "stats_pokemon": "🐉 1025 宝可梦",
+    "stats_regions": "🗺️ 4 个地区",
+    "stats_megas": "✨ 93 种超级进化"
   },
   "install": {
     "title": "安装中",
+    "subtitle": "请稍候，我们正在为您准备游戏...",
     "preparing": "准备中...",
     "java": "正在下载 Java 21...",
     "minecraft": "正在下载 Minecraft...",
@@ -31,12 +35,32 @@
     "download_required": "需要下载",
     "update_btn": "更新",
     "console_btn": "控制台",
-    "files_btn": "文件"
+    "files_btn": "文件",
+    "trainer_placeholder": "训练家"
   },
   "toast": {
     "username_short": "用户名至少需要 3 个字符！",
     "username_chars": "只允许字母、数字和下划线！",
     "install_error": "安装错误：",
-    "update_error": "更新错误："
+    "update_error": "更新错误：",
+    "launch_error": "启动错误："
+  },
+  "titlebar": {
+    "lang_title": "更换语言",
+    "minimize": "最小化",
+    "close": "关闭"
+  },
+  "skin": {
+    "modal_title": "皮肤设置",
+    "rotate_hint": "拖动以旋转",
+    "source_label": "皮肤来源",
+    "type_mojang": "Mojang 玩家名",
+    "type_url": "自定义 URL",
+    "type_file": "本地文件",
+    "browse_btn": "选择文件...",
+    "save_btn": "保存并应用",
+    "toast_empty": "⚠️ 请提供名字、链接或选择文件！",
+    "toast_saved": "✅ 皮肤已保存并上传到服务器！",
+    "toast_upload_error": "⚠️ 皮肤上传失败（无法连接服务器）"
   }
 }

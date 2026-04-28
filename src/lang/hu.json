@@ -6,7 +6,10 @@
     "username_placeholder": "Felhasználónév",
     "ram_label": "Memória (RAM):",
     "install_btn": "TELEPÍTÉS ÉS JÁTÉK",
-    "disclaimer": "A telepítésre kattintva elfogadod kb. 2GB adat letöltését."
+    "disclaimer": "A telepítésre kattintva elfogadod kb. 2GB adat letöltését.",
+    "stats_pokemon": "1025 Pokémon",
+    "stats_regions": "4 Régió",
+    "stats_megas": "93 Mega Evolúció"
   },
   "install": {
     "title": "Telepítés",
@@ -17,7 +20,7 @@
     "fabric": "Fabric telepítése...",
     "modpack": "Modpack letöltése...",
     "waiting": "Várakozás...",
-    "done": "Minden telepítve! Jó játékot! 🎮",
+    "done": "Minden telepítve! Jó játékot!",
     "error": "Telepítési hiba: "
   },
   "home": {
@@ -32,7 +35,8 @@
     "download_required": "Letöltés szükséges",
     "update_btn": "Frissítés",
     "console_btn": "Konzol",
-    "files_btn": "Fájlok"
+    "files_btn": "Fájlok",
+    "trainer_placeholder": "Edző"
   },
   "sync": {
     "connecting": "Kapcsolódás a szerverhez: ",
@@ -46,6 +50,25 @@
     "username_short": "Adj meg legalább 3 karakteres felhasználónevet!",
     "username_chars": "Csak betűk, számok és _ engedélyezett!",
     "install_error": "Telepítési hiba: ",
-    "update_error": "Frissítési hiba: "
+    "update_error": "Frissítési hiba: ",
+    "launch_error": "Indítási hiba: "
+  },
+  "titlebar": {
+    "lang_title": "Nyelv váltása",
+    "minimize": "Minimalizálás",
+    "close": "Bezárás"
+  },
+  "skin": {
+    "modal_title": "Skin Beállítása",
+    "rotate_hint": "Húzza a forgatáshoz",
+    "source_label": "Skin Forrása",
+    "type_mojang": "Mojang Név",
+    "type_url": "Egyedi URL",
+    "type_file": "Helyi Fájl",
+    "browse_btn": "Fájl kiválasztása...",
+    "save_btn": "Mentés és Alkalmazás",
+    "toast_empty": "Kérlek adj meg egy nevet, linket vagy válassz fájlt!",
+    "toast_saved": "Skin elmentve és feltöltve a szerverre!",
+    "toast_upload_error": "Skin feltöltés sikertelen (nincs szerver kapcsolat)"
   }
 }

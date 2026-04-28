@@ -21,7 +21,7 @@
     </div>
     <div class="titlebar-controls">
       <div class="lang-switcher-launcher">
-        <button id="lang-btn-launcher" title="Nyelv váltása" style="margin-right: 10px;">
+        <button id="lang-btn-launcher" data-i18n-title="titlebar.lang_title" style="margin-right: 10px;">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width: 16px; height: 16px; display: inline-block; vertical-align: middle; margin-right: 4px;"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></svg>
           <span>Lang</span>
         </button>
@@ -42,8 +42,8 @@
           <button data-lang="ro">Română</button>
         </div>
       </div>
-      <button class="tb-btn minimize" id="btn-minimize" title="Minimalizálás">─</button>
-      <button class="tb-btn close" id="btn-close" title="Bezárás">✕</button>
+      <button class="tb-btn minimize" id="btn-minimize" data-i18n-title="titlebar.minimize">─</button>
+      <button class="tb-btn close" id="btn-close" data-i18n-title="titlebar.close">✕</button>
     </div>
   </div>
 
@@ -70,13 +70,28 @@
           <h1 class="brand-title">COBBLEMON <span class="brand-accent">UNIVERSE</span></h1>
           <p class="brand-subtitle" data-i18n="welcome.subtitle">Pokémon Adventure · Minecraft 1.21.1</p>
           <div class="info-badges">
-            <span class="badge">🎮 Cobblemon 1.7.3</span>
-            <span class="badge">🐉 1025 Pokémon</span>
-            <span class="badge">🗺️ 4 Régió</span>
+            <span class="badge">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="badge-icon"><rect width="20" height="12" x="2" y="6" rx="2"></rect><circle cx="12" cy="12" r="2"></circle><path d="M6 12h.01"></path><path d="M18 12h.01"></path></svg>
+              Cobblemon 1.7.3
+            </span>
+            <span class="badge">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="badge-icon"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
+              <span data-i18n="welcome.stats_pokemon">1025 Pokémon</span>
+            </span>
+            <span class="badge">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="badge-icon"><polygon points="3 6 9 3 15 6 21 3 21 18 15 21 9 18 3 21"></polygon><line x1="9" y1="3" x2="9" y2="18"></line><line x1="15" y1="6" x2="15" y2="21"></line></svg>
+              <span data-i18n="welcome.stats_regions">4 Régió</span>
+            </span>
           </div>
           <div class="info-badges" style="margin-top: 8px;">
-            <span class="badge">✨ 93 Mega Evolúció</span>
-            <span class="badge">⚡ Raid Dennek</span>
+            <span class="badge">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="badge-icon"><path d="M12 2v20"></path><path d="m4.93 4.93 14.14 14.14"></path><path d="M2 12h20"></path><path d="m19.07 4.93-14.14 14.14"></path></svg>
+              <span data-i18n="welcome.stats_megas">93 Mega Evolúció</span>
+            </span>
+            <span class="badge">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="badge-icon"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"></path></svg>
+              Raid Dennek
+            </span>
           </div>
         </div>
 
@@ -223,7 +238,7 @@
                 </div>
               </div>
               <div class="player-info">
-                <span class="player-name" id="player-name-display">Edző</span>
+                <span class="player-name" id="player-name-display" data-i18n="home.trainer_placeholder">Edző</span>
                 <span class="player-mode" data-i18n="home.player_status">Offline mód</span>
               </div>
             </div>
@@ -302,7 +317,7 @@
         <div class="modal-header">
           <h2 class="modal-title">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width: 20px; height: 20px; vertical-align: middle; margin-right: 8px; color: var(--accent-purple);"><path d="M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18z"></path><path d="M12 8a2 2 0 1 0 0-4 2 2 0 0 0 0 4z"></path><path d="M12 13a5 5 0 1 0 0-10 5 5 0 0 0 0 10z"></path></svg>
-            Skin Beállítása
+            <span data-i18n="skin.modal_title">Skin Beállítása</span>
           </h2>
           <button class="modal-close" id="btn-close-skin">✕</button>
         </div>
@@ -313,17 +328,17 @@
             <canvas id="skin-3d-canvas"></canvas>
             <div class="skin-3d-hint">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width: 14px; height: 14px; vertical-align: middle; margin-right: 4px;"><path d="m15 18-2 2-2-2"></path><path d="M13 20V4"></path><path d="m9 6 2-2 2 2"></path></svg>
-              Húzza a forgatáshoz
+              <span data-i18n="skin.rotate_hint">Húzza a forgatáshoz</span>
             </div>
           </div>
 
           <div class="skin-form">
             <div class="form-group">
-              <label class="form-label">Skin Forrása</label>
+              <label class="form-label" data-i18n="skin.source_label">Skin Forrása</label>
               <div class="tab-selectors">
-                <button class="tab-btn active" data-skin-type="mojang">Mojang Név</button>
-                <button class="tab-btn" data-skin-type="url">Egyedi URL</button>
-                <button class="tab-btn" data-skin-type="file">Helyi Fájl</button>
+                <button class="tab-btn active" data-skin-type="mojang" data-i18n="skin.type_mojang">Mojang Név</button>
+                <button class="tab-btn" data-skin-type="url" data-i18n="skin.type_url">Egyedi URL</button>
+                <button class="tab-btn" data-skin-type="file" data-i18n="skin.type_file">Helyi Fájl</button>
               </div>
               <div id="skin-input-container">
                 <input type="text" id="input-skin-val" class="form-input" placeholder="pl. Steve" style="margin-top: 10px;" />
@@ -332,7 +347,7 @@
               <button class="btn-secondary hidden" id="btn-browse-skin" style="width: 100%; margin-top: 10px;">
                 <span>
                   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width: 16px; height: 16px; vertical-align: middle; margin-right: 6px;"><path d="M4 20h16a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.93a2 2 0 0 1-1.66-.9l-.82-1.2A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v13c0 1.1.9 2 2 2z"></path></svg>
-                  Fájl kiválasztása...
+                  <span data-i18n="skin.browse_btn">Fájl kiválasztása...</span>
                 </span>
               </button>
               <div class="skin-sp-hint" id="skin-sp-hint" style="display:none;">
@@ -348,7 +363,7 @@
               <span class="btn-icon">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width: 18px; height: 18px;"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path><polyline points="17 21 17 13 7 13 7 21"></polyline><polyline points="7 3 7 8 15 8"></polyline></svg>
               </span>
-              <span class="btn-text">Mentés és Alkalmazás</span>
+              <span class="btn-text" data-i18n="skin.save_btn">Mentés és Alkalmazás</span>
             </button>
           </div>
         </div>

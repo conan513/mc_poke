@@ -47,6 +47,10 @@ function updateUI() {
     const key = el.getAttribute('data-i18n')
     el.innerHTML = t(key)
   })
+  document.querySelectorAll('[data-i18n-title]').forEach(el => {
+    const key = el.getAttribute('data-i18n-title')
+    el.title = t(key)
+  })
   document.querySelectorAll('[data-i18n-placeholder]').forEach(el => {
     const key = el.getAttribute('data-i18n-placeholder')
     el.placeholder = t(key)
@@ -99,9 +103,22 @@ function showToast(msg) {
     t.className = 'toast'
     document.body.appendChild(t)
   }
-  t.textContent = msg
+  
+  let iconSvg = ''
+  if (msg.includes('✅') || msg.toLowerCase().includes('sikeres') || msg.toLowerCase().includes('kész') || msg.toLowerCase().includes('saved') || msg.toLowerCase().includes('elmentve')) {
+    iconSvg = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" style="width:18px; height:18px; color:#4ade80;"><polyline points="20 6 9 17 4 12"></polyline></svg>'
+  } else if (msg.includes('❌') || msg.includes('hiba') || msg.toLowerCase().includes('error') || msg.toLowerCase().includes('failed')) {
+    iconSvg = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" style="width:18px; height:18px; color:#f87171;"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>'
+  } else {
+    iconSvg = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" style="width:18px; height:18px; color:#fbbf24;"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>'
+  }
+
+  const cleanMsg = msg.replace(/[✅❌⚠️]/g, '').trim()
+  t.innerHTML = `<div style="display:flex; align-items:center; gap:10px;">${iconSvg}<span>${cleanMsg}</span></div>`
+  
   t.classList.add('show')
-  setTimeout(() => t.classList.remove('show'), 4000)
+  if (t._timeout) clearTimeout(t._timeout)
+  t._timeout = setTimeout(() => t.classList.remove('show'), 4000)
 }
 
 // ── Window controls ───────────────────────────────────────────
@@ -207,12 +224,12 @@ async function startInstall() {
     const el = $id(id)
     if (el) {
       el.className = 'step'
-      el.querySelector('.step-status').textContent = 'Várakozás...'
+      el.querySelector('.step-status').textContent = t('install.waiting')
       el.querySelector('.step-indicator').className = 'step-indicator idle'
     }
   })
   $id('progress-fill').style.width = '0%'
-  $id('progress-msg').textContent = 'Előkészítés...'
+  $id('progress-msg').textContent = t('install.preparing')
   $id('progress-pct').textContent = '0%'
 
   const serverUrl = $id('input-server-url').value.trim()
@@ -277,7 +294,7 @@ async function runUpdateCheck() {
 $id('btn-update').addEventListener('click', async () => {
   const btn = $id('btn-update')
   btn.disabled = true
-  btn.textContent = 'Frissítés...'
+  btn.textContent = t('home.launching')
   $id('update-banner').classList.add('hidden')
 
   showScreen('install')
@@ -309,19 +326,19 @@ $id('btn-play').addEventListener('click', async () => {
   if (isGameRunning) return
   const btn = $id('btn-play')
   btn.disabled = true
-  btn.querySelector('span:last-child').textContent = 'Indítás...'
+  btn.querySelector('span:last-child').textContent = t('home.launching')
 
   const serverUrl = $id('input-server-url').value.trim()
   const result = await window.cobble.launch({ username, ram: selectedRam, serverUrl })
   if (!result.success) {
-    showToast(`❌ Indítási hiba: ${result.error}`)
+    showToast(t('home.launch_error') + result.error)
     btn.disabled = false
-    btn.querySelector('span:last-child').textContent = 'JÁTÉK INDÍTÁSA'
+    btn.querySelector('span:last-child').textContent = t('home.play_btn')
     return
   }
 
   isGameRunning = true
-  btn.querySelector('span:last-child').textContent = 'Játék fut...'
+  btn.querySelector('span:last-child').textContent = t('home.running')
 })
 
 window.cobble.onGameLog((data) => {
@@ -657,7 +674,7 @@ $id('btn-save-skin').addEventListener('click', async () => {
   }
 
   if (!currentSkinVal) {
-    showToast('⚠️ Kérlek adj meg egy nevet, linket vagy válassz fájlt!')
+    showToast(t('skin.toast_empty'))
     return
   }
 
@@ -671,7 +688,7 @@ $id('btn-save-skin').addEventListener('click', async () => {
   // Upload to server for SkinsRestorer integration (multiplayer)
   await uploadSkinToServer()
 
-  showToast('✅ Skin elmentve és feltöltve a szerverre!')
+  showToast(t('skin.toast_saved'))
   $id('btn-close-skin').click()
 })
 

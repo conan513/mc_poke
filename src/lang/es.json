@@ -37,6 +37,25 @@
     "username_short": "¡El usuario debe tener al menos 3 caracteres!",
     "username_chars": "¡Solo se permiten letras, números y _!",
     "install_error": "Error de instalación: ",
-    "update_error": "Error de actualización: "
+    "update_error": "Error de actualización: ",
+    "launch_error": "Error de lanzamiento: "
+  },
+  "titlebar": {
+    "lang_title": "Cambiar idioma",
+    "minimize": "Minimizar",
+    "close": "Cerrar"
+  },
+  "skin": {
+    "modal_title": "Ajustes de Skin",
+    "rotate_hint": "Arrastra para rotar",
+    "source_label": "Fuente de Skin",
+    "type_mojang": "Nombre Mojang",
+    "type_url": "URL personalizada",
+    "type_file": "Archivo local",
+    "browse_btn": "Seleccionar archivo...",
+    "save_btn": "Guardar y Aplicar",
+    "toast_empty": "⚠️ ¡Por favor, proporciona un nombre, enlace o selecciona un archivo!",
+    "toast_saved": "✅ ¡Skin guardada y subida al servidor!",
+    "toast_upload_error": "⚠️ Error al subir la skin (sin conexión al servidor)"
   }
 }

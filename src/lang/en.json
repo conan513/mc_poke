@@ -6,7 +6,10 @@
     "username_placeholder": "Username",
     "ram_label": "Memory (RAM):",
     "install_btn": "INSTALL & PLAY",
-    "disclaimer": "By clicking install, you agree to download ~2GB of data."
+    "disclaimer": "By clicking install, you agree to download ~2GB of data.",
+    "stats_pokemon": "1025 Pokémon",
+    "stats_regions": "4 Regions",
+    "stats_megas": "93 Mega Evolutions"
   },
   "install": {
     "title": "Installing",
@@ -32,7 +35,8 @@
     "download_required": "Download required",
     "update_btn": "Update",
     "console_btn": "Console",
-    "files_btn": "Files"
+    "files_btn": "Files",
+    "trainer_placeholder": "Trainer"
   },
   "sync": {
     "connecting": "Connecting to server: ",
@@ -46,6 +50,25 @@
     "username_short": "Username must be at least 3 characters!",
     "username_chars": "Only letters, numbers and _ allowed!",
     "install_error": "Installation error: ",
-    "update_error": "Update error: "
+    "update_error": "Update error: ",
+    "launch_error": "Launch error: "
+  },
+  "titlebar": {
+    "lang_title": "Change language",
+    "minimize": "Minimize",
+    "close": "Close"
+  },
+  "skin": {
+    "modal_title": "Skin Settings",
+    "rotate_hint": "Drag to rotate",
+    "source_label": "Skin Source",
+    "type_mojang": "Mojang Name",
+    "type_url": "Custom URL",
+    "type_file": "Local File",
+    "browse_btn": "Select file...",
+    "save_btn": "Save & Apply",
+    "toast_empty": "⚠️ Please provide a name, link or select a file!",
+    "toast_saved": "✅ Skin saved and uploaded to server!",
+    "toast_upload_error": "⚠️ Skin upload failed (no server connection)"
   }
 }
