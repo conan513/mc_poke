@@ -303,26 +303,45 @@ async function updateModsFromModrinth() {
 
 /**
  * Ensures specific extra mods are present.
+ * NOTE: SkinsRestorer is NOT a Fabric mod – on Modrinth its loaders are
+ * listed as "bungee", "velocity", "bukkit" etc. Filtering by loader=["fabric"]
+ * returns no results and a wrong version is downloaded. We therefore query
+ * SkinsRestorer WITHOUT a loader filter but WITH a game_version constraint.
  */
 async function ensureExtraMods() {
-  const extraMods = ['chipped', 'terrablender', 'skinsrestorer'];
-  console.log(`[Modrinth] Extra modok ellenőrzése: ${extraMods.join(', ')}...`);
+  // Each entry: slug, optional loaders array, optional gameVersions array
+  // 'skinrestorer' (ghrZDhGW) is the FABRIC-native mod (v2.7.x) – distinct from
+  // 'skinsrestorer' which is the bukkit/spigot plugin (v15.x).
+  const extraMods = [
+    { slug: 'chipped',       loaders: ['fabric'], gameVersions: [MC_VERSION] },
+    { slug: 'terrablender',  loaders: ['fabric'], gameVersions: [MC_VERSION] },
+    { slug: 'skinrestorer',  loaders: ['fabric'], gameVersions: [MC_VERSION] },
+  ];
+  console.log(`[Modrinth] Extra modok ellenőrzése: ${extraMods.map(m => m.slug).join(', ')}...`);
 
-  for (const slug of extraMods) {
+  for (const { slug, loaders, gameVersions } of extraMods) {
     try {
-      const gameVersionQuery = slug === 'skinsrestorer' ? '' : `&game_versions=${encodeURIComponent(`["${MC_VERSION}"]`)}`
-      const query = `loaders=${encodeURIComponent('["fabric"]')}${gameVersionQuery}`
-      const versions = await modrinthRequest(`/v2/project/${slug}/version?${query}`);
+      const params = [];
+      if (loaders)      params.push(`loaders=${encodeURIComponent(JSON.stringify(loaders))}`);
+      if (gameVersions) params.push(`game_versions=${encodeURIComponent(JSON.stringify(gameVersions))}`);
+      const qs = params.length ? '?' + params.join('&') : '';
+
+      const versions = await modrinthRequest(`/v2/project/${slug}/version${qs}`);
       const latest = versions.filter(v => v.version_type === 'release')[0] || versions[0];
-      
-      if (!latest) continue;
+
+      if (!latest) {
+        console.log(`[Modrinth] Nincs megfelelő verzió: ${slug} (MC ${MC_VERSION})`);
+        continue;
+      }
+
+      console.log(`[Modrinth] ${slug} → ${latest.version_number}`);
 
       const file = latest.files.find(f => f.primary) || latest.files[0];
       const dest = path.join(MODS_DIR, file.filename);
 
-      const files = fs.readdirSync(MODS_DIR);
-      const isPresent = files.some(f => f.toLowerCase().includes(slug.toLowerCase()));
-      
+      const existingFiles = fs.readdirSync(MODS_DIR);
+      const isPresent = existingFiles.some(f => f.toLowerCase().includes(slug.toLowerCase()));
+
       if (!isPresent) {
         console.log(`[Modrinth] Extra mod letöltése: ${slug} -> ${file.filename}`);
         await downloadFile(file.url, dest);
