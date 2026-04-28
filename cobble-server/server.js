@@ -614,6 +614,69 @@ function getLocalIPs() {
   return ips
 }
 
+// ── Nightly Restart Scheduler ────────────────────────────────
+
+/**
+ * Ütemezi a következő hajnali 3:00-ás automatikus újraindítást.
+ * Minden nap lefut: leállítja a Minecraftet, frissíti a modokat,
+ * majd újraindítja a szervert.
+ */
+function scheduleNightlyRestart() {
+  const now = new Date()
+  const next = new Date()
+  next.setHours(3, 0, 0, 0)
+  if (next <= now) next.setDate(next.getDate() + 1) // ha már elmúlt ma 3, holnapra ütemez
+
+  const msUntilRestart = next - now
+  const msUntilWarning = msUntilRestart - 5 * 60 * 1000 // 5 perccel korábban figyelmeztet
+
+  console.log(`[Scheduler] Következő automatikus újraindítás: ${next.toLocaleString('hu-HU')} (${Math.round(msUntilRestart / 60000)} perc múlva)`)
+
+  // 5 perces figyelmeztetés
+  if (msUntilWarning > 0) {
+    setTimeout(() => {
+      console.log('[Scheduler] ⚠️  5 perc múlva automatikus újraindítás!')
+      sendCommand('say [Szerver] Automatikus ujrainditas 5 perc mulva! Modok frissitese folyamatban...')
+      sendCommand('say [Server] Automatic restart in 5 minutes! Mod updates incoming...')
+    }, msUntilWarning)
+  }
+
+  // Újraindítás időpontja
+  setTimeout(async () => {
+    console.log('[Scheduler] 🔄 Éjszakai automatikus újraindítás kezdődik...')
+    sendCommand('say [Szerver] Ujrainditas most! Visszajovunk nehany masodperc mulva.')
+
+    // Adjunk 3 mp-et hogy a chat üzenet kimenjen
+    await new Promise(r => setTimeout(r, 3000))
+
+    // MC leállítása
+    stopMinecraft()
+
+    // Várunk amíg teljesen leáll
+    await new Promise(resolve => {
+      const check = setInterval(() => {
+        if (mcStatus === 'stopped') { clearInterval(check); resolve() }
+      }, 1000)
+      setTimeout(resolve, 30000) // max 30 mp várakozás
+    })
+
+    console.log('[Scheduler] ⬇️  Minecraft leállva, frissítések ellenőrzése...')
+
+    try {
+      const javaPath = await installer.install()
+      activeJavaPath = javaPath
+      console.log('[Scheduler] ✅ Frissítések kész, Minecraft újraindítása...')
+    } catch (err) {
+      console.error('[Scheduler] ❌ Hiba a frissítés közben:', err.message)
+    }
+
+    startMinecraft()
+
+    // Következő éjszakára ütemezés
+    scheduleNightlyRestart()
+  }, msUntilRestart)
+}
+
 // ── Start server ─────────────────────────────────────────────
 
 async function start() {
@@ -648,6 +711,9 @@ async function start() {
     // 3. Start Minecraft Server
     activeJavaPath = javaPath
     startMinecraft()
+
+    // 4. Hajnali 3:00-ás automatikus újraindítás ütemezése
+    scheduleNightlyRestart()
 
     // Graceful shutdown
     process.on('SIGINT', () => {

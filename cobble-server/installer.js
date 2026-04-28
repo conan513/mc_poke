@@ -329,6 +329,12 @@ async function ensureExtraMods() {
     { slug: 'cobblemon-rustling-spots',       loaders: ['fabric'], gameVersions: [MC_VERSION] },
     { slug: 'cobblemon-cobbled-levels',       loaders: ['fabric'], gameVersions: [MC_VERSION] },
     { slug: 'village-spawn-point',            loaders: ['fabric'], gameVersions: [MC_VERSION] },
+    // Függőségek (dependencies)
+    { slug: 'cloth-config',                   loaders: ['fabric'], gameVersions: [MC_VERSION] }, // player-locator-plus
+    { slug: 'trainerattributeslib',           loaders: ['fabric'], gameVersions: [MC_VERSION] }, // trainer-accessories
+    { slug: 'accessories',                    loaders: ['fabric'], gameVersions: [MC_VERSION] }, // trainer-accessories
+    { slug: 'geckolib',                       loaders: ['fabric'], gameVersions: [MC_VERSION] }, // trainer-accessories
+    { slug: 'collective',                     loaders: ['fabric'], gameVersions: [MC_VERSION] }, // village-spawn-point
   ];
   console.log(`[Modrinth] Extra modok ellenőrzése: ${extraMods.map(m => m.slug).join(', ')}...`);
 
