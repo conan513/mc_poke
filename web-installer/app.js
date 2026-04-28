@@ -136,11 +136,12 @@ document.addEventListener('DOMContentLoaded', () => {
         restartEl.textContent = d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
       }
 
-      if (btn) btn.classList.remove('btn-offline');
+      if (btnDownload) btnDownload.classList.remove('btn-offline');
     } catch (e) {
-      if (btn) {
-        btn.classList.add('btn-offline');
-        btnText.textContent = t('status.offline');
+      if (btnDownload) {
+        btnDownload.classList.add('btn-offline');
+        const btnText = document.getElementById('btn-download-text');
+        if (btnText) btnText.textContent = t('status.offline');
       }
     }
   }

@@ -140,7 +140,7 @@ h1 {
 }
 
 /* Download Section */
-.download-buttons {
+.download-container {
   display: flex;
   flex-direction: column;
   align-items: center;
