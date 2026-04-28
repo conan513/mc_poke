@@ -156,8 +156,9 @@ document.addEventListener('DOMContentLoaded', () => {
   updateStatus();
 
   // Smooth scroll for anchor links
-  document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-    anchor.addEventListener('click', function (e) {
+  const altTrigger = document.querySelector('.alt-trigger-link');
+  if (altTrigger) {
+    altTrigger.addEventListener('click', function (e) {
       e.preventDefault();
       const targetId = this.getAttribute('href').slice(1);
       const targetElement = document.getElementById(targetId);
@@ -168,5 +169,5 @@ document.addEventListener('DOMContentLoaded', () => {
         });
       }
     });
-  });
+  }
 });
