@@ -203,6 +203,7 @@ h1 {
   gap: 1.5rem;
   width: 100%;
   max-width: 600px;
+  margin: 0 auto;
 }
 
 .stat-item {
