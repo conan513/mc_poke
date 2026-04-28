@@ -179,8 +179,19 @@ function applySkinFromLocal(req, username, res) {
   const host = req.headers['host'] || `localhost:${PORT}`
   const skinPublicUrl = `http://${host}/skins/${username}.png`
 
-  console.log(`[Skins] SR parancs küldése: skin set ${username} url "${skinPublicUrl}"`)
-  sendCommand(`skin set ${username} url "${skinPublicUrl}"`)
+  // SkinsRestorer does not support setting URL skins for another player in one command.
+  // The correct approach is:
+  // 1) sr createcustom <name> <url>  – registers the skin URL under a unique name
+  // 2) skin set <name> <player>      – applies that named skin to the player
+  const skinName = `custom_${username}`
+  console.log(`[Skins] SR parancs 1/2: sr createcustom ${skinName} ${skinPublicUrl}`)
+  sendCommand(`sr createcustom ${skinName} ${skinPublicUrl}`)
+
+  // Give SR ~1 second to process the skin before applying it
+  setTimeout(() => {
+    console.log(`[Skins] SR parancs 2/2: skin set ${skinName} ${username}`)
+    sendCommand(`skin set ${skinName} ${username}`)
+  }, 1000)
 
   if (!res.writableEnded) {
     res.writeHead(200, { 'Content-Type': 'application/json' })
