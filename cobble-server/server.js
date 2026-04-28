@@ -50,6 +50,7 @@ SYNC_FOLDERS.forEach(f => {
   fs.mkdirSync(DIRS[f], { recursive: true })
 })
 fs.mkdirSync(SKINS_DIR, { recursive: true })
+console.log(`[Skins-Init] Absolute skins directory: ${path.resolve(SKINS_DIR)}`)
 
 // ── Auth ──────────────────────────────────────────────────────────
 const AUTH_FILE = path.join(DATA_DIR, '.admin-auth.json')
@@ -196,7 +197,7 @@ function applySkinFromLocal(req, username, res) {
 
   // The server runs the Fabric-native "Skin Restorer" mod (slug: skinrestorer, v2.7.x).
   // Its command syntax is: skin set web (classic|slim) "<url>" [<targets>]
-  const cmd = `skin set web classic "${skinPublicUrl}" ${username}`
+  const cmd = `skin set web classic ${skinPublicUrl} ${username}`
   console.log(`[Skins] SR parancs küldése (web): ${cmd}`)
   sendCommand(cmd)
 
@@ -209,13 +210,14 @@ function applySkinFromLocal(req, username, res) {
 // ── Request handler ──────────────────────────────────────────
 
 function handleRequest(req, res) {
+  const url = req.url.split('?')[0].replace(/\/+/g, '/')
+  console.log(`[Request] ${req.method} ${url}`)
+
   // CORS – allow the Electron renderer / LAN clients
   res.setHeader('Access-Control-Allow-Origin', '*')
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization')
   res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS')
   if (req.method === 'OPTIONS') { res.writeHead(204); res.end(); return }
-
-  const url = req.url.split('?')[0].replace(/\/+/g, '/')
 
   // ── Skin Serving (GET /skins/:name.png) ───────────────────
   if (req.method === 'GET' && url.startsWith('/skins/')) {
