@@ -35,7 +35,7 @@
   "build": {
     "appId": "hu.cobblemonuniverse.launcher",
     "productName": "Cobblemon-Universe",
-    "copyright": "Copyright © 2026 Cobbleverse",
+    "copyright": "Copyright © 2026 LUMYVERSE & Conan (Cobblemon Universe)",
     "publish": [
       {
         "provider": "generic",
