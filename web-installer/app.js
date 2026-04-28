@@ -83,7 +83,9 @@ document.addEventListener('DOMContentLoaded', () => {
       currentDownloadUrl = DOWNLOADS.win;
     } else if (ua.includes('mac')) {
       os = 'macOS';
-      currentDownloadUrl = DOWNLOADS.macDmg;
+      currentDownloadUrl = '#';
+      if (btnDownload) btnDownload.style.opacity = "0.5";
+      if (btnDownload) btnDownload.style.pointerEvents = "none";
     } else if (ua.includes('linux')) {
       os = 'Linux';
       currentDownloadUrl = DOWNLOADS.linuxApp;
