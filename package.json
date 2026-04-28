@@ -41,7 +41,7 @@
       ]
     },
     "directories": {
-      "output": "dist-electron",
+      "output": "web-installer/releases",
       "buildResources": "build-assets"
     },
     "files": [

@@ -23,7 +23,7 @@ const { spawn, execFile } = require('child_process')
 const installer = require('./installer')
 const https   = require('https')
 
-const PORT       = parseInt(process.env.PORT || '80', 10)
+const PORT       = parseInt(process.env.PORT || '8080', 10)
 const DATA_DIR   = path.join(__dirname, 'server-data')
 const SKINS_DIR  = path.join(DATA_DIR, 'skins')
 const SYNC_FOLDERS = ['mods', 'datapacks', 'config', 'resourcepacks', 'shaderpacks']
@@ -368,23 +368,31 @@ function handleRequest(req, res) {
     return
   }
 
-  // ── Serve Web Installer assets (app.js, style.css, images) ──
-  const webInstallerFiles = ['app.js', 'style.css', 'hero_bg.png']
+  // ── Serve Web Installer assets (app.js, style.css, images, releases) ──
+  const allowedExtensions = ['.js', '.css', '.png', '.jpg', '.jpeg', '.exe', '.AppImage', '.deb', '.zip', '.dmg']
   const requestedFile = url.startsWith('/') ? url.slice(1) : url
-  if (webInstallerFiles.includes(requestedFile)) {
-    const filePath = path.join(WEB_INSTALLER_DIR, requestedFile)
-    if (fs.existsSync(filePath)) {
-      const ext = path.extname(requestedFile)
-      const mimeTypes = { 
-        '.css': 'text/css', 
-        '.js': 'application/javascript',
-        '.png': 'image/png',
-        '.jpg': 'image/jpeg'
-      }
-      res.writeHead(200, { 'Content-Type': mimeTypes[ext] || 'text/plain' })
-      fs.createReadStream(filePath).pipe(res)
-      return
+  
+  // Basic security: prevent directory traversal
+  if (requestedFile.includes('..')) return
+
+  const filePath = path.join(WEB_INSTALLER_DIR, requestedFile)
+  const ext = path.extname(requestedFile)
+
+  if (allowedExtensions.includes(ext) && fs.existsSync(filePath)) {
+    const mimeTypes = { 
+      '.css': 'text/css', 
+      '.js': 'application/javascript',
+      '.png': 'image/png',
+      '.jpg': 'image/jpeg',
+      '.exe': 'application/x-msdownload',
+      '.AppImage': 'application/octet-stream',
+      '.deb': 'application/vnd.debian.binary-package',
+      '.zip': 'application/zip',
+      '.dmg': 'application/x-apple-diskimage'
     }
+    res.writeHead(200, { 'Content-Type': mimeTypes[ext] || 'application/octet-stream' })
+    fs.createReadStream(filePath).pipe(res)
+    return
   }
 
   // ── Manifest ─────────────────────────────────────────────
