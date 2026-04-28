@@ -98,7 +98,6 @@
       "synopsis": "COBBLEVERSE Minecraft Launcher"
     },
     "win": {
-      "artifactName": "${productName}-Setup.${ext}",
       "target": [
         {
           "target": "nsis",
@@ -117,6 +116,7 @@
       "requestedExecutionLevel": "asInvoker"
     },
     "nsis": {
+      "artifactName": "${productName}-Setup.${ext}",
       "oneClick": false,
       "allowToChangeInstallationDirectory": true,
       "installerIcon": "build-assets/icon.ico",
@@ -125,6 +125,9 @@
       "createDesktopShortcut": true,
       "createStartMenuShortcut": true,
       "shortcutName": "CobbleLauncher"
+    },
+    "portable": {
+      "artifactName": "${productName}.${ext}"
     },
     "mac": {
       "artifactName": "${productName}.${ext}",
