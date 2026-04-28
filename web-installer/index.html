@@ -151,46 +151,77 @@
     </div>
 
     <div class="alternatives container" id="alternatives">
-      <p data-i18n="alternatives.text">Másik platformra keresel letöltést?</p>
-      <div class="alt-links">
-        <a href="#" id="alt-win" class="alt-link">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width: 14px; height: 14px; vertical-align: middle; margin-right: 4px;"><rect width="18" height="18" x="3" y="3" rx="2"></rect><line x1="3" y1="12" x2="21" y2="12"></line><line x1="12" y1="3" x2="12" y2="21"></line></svg>
-          <span data-i18n="alternatives.win">Windows (.exe)</span>
-        </a>
-        <a href="#" id="alt-win-portable" class="alt-link">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width: 14px; height: 14px; vertical-align: middle; margin-right: 4px;"><path d="M16 20V4a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path><rect width="20" height="14" x="2" y="6" rx="2"></rect></svg>
-          <span data-i18n="alternatives.win_portable">Windows Portable (.exe)</span>
-        </a>
-        <a href="#" id="alt-linux-app" class="alt-link">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width: 14px; height: 14px; vertical-align: middle; margin-right: 4px;"><path d="M12 3a5 5 0 0 0-5 5v3.5a2 2 0 0 1-2 2 2 2 0 0 0-2 2 2 2 0 0 0 2 2h14a2 2 0 0 0 2-2 2 2 0 0 0-2-2 2 2 0 0 1-2-2V8a5 5 0 0 0-5-5Z"></path><path d="M9 19a2 2 0 0 0 6 0"></path></svg>
-          <span data-i18n="alternatives.linux_app">Linux (.AppImage)</span>
-        </a>
-        <a href="#" id="alt-linux-deb" class="alt-link">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width: 14px; height: 14px; vertical-align: middle; margin-right: 4px;"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path></svg>
-          <span data-i18n="alternatives.linux_deb">Ubuntu/Debian (.deb)</span>
-        </a>
-        <a href="#" id="alt-linux-rpm" class="alt-link">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width: 14px; height: 14px; vertical-align: middle; margin-right: 4px;"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path></svg>
-          <span data-i18n="alternatives.linux_rpm">Fedora/SUSE (.rpm)</span>
-        </a>
-        <a href="#" id="alt-linux-tar" class="alt-link">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width: 14px; height: 14px; vertical-align: middle; margin-right: 4px;"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path></svg>
-          <span data-i18n="alternatives.linux_tar">Generic Linux (.tar.gz)</span>
-        </a>
-        <a href="#" id="alt-linux-pacman" class="alt-link">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width: 14px; height: 14px; vertical-align: middle; margin-right: 4px;"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path></svg>
-          <span data-i18n="alternatives.linux_pacman">Arch Linux (pacman)</span>
-        </a>
-        <a href="#" id="alt-mac-dmg" class="alt-link">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width: 14px; height: 14px; vertical-align: middle; margin-right: 4px;"><path d="M12 20.94c1.5 0 2.75 1.06 4 1.06 3 0 6-8 6-12.22A4.91 4.91 0 0 0 17 5c-2.22 0-4 1.44-5 1.44S8.22 5 6 5a4.91 4.91 0 0 0-5 4.78c0 4.22 3 12.22 6 12.22 1.25 0 2.5-1.06 4-1.06Z"></path><path d="M12 5a3 3 0 0 0 3-3"></path></svg>
-          <span data-i18n="alternatives.mac_dmg">macOS (.dmg)</span>
-        </a>
-        <a href="#" id="alt-mac-zip" class="alt-link">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width: 14px; height: 14px; vertical-align: middle; margin-right: 4px;"><path d="M12 20.94c1.5 0 2.75 1.06 4 1.06 3 0 6-8 6-12.22A4.91 4.91 0 0 0 17 5c-2.22 0-4 1.44-5 1.44S8.22 5 6 5a4.91 4.91 0 0 0-5 4.78c0 4.22 3 12.22 6 12.22 1.25 0 2.5-1.06 4-1.06Z"></path><path d="M12 5a3 3 0 0 0 3-3"></path></svg>
-          <span data-i18n="alternatives.mac_zip">macOS (.zip)</span>
-        </a>
+      <h2 class="alt-title" data-i18n="alternatives.title">Összes letöltés</h2>
+      <p class="alt-subtitle" data-i18n="alternatives.text">Másik platformra keresel letöltést?</p>
+      <div class="alt-platforms">
+
+        <!-- Windows -->
+        <div class="alt-platform-card">
+          <div class="alt-platform-header">
+            <svg viewBox="0 0 24 24" fill="currentColor" style="width:28px;height:28px;color:#00adef"><path d="M3 12V6.75l6-1.32v6.1L3 12zm0 .75 6 .57v6.1l-6-1.32V12.75zm7-.82V5.18L21 3v9.75l-11-.82zm0 1.63L21 14.25V21l-11-1.5v-6z"/></svg>
+            <span data-i18n="alternatives.platform_win">Windows</span>
+          </div>
+          <div class="alt-btn-group">
+            <a href="#" id="alt-win" class="alt-link">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:15px;height:15px"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+              <span data-i18n="alternatives.win">Telepítő (.exe)</span>
+            </a>
+            <a href="#" id="alt-win-portable" class="alt-link">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:15px;height:15px"><path d="M16 20V4a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/><rect width="20" height="14" x="2" y="6" rx="2"/></svg>
+              <span data-i18n="alternatives.win_portable">Portable (.exe)</span>
+            </a>
+          </div>
+        </div>
+
+        <!-- Linux -->
+        <div class="alt-platform-card">
+          <div class="alt-platform-header">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:28px;height:28px;color:#f7c948"><path d="M12 3a5 5 0 0 0-5 5v3.5a2 2 0 0 1-2 2 2 2 0 0 0-2 2 2 2 0 0 0 2 2h14a2 2 0 0 0 2-2 2 2 0 0 0-2-2 2 2 0 0 1-2-2V8a5 5 0 0 0-5-5Z"/><path d="M9 19a2 2 0 0 0 6 0"/></svg>
+            <span data-i18n="alternatives.platform_linux">Linux</span>
+          </div>
+          <div class="alt-btn-group">
+            <a href="#" id="alt-linux-app" class="alt-link">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:15px;height:15px"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+              <span data-i18n="alternatives.linux_app">AppImage</span>
+            </a>
+            <a href="#" id="alt-linux-deb" class="alt-link">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:15px;height:15px"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+              <span data-i18n="alternatives.linux_deb">Ubuntu/Debian (.deb)</span>
+            </a>
+            <a href="#" id="alt-linux-rpm" class="alt-link">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:15px;height:15px"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+              <span data-i18n="alternatives.linux_rpm">Fedora/SUSE (.rpm)</span>
+            </a>
+            <a href="#" id="alt-linux-tar" class="alt-link">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:15px;height:15px"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+              <span data-i18n="alternatives.linux_tar">Generic (.tar.gz)</span>
+            </a>
+            <a href="#" id="alt-linux-pacman" class="alt-link">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:15px;height:15px"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+              <span data-i18n="alternatives.linux_pacman">Arch Linux (pacman)</span>
+            </a>
+          </div>
+        </div>
+
+        <!-- macOS -->
+        <div class="alt-platform-card">
+          <div class="alt-platform-header">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:28px;height:28px;color:#a78bfa"><path d="M12 20.94c1.5 0 2.75 1.06 4 1.06 3 0 6-8 6-12.22A4.91 4.91 0 0 0 17 5c-2.22 0-4 1.44-5 1.44S8.22 5 6 5a4.91 4.91 0 0 0-5 4.78c0 4.22 3 12.22 6 12.22 1.25 0 2.5-1.06 4-1.06Z"/><path d="M12 5a3 3 0 0 0 3-3"/></svg>
+            <span data-i18n="alternatives.platform_mac">macOS</span>
+          </div>
+          <div class="alt-btn-group">
+            <a href="#" id="alt-mac-dmg" class="alt-link">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:15px;height:15px"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+              <span data-i18n="alternatives.mac_dmg">macOS (.dmg)</span>
+            </a>
+            <a href="#" id="alt-mac-zip" class="alt-link">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:15px;height:15px"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+              <span data-i18n="alternatives.mac_zip">macOS (.zip)</span>
+            </a>
+          </div>
+        </div>
+
       </div>
-    </div> <!-- alternatives container -->
   </div> <!-- main-content -->
 
   <script src="app.js?v=1.2"></script>

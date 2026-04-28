@@ -44,14 +44,18 @@
     "text": "Click the <strong>Launch Game</strong> button! If you already have our client installed, the game will start immediately and automatically log you into the server. If not, we'll offer you the installer download."
   },
   "alternatives": {
+    "title": "All Downloads",
     "text": "Looking for another platform?",
-    "win": "Windows (.exe)",
-    "win_portable": "Windows Portable (.exe)",
-    "linux_app": "Linux (.AppImage)",
+    "platform_win": "Windows",
+    "platform_linux": "Linux",
+    "platform_mac": "macOS",
+    "win": "Installer (.exe)",
+    "win_portable": "Portable (.exe)",
+    "linux_app": "AppImage",
     "linux_deb": "Ubuntu/Debian (.deb)",
-    "linux_rpm": " Fedora/SUSE (.rpm)",
-    "linux_tar": "Generic Linux (.tar.gz)",
-    "linux_pacman": " Arch Linux (pacman)",
+    "linux_rpm": "Fedora/SUSE (.rpm)",
+    "linux_tar": "Generic (.tar.gz)",
+    "linux_pacman": "Arch Linux (pacman)",
     "mac_dmg": "macOS (.dmg)",
     "mac_zip": "macOS (.zip)"
   }

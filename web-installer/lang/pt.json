@@ -44,14 +44,18 @@
   },
   "alternatives": {
     "text": "Procurando outra plataforma?",
-    "win": "Windows (.exe)",
-    "win_portable": "Windows Portable (.exe)",
-    "linux_app": "Linux (.AppImage)",
+    "win": "Installer (.exe)",
+    "win_portable": "Portable (.exe)",
+    "linux_app": "AppImage",
     "linux_deb": "Ubuntu/Debian (.deb)",
-    "linux_rpm": " Fedora/SUSE (.rpm)",
+    "linux_rpm": "Fedora/SUSE (.rpm)",
     "linux_tar": "Linux genérico (.tar.gz)",
-    "linux_pacman": " Arch Linux (pacman)",
+    "linux_pacman": "Arch Linux (pacman)",
     "mac_dmg": "macOS (.dmg)",
-    "mac_zip": "macOS (.zip)"
+    "mac_zip": "macOS (.zip)",
+    "title": "Procurando outra plataforma?",
+    "platform_win": "Windows",
+    "platform_linux": "Linux",
+    "platform_mac": "macOS"
   }
 }
