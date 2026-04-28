@@ -219,25 +219,30 @@ function handleRequest(req, res) {
   res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS')
   if (req.method === 'OPTIONS') { res.writeHead(204); res.end(); return }
 
-  // ── Skin Serving (GET /skins/:name.png) ───────────────────
-  if (req.method === 'GET' && url.startsWith('/skins/')) {
-    // Clean filename (remove trailing quotes or spaces that might come from copy-paste)
+  // ── Skin Serving (GET/HEAD /skins/:name.png) ─────────────
+  // MineSkin.org sends a HEAD before GET to validate the URL.
+  // If HEAD returns 404, MineSkin aborts immediately.
+  if ((req.method === 'GET' || req.method === 'HEAD') && url.startsWith('/skins/')) {
     const fileName = path.basename(url).replace(/['"\s]/g, '')
     const filePath = path.resolve(SKINS_DIR, fileName)
-    
-    console.log(`[Skins-GET] Request: ${url} -> Checking path: ${filePath}`)
+
+    console.log(`[Skins-${req.method}] Request: ${url} -> ${filePath}`)
 
     if (fs.existsSync(filePath) && fs.statSync(filePath).isFile()) {
-      res.writeHead(200, { 
+      const stat = fs.statSync(filePath)
+      res.writeHead(200, {
         'Content-Type': 'image/png',
+        'Content-Length': stat.size,
         'Access-Control-Allow-Origin': '*',
-        'Cache-Control': 'public, max-age=3600' 
+        'Cache-Control': 'no-store'
       })
+      // HEAD: only headers, no body (MineSkin uses this to validate the URL exists)
+      if (req.method === 'HEAD') return res.end()
       return fs.createReadStream(filePath).pipe(res)
     } else {
-      console.warn(`[Skins-GET] 404 - File not found: ${filePath}`)
+      console.warn(`[Skins-${req.method}] 404 - File not found: ${filePath}`)
       res.writeHead(404, { 'Content-Type': 'application/json' })
-      return res.end(JSON.stringify({ error: 'Skin not found', path: filePath }))
+      return res.end(JSON.stringify({ error: 'Skin not found' }))
     }
   }
 
