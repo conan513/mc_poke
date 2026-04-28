@@ -1,4 +1,7 @@
 {
+  "modal": {
+    "mods_title": "Telepített Modok"
+  },
   "alternatives": {
     "linux_app": "AppImage",
     "linux_app_arm64": "AppImage",

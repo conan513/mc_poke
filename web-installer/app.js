@@ -25,6 +25,12 @@ document.addEventListener('DOMContentLoaded', () => {
   const langBtn = document.getElementById('lang-btn');
   const langDropdown = document.getElementById('lang-dropdown');
   const instructions = document.getElementById('install-instructions');
+  
+  // Modal Elements
+  const modModal = document.getElementById('mod-modal');
+  const modModalClose = document.getElementById('modal-close');
+  const modModsContainer = document.getElementById('stat-mods-container');
+  const modListContent = document.getElementById('mod-list-container');
 
   // ── Translation Engine ───────────────────────────────────────
   async function loadLanguage(lang) {
@@ -131,6 +137,84 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
+  // ── Modal Logic ──────────────────────────────────────────────
+  let modsData = [];
+
+  async function openModModal() {
+    modModal.classList.add('show');
+    document.body.style.overflow = 'hidden';
+
+    if (modsData.length === 0) {
+      try {
+        const res = await fetch('/manifest');
+        const data = await res.json();
+        modsData = data.mods || [];
+        renderModList();
+      } catch (e) {
+        modListContent.innerHTML = '<p style="text-align:center;color:var(--accent-red)">Hiba a lista betöltésekor.</p>';
+      }
+    } else {
+      renderModList();
+    }
+  }
+
+  function closeModModal() {
+    modModal.classList.remove('show');
+    document.body.style.overflow = '';
+  }
+
+  function renderModList() {
+    if (modsData.length === 0) {
+      modListContent.innerHTML = '<p style="text-align:center;color:#888">Nincsenek modok.</p>';
+      return;
+    }
+
+    const listHtml = modsData.map(m => `
+      <div class="mod-list-item">
+        <span class="mod-name">${m.filename}</span>
+        <span class="mod-size">${(m.size / 1024 / 1024).toFixed(2)} MB</span>
+      </div>
+    `).join('');
+
+    modListContent.innerHTML = `<div class="mod-list">${listHtml}</div>`;
+  }
+
+  if (modModsContainer) modModsContainer.addEventListener('click', openModModal);
+  if (modModalClose) modModalClose.addEventListener('click', closeModModal);
+  if (modModal) modModal.addEventListener('click', (e) => {
+    if (e.target === modModal) closeModModal();
+  });
+
+  // ── Countdown Timer ──────────────────────────────────────────
+  let countdownInterval = null;
+
+  function startCountdown(targetTime) {
+    if (countdownInterval) clearInterval(countdownInterval);
+    
+    const restartEl = document.getElementById('stat-restart');
+    if (!restartEl) return;
+
+    function update() {
+      const now = new Date().getTime();
+      const diff = targetTime - now;
+
+      if (diff <= 0) {
+        restartEl.textContent = "NOW";
+        clearInterval(countdownInterval);
+        return;
+      }
+
+      const h = Math.floor(diff / (1000 * 60 * 60));
+      const m = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+      const s = Math.floor((diff % (1000 * 60)) / 1000);
+
+      restartEl.textContent = `${h}:${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
+    }
+
+    update();
+    countdownInterval = setInterval(update, 1000);
+  }
+
   // ── Server Status Polling ───────────────────────────────────
   async function updateStatus() {
     try {
@@ -143,9 +227,8 @@ document.addEventListener('DOMContentLoaded', () => {
       const statusText = document.getElementById('status-text');
       
       if (modsEl) modsEl.textContent = data.modCount || '--';
-      if (restartEl && data.nextRestart) {
-        const d = new Date(data.nextRestart);
-        restartEl.textContent = d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+      if (data.nextRestart) {
+        startCountdown(new Date(data.nextRestart).getTime());
       }
 
       if (statusDot) {
