@@ -197,7 +197,7 @@ function applySkinFromLocal(req, username, res) {
 
   // The server runs the Fabric-native "Skin Restorer" mod (slug: skinrestorer, v2.7.x).
   // Its command syntax is: skin set web (classic|slim) "<url>" [<targets>]
-  const cmd = `skin set web classic ${skinPublicUrl} ${username}`
+  const cmd = `skin set web classic "${skinPublicUrl}" ${username}`
   console.log(`[Skins] SR parancs küldése (web): ${cmd}`)
   sendCommand(cmd)
 
@@ -238,6 +238,24 @@ function handleRequest(req, res) {
       console.warn(`[Skins-GET] 404 - File not found: ${filePath}`)
       res.writeHead(404, { 'Content-Type': 'application/json' })
       return res.end(JSON.stringify({ error: 'Skin not found', path: filePath }))
+    }
+  }
+
+  // ── Debug Skins (GET /api/test-skins) ─────────────────────
+  if (req.method === 'GET' && url === '/api/test-skins') {
+    try {
+      const files = fs.readdirSync(SKINS_DIR)
+      res.writeHead(200, { 'Content-Type': 'application/json' })
+      return res.end(JSON.stringify({
+        skins_dir: path.resolve(SKINS_DIR),
+        exists: fs.existsSync(SKINS_DIR),
+        files: files,
+        cwd: process.cwd(),
+        dirname: __dirname
+      }, null, 2))
+    } catch (e) {
+      res.writeHead(500, { 'Content-Type': 'application/json' })
+      return res.end(JSON.stringify({ error: e.message, path: SKINS_DIR }))
     }
   }
 
