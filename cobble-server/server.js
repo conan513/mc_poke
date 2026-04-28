@@ -193,7 +193,8 @@ function applySkinMojang(username, mojangUsername, res) {
 function applySkinFromLocal(req, username, res) {
   // Derive the public base URL from the incoming request's Host header
   const host = req.headers['host'] || `localhost:${PORT}`
-  const skinPublicUrl = `http://${host}/skins/${username}.png`
+  // Add a timestamp query parameter (?t=...) to bypass SkinRestorer/MineSkin caches
+  const skinPublicUrl = `http://${host}/skins/${username}.png?t=${Date.now()}`
 
   // The server runs the Fabric-native "Skin Restorer" mod (slug: skinrestorer, v2.7.x).
   // Its command syntax is: skin set web (classic|slim) "<url>" [<targets>]
