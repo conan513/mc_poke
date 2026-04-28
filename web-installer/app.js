@@ -1,15 +1,15 @@
 document.addEventListener('DOMContentLoaded', () => {
   // Config
   const DOWNLOADS = {
-    win: './releases/Cobblemon-Universe-Setup-1.0.0.exe',
-    winPortable: './releases/Cobblemon-Universe-1.0.0.exe',
-    linuxApp: './releases/Cobblemon-Universe-1.0.0.AppImage',
-    linuxDeb: './releases/cobblemon-universe_1.0.0_amd64.deb',
-    linuxRpm: './releases/cobblemon-universe_1.0.0.x86_64.rpm',
-    linuxTar: './releases/cobblemon-universe_1.0.0.tar.gz',
-    linuxPacman: './releases/cobblemon-universe_1.0.0.pacman',
-    macDmg: './releases/Cobblemon-Universe-1.0.0.dmg',
-    macZip: './releases/Cobblemon-Universe-1.0.0.zip'
+    win: './releases/Cobblemon-Universe-Setup.exe',
+    winPortable: './releases/Cobblemon-Universe.exe',
+    linuxApp: './releases/Cobblemon-Universe.AppImage',
+    linuxDeb: './releases/Cobblemon-Universe.deb',
+    linuxRpm: './releases/Cobblemon-Universe.rpm',
+    linuxTar: './releases/Cobblemon-Universe.tar.gz',
+    linuxPacman: './releases/Cobblemon-Universe.pacman',
+    macDmg: './releases/Cobblemon-Universe.dmg',
+    macZip: './releases/Cobblemon-Universe.zip'
   };
 
   let currentLang = 'hu';
