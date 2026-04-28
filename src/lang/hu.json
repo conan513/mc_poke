@@ -10,6 +10,7 @@
   },
   "install": {
     "title": "Telepítés",
+    "subtitle": "Kérjük várj, amíg előkészítjük a játékot...",
     "preparing": "Előkészítés...",
     "java": "Java 21 letöltése...",
     "minecraft": "Minecraft letöltése...",

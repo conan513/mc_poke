@@ -404,7 +404,9 @@ body::before {
   justify-content: center;
   padding: 40px;
   gap: 28px;
-  background: radial-gradient(circle at center, rgba(13, 17, 32, 0.4) 0%, transparent 70%);
+  background: rgba(10, 11, 20, 0.65);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
 }
 
 .install-header {

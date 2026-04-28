@@ -9,7 +9,8 @@
     "disclaimer": "By clicking install, you agree to download ~2GB of data."
   },
   "install": {
-    "title": "Installation",
+    "title": "Installing",
+    "subtitle": "Please wait while we prepare your game...",
     "preparing": "Preparing...",
     "java": "Downloading Java 21...",
     "minecraft": "Downloading Minecraft...",
