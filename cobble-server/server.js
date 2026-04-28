@@ -23,7 +23,7 @@ const { spawn, execFile } = require('child_process')
 const installer = require('./installer')
 const https   = require('https')
 
-const PORT       = parseInt(process.env.PORT || '7878', 10)
+const PORT       = parseInt(process.env.PORT || '80', 10)
 const DATA_DIR   = path.join(__dirname, 'server-data')
 const SKINS_DIR  = path.join(DATA_DIR, 'skins')
 const SYNC_FOLDERS = ['mods', 'datapacks', 'config', 'resourcepacks', 'shaderpacks']

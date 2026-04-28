@@ -1,9 +1,9 @@
 document.addEventListener('DOMContentLoaded', () => {
   // Beállítások: Ide írd a tényleges letöltési linkeket (pl. webtárhely URL, GitHub Releases link, stb.)
   const DOWNLOADS = {
-    windows: 'http://localhost:7878/releases/CobbleLauncher%20Setup%201.0.0.exe',
-    linuxAppImage: 'http://localhost:7878/releases/CobbleLauncher-1.0.0.AppImage',
-    linuxDeb: 'http://localhost:7878/releases/cobble_launcher_1.0.0_amd64.deb'
+    windows: './releases/CobbleLauncher%20Setup%201.0.0.exe',
+    linuxAppImage: './releases/CobbleLauncher-1.0.0.AppImage',
+    linuxDeb: './releases/cobble_launcher_1.0.0_amd64.deb'
   };
 
   const btn = document.getElementById('main-download-btn');
