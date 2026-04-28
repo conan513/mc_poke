@@ -56,6 +56,7 @@
     "title": "Cauți altă platformă?",
     "platform_win": "Windows",
     "platform_linux": "Linux",
-    "platform_mac": "macOS"
+    "platform_mac": "macOS",
+    "linux_flatpak": "Flatpak"
   }
 }

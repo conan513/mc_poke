@@ -56,6 +56,7 @@
     "linux_rpm": "Fedora/SUSE (.rpm)",
     "linux_tar": "Generic (.tar.gz)",
     "linux_pacman": "Arch Linux (pacman)",
+    "linux_flatpak": "Flatpak",
     "mac_dmg": "macOS (.dmg)",
     "mac_zip": "macOS (.zip)"
   }

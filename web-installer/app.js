@@ -8,6 +8,7 @@ document.addEventListener('DOMContentLoaded', () => {
     linuxRpm: './releases/Cobblemon-Universe.rpm',
     linuxTar: './releases/Cobblemon-Universe.tar.gz',
     linuxPacman: './releases/Cobblemon-Universe.pacman',
+    linuxFlatpak: './releases/Cobblemon-Universe.flatpak',
     macDmg: './releases/Cobblemon-Universe.dmg',
     macZip: './releases/Cobblemon-Universe.zip'
   };
@@ -104,6 +105,7 @@ document.addEventListener('DOMContentLoaded', () => {
     'alt-linux-rpm': DOWNLOADS.linuxRpm,
     'alt-linux-tar': DOWNLOADS.linuxTar,
     'alt-linux-pacman': DOWNLOADS.linuxPacman,
+    'alt-linux-flatpak': DOWNLOADS.linuxFlatpak,
     'alt-mac-dmg': DOWNLOADS.macDmg,
     'alt-mac-zip': DOWNLOADS.macZip
   };
