@@ -69,11 +69,45 @@ document.addEventListener('DOMContentLoaded', () => {
     if(altLinuxDeb) altLinuxDeb.href = DOWNLOADS.linuxDeb;
   }, 500); // small delay for nice animation effect
 
+  // ── Server Status Check ─────────────────────────────────────
+  async function checkServerStatus() {
+    try {
+      // We fetch / with application/json to get the manifest summary instead of HTML
+      const res = await fetch('/', { headers: { 'Accept': 'application/json' } });
+      const data = await res.json();
+      
+      const statusIndicator = document.createElement('div');
+      statusIndicator.className = 'server-status-tag';
+      
+      if (data.status === 'running') {
+        statusIndicator.innerHTML = '<span class="status-dot online"></span> Szerver ONLINE';
+        btn.classList.remove('btn-offline');
+      } else {
+        statusIndicator.innerHTML = '<span class="status-dot offline"></span> Szerver OFFLINE';
+        btn.classList.add('btn-offline');
+        btnText.textContent = 'Szerver Offline';
+      }
+      
+      // Fill stats
+      if (data.modCount) document.getElementById('stat-mods').textContent = data.modCount;
+      if (data.nextRestart) {
+        const restartDate = new Date(data.nextRestart);
+        document.getElementById('stat-restart').textContent = restartDate.toLocaleTimeString('hu-HU', { hour: '2-digit', minute: '2-digit' });
+      }
+
+      // Insert before subtitle
+      const subtitle = document.querySelector('.subtitle');
+      if (subtitle) subtitle.parentNode.insertBefore(statusIndicator, subtitle);
+      
+    } catch (e) {
+      console.warn('Nem sikerült elérni a szerver állapotot:', e);
+    }
+  }
+  checkServerStatus();
+
   // Protocol Launch Logic
   btn.addEventListener('click', (e) => {
     if (os === 'mac') return; // Not supported
-
-    // We don't preventDefault, so the browser tries to navigate to cobble://launch
     
     // We set a timeout. If the window still has focus after 2 seconds, 
     // it means the protocol prompt didn't show up, so the app is likely not installed.
@@ -100,7 +134,7 @@ document.addEventListener('DOMContentLoaded', () => {
         instructions.innerHTML = `
           <h3>🚀 Hogyan telepítsd?</h3>
           <p>1. Töltsd le a telepítőt.<br>
-             2. Futtasd, majd kövesd az utasításokat.<br>
+             2. Futtaszt, majd kövesd az utasításokat.<br>
              3. Miután kész, próbáld újra megnyomni az Indítás gombot az oldalon!</p>
         `;
       } else {

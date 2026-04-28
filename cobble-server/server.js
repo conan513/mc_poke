@@ -38,10 +38,12 @@ SYNC_FOLDERS.forEach(f => {
 const MODS_DIR = DIRS['mods']
 
 const PUBLIC_DIR = path.join(__dirname, 'public')
+const WEB_INSTALLER_DIR = path.join(__dirname, '..', 'web-installer')
 
 let mcProcess = null
 let mcStatus = 'stopped'
 let activeJavaPath = null
+let nextRestartTime = null
 
 // Ensure sync directories exist
 SYNC_FOLDERS.forEach(f => {
@@ -336,8 +338,21 @@ function handleRequest(req, res) {
     if (!checkAuth(req, res)) return
   }
 
-  // ── Root status ──────────────────────────────────────────
-  if (url === '/' || url === '') {
+  // ── Root / Landing Page ───────────────────────────────────
+  if (url === '/' || url === '' || url === '/index.html') {
+    const accept = req.headers['accept'] || ''
+    
+    // Ha böngésző kéri (HTML), adjuk a Web Installert
+    if (accept.includes('text/html')) {
+      const filePath = path.join(WEB_INSTALLER_DIR, 'index.html')
+      if (fs.existsSync(filePath)) {
+        res.writeHead(200, { 'Content-Type': 'text/html' })
+        fs.createReadStream(filePath).pipe(res)
+        return
+      }
+    }
+
+    // Egyébként marad a JSON manifest (kompatibilitás miatt)
     const manifest = buildManifest()
     const info = {
       server: 'CobbleServer',
@@ -346,10 +361,25 @@ function handleRequest(req, res) {
       modCount: manifest.modCount,
       modsDir: MODS_DIR,
       endpoints: ['/manifest', '/mods/:filename'],
+      nextRestart: nextRestartTime,
     }
     res.writeHead(200, { 'Content-Type': 'application/json' })
     res.end(JSON.stringify(info, null, 2))
     return
+  }
+
+  // ── Serve Web Installer assets (app.js, style.css) ─────────
+  const webInstallerFiles = ['app.js', 'style.css']
+  const requestedFile = url.startsWith('/') ? url.slice(1) : url
+  if (webInstallerFiles.includes(requestedFile)) {
+    const filePath = path.join(WEB_INSTALLER_DIR, requestedFile)
+    if (fs.existsSync(filePath)) {
+      const ext = path.extname(requestedFile)
+      const mimeTypes = { '.css': 'text/css', '.js': 'application/javascript' }
+      res.writeHead(200, { 'Content-Type': mimeTypes[ext] || 'text/plain' })
+      fs.createReadStream(filePath).pipe(res)
+      return
+    }
   }
 
   // ── Manifest ─────────────────────────────────────────────
@@ -629,6 +659,8 @@ function scheduleNightlyRestart() {
 
   const msUntilRestart = next - now
   const msUntilWarning = msUntilRestart - 5 * 60 * 1000 // 5 perccel korábban figyelmeztet
+  
+  nextRestartTime = next.getTime()
 
   console.log(`[Scheduler] Következő automatikus újraindítás: ${next.toLocaleString('hu-HU')} (${Math.round(msUntilRestart / 60000)} perc múlva)`)
 

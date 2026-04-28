@@ -119,6 +119,12 @@ async function loadStatus() {
     const data = await fetchApi('/')
     $id('server-mod-count').textContent = `${data.modCount} db`
     $id('server-ip').textContent = `http://localhost:${data.port}`
+    if (data.nextRestart) {
+      const date = new Date(data.nextRestart)
+      $id('server-restart-time').textContent = date.toLocaleTimeString('hu-HU', { hour: '2-digit', minute: '2-digit' })
+    } else {
+      $id('server-restart-time').textContent = '--'
+    }
     updateStatusUI(data.status)
   } catch (e) { console.error('Státusz hiba:', e) }
 }
