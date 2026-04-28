@@ -7,6 +7,7 @@ build/
 out/
 .vite/
 dist-electron/
+web-installer/releases/
 
 # Környezeti változók
 .env

@@ -52,7 +52,7 @@
     ],
     "extraResources": [],
     "linux": {
-      "artifactName": "${productName}.${ext}",
+      "artifactName": "${productName}-${arch}.${ext}",
       "target": [
         {
           "target": "AppImage",
@@ -97,6 +97,22 @@
       "icon": "build-assets/icons",
       "synopsis": "COBBLEVERSE Minecraft Launcher"
     },
+    "flatpak": {
+      "artifactName": "${productName}.${ext}",
+      "runtime": "org.freedesktop.Platform",
+      "runtimeVersion": "23.08",
+      "sdk": "org.freedesktop.Sdk",
+      "base": "org.electronjs.Electron2.BaseApp",
+      "baseVersion": "23.08",
+      "finishArgs": [
+        "--share=ipc",
+        "--share=network",
+        "--socket=x11",
+        "--socket=wayland",
+        "--device=dri",
+        "--filesystem=home"
+      ]
+    },
     "win": {
       "target": [
         {
@@ -130,7 +146,7 @@
       "artifactName": "${productName}.${ext}"
     },
     "mac": {
-      "artifactName": "${productName}.${ext}",
+      "artifactName": "${productName}-${arch}.${ext}",
       "target": [
         {
           "target": "dmg",
