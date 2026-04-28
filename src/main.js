@@ -1,7 +1,4 @@
-/**
- * CobbleLauncher – Renderer Process
- * Handles UI state, events, particle animation
- */
+const $id = (id) => document.getElementById(id)
 
 // ── State ────────────────────────────────────────────────────
 let selectedRam = 4096
@@ -19,7 +16,7 @@ async function loadLanguage() {
     } else {
       const locale = await window.cobble.getLocale()
       const langCode = locale.split(/[-_]/)[0].toLowerCase()
-      const available = ['hu', 'en', 'de', 'fr', 'es', 'it', 'pt', 'nl', 'ru', 'ja', 'ko', 'zh', 'pl', 'tr', 'ro', 'sv', 'da', 'no', 'fi', 'cs']
+      const available = ['hu', 'en', 'de', 'fr', 'es', 'it', 'pt', 'nl', 'ru', 'ja', 'ko', 'zh', 'pl', 'tr', 'ro', 'sv', 'da', 'no', 'fi', 'cs', 'uk']
       currentLang = available.includes(langCode) ? langCode : 'en'
     }
     
@@ -78,8 +75,6 @@ const screens = {
   install: document.getElementById('screen-install'),
   home:    document.getElementById('screen-home'),
 }
-
-const $id = (id) => document.getElementById(id)
 
 // ── Screen transitions ────────────────────────────────────────
 function showScreen(name) {
@@ -739,7 +734,3 @@ try {
     applyAvatar()
   }
 } catch (e) {}
-
-
-
-loadLanguage()

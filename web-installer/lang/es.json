@@ -36,13 +36,14 @@
     "f7_title": "Música reactiva",
     "f7_desc": "Una banda sonora dinámica única que cambia durante las batallas y la exploración.",
     "f8_title": "Optimizado",
-    "f8_desc": "Toneladas de mejoras de calidad de vida y optimizaciones de rendimiento para una experiencia fluida."
+    "f8_desc": "Docenas de mejoras de QoL y optimizaciones de rendimiento para una experiencia fluida y sin lag."
   },
   "instructions": {
     "title": "💡 ¿Cómo unirse?",
-    "text": "¡Haz clic en el botón <strong>Iniciar juego</strong>! Si ya tienes nuestro cliente instalado, el juego comenzará de inmediato. Si no, te ofreceremos el instalador."
+    "text": "¡Haz clic en el botón <strong>Descargar</strong>! El sistema te ofrecerá automáticamente el instalador correcto para tu sistema operativo. Después de la instalación, Cobblemon Universe estará listo para jugar."
   },
   "alternatives": {
+    "title": "Todas las descargas",
     "text": "¿Buscas otra plataforma?",
     "win": "Installer (.exe)",
     "win_portable": "Portable (.exe)",

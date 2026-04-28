@@ -36,13 +36,14 @@
     "f7_title": "Reactieve Muziek",
     "f7_desc": "Een unieke, dynamische soundtrack die verandert tijdens gevechten en verkenning.",
     "f8_title": "Geoptimaliseerd",
-    "f8_desc": "Tal van QoL-verbeteringen en prestatie-optimalisaties voor een soepele ervaring."
+    "f8_desc": "Tientallen QoL-verbeteringen en prestatie-optimalisaties voor een soepele, lag-vrije ervaring."
   },
   "instructions": {
-    "title": "💡 Hoe doe ik mee?",
-    "text": "Klik op de knop <strong>Spel Starten</strong>! Als je onze client al hebt geïnstalleerd, start het spel onmiddellijk. Zo niet, dan bieden we de installatie aan."
+    "title": "💡 Hoe doe je mee?",
+    "text": "Klik op de <strong>Download</strong> knop! Het systeem biedt automatisch de juiste installer aan voor jouw besturingssysteem. Na installatie is Cobblemon Universe klaar om te starten."
   },
   "alternatives": {
+    "title": "Alle downloads",
     "text": "Op zoek naar een ander platform?",
     "win": "Installer (.exe)",
     "win_portable": "Portable (.exe)",

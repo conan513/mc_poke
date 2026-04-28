@@ -36,14 +36,13 @@
     "f7_title": "Muzică reactivă",
     "f7_desc": "O coloană sonoră dinamică unică ce se schimbă în timpul luptelor și explorării.",
     "f8_title": "Optimizat",
-    "f8_desc": "O mulțime de îmbunătățiri QoL și optimizări de performanță pentru o experiență fluidă."
+    "f8_desc": "Zeci de îmbunătățiri QoL și optimizări de performanță pentru o experiență fluidă și fără lag."
   },
   "instructions": {
-    "title": "💡 Cum te alături?",
-    "text": "Apasă butonul <strong>Lansează Jocul</strong>! Dacă ai deja clientul nostru instalat, jocul va porni imediat. Dacă nu, îți vom oferi instalatorul."
+    "title": "💡 Cum să te alături?",
+    "text": "Apasă pe butonul <strong>Descărcare</strong>! Sistemul îți va oferi automat instalatorul potrivit pentru sistemul tău de operare. După instalare, Cobblemon Universe este gata de lansare."
   },
   "alternatives": {
-    "text": "Cauți altă platformă?",
     "win": "Installer (.exe)",
     "win_portable": "Portable (.exe)",
     "linux_app": "AppImage",

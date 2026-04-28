@@ -36,14 +36,13 @@
     "f7_title": "动态音乐",
     "f7_desc": "独特的动态原声带，会根据战斗和探索情况实时切换。",
     "f8_title": "性能优化",
-    "f8_desc": "大量的 QoL 增强和性能优化，确保流畅、无卡顿的体验。"
+    "f8_desc": "数十项 QoL 改进和性能优化，确保流畅、无卡顿的体验。"
   },
   "instructions": {
     "title": "💡 如何加入？",
-    "text": "点击<strong>启动游戏</strong>按钮！如果您已经安装了我们的客户端，游戏将立即启动。如果没有，我们将为您提供安装程序下载。"
+    "text": "点击 <strong>下载</strong> 按钮！系统会自动为您提供适合您操作系统的安装程序。安装完成后，Cobblemon Universe 即可启动。"
   },
   "alternatives": {
-    "text": "寻找其他平台？",
     "win": "Installer (.exe)",
     "win_portable": "Portable (.exe)",
     "linux_app": "AppImage",

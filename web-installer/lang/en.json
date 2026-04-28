@@ -37,11 +37,11 @@
     "f7_title": "Reactive Music",
     "f7_desc": "A unique, dynamic soundtrack that changes during battles and exploration.",
     "f8_title": "Optimized",
-    "f8_desc": "Tons of QoL enhancements and performance optimizations for a smooth, lag-free experience."
+    "f8_desc": "Dozens of QoL improvements and performance optimizations for a smooth, lag-free experience."
   },
   "instructions": {
     "title": "💡 How to join?",
-    "text": "Click the <strong>Launch Game</strong> button! If you already have our client installed, the game will start immediately and automatically log you into the server. If not, we'll offer you the installer download."
+    "text": "Click the <strong>Download</strong> button! The system will automatically offer the correct installer for your OS. After installation, Cobblemon Universe is ready to launch."
   },
   "alternatives": {
     "title": "All Downloads",
