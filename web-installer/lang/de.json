@@ -9,8 +9,9 @@
     "online": "SERVER ONLINE",
     "offline": "SERVER OFFLINE",
     "launch": "Spiel starten",
-    "download": "Client herunterladen",
-    "os_detected": "Erkanntes System: "
+    "download": "Download",
+    "os_detected": "Erkanntes System: ",
+    "see_all": "Andere Version gesucht? Alle Downloads anzeigen"
   },
   "stats": {
     "mods": "Installierte Mods",
@@ -39,7 +40,7 @@
   },
   "instructions": {
     "title": "💡 Wie trete ich bei?",
-    "text": "Klicke auf die Schaltfläche <strong>Spiel starten</strong>! Wenn du unseren Client bereits installiert hast, startet das Spiel sofort. Wenn nicht, bieten wir dir den Installer an."
+    "text": "Klicke auf die Schaltfläche <strong>Download</strong>! Wenn du unseren Client bereits installiert hast, startet das Spiel sofort. Wenn nicht, bieten wir dir den Installer an."
   },
   "alternatives": {
     "text": "Suchst du eine andere Plattform?",

@@ -9,7 +9,8 @@
     "online": "SERVER ONLINE",
     "offline": "SERVER OFFLINE",
     "launch": "Launch Game",
-    "download": "Download Client",
+    "see_all": "Looking for another version? See all downloads",
+    "download": "Download",
     "download_confirm": "The launcher was not found on your computer. Would you like to download the installer?",
     "os_detected": "Detected system: "
   },

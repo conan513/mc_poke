@@ -10,7 +10,8 @@
     "offline": "SERVEUR HORS LIGNE",
     "launch": "Lancer le jeu",
     "download": "Télécharger le client",
-    "os_detected": "Système détecté : "
+    "os_detected": "Système détecté : ",
+    "see_all": "Vous cherchez une autre version ? Voir tous les téléchargements"
   },
   "stats": {
     "mods": "Mods installés",

@@ -10,7 +10,8 @@
     "offline": "SERWER OFFLINE",
     "launch": "Uruchom Grę",
     "download": "Pobierz Klienta",
-    "os_detected": "Wykryty system: "
+    "os_detected": "Wykryty system: ",
+    "see_all": "Szukasz innej wersji? Zobacz wszystkie pliki do pobrania"
   },
   "stats": {
     "mods": "Zainstalowane Mody",

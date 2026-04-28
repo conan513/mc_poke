@@ -10,7 +10,8 @@
     "offline": "SERVER OFFLINE",
     "launch": "Avvia Gioco",
     "download": "Scarica Client",
-    "os_detected": "Sistema rilevato: "
+    "os_detected": "Sistema rilevato: ",
+    "see_all": "Cerchi un'altra versione? Vedi tutti i download"
   },
   "stats": {
     "mods": "Mod installate",

@@ -140,11 +140,11 @@ h1 {
 }
 
 /* Download Section */
-.download-section {
+.download-buttons {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 2rem;
+  gap: 1.2rem;
 }
 
 .btn-main {
@@ -170,6 +170,23 @@ h1 {
 .btn-main.btn-offline {
   background: linear-gradient(135deg, #444, #222);
   box-shadow: 0 10px 25px rgba(0, 0, 0, 0.4);
+}
+
+.alt-trigger-link {
+  color: #888;
+  font-size: 0.9rem;
+  text-decoration: none;
+  transition: all 0.2s;
+  border-bottom: 1px solid transparent;
+}
+
+.alt-trigger-link:hover {
+  color: var(--accent-blue);
+  border-bottom-color: var(--accent-blue);
+}
+
+.btn-secondary-launch {
+  display: none;
 }
 
 /* Stats Grid */

@@ -10,7 +10,8 @@
     "offline": "服务器离线",
     "launch": "启动游戏",
     "download": "下载客户端",
-    "os_detected": "检测到的系统： "
+    "os_detected": "检测到的系统： ",
+    "see_all": "寻找其他版本？查看所有下载"
   },
   "stats": {
     "mods": "已安装模组",

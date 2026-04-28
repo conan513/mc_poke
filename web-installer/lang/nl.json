@@ -10,7 +10,8 @@
     "offline": "SERVER OFFLINE",
     "launch": "Spel Starten",
     "download": "Client Downloaden",
-    "os_detected": "Gedetecteerd systeem: "
+    "os_detected": "Gedetecteerd systeem: ",
+    "see_all": "Op zoek naar een andere versie? Bekijk alle downloads"
   },
   "stats": {
     "mods": "Geïnstalleerde Mods",

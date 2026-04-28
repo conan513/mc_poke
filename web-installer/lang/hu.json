@@ -9,7 +9,8 @@
     "online": "SZERVER ONLINE",
     "offline": "SZERVER OFFLINE",
     "launch": "Játék Indítása",
-    "download": "Kliens Letöltése",
+    "see_all": "Looking for another version? See all downloads",
+    "download": "Letöltés",
     "download_confirm": "A launcher nem található a számítógépeden. Szeretnéd letölteni a telepítőt?",
     "os_detected": "Észlelt rendszer: "
   },

@@ -10,7 +10,8 @@
     "offline": "SERVER OFFLINE",
     "launch": "Lansează Jocul",
     "download": "Descarcă Clientul",
-    "os_detected": "Sistem detectat: "
+    "os_detected": "Sistem detectat: ",
+    "see_all": "Cauți o altă versiune? Vezi toate descărcările"
   },
   "stats": {
     "mods": "Moduri instalate",

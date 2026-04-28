@@ -10,7 +10,8 @@
     "offline": "SERVIDOR DESCONECTADO",
     "launch": "Iniciar juego",
     "download": "Descargar cliente",
-    "os_detected": "Sistema detectado: "
+    "os_detected": "Sistema detectado: ",
+    "see_all": "¿Buscas otra versión? Ver todas las descargas"
   },
   "stats": {
     "mods": "Mods instalados",

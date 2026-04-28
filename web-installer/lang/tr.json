@@ -10,7 +10,8 @@
     "offline": "SUNUCU ÇEVRİMDIŞI",
     "launch": "Oyunu Başlat",
     "download": "İstemciyi İndir",
-    "os_detected": "Tespit edilen sistem: "
+    "os_detected": "Tespit edilen sistem: ",
+    "see_all": "Başka bir sürüm mü arıyorsunuz? Tüm indirmeleri gör"
   },
   "stats": {
     "mods": "Yüklü Modlar",
