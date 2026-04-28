@@ -41,7 +41,7 @@
   },
   "instructions": {
     "title": "💡 Hogyan csatlakozz?",
-    "text": "Kattints a <strong>Játék Indítása</strong> gombra! Ha már telepítve van a kliensünk, a játék azonnal elindul és automatikusan beléptet a szerverre. Ha még nincs meg, felkínáljuk a telepítő letöltését."
+    "text": "Kattints a <strong>Letöltés</strong> gombra! A rendszer automatikusan felkínálja a neked megfelelő telepítőt. Telepítés után a Cobblemon Universe azonnal indítható."
   },
   "alternatives": {
     "text": "Másik platformra keresel letöltést?",

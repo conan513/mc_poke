@@ -71,7 +71,7 @@ body.i18n-ready [data-i18n] {
   backdrop-filter: blur(24px);
   -webkit-backdrop-filter: blur(24px);
   box-shadow: 0 25px 60px rgba(0, 0, 0, 0.6);
-  margin-bottom: 3rem;
+  margin: 0 auto 3rem;
   animation: fadeInUp 1s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
 }
 

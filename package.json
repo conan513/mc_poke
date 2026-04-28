@@ -31,7 +31,7 @@
   },
   "build": {
     "appId": "hu.cobblemonuniverse.launcher",
-    "productName": "Cobblemon Universe",
+    "productName": "Cobblemon-Universe",
     "copyright": "Copyright © 2026 Cobbleverse",
     "asar": true,
     "protocols": {
@@ -52,6 +52,7 @@
     ],
     "extraResources": [],
     "linux": {
+      "artifactName": "${productName}-${version}-${arch}.${ext}",
       "target": [
         {
           "target": "AppImage",
@@ -91,6 +92,7 @@
       "synopsis": "COBBLEVERSE Minecraft Launcher"
     },
     "win": {
+      "artifactName": "${productName}-Setup-${version}.${ext}",
       "target": [
         {
           "target": "nsis",
@@ -119,6 +121,7 @@
       "shortcutName": "CobbleLauncher"
     },
     "mac": {
+      "artifactName": "${productName}-${version}-${arch}.${ext}",
       "target": [
         {
           "target": "dmg",
