@@ -30,13 +30,13 @@
     "update_available": "有可用更新！",
     "download_required": "需要下载",
     "update_btn": "更新",
-    "console_btn": "📋 控制台",
-    "files_btn": "📂 文件"
+    "console_btn": "控制台",
+    "files_btn": "文件"
   },
   "toast": {
-    "username_short": "⚠️ 用户名至少需要 3 个字符！",
-    "username_chars": "⚠️ 只允许字母、数字和下划线！",
-    "install_error": "❌ 安装错误：",
-    "update_error": "❌ 更新错误："
+    "username_short": "用户名至少需要 3 个字符！",
+    "username_chars": "只允许字母、数字和下划线！",
+    "install_error": "安装错误：",
+    "update_error": "更新错误："
   }
 }

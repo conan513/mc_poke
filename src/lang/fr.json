@@ -30,13 +30,13 @@
     "update_available": "Mise à jour disponible !",
     "download_required": "Téléchargement requis",
     "update_btn": "Mettre à jour",
-    "console_btn": "📋 Console",
-    "files_btn": "📂 Fichiers"
+    "console_btn": "Console",
+    "files_btn": "Fichiers"
   },
   "toast": {
-    "username_short": "⚠️ Le pseudo doit faire au moins 3 caractères !",
-    "username_chars": "⚠️ Seuls les lettres, chiffres et _ sont autorisés !",
-    "install_error": "❌ Erreur d'installation : ",
-    "update_error": "❌ Erreur de mise à jour : "
+    "username_short": "Le pseudo doit faire au moins 3 caractères !",
+    "username_chars": "Seuls les lettres, chiffres et _ sont autorisés !",
+    "install_error": "Erreur d'installation : ",
+    "update_error": "Erreur de mise à jour : "
   }
 }

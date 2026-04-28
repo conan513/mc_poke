@@ -30,13 +30,13 @@
     "update_available": "Aggiornamento disponibile!",
     "download_required": "Download richiesto",
     "update_btn": "Aggiorna",
-    "console_btn": "📋 Console",
-    "files_btn": "📂 File"
+    "console_btn": "Console",
+    "files_btn": "File"
   },
   "toast": {
-    "username_short": "⚠️ L'username deve avere almeno 3 caratteri!",
-    "username_chars": "⚠️ Sono ammessi solo lettere, numeri e _!",
-    "install_error": "❌ Errore installazione: ",
-    "update_error": "❌ Errore aggiornamento: "
+    "username_short": "L'username deve avere almeno 3 caratteri!",
+    "username_chars": "Sono ammessi solo lettere, numeri e _!",
+    "install_error": "Errore installazione: ",
+    "update_error": "Errore aggiornamento: "
   }
 }

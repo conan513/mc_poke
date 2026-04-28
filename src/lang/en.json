@@ -30,8 +30,8 @@
     "update_available": "Update Available!",
     "download_required": "Download required",
     "update_btn": "Update",
-    "console_btn": "📋 Console",
-    "files_btn": "📂 Files"
+    "console_btn": "Console",
+    "files_btn": "Files"
   },
   "sync": {
     "connecting": "Connecting to server: ",
@@ -42,9 +42,9 @@
     "finished": "Sync finished! Downloaded: "
   },
   "toast": {
-    "username_short": "⚠️ Username must be at least 3 characters!",
-    "username_chars": "⚠️ Only letters, numbers and _ allowed!",
-    "install_error": "❌ Installation error: ",
-    "update_error": "❌ Update error: "
+    "username_short": "Username must be at least 3 characters!",
+    "username_chars": "Only letters, numbers and _ allowed!",
+    "install_error": "Installation error: ",
+    "update_error": "Update error: "
   }
 }

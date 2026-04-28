@@ -30,8 +30,8 @@
     "update_available": "Päivitys saatavilla!",
     "download_required": "Lataus vaaditaan",
     "update_btn": "Päivitä",
-    "console_btn": "📋 Konsoli",
-    "files_btn": "📂 Tiedostot"
+    "console_btn": "Konsoli",
+    "files_btn": "Tiedostot"
   },
   "sync": {
     "connecting": "Yhdistetään palvelimeen: ",
@@ -42,9 +42,9 @@
     "finished": "Synkronointi valmis! Ladattu: "
   },
   "toast": {
-    "username_short": "⚠️ Käyttäjänimen on oltava vähintään 3 merkkiä pitkä!",
-    "username_chars": "⚠️ Vain kirjaimet, numerot ja _ ovat sallittuja!",
-    "install_error": "❌ Asennusvirhe: ",
-    "update_error": "❌ Päivitysvirhe: "
+    "username_short": "Käyttäjänimen on oltava vähintään 3 merkkiä pitkä!",
+    "username_chars": "Vain kirjaimet, numerot ja _ ovat sallittuja!",
+    "install_error": "Asennusvirhe: ",
+    "update_error": "Päivitysvirhe: "
   }
 }

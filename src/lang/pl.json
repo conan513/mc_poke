@@ -30,13 +30,13 @@
     "update_available": "Aktualizacja dostępna!",
     "download_required": "Wymagane pobieranie",
     "update_btn": "Aktualizuj",
-    "console_btn": "📋 Konsola",
-    "files_btn": "📂 Pliki"
+    "console_btn": "Konsola",
+    "files_btn": "Pliki"
   },
   "toast": {
-    "username_short": "⚠️ Nazwa użytkownika musi mieć co najmniej 3 znaki!",
-    "username_chars": "⚠️ Dozwolone są tylko litery, cyfry i _!",
-    "install_error": "❌ Błąd instalacji: ",
-    "update_error": "❌ Błąd aktualizacji: "
+    "username_short": "Nazwa użytkownika musi mieć co najmniej 3 znaki!",
+    "username_chars": "Dozwolone są tylko litery, cyfry i _!",
+    "install_error": "Błąd instalacji: ",
+    "update_error": "Błąd aktualizacji: "
   }
 }

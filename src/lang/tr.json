@@ -30,13 +30,13 @@
     "update_available": "Güncelleme Mevcut!",
     "download_required": "İndirme gerekiyor",
     "update_btn": "Güncelle",
-    "console_btn": "📋 Konsol",
-    "files_btn": "📂 Dosyalar"
+    "console_btn": "Konsol",
+    "files_btn": "Dosyalar"
   },
   "toast": {
-    "username_short": "⚠️ Kullanıcı adı en az 3 karakter olmalıdır!",
-    "username_chars": "⚠️ Sadece harf, rakam ve _ karakterlerine izin verilir!",
-    "install_error": "❌ Kurulum hatası: ",
-    "update_error": "❌ Güncelleme hatası: "
+    "username_short": "Kullanıcı adı en az 3 karakter olmalıdır!",
+    "username_chars": "Sadece harf, rakam ve _ karakterlerine izin verilir!",
+    "install_error": "Kurulum hatası: ",
+    "update_error": "Güncelleme hatası: "
   }
 }

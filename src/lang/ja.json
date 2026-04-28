@@ -30,8 +30,8 @@
     "update_available": "アップデートがあります！",
     "download_required": "ダウンロードが必要です",
     "update_btn": "更新",
-    "console_btn": "📋 コンソール",
-    "files_btn": "📂 ファイル"
+    "console_btn": "コンソール",
+    "files_btn": "ファイル"
   },
   "sync": {
     "connecting": "サーバーに接続中: ",
@@ -42,9 +42,9 @@
     "finished": "同期完了！ダウンロード数: "
   },
   "toast": {
-    "username_short": "⚠️ ユーザー名は3文字以上である必要があります！",
-    "username_chars": "⚠️ 英数字とアンダースコア (_) のみ使用できます！",
-    "install_error": "❌ インストールエラー: ",
-    "update_error": "❌ アップデートエラー: "
+    "username_short": "ユーザー名は3文字以上である必要があります！",
+    "username_chars": "英数字とアンダースコア (_) のみ使用できます！",
+    "install_error": "インストールエラー: ",
+    "update_error": "アップデートエラー: "
   }
 }

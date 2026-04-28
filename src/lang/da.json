@@ -30,8 +30,8 @@
     "update_available": "Opdatering tilgængelig!",
     "download_required": "Download påkrævet",
     "update_btn": "Opdater",
-    "console_btn": "📋 Konsol",
-    "files_btn": "📂 Filer"
+    "console_btn": "Konsol",
+    "files_btn": "Filer"
   },
   "sync": {
     "connecting": "Forbinder til server: ",
@@ -42,9 +42,9 @@
     "finished": "Synkronisering færdig! Downloadet: "
   },
   "toast": {
-    "username_short": "⚠️ Brugernavn skal være mindst 3 tegn langt!",
-    "username_chars": "⚠️ Kun bogstaver, tal og _ er tilladt!",
-    "install_error": "❌ Installationsfejl: ",
-    "update_error": "❌ Opdateringsfejl: "
+    "username_short": "Brugernavn skal være mindst 3 tegn langt!",
+    "username_chars": "Kun bogstaver, tal og _ er tilladt!",
+    "install_error": "Installationsfejl: ",
+    "update_error": "Opdateringsfejl: "
   }
 }

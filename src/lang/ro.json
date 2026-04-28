@@ -30,13 +30,13 @@
     "update_available": "Actualizare disponibilă!",
     "download_required": "Descărcare necesară",
     "update_btn": "Actualizează",
-    "console_btn": "📋 Consolă",
-    "files_btn": "📂 Fișiere"
+    "console_btn": "Consolă",
+    "files_btn": "Fișiere"
   },
   "toast": {
-    "username_short": "⚠️ Numele de utilizator trebuie să aibă cel puțin 3 caractere!",
-    "username_chars": "⚠️ Doar litere, cifre și _ sunt permise!",
-    "install_error": "❌ Eroare de instalare: ",
-    "update_error": "❌ Eroare de actualizare: "
+    "username_short": "Numele de utilizator trebuie să aibă cel puțin 3 caractere!",
+    "username_chars": "Doar litere, cifre și _ sunt permise!",
+    "install_error": "Eroare de instalare: ",
+    "update_error": "Eroare de actualizare: "
   }
 }

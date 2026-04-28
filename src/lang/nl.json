@@ -30,13 +30,13 @@
     "update_available": "Update beschikbaar!",
     "download_required": "Download vereist",
     "update_btn": "Update",
-    "console_btn": "📋 Console",
-    "files_btn": "📂 Bestanden"
+    "console_btn": "Console",
+    "files_btn": "Bestanden"
   },
   "toast": {
-    "username_short": "⚠️ Gebruikersnaam moet minimaal 3 tekens bevatten!",
-    "username_chars": "⚠️ Alleen letters, cijfers en _ toegestaan!",
-    "install_error": "❌ Installatiefout: ",
-    "update_error": "❌ Updatefout: "
+    "username_short": "Gebruikersnaam moet minimaal 3 tekens bevatten!",
+    "username_chars": "Alleen letters, cijfers en _ toegestaan!",
+    "install_error": "Installatiefout: ",
+    "update_error": "Updatefout: "
   }
 }

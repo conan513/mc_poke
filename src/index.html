@@ -261,21 +261,23 @@
               <span data-i18n="home.play_btn">JÁTÉK INDÍTÁSA</span>
             </button>
             <button class="btn-secondary" id="btn-console-toggle">
-              <span data-i18n="home.console_btn">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width: 16px; height: 16px; vertical-align: middle; margin-right: 6px;"><path d="M4 17l6-6-6-6"></path><path d="M12 19h8"></path></svg>
-                Konzol
-              </span>
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width: 16px; height: 16px; vertical-align: middle; margin-right: 6px;"><path d="M4 17l6-6-6-6"></path><path d="M12 19h8"></path></svg>
+              <span data-i18n="home.console_btn">Konzol</span>
             </button>
           </div>
 
           <div class="home-links">
-            <button class="link-btn" id="link-modrinth">🌐 Modrinth</button>
-            <button class="link-btn" id="link-discord">💬 Discord</button>
+            <button class="link-btn" id="link-modrinth">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width: 14px; height: 14px; vertical-align: middle; margin-right: 6px;"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></svg>
+              Modrinth
+            </button>
+            <button class="link-btn" id="link-discord">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width: 14px; height: 14px; vertical-align: middle; margin-right: 6px;"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
+              Discord
+            </button>
             <button class="link-btn" id="link-folder">
-              <span data-i18n="home.files_btn">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width: 16px; height: 16px; vertical-align: middle; margin-right: 6px;"><path d="M4 20h16a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.93a2 2 0 0 1-1.66-.9l-.82-1.2A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v13c0 1.1.9 2 2 2z"></path></svg>
-                Fájlok
-              </span>
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width: 16px; height: 16px; vertical-align: middle; margin-right: 6px;"><path d="M4 20h16a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.93a2 2 0 0 1-1.66-.9l-.82-1.2A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v13c0 1.1.9 2 2 2z"></path></svg>
+              <span data-i18n="home.files_btn">Fájlok</span>
             </button>
           </div>
         </div>
@@ -284,9 +286,9 @@
       <!-- Console overlay -->
       <div class="console-overlay hidden" id="console-overlay">
         <div class="console-header">
-          <span data-i18n="home.console_btn">
+          <span class="console-title">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width: 18px; height: 18px; vertical-align: middle; margin-right: 8px;"><path d="M4 17l6-6-6-6"></path><path d="M12 19h8"></path></svg>
-            Játék Konzol
+            <span data-i18n="home.console_btn">Játék Konzol</span>
           </span>
           <button class="console-close" id="console-close">✕</button>
         </div>

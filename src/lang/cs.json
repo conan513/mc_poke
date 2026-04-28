@@ -30,8 +30,8 @@
     "update_available": "Aktualizace k dispozici!",
     "download_required": "Vyžadováno stažení",
     "update_btn": "Aktualizovat",
-    "console_btn": "📋 Konzole",
-    "files_btn": "📂 Soubory"
+    "console_btn": "Konzole",
+    "files_btn": "Soubory"
   },
   "sync": {
     "connecting": "Připojování k serveru: ",
@@ -42,9 +42,9 @@
     "finished": "Synchronizace dokončena! Staženo: "
   },
   "toast": {
-    "username_short": "⚠️ Uživatelské jméno musí mít alespoň 3 znaky!",
-    "username_chars": "⚠️ Povoleny jsou pouze písmena, číslice a _!",
-    "install_error": "❌ Chyba instalace: ",
-    "update_error": "❌ Chyba aktualizace: "
+    "username_short": "Uživatelské jméno musí mít alespoň 3 znaky!",
+    "username_chars": "Povoleny jsou pouze písmena, číslice a _!",
+    "install_error": "Chyba instalace: ",
+    "update_error": "Chyba aktualizace: "
   }
 }

@@ -30,8 +30,8 @@
     "update_available": "Uppdatering tillgänglig!",
     "download_required": "Nedladdning krävs",
     "update_btn": "Uppdatera",
-    "console_btn": "📋 Konsol",
-    "files_btn": "📂 Filer"
+    "console_btn": "Konsol",
+    "files_btn": "Filer"
   },
   "sync": {
     "connecting": "Ansluter till server: ",
@@ -42,9 +42,9 @@
     "finished": "Synkronisering klar! Laddade ner: "
   },
   "toast": {
-    "username_short": "⚠️ Användarnamnet måste vara minst 3 tecken långt!",
-    "username_chars": "⚠️ Endast bokstäver, siffror och _ är tillåtna!",
-    "install_error": "❌ Installationsfel: ",
-    "update_error": "❌ Uppdateringsfel: "
+    "username_short": "Användarnamnet måste vara minst 3 tecken långt!",
+    "username_chars": "Endast bokstäver, siffror och _ är tillåtna!",
+    "install_error": "Installationsfel: ",
+    "update_error": "Uppdateringsfel: "
   }
 }

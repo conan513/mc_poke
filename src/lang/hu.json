@@ -30,8 +30,8 @@
     "update_available": "Frissítés elérhető!",
     "download_required": "Letöltés szükséges",
     "update_btn": "Frissítés",
-    "console_btn": "📋 Konzol",
-    "files_btn": "📂 Fájlok"
+    "console_btn": "Konzol",
+    "files_btn": "Fájlok"
   },
   "sync": {
     "connecting": "Kapcsolódás a szerverhez: ",
@@ -42,9 +42,9 @@
     "finished": "Szinkron kész! Letöltve: "
   },
   "toast": {
-    "username_short": "⚠️ Adj meg legalább 3 karakteres felhasználónevet!",
-    "username_chars": "⚠️ Csak betűk, számok és _ engedélyezett!",
-    "install_error": "❌ Telepítési hiba: ",
-    "update_error": "❌ Frissítési hiba: "
+    "username_short": "Adj meg legalább 3 karakteres felhasználónevet!",
+    "username_chars": "Csak betűk, számok és _ engedélyezett!",
+    "install_error": "Telepítési hiba: ",
+    "update_error": "Frissítési hiba: "
   }
 }
