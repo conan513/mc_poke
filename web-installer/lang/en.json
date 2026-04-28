@@ -10,6 +10,7 @@
     "offline": "SERVER OFFLINE",
     "launch": "Launch Game",
     "download": "Download Client",
+    "download_confirm": "The launcher was not found on your computer. Would you like to download the installer?",
     "os_detected": "Detected system: "
   },
   "stats": {

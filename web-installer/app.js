@@ -50,6 +50,11 @@ document.addEventListener('DOMContentLoaded', () => {
     });
     document.title = t('title');
     detectOS(); // Update button text with current language
+    
+    // Smooth reveal after first translation
+    setTimeout(() => {
+      document.body.classList.add('i18n-ready');
+    }, 50);
   }
 
   // Language Switcher Logic
@@ -115,21 +120,46 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // ── Protocol Launch Logic ─────────────────────────────────────
   btn.addEventListener('click', (e) => {
-    // Protocol URL
+    e.preventDefault();
+    
+    // UI Feedback
+    const originalText = btnText.textContent;
+    const originalIcon = btnIcon.textContent;
+    
+    btn.classList.add('loading');
+    btnText.textContent = t('status.checking');
+    btnIcon.textContent = '🔍';
+
+    // Try protocol
     window.location.href = "cobble://launch";
     
     const start = Date.now();
     let hasBlurred = false;
-    const blurHandler = () => { hasBlurred = true; };
+    const blurHandler = () => { 
+      hasBlurred = true; 
+      // Launcher started!
+      btn.classList.remove('loading');
+      btnText.textContent = originalText;
+      btnIcon.textContent = originalIcon;
+    };
     window.addEventListener('blur', blurHandler);
 
     setTimeout(() => {
       window.removeEventListener('blur', blurHandler);
+      btn.classList.remove('loading');
+      
       if (!hasBlurred && (Date.now() - start < 2500)) {
         // App is likely not installed
-        if (confirm(t('status.download') + "?")) {
+        btnText.textContent = t('status.download');
+        btnIcon.textContent = '📥';
+        
+        if (confirm(t('status.download_confirm') || "A launcher nem található. Szeretnéd letölteni a telepítőt?")) {
           window.location.href = currentDownloadUrl;
         }
+      } else {
+        // Restore original state if it worked or blurred
+        btnText.textContent = originalText;
+        btnIcon.textContent = originalIcon;
       }
     }, 2000);
   });

@@ -23,6 +23,16 @@ body {
   overflow-x: hidden;
 }
 
+/* Language Flash Prevention */
+[data-i18n] {
+  opacity: 0 !important;
+  transition: opacity 0.3s ease;
+}
+
+body.i18n-ready [data-i18n] {
+  opacity: 1 !important;
+}
+
 /* Background & Hero */
 .hero-bg {
   position: fixed;

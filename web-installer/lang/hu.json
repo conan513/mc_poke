@@ -10,6 +10,7 @@
     "offline": "SZERVER OFFLINE",
     "launch": "Játék Indítása",
     "download": "Kliens Letöltése",
+    "download_confirm": "A launcher nem található a számítógépeden. Szeretnéd letölteni a telepítőt?",
     "os_detected": "Észlelt rendszer: "
   },
   "stats": {
