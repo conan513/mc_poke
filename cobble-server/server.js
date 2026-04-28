@@ -291,23 +291,10 @@ function handleRequest(req, res) {
 
         if (isUrl) {
           // Download the skin PNG from the provided URL
-          const makeGet = (targetUrl) => {
-            const mod = targetUrl.startsWith('https') ? https : http
-            mod.get(targetUrl, { headers: { 'User-Agent': 'CobbleServer/1.0' } }, (sres) => {
-              // Follow redirects (Mojang / mc-heads may redirect)
-              if (sres.statusCode === 301 || sres.statusCode === 302 || sres.statusCode === 307) {
-                return makeGet(sres.headers.location)
-              }
-              const file = fs.createWriteStream(savePath)
-              sres.pipe(file)
-              file.on('finish', () => { file.close(); onSaved() })
-              file.on('error', (e) => { res.writeHead(500); res.end(JSON.stringify({ error: e.message })) })
-            }).on('error', (e) => {
-              res.writeHead(500)
-              res.end(JSON.stringify({ error: e.message }))
-            })
-          }
-          makeGet(skinData)
+          installer.downloadFile(skinData, savePath).then(onSaved).catch(e => {
+            res.writeHead(500)
+            res.end(JSON.stringify({ error: e.message }))
+          })
         } else {
           // Base64 encoded PNG
           const base64 = skinData.replace(/^data:image\/\w+;base64,/, '')
@@ -641,21 +628,16 @@ function handleRequest(req, res) {
             const file = latest.files.find(f => f.primary) || latest.files[0]
             
             const dest = path.join(MODS_DIR, file.filename)
-            const fileStream = fs.createWriteStream(dest)
             
-            https.get(file.url, dlRes => {
-              dlRes.pipe(fileStream)
-              fileStream.on('finish', () => {
-                fileStream.close()
-                // Ha frissítés volt, töröljük a régit
-                if (oldFilename && oldFilename !== file.filename && !oldFilename.includes('..')) {
-                  const oldPath = path.join(MODS_DIR, oldFilename)
-                  if (fs.existsSync(oldPath)) fs.unlinkSync(oldPath)
-                }
-                res.writeHead(200, { 'Content-Type': 'application/json' })
-                res.end(JSON.stringify({ success: true, filename: file.filename }))
-              })
-            }).on('error', e => {
+            installer.downloadFile(file.url, dest, { hash: file.hashes?.sha1 }).then(() => {
+              // Ha frissítés volt, töröljük a régit
+              if (oldFilename && oldFilename !== file.filename && !oldFilename.includes('..')) {
+                const oldPath = path.join(MODS_DIR, oldFilename)
+                if (fs.existsSync(oldPath)) fs.unlinkSync(oldPath)
+              }
+              res.writeHead(200, { 'Content-Type': 'application/json' })
+              res.end(JSON.stringify({ success: true, filename: file.filename }))
+            }).catch(e => {
               res.writeHead(500, { 'Content-Type': 'application/json' })
               res.end(JSON.stringify({ error: 'Letöltési hiba: ' + e.message }))
             })

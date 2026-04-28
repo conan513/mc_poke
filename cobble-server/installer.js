@@ -55,16 +55,16 @@ async function installJava() {
   await downloadFile(url, javaDl, (p) => {
     process.stdout.write(`\r[Java] Letöltés: ${Math.round(p * 100)}%`)
   })
-  console.log('\n[Java] Java 21 kicsomagolása...')
-
-  fs.mkdirSync(javaDir, { recursive: true })
+  const javaTmpDir = javaDir + '.tmp'
+  if (fs.existsSync(javaTmpDir)) fs.rmSync(javaTmpDir, { recursive: true, force: true })
+  fs.mkdirSync(javaTmpDir, { recursive: true })
 
   if (ext === '.zip') {
     const zip = new AdmZip(javaDl)
-    zip.extractAllTo(javaDir, true)
+    zip.extractAllTo(javaTmpDir, true)
   } else {
     await new Promise((resolve, reject) => {
-      execFile('tar', ['-xzf', javaDl, '-C', javaDir, '--strip-components=1'], (err) => {
+      execFile('tar', ['-xzf', javaDl, '-C', javaTmpDir, '--strip-components=1'], (err) => {
         if (err) reject(err)
         else resolve()
       })
@@ -72,6 +72,9 @@ async function installJava() {
   }
 
   fs.unlinkSync(javaDl)
+
+  if (fs.existsSync(javaDir)) fs.rmSync(javaDir, { recursive: true, force: true })
+  fs.renameSync(javaTmpDir, javaDir)
 
   // After extraction, the layout for the JDK may include a top-level directory
   // (e.g. "jdk-21.0.5+11/") which means javaExe may not exist at the
@@ -126,24 +129,58 @@ async function installJava() {
   return resolvedJavaExe
 }
 
-function downloadFile(url, dest, onProgress) {
+function downloadFile(url, dest, options = {}) {
+  const onProgress = typeof options === 'function' ? options : options.onProgress
+  const expectedHash = options.hash
+  const algorithm = options.algorithm || 'sha1'
+
   return new Promise((resolve, reject) => {
     fs.mkdirSync(path.dirname(dest), { recursive: true })
+    const tmpDest = dest + '.tmp'
+    
     const request = (targetUrl) => {
       const mod = targetUrl.startsWith('https') ? https : http
       mod.get(targetUrl, { headers: { 'User-Agent': 'CobbleServer/1.0' } }, (res) => {
         if ([301, 302, 307, 308].includes(res.statusCode)) return request(res.headers.location)
         if (res.statusCode !== 200) return reject(new Error(`HTTP ${res.statusCode} for ${targetUrl}`))
+        
         const total = parseInt(res.headers['content-length'] || '0', 10)
         let downloaded = 0
-        const file = fs.createWriteStream(dest)
+        const file = fs.createWriteStream(tmpDest)
+        
         res.on('data', chunk => {
           downloaded += chunk.length
           if (total > 0 && onProgress) onProgress(downloaded / total)
         })
+        
         res.pipe(file)
-        file.on('finish', () => file.close(resolve))
-        file.on('error', reject)
+        
+        file.on('finish', async () => {
+          file.close(async () => {
+            try {
+              if (expectedHash) {
+                const actualHash = await getFileHash(tmpDest, algorithm)
+                if (actualHash !== expectedHash) {
+                  fs.unlinkSync(tmpDest)
+                  return reject(new Error(`Hash hiba! Elvárt: ${expectedHash}, Kapott: ${actualHash}`))
+                }
+              }
+              
+              // Siker: átnevezés véglegesre
+              if (fs.existsSync(dest)) fs.unlinkSync(dest)
+              fs.renameSync(tmpDest, dest)
+              resolve()
+            } catch (err) {
+              if (fs.existsSync(tmpDest)) fs.unlinkSync(tmpDest)
+              reject(err)
+            }
+          })
+        })
+        
+        file.on('error', (err) => {
+          if (fs.existsSync(tmpDest)) fs.unlinkSync(tmpDest)
+          reject(err)
+        })
       }).on('error', reject)
     }
     request(url)
@@ -155,6 +192,7 @@ function downloadFile(url, dest, onProgress) {
  */
 function getFileHash(filePath, algorithm = 'sha1') {
   return new Promise((resolve, reject) => {
+    if (!fs.existsSync(filePath)) return reject(new Error('Fájl nem található a hash-eléshez.'))
     const hash = crypto.createHash(algorithm)
     const stream = fs.createReadStream(filePath)
     stream.on('data', chunk => hash.update(chunk))
@@ -279,7 +317,7 @@ async function updateModsFromModrinth() {
             console.log(`[Modrinth] FRISSÍTÉS: ${oldFileInfo.file} -> ${newestFile.filename} (${latest.version_number})`);
             const dest = path.join(MODS_DIR, newestFile.filename);
             
-            await downloadFile(newestFile.url, dest);
+            await downloadFile(newestFile.url, dest, { hash: newestFile.hashes.sha1, algorithm: 'sha1' });
             if (fs.existsSync(oldFileInfo.fullPath) && oldFileInfo.fullPath !== dest) {
               fs.unlinkSync(oldFileInfo.fullPath);
             }
@@ -375,7 +413,7 @@ async function ensureExtraMods() {
 
       if (!isPresent) {
         console.log(`[Modrinth] Extra mod letöltése: ${slug} -> ${file.filename}`);
-        await downloadFile(file.url, dest);
+        await downloadFile(file.url, dest, { hash: file.hashes.sha1, algorithm: 'sha1' });
       } else {
         console.log(`[Modrinth] Extra mod már jelen van: ${slug}`);
       }
@@ -436,6 +474,32 @@ async function getLatestFabric() {
   return { loader, installer }
 }
 
+async function verifyIntegrity(state) {
+  console.log('[Installer] Integritás ellenőrzése...')
+  
+  // 1. Java check
+  const javaExe = getJavaExecutable()
+  if (!fs.existsSync(javaExe)) {
+    console.warn('[Installer] Java végrehajtható nem található, újratelepítés szükséges.')
+    return false
+  }
+
+  // 2. Fabric check
+  const launchJar = path.join(SERVER_DIR, 'fabric-server-launch.jar')
+  if (!fs.existsSync(launchJar)) {
+    console.warn('[Installer] Fabric szerver jar nem található, újratelepítés szükséges.')
+    return false
+  }
+
+  // 3. Modpack check
+  if (!fs.existsSync(MODS_DIR) || fs.readdirSync(MODS_DIR).length === 0) {
+    console.warn('[Installer] Mods mappa üres vagy hiányzik, modpack újratelepítése szükséges.')
+    return false
+  }
+
+  return true
+}
+
 async function install() {
   console.log('[Installer] Indítás...')
 
@@ -454,80 +518,112 @@ async function install() {
   let state = {}
   if (fs.existsSync(stateFile)) state = JSON.parse(fs.readFileSync(stateFile, 'utf8'))
 
-  if (state.modpackId === latestPack.id) {
-    console.log(`[Installer] Modpack (${latestPack.version_number}) már telepítve.`)
+  const integrityOk = await verifyIntegrity(state)
+
+  if (state.modpackId === latestPack.id && integrityOk) {
+    console.log(`[Installer] Modpack (${latestPack.version_number}) és alap fájlok rendben.`)
   } else {
     console.log(`[Installer] Új modpack telepítése: ${latestPack.version_number}`)
     const mrpackPath = path.join(SERVER_DIR, 'modpack.mrpack')
+    const MODS_STAGING = path.join(SERVER_DIR, 'mods.new')
+    const MODS_BACKUP = path.join(SERVER_DIR, 'mods.old')
 
-    // Clean old mods to prevent conflicts
-    if (fs.existsSync(MODS_DIR)) {
-      fs.readdirSync(MODS_DIR).forEach(f => {
-        if (f.endsWith('.jar') || f.endsWith('.zip')) fs.unlinkSync(path.join(MODS_DIR, f))
-      })
-    }
+    // Clean staging area
+    if (fs.existsSync(MODS_STAGING)) fs.rmSync(MODS_STAGING, { recursive: true, force: true })
+    fs.mkdirSync(MODS_STAGING, { recursive: true })
 
-    await downloadFile(file.url, mrpackPath, p => {
-      process.stdout.write(`\r[Installer] Modpack letöltése: ${Math.round(p * 100)}%`)
-    })
-    console.log('\n[Installer] Kicsomagolás...')
-
-    const zip = new AdmZip(mrpackPath)
-    const index = JSON.parse(zip.readAsText('modrinth.index.json'))
-
-    // Extract overrides (prioritize server-overrides, then overrides)
-    for (const entry of zip.getEntries()) {
-      if (entry.isDirectory) continue
-      const lowerName = entry.entryName.toLowerCase()
-      if (lowerName.includes('no hunger') || lowerName.includes('mobsbegone') || lowerName.includes('no ender dragon') || lowerName.includes('soundsbegone') || lowerName.includes('interactic') || lowerName.includes('custom-splash-screen') || lowerName.includes('customsplashscreen')) continue
-
-      let destPath = null
-      if (entry.entryName.startsWith('server-overrides/')) {
-        destPath = path.join(SERVER_DIR, entry.entryName.slice('server-overrides/'.length))
-      } else if (entry.entryName.startsWith('overrides/')) {
-        // Only extract normal overrides if it doesn't already exist (server-overrides might have placed it)
-        const checkPath = path.join(SERVER_DIR, entry.entryName.slice('overrides/'.length))
-        if (!fs.existsSync(checkPath)) destPath = checkPath
-      }
-      if (destPath) {
-        fs.mkdirSync(path.dirname(destPath), { recursive: true })
-        fs.writeFileSync(destPath, entry.getData())
-      }
-    }
-
-    // Download mods that are NOT client-only and filter out unwanted mods
-    const files = index.files || []
-    const serverFiles = files.filter(f => {
-      if (f.env && f.env.server === 'unsupported') return false
-      const lowerPath = f.path.toLowerCase()
-      if (lowerPath.includes('no hunger') || lowerPath.includes('mobsbegone') || lowerPath.includes('no ender dragon') || lowerPath.includes('soundsbegone') || lowerPath.includes('interactic') || lowerPath.includes('custom-splash-screen') || lowerPath.includes('customsplashscreen')) return false
-      return true
-    })
-    console.log(`[Installer] Szerver modok letöltése (${serverFiles.length} db)...`)
-
-    const baseFilenames = []
-    let done = 0
-    for (let i = 0; i < serverFiles.length; i += 5) {
-      const batch = serverFiles.slice(i, i + 5)
-      await Promise.all(batch.map(async f => {
-        const dest = path.join(SERVER_DIR, f.path)
-        baseFilenames.push(path.basename(f.path))
-        const downloadUrl = f.downloads?.[0]
-        if (downloadUrl) {
-          await downloadFile(downloadUrl, dest).catch(() => { })
+    try {
+      await downloadFile(file.url, mrpackPath, {
+        hash: file.hashes.sha1,
+        onProgress: p => {
+          process.stdout.write(`\r[Installer] Modpack letöltése: ${Math.round(p * 100)}%`)
         }
-        done++
-      }))
-      process.stdout.write(`\r[Installer] Modok: ${done}/${serverFiles.length}`)
+      })
+      console.log('\n[Installer] Kicsomagolás...')
+
+      const zip = new AdmZip(mrpackPath)
+      const index = JSON.parse(zip.readAsText('modrinth.index.json'))
+
+      // Extract overrides to a temporary location first or apply carefully
+      // Overrides are tricky because they go into SERVER_DIR directly.
+      // For now, we extract them directly but they are usually small config files.
+      for (const entry of zip.getEntries()) {
+        if (entry.isDirectory) continue
+        const lowerName = entry.entryName.toLowerCase()
+        if (lowerName.includes('no hunger') || lowerName.includes('mobsbegone') || lowerName.includes('no ender dragon') || lowerName.includes('soundsbegone') || lowerName.includes('interactic') || lowerName.includes('custom-splash-screen') || lowerName.includes('customsplashscreen')) continue
+
+        let destPath = null
+        if (entry.entryName.startsWith('server-overrides/')) {
+          destPath = path.join(SERVER_DIR, entry.entryName.slice('server-overrides/'.length))
+        } else if (entry.entryName.startsWith('overrides/')) {
+          const checkPath = path.join(SERVER_DIR, entry.entryName.slice('overrides/'.length))
+          if (!fs.existsSync(checkPath)) destPath = checkPath
+        }
+        if (destPath) {
+          fs.mkdirSync(path.dirname(destPath), { recursive: true })
+          fs.writeFileSync(destPath, entry.getData())
+        }
+      }
+
+      // Download mods to STAGING
+      const files = index.files || []
+      const serverFiles = files.filter(f => {
+        if (f.env && f.env.server === 'unsupported') return false
+        const lowerPath = f.path.toLowerCase()
+        if (lowerPath.includes('no hunger') || lowerPath.includes('mobsbegone') || lowerPath.includes('no ender dragon') || lowerPath.includes('soundsbegone') || lowerPath.includes('interactic') || lowerPath.includes('custom-splash-screen') || lowerPath.includes('customsplashscreen')) return false
+        return true
+      })
+      
+      console.log(`[Installer] Szerver modok letöltése (${serverFiles.length} db) a staging mappába...`)
+
+      const baseFilenames = []
+      let done = 0
+      // Download in batches
+      for (let i = 0; i < serverFiles.length; i += 5) {
+        const batch = serverFiles.slice(i, i + 5)
+        await Promise.all(batch.map(async f => {
+          // Inside mrpack, f.path is usually "mods/something.jar"
+          // We want to put it in MODS_STAGING, so we take the basename.
+          const filename = path.basename(f.path)
+          const dest = path.join(MODS_STAGING, filename)
+          baseFilenames.push(filename)
+          const downloadUrl = f.downloads?.[0]
+          if (downloadUrl) {
+            await downloadFile(downloadUrl, dest, { hash: f.hashes.sha1 }).catch(e => {
+               console.error(`\n[Installer] Hiba a mod letöltésekor (${filename}): ${e.message}`)
+               throw e
+            })
+          }
+          done++
+        }))
+        process.stdout.write(`\r[Installer] Modok: ${done}/${serverFiles.length}`)
+      }
+      console.log()
+
+      // SUCCESS! Now swap the mods folder.
+      console.log('[Installer] Modok cseréje...')
+      if (fs.existsSync(MODS_BACKUP)) fs.rmSync(MODS_BACKUP, { recursive: true, force: true })
+      if (fs.existsSync(MODS_DIR)) fs.renameSync(MODS_DIR, MODS_BACKUP)
+      fs.renameSync(MODS_STAGING, MODS_DIR)
+
+      // Save base modpack filenames
+      fs.writeFileSync(path.join(SERVER_DIR, '.modpack-files.json'), JSON.stringify(baseFilenames, null, 2))
+
+      fs.unlinkSync(mrpackPath)
+      if (fs.existsSync(MODS_BACKUP)) fs.rmSync(MODS_BACKUP, { recursive: true, force: true })
+
+      state.modpackId = latestPack.id
+      fs.writeFileSync(stateFile, JSON.stringify(state, null, 2))
+      console.log('[Installer] Modpack frissítés sikeres.')
+
+    } catch (err) {
+      console.error(`\n[Installer] HIBA a modpack telepítésekor: ${err.message}`)
+      console.log('[Installer] Visszaállítás...')
+      if (fs.existsSync(MODS_STAGING)) fs.rmSync(MODS_STAGING, { recursive: true, force: true })
+      // If we failed before swapping, MODS_DIR is still there and untouched.
+      // If we failed AFTER swapping (unlikely here but still), we'd need more logic.
+      throw err
     }
-    console.log()
-
-    // Save base modpack filenames so the Admin UI doesn't touch them
-    fs.writeFileSync(path.join(SERVER_DIR, '.modpack-files.json'), JSON.stringify(baseFilenames, null, 2))
-
-    fs.unlinkSync(mrpackPath)
-    state.modpackId = latestPack.id
-    fs.writeFileSync(stateFile, JSON.stringify(state, null, 2))
   }
 
   // 2. Fabric Server Install
@@ -653,4 +749,4 @@ async function install() {
   return javaPath
 }
 
-module.exports = { install }
+module.exports = { install, downloadFile }
