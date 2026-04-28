@@ -155,20 +155,28 @@ document.addEventListener('DOMContentLoaded', () => {
   setInterval(updateStatus, 30000);
   updateStatus();
 
-  // Smooth scroll for anchor links
-  const altTrigger = document.querySelector('.alt-trigger-link');
-  if (altTrigger) {
-    altTrigger.addEventListener('click', function (e) {
+  // Robust Smooth Scroll (Event Delegation)
+  document.addEventListener('click', function (e) {
+    const trigger = e.target.closest('.alt-trigger-link');
+    if (trigger) {
       e.preventDefault();
-      const targetId = this.getAttribute('href').slice(1);
+      const targetId = trigger.getAttribute('href').slice(1);
       const targetElement = document.getElementById(targetId);
+      
       if (targetElement) {
-        const topOffset = targetElement.getBoundingClientRect().top + window.pageYOffset - 20;
+        // Method 1: Smooth scroll
         window.scrollTo({
-          top: topOffset,
+          top: targetElement.offsetTop - 20,
           behavior: 'smooth'
         });
+        
+        // Method 2: Fallback jump if smooth scroll is blocked/slow
+        setTimeout(() => {
+          if (Math.abs(window.pageYOffset - (targetElement.offsetTop - 20)) > 100) {
+            targetElement.scrollIntoView();
+          }
+        }, 500);
       }
-    });
-  }
+    }
+  });
 });
