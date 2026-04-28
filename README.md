@@ -1,6 +1,6 @@
 # 🌌 Cobblemon Universe Ecosystem
 
-Üdvözöl a **Cobblemon Universe**, a legteljesebb és legmodernebb Pokémon élmény Minecraftban. Ez a projekt egy teljeskörű, automatizált ökoszisztémát biztosít, amely magában foglalja az egyedi launchert, a webes telepítőt és a dedikált szerverkezelő központot.
+Welcome to **Cobblemon Universe**, the most complete and modern Pokémon experience in Minecraft. This project provides a comprehensive, automated ecosystem including a custom launcher, web installer, and dedicated server management hub.
 
 ![Minecraft](https://img.shields.io/badge/Minecraft-1.21.1-green?style=for-the-badge)
 ![Platform](https://img.shields.io/badge/Platform-Windows%20%7C%20Linux%20%7C%20macOS-blue?style=for-the-badge)
@@ -8,68 +8,68 @@
 
 ---
 
-## 📂 Projekt Struktúra
+## 📂 Project Structure
 
-A repozitórium három fő pillérre épül:
+The repository is built on three main pillars:
 
-1.  **🚀 Cobblemon Universe Launcher (Kliens)**: Prémium, Electron-alapú Minecraft kliens, amely automatizálja a teljes játékélményt.
-2.  **🌐 Web-Installer (Landing Page)**: Modern, reszponzív weboldal automatikus OS-felismeréssel és letöltési segédlettel.
-3.  **🛠️ Universe Server Control (Host)**: Node.js alapú központi szerver, amely a játékot és a mod-szinkronizációt kezeli.
+1.  **🚀 Cobblemon Universe Launcher (Client)**: A premium, Electron-based Minecraft client that automates the entire gaming experience.
+2.  **🌐 Web-Installer (Landing Page)**: A modern, responsive website with automatic OS detection and download assistance.
+3.  **🛠️ Universe Server Control (Host)**: A Node.js-based central server that manages the game and mod synchronization.
 
 ---
 
 ## 🚀 1. Cobblemon Universe Launcher
 
-Egyedi tervezésű, vizuálisan lenyűgöző indítóprogram, amely leveszi a technikai terhet a játékosok válláról.
+A custom-designed, visually stunning launcher that takes the technical burden off the players' shoulders.
 
-### Kiemelt funkciók:
-*   🌍 **Többnyelvűség (i18n):** 14+ támogatott nyelv, automatikus rendszer-nyelv felismeréssel (Windows, Linux, macOS).
-*   🔄 **Intelligens Mod-Szinkron:** A kliens minden indításkor ellenőrzi a szerver állapotát, és automatikusan le- vagy feltölti a szükséges modokat és konfigurációkat.
-*   👤 **Skin Rendszer:** Beépített 3D skin nézegető és feltöltő felület, amely szinkronizálja a játékos megjelenését a szerverrel.
-*   ⚙️ **Auto-Setup:** Automatikusan telepíti a megfelelő Java 21 környezetet és a Fabric Loadert.
-*   🎨 **Prémium Design:** Kinematikus háttérképek, üveg-szerű (glassmorphism) felületek és smooth animációk.
+### Key Features:
+*   🌍 **Internationalization (i18n):** 14+ supported languages with automatic system language detection (Windows, Linux, macOS).
+*   🔄 **Intelligent Mod Sync:** The client checks the server status at every launch and automatically syncs necessary mods and configurations.
+*   👤 **Skin System:** Built-in 3D skin viewer and uploader interface, synchronizing player appearance with the server.
+*   ⚙️ **Auto-Setup:** Automatically installs the correct Java 21 environment and Fabric Loader.
+*   🎨 **Premium Design:** Cinematic background images, glassmorphism interfaces, and smooth animations.
 
 ---
 
 ## 🌐 2. Web-Installer (Landing Page)
 
-A játékosok első érintkezési pontja, egy modern landing page, amely a `web-installer` mappában található.
+The first point of contact for players, a modern landing page located in the `web-installer` folder.
 
-*   💻 **OS Detektálás:** Automatikusan felajánlja a rendszeredhez illő telepítőt (Windows, Linux vagy Mac).
-*   📦 **Minden Platform Támogatott:** Elérhető EXE, AppImage, DEB, RPM, DMG és ZIP formátumokban is.
-*   📊 **Élő Szerverstátusz:** Az oldalon látható a szerver aktuális állapota, a telepített modok száma és a következő tervezett újraindítás ideje.
+*   💻 **OS Detection:** Automatically offers the appropriate installer for your system (Windows, Linux, or Mac).
+*   📦 **Cross-Platform Support:** Available in EXE, AppImage, DEB, RPM, DMG, and ZIP formats.
+*   📊 **Live Server Status:** Displays current server status, installed mod count, and the next scheduled restart.
 
 ---
 
 ## 🛠️ 3. Universe Server Control
 
-A központi agy, amely a `/cobble-server` mappában található.
+The central brain of the ecosystem, located in the `/cobble-server` folder.
 
-*   🖥️ **Web Dashboard:** Teljes körű vezérlés a böngészőből (Indítás/Leállítás, RAM kezelés).
-*   🔍 **Modrinth Integráció:** Beépített mod-kereső és telepítő, verziókezeléssel és frissítés-ellenőrzéssel.
-*   📋 **Manifest API:** Kiszolgálja a klienseket a pontos mod-listával és konfigurációkkal.
-*   👕 **Skin API:** Kezeli a játékosok skinjeit és kiszolgálja azokat a SkinsRestorer mod felé.
+*   🖥️ **Web Dashboard:** Full control from the browser (Start/Stop, RAM management).
+*   🔍 **Modrinth Integration:** Built-in mod search and installer with version control and update checking.
+*   📋 **Manifest API:** Serves clients with the exact mod list and configurations.
+*   👕 **Skin API:** Manages player skins and serves them to the SkinsRestorer mod.
 
 ---
 
-## 🛠️ Technológiai Stack
+## 🛠️ Technology Stack
 
-*   **Frontend:** Vanilla JS, HTML5, CSS3 (Modern design tokenekkel).
-*   **Backend:** Node.js (V原生 HTTP szerver, Express nélkül a maximális sebességért).
+*   **Frontend:** Vanilla JS, HTML5, CSS3 (Modern design tokens).
+*   **Backend:** Node.js (Raw HTTP server for maximum speed).
 *   **Frameworks:** Electron 31 (Launcher), Vite (Build tool).
 *   **APIs:** Modrinth API v2, Cobblemon Official Metadata.
 
 ---
 
-## 🏁 Gyors Indítás
+## 🏁 Quick Start
 
-### Kliens (Fejlesztéshez):
+### Client (Development):
 ```bash
 npm install
 npm run dev
 ```
 
-### Szerver indítása:
+### Server Start:
 ```bash
 cd cobble-server
 npm install
@@ -77,11 +77,11 @@ node server.js
 ```
 
 ### Web-Installer:
-A szerver automatikusan hosztolja a `web-installer` tartalmát a `http://localhost:8080` címen.
+The server automatically hosts the `web-installer` content at `http://localhost:8080`.
 
 ---
 
-## 📝 Licensz & Megjegyzések
-A projekt célja a közösségi játékélmény maximalizálása. A kliens és a szerver offline (cracked) módban is üzemelhet, de javasoljuk az eredeti Minecraft használatát a Pokémon élmény teljes kiaknázásához.
+## 📝 License & Notes
+This project aims to maximize the community gaming experience. The client and server can operate in offline (cracked) mode, but we recommend using original Minecraft to fully enjoy the Pokémon experience.
 
 © 2026 Cobblemon Universe Team
