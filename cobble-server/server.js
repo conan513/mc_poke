@@ -168,34 +168,22 @@ function buildManifest() {
   return manifest
 }
 
-function uploadToCatboxAndSetSkin(filePath, username, res) {
-  console.log(`[Skins] Feltöltés a webre (catbox.moe) a MineSkin API miatt...`);
-  execFile('curl', ['-F', 'reqtype=fileupload', '-F', `fileToUpload=@${filePath}`, 'https://catbox.moe/user/api.php'], (err, stdout, stderr) => {
-    if (err) {
-      console.error('[Skins] Catbox feltöltési hiba:', err);
-      if (!res.writableEnded) {
-        res.writeHead(500, { 'Content-Type': 'application/json' });
-        res.end(JSON.stringify({ error: 'Hiba a publikus skin URL generálása során: ' + err.message }));
-      }
-      return;
-    }
-    const publicUrl = stdout.trim();
-    if (!publicUrl.startsWith('http')) {
-      console.error('[Skins] Érvénytelen válasz a catbox.moe-tól:', publicUrl);
-      if (!res.writableEnded) {
-        res.writeHead(500, { 'Content-Type': 'application/json' });
-        res.end(JSON.stringify({ error: 'Érvénytelen válasz a publikus képmegosztótól.' }));
-      }
-      return;
-    }
-    
-    console.log(`[Skins] Publikus URL elkészült: ${publicUrl}`);
-    sendCommand(`sr url ${username} "${publicUrl}"`);
-    if (!res.writableEnded) {
-      res.writeHead(200, { 'Content-Type': 'application/json' });
-      res.end(JSON.stringify({ success: true, url: publicUrl }));
-    }
-  });
+/**
+ * Applies the saved skin via SkinsRestorer using the server's own skin URL.
+ * No external services required – the skin PNG is served directly from this server.
+ */
+function applySkinFromLocal(req, username, res) {
+  // Derive the public base URL from the incoming request's Host header
+  const host = req.headers['host'] || `localhost:${PORT}`
+  const skinPublicUrl = `http://${host}/skins/${username}.png`
+
+  console.log(`[Skins] SR parancs küldése: sr set ${username} ${skinPublicUrl}`)
+  sendCommand(`sr set ${username} ${skinPublicUrl}`)
+
+  if (!res.writableEnded) {
+    res.writeHead(200, { 'Content-Type': 'application/json' })
+    res.end(JSON.stringify({ success: true, url: skinPublicUrl }))
+  }
 }
 
 // ── Request handler ──────────────────────────────────────────
@@ -233,28 +221,37 @@ function handleRequest(req, res) {
         if (!username || !skinData) throw new Error('Hiányzó adatok.')
 
         const savePath = path.join(SKINS_DIR, `${username}.png`)
-        
+
+        const onSaved = () => {
+          console.log(`[Skins] Skin mentve: ${username}`)
+          // Apply via SkinsRestorer using this server's own public URL
+          applySkinFromLocal(req, username, res)
+        }
+
         if (isUrl) {
-          // If it's a URL, we download it on the server
-          const mod = skinData.startsWith('https') ? https : http
-          mod.get(skinData, (sres) => {
-            const file = fs.createWriteStream(savePath)
-            sres.pipe(file)
-            file.on('finish', () => {
-              file.close()
-              console.log(`[Skins] Skin letöltve: ${username}`)
-              uploadToCatboxAndSetSkin(savePath, username, res)
+          // Download the skin PNG from the provided URL
+          const makeGet = (targetUrl) => {
+            const mod = targetUrl.startsWith('https') ? https : http
+            mod.get(targetUrl, { headers: { 'User-Agent': 'CobbleServer/1.0' } }, (sres) => {
+              // Follow redirects (Mojang / mc-heads may redirect)
+              if (sres.statusCode === 301 || sres.statusCode === 302 || sres.statusCode === 307) {
+                return makeGet(sres.headers.location)
+              }
+              const file = fs.createWriteStream(savePath)
+              sres.pipe(file)
+              file.on('finish', () => { file.close(); onSaved() })
+              file.on('error', (e) => { res.writeHead(500); res.end(JSON.stringify({ error: e.message })) })
+            }).on('error', (e) => {
+              res.writeHead(500)
+              res.end(JSON.stringify({ error: e.message }))
             })
-          }).on('error', (e) => {
-            res.writeHead(500)
-            res.end(JSON.stringify({ error: e.message }))
-          })
+          }
+          makeGet(skinData)
         } else {
-          // Base64 data
-          const base64 = skinData.replace(/^data:image\/\w+;base64,/, "")
+          // Base64 encoded PNG
+          const base64 = skinData.replace(/^data:image\/\w+;base64,/, '')
           fs.writeFileSync(savePath, base64, 'base64')
-          console.log(`[Skins] Skin feltöltve: ${username}`)
-          uploadToCatboxAndSetSkin(savePath, username, res)
+          onSaved()
         }
       } catch (e) {
         res.writeHead(400, { 'Content-Type': 'application/json' })

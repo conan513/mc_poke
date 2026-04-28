@@ -445,50 +445,147 @@ animateParticles()
 // ── Skin Management Logic ──────────────────────────────────────
 let currentSkinType = 'mojang'
 let currentSkinVal = ''
+let skinViewer = null // skinview3d instance
+
+/**
+ * Returns the correct 64x64 skin texture URL based on current type & value.
+ */
+function getSkinTextureUrl() {
+  if (currentSkinType === 'mojang') {
+    const name = ($id('input-skin-val')?.value || '').trim() || 'Steve'
+    // ✅ Correct endpoint: /skin/<name> returns the actual 64x64 PNG texture
+    return `https://mc-heads.net/skin/${name}`
+  } else if (currentSkinType === 'url') {
+    return ($id('input-skin-val')?.value || '').trim() || null
+  } else if (currentSkinType === 'file') {
+    return currentSkinVal || null // base64 data URL
+  }
+  return null
+}
+
+/**
+ * Initializes the skinview3d 3D viewer in the modal canvas.
+ */
+function initSkinViewer() {
+  const canvas = $id('skin-3d-canvas')
+  if (!canvas) return
+
+  // Destroy previous viewer to free memory
+  if (skinViewer) {
+    try { skinViewer.dispose() } catch (_) {}
+    skinViewer = null
+  }
+
+  // If skinview3d isn't loaded (CDN failure), gracefully skip
+  if (typeof skinview3d === 'undefined') {
+    console.warn('[Skin3D] skinview3d library not loaded.')
+    return
+  }
+
+  try {
+    skinViewer = new skinview3d.SkinViewer({
+      canvas,
+      width: 180,
+      height: 270,
+      skin: 'https://mc-heads.net/skin/Steve',
+    })
+
+    skinViewer.autoRotate = true
+    skinViewer.autoRotateSpeed = 0.8
+    skinViewer.controls.enabled = true
+    skinViewer.animation = new skinview3d.WalkingAnimation()
+    skinViewer.animation.speed = 0.5
+    skinViewer.zoom = 0.9
+  } catch (e) {
+    console.warn('[Skin3D] Viewer init hiba:', e.message)
+    skinViewer = null
+  }
+}
+
+/**
+ * Loads the current skin into the 3D viewer.
+ */
+function updateSkinViewer() {
+  if (!skinViewer) return
+  const url = getSkinTextureUrl()
+  if (!url) return
+
+  skinViewer.loadSkin(url).catch(e => {
+    console.warn('[Skin3D] Skin betöltési hiba:', e.message)
+  })
+}
+
+/**
+ * Updates the singleplayer hint with the current skin URL.
+ */
+function updateSpHint() {
+  const serverUrl = ($id('input-server-url')?.value || '').trim()
+  const hint = $id('skin-sp-hint')
+  const hintText = $id('skin-sp-hint-text')
+  if (!hint || !hintText) return
+
+  if (serverUrl && username) {
+    const skinUrl = `${serverUrl.replace(/\/+$/, '')}/skins/${username}.png`
+    hintText.innerHTML = `SP in-game parancs: <code>/skin url ${skinUrl}</code>`
+    hint.style.display = 'flex'
+  } else {
+    hint.style.display = 'none'
+  }
+}
 
 function updateSkinPreview() {
-  const img = $id('skin-preview-img')
-  const val = $id('input-skin-val').value.trim() || 'Steve'
-  
-  if (currentSkinType === 'mojang') {
-    img.src = `https://mc-heads.net/body/front/${val}`
-  } else {
-    img.src = val // Assumes direct image URL
-  }
+  updateSkinViewer()
 }
 
 function applyAvatar() {
   const avatar = $id('player-avatar')
-  const val = currentSkinVal || 'Steve'
-  
+  const val = currentSkinVal || username || 'Steve'
+
   if (currentSkinType === 'mojang') {
-    avatar.style.backgroundImage = `url(https://mc-heads.net/avatar/${val})`
+    // Use head avatar from mc-heads.net
+    avatar.style.backgroundImage = `url(https://mc-heads.net/avatar/${val || 'Steve'})`
     avatar.style.backgroundSize = 'cover'
     avatar.textContent = ''
+  } else if (currentSkinType === 'url') {
+    // For URL skins, fall back to first letter (we can't easily crop the face)
+    avatar.style.backgroundImage = ''
+    avatar.textContent = username ? username.charAt(0).toUpperCase() : '?'
   } else {
-    // For URL skins, we might not have a square avatar easily, 
-    // but we can try to use the same URL or fallback to first letter.
-    avatar.style.backgroundImage = `url(${val})`
-    avatar.style.backgroundSize = 'cover'
-    avatar.textContent = ''
+    // File upload: use the first letter as avatar
+    avatar.style.backgroundImage = ''
+    avatar.textContent = username ? username.charAt(0).toUpperCase() : '?'
   }
 }
 
-// Event Listeners for Skin Modal
+// ── Event Listeners for Skin Modal ────────────────────────────
+
 $id('btn-change-skin').addEventListener('click', () => {
   const modal = $id('modal-skin')
   modal.classList.remove('hidden')
   setTimeout(() => modal.classList.add('active'), 10)
-  
-  // Load current values into modal
-  $id('input-skin-val').value = currentSkinVal
-  updateSkinPreview()
+
+  // Load current values into modal input
+  if (currentSkinType !== 'file') {
+    $id('input-skin-val').value = currentSkinVal
+  }
+
+  // Initialize 3D viewer (needs to be after modal is visible for correct canvas size)
+  setTimeout(() => {
+    initSkinViewer()
+    updateSkinViewer()
+    updateSpHint()
+  }, 50)
 })
 
 $id('btn-close-skin').addEventListener('click', () => {
   const modal = $id('modal-skin')
   modal.classList.remove('active')
   setTimeout(() => modal.classList.add('hidden'), 300)
+
+  // Pause/stop viewer when modal is hidden
+  if (skinViewer) {
+    skinViewer.autoRotate = false
+  }
 })
 
 document.querySelectorAll('[data-skin-type]').forEach(btn => {
@@ -496,7 +593,7 @@ document.querySelectorAll('[data-skin-type]').forEach(btn => {
     document.querySelectorAll('[data-skin-type]').forEach(b => b.classList.remove('active'))
     btn.classList.add('active')
     currentSkinType = btn.dataset.skinType
-    
+
     // UI visibility
     if (currentSkinType === 'file') {
       $id('skin-input-container').classList.add('hidden')
@@ -504,7 +601,9 @@ document.querySelectorAll('[data-skin-type]').forEach(btn => {
     } else {
       $id('skin-input-container').classList.remove('hidden')
       $id('btn-browse-skin').classList.add('hidden')
-      $id('input-skin-val').placeholder = currentSkinType === 'mojang' ? 'pl. AshKetchum' : 'https://.../skin.png'
+      $id('input-skin-val').placeholder = currentSkinType === 'mojang'
+        ? 'pl. AshKetchum'
+        : 'https://.../skin.png'
     }
     updateSkinPreview()
   })
@@ -517,24 +616,24 @@ $id('btn-browse-skin').addEventListener('click', () => {
 $id('input-skin-file').addEventListener('change', (e) => {
   const file = e.target.files[0]
   if (!file) return
-  
+
   const reader = new FileReader()
   reader.onload = (ev) => {
-    const data = ev.target.result
-    $id('skin-preview-img').src = data
-    // Store temporarily in currentSkinVal so save button can use it
-    currentSkinVal = data 
+    currentSkinVal = ev.target.result // base64 data URL
+    updateSkinPreview()
   }
   reader.readAsDataURL(file)
 })
 
-$id('input-skin-val').addEventListener('input', updateSkinPreview)
+$id('input-skin-val').addEventListener('input', () => {
+  updateSkinPreview()
+})
 
 $id('btn-save-skin').addEventListener('click', async () => {
   if (currentSkinType !== 'file') {
     currentSkinVal = $id('input-skin-val').value.trim()
   }
-  
+
   if (!currentSkinVal) {
     showToast('⚠️ Kérlek adj meg egy nevet, linket vagy válassz fájlt!')
     return
@@ -543,14 +642,14 @@ $id('btn-save-skin').addEventListener('click', async () => {
   try {
     localStorage.setItem('cobble_skin_type', currentSkinType)
     localStorage.setItem('cobble_skin_val', currentSkinVal)
-  } catch(e) {}
-  
+  } catch (e) {}
+
   applyAvatar()
-  
-  // Upload to server for SkinsRestorer integration
+
+  // Upload to server for SkinsRestorer integration (multiplayer)
   await uploadSkinToServer()
 
-  showToast('✅ Skin elmentve és feltöltve!')
+  showToast('✅ Skin elmentve és feltöltve a szerverre!')
   $id('btn-close-skin').click()
 })
 
@@ -558,35 +657,43 @@ async function uploadSkinToServer() {
   const serverUrl = $id('input-server-url').value.trim()
   if (!serverUrl) return
 
-  const payload = {
-    username: username,
-    skinData: currentSkinVal, // This is either name, url, or base64
-    isUrl: currentSkinType === 'url' || currentSkinType === 'mojang'
-  }
-  
-  // Actually, for mojang we might want the server to download it, 
-  // but let's just send the name and let the server handle 'isUrl'
-  // If currentSkinType is 'mojang', the server will try to download from mc-heads or similar
-  // Wait, let's refine the server logic: if it's a mojang name, let's treat it as a special case.
-  // Actually, my server logic handles 'isUrl'. If it starts with http, it downloads.
-  
+  const payload = { username, skinData: currentSkinVal, isUrl: false }
+
   if (currentSkinType === 'mojang') {
-    payload.skinData = `https://mc-heads.net/body/front/${currentSkinVal}.png`
+    // ✅ Send the actual skin TEXTURE URL (64x64 PNG), not the rendered body image
+    payload.skinData = `https://mc-heads.net/skin/${currentSkinVal}`
     payload.isUrl = true
+  } else if (currentSkinType === 'url') {
+    payload.skinData = currentSkinVal
+    payload.isUrl = true
+  } else {
+    // file: base64
+    payload.skinData = currentSkinVal
+    payload.isUrl = false
   }
 
   try {
     const response = await fetch(`${serverUrl.replace(/\/+$/, '')}/api/upload-skin`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(payload)
+      body: JSON.stringify(payload),
     })
     const res = await response.json()
     if (res.success) {
-      console.log('[Skins] Skin sikeresen feltöltve a szerverre:', res.url)
+      console.log('[Skins] Skin sikeresen feltöltve:', res.url)
+      // Update SP hint with the actual skin URL returned by server
+      const hintText = $id('skin-sp-hint-text')
+      if (hintText && res.url) {
+        hintText.innerHTML = `SP in-game parancs: <code>/skin url ${res.url}</code>`
+        const hint = $id('skin-sp-hint')
+        if (hint) hint.style.display = 'flex'
+      }
+    } else {
+      console.warn('[Skins] Szerver hiba:', res.error)
     }
   } catch (e) {
-    console.warn('[Skins] Nem sikerült feltölteni a skint a szerverre:', e.message)
+    console.warn('[Skins] Nem sikerült feltölteni a skint:', e.message)
+    showToast('⚠️ Skin feltöltés sikertelen (nincs szerver kapcsolat)')
   }
 }
 
@@ -604,4 +711,7 @@ try {
     currentSkinVal = sv
     applyAvatar()
   }
-} catch(e) {}
+} catch (e) {}
+
+
+

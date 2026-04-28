@@ -7,6 +7,8 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="./style.css" />
+  <!-- 3D Minecraft skin viewer library -->
+  <script src="https://unpkg.com/skinview3d@3.0.0-alpha.1/bundles/skinview3d.bundle.js"></script>
 </head>
 <body>
   <!-- Custom title bar -->
@@ -245,11 +247,13 @@
           <button class="modal-close" id="btn-close-skin">✕</button>
         </div>
         <div class="modal-body">
-          <div class="skin-preview-container">
+          <!-- 3D Minecraft Player Model -->
+          <div class="skin-preview-container" id="skin-preview-container">
             <div class="skin-preview-glow"></div>
-            <img id="skin-preview-img" src="https://mc-heads.net/body/front/Steve" alt="Skin Preview" />
+            <canvas id="skin-3d-canvas"></canvas>
+            <div class="skin-3d-hint">🖱️ Húzza a forgatáshoz</div>
           </div>
-          
+
           <div class="skin-form">
             <div class="form-group">
               <label class="form-label">Skin Forrása</label>
@@ -265,9 +269,13 @@
               <button class="btn-secondary hidden" id="btn-browse-skin" style="width: 100%; margin-top: 10px;">
                 <span>📂 Fájl kiválasztása...</span>
               </button>
-              <p class="form-hint" style="margin-top: 8px;">Megjegyzés: Ez a skin csak nálad fog látszódni, kivéve ha a szerveren használsz <b>/skin</b> parancsot!</p>
+              <div class="skin-sp-hint" id="skin-sp-hint" style="display:none;">
+                <span>ℹ️</span>
+                <span id="skin-sp-hint-text">Singleplayer-ben in-game futtasd: <code>/skin url ...</code></span>
+              </div>
+              <p class="form-hint" style="margin-top: 8px;">Multiplayer-ben a SkinsRestorer automatikusan alkalmazza a skint!</p>
             </div>
-            
+
             <button class="btn-primary" id="btn-save-skin" style="width: 100%;">
               <span class="btn-icon">💾</span>
               <span class="btn-text">Mentés és Alkalmazás</span>

@@ -1115,31 +1115,21 @@ async function checkForUpdates() {
 }
 
 /**
- * Prepares the local SkinsRestorer configuration for singleplayer.
+ * Logs the skin URL that the player can use in-game with /skin url <url>.
+ * NOTE: SkinsRestorer is a server-side mod. It does NOT run in singleplayer
+ * (integrated server). There is no reliable way to auto-apply skins in SP
+ * without a dedicated client-side skin mod. The skin will be applied automatically
+ * when the player joins the multiplayer server (SR applies it server-side).
  */
 async function prepareLocalSkinConfig(instanceDir, username, serverUrl) {
   try {
-    const srConfigDir = path.join(instanceDir, 'config', 'SkinsRestorer')
-    const playersDir = path.join(srConfigDir, 'players')
-    fse.ensureDirSync(playersDir)
-
-    // Construct the public skin URL (same logic as server-side)
     const baseUrl = serverUrl.replace(/\/+$/, '')
     const skinUrl = `${baseUrl}/skins/${username}.png`
-
-    // SkinsRestorer Fabric often uses <name>.json in the players folder
-    const playerFile = path.join(playersDir, `${username.toLowerCase()}.json`)
-    
-    const skinData = {
-      skin: skinUrl,
-      timestamp: Date.now(),
-      variant: 'CLASSIC'
-    }
-
-    fs.writeFileSync(playerFile, JSON.stringify(skinData, null, 2))
-    console.log(`[Launcher] Local skin config prepared for ${username} at ${skinUrl}`)
+    console.log(`[Launcher] Skin URL: ${skinUrl}`)
+    console.log(`[Launcher] Multiplayer-ben a SkinsRestorer automatikusan alkalmazza a skint.`)
+    console.log(`[Launcher] Singleplayer-ben in-game parancs: /skin url ${skinUrl}`)
   } catch (e) {
-    console.warn(`[Launcher-Warning] Failed to prepare local skin config: ${e.message}`)
+    console.warn(`[Launcher-Warning] Skin URL log hiba: ${e.message}`)
   }
 }
 
