@@ -392,7 +392,10 @@ function handleRequest(req, res) {
       '.zip': 'application/zip',
       '.dmg': 'application/x-apple-diskimage'
     }
-    res.writeHead(200, { 'Content-Type': mimeTypes[ext] || 'application/octet-stream' })
+    res.writeHead(200, { 
+      'Content-Type': mimeTypes[ext] || 'application/octet-stream',
+      'Cache-Control': 'public, max-age=86400'
+    })
     fs.createReadStream(filePath).pipe(res)
     return
   }
