@@ -12,6 +12,7 @@
     "dist:linux": "vite build && electron-builder --linux",
     "dist:win": "vite build && electron-builder --win",
     "dist:mac": "vite build && electron-builder --mac",
+    "dist:flatpak": "vite build && electron-builder --linux flatpak",
     "serve:web": "vite serve web-installer --port 8080"
   },
   "dependencies": {
@@ -86,17 +87,12 @@
             "x64"
           ]
         },
-        {
-          "target": "flatpak",
-          "arch": [
-            "x64"
-          ]
-        }
       ],
       "category": "Game",
       "icon": "build-assets/icons",
       "synopsis": "COBBLEVERSE Minecraft Launcher"
     },
+
     "flatpak": {
       "artifactName": "${productName}.${ext}",
       "runtime": "org.freedesktop.Platform",

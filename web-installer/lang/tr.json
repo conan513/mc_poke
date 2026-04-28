@@ -3,7 +3,6 @@
     "linux_app": "AppImage",
     "linux_app_arm64": "AppImage",
     "linux_deb": "Ubuntu/Debian (.deb)",
-    "linux_flatpak": "Flatpak",
     "linux_pacman": "Arch Linux (pacman)",
     "linux_rpm": "Fedora/SUSE (.rpm)",
     "linux_tar": "Linux (.tar.gz)",
