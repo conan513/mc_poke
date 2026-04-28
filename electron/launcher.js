@@ -1149,43 +1149,74 @@ async function prepareLocalSkinConfig(instanceDir, username, serverUrl) {
  */
 async function updateServersDat(instanceDir, serverUrl) {
   try {
+    const zlib = require('zlib')
     const url = new URL(serverUrl)
     const host = url.hostname
     const name = "Cobblemon Universe"
     
-    // Simple NBT buffer builder for a servers.dat with ONE entry
+    const serversDatPath = path.join(instanceDir, 'servers.dat')
+    
+    // Check if it already exists and if our host is in there
+    if (fs.existsSync(serversDatPath)) {
+      try {
+        const existingData = fs.readFileSync(serversDatPath)
+        const decompressed = zlib.gunzipSync(existingData)
+        // Simple check: if the host string is anywhere in the NBT, we assume it's already there
+        // This is safer than overwriting and losing other servers.
+        if (decompressed.includes(Buffer.from(host, 'utf8'))) {
+          console.log(`[Launcher] A szerver (${host}) már szerepel a listán, nem módosítom.`)
+          return
+        }
+      } catch (e) {
+        // If decompression fails or it's not a valid GZip/NBT, we'll proceed to create a new one
+        console.warn('[Launcher] Meglévő servers.dat beolvasása sikertelen, új létrehozása...')
+      }
+    }
+    
     const nameBuf = Buffer.from(name, 'utf8')
     const hostBuf = Buffer.from(host, 'utf8')
     
+    // NBT Structure for servers.dat:
+    // Compound (root, nameless)
+    //   List (name: "servers", type: Compound)
+    //     Compound (entry 0, nameless)
+    //       String (name: "name", value: "Cobblemon Universe")
+    //       String (name: "ip", value: host)
+    //     End
+    //   End
+    // End
+    
     const parts = [
-      Buffer.from([0x0A, 0x00, 0x00]), // Root Compound
-      Buffer.from([0x09, 0x00, 0x07]), // List Tag "servers"
-      Buffer.from("servers", 'utf8'),
-      Buffer.from([0x0A]),             // Compound Type
-      Buffer.from([0x00, 0x00, 0x00, 0x01]), // List Length: 1
+      Buffer.from([0x0A, 0x00, 0x00]), // Root Compound (Type 10, Name Length 0)
       
-      Buffer.from([0x0A]),             // Server Compound Start
-      Buffer.from([0x08, 0x00, 0x04]), // String Tag "name"
+      Buffer.from([0x09, 0x00, 0x07]), // List Tag (Type 9), Name Length 7
+      Buffer.from("servers", 'utf8'),
+      Buffer.from([0x0A]),             // List element type: Compound (10)
+      Buffer.from([0x00, 0x00, 0x00, 0x01]), // List length: 1
+      
+      // The first element of a List of Compounds starts directly with its tags, 
+      // NOT with a 0x0A tag ID.
+      
+      Buffer.from([0x08, 0x00, 0x04]), // String Tag (8), Name Length 4: "name"
       Buffer.from("name", 'utf8'),
-      Buffer.from([Math.floor(nameBuf.length / 256), nameBuf.length % 256]), // Name length
+      Buffer.from([Math.floor(nameBuf.length / 256), nameBuf.length % 256]), // Value Length
       nameBuf,
       
-      Buffer.from([0x08, 0x00, 0x02]), // String Tag "ip"
+      Buffer.from([0x08, 0x00, 0x02]), // String Tag (8), Name Length 2: "ip"
       Buffer.from("ip", 'utf8'),
-      Buffer.from([Math.floor(hostBuf.length / 256), hostBuf.length % 256]), // Host length
+      Buffer.from([Math.floor(hostBuf.length / 256), hostBuf.length % 256]), // Value Length
       hostBuf,
       
-      Buffer.from([0x00]),             // End Server Compound
-      Buffer.from([0x00])              // End Root Compound
+      Buffer.from([0x00]),             // End of Server Compound
+      Buffer.from([0x00])              // End of Root Compound
     ]
     
-    const finalBuf = Buffer.concat(parts)
-    const serversDatPath = path.join(instanceDir, 'servers.dat')
+    const uncompressed = Buffer.concat(parts)
+    const compressed = zlib.gzipSync(uncompressed)
     
-    fs.writeFileSync(serversDatPath, finalBuf)
+    fs.writeFileSync(serversDatPath, compressed)
   } catch (e) {
     console.error('[Launcher] servers.dat hiba:', e.message)
-    throw e
   }
 }
 

@@ -579,7 +579,7 @@ body::before {
   position: relative;
   background:
     linear-gradient(135deg, rgba(8,11,20,0.7) 0%, rgba(8,11,20,0.3) 100%),
-    url('https://cdn.modrinth.com/data/Jkb29YJU/images/ce5388f2e850f2d203fc18c0981bfd3cb5a48025.jpeg') center/cover no-repeat;
+    url('./cobblemon_hero_widescreen_1777376455759.png') center/cover no-repeat;
   overflow: hidden;
 }
 
