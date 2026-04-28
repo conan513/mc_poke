@@ -507,8 +507,8 @@ function initSkinViewer() {
   try {
     skinViewer = new skinview3d.SkinViewer({
       canvas,
-      width: 180,
-      height: 270,
+      width: 300,
+      height: 400,
       skin: 'https://mc-heads.net/skin/Steve',
     })
 
@@ -517,7 +517,7 @@ function initSkinViewer() {
     skinViewer.controls.enabled = true
     skinViewer.animation = new skinview3d.WalkingAnimation()
     skinViewer.animation.speed = 0.5
-    skinViewer.zoom = 0.9
+    skinViewer.zoom = 1.0
   } catch (e) {
     console.warn('[Skin3D] Viewer init hiba:', e.message)
     skinViewer = null
