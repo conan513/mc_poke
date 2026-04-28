@@ -129,6 +129,8 @@ document.addEventListener('DOMContentLoaded', () => {
       
       const modsEl = document.getElementById('stat-mods');
       const restartEl = document.getElementById('stat-restart');
+      const statusDot = document.getElementById('status-dot');
+      const statusText = document.getElementById('status-text');
       
       if (modsEl) modsEl.textContent = data.modCount || '--';
       if (restartEl && data.nextRestart) {
@@ -136,8 +138,23 @@ document.addEventListener('DOMContentLoaded', () => {
         restartEl.textContent = d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
       }
 
+      if (statusDot) {
+        statusDot.classList.remove('offline');
+        statusDot.classList.add('online');
+      }
+      if (statusText) statusText.textContent = t('status.online');
+
       if (btnDownload) btnDownload.classList.remove('btn-offline');
     } catch (e) {
+      const statusDot = document.getElementById('status-dot');
+      const statusText = document.getElementById('status-text');
+      
+      if (statusDot) {
+        statusDot.classList.remove('online');
+        statusDot.classList.add('offline');
+      }
+      if (statusText) statusText.textContent = t('status.offline');
+
       if (btnDownload) {
         btnDownload.classList.add('btn-offline');
         const btnText = document.getElementById('btn-download-text');
