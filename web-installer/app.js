@@ -163,9 +163,10 @@ document.addEventListener('DOMContentLoaded', () => {
       const targetId = this.getAttribute('href').slice(1);
       const targetElement = document.getElementById(targetId);
       if (targetElement) {
-        targetElement.scrollIntoView({
-          behavior: 'smooth',
-          block: 'start'
+        const topOffset = targetElement.getBoundingClientRect().top + window.pageYOffset - 20;
+        window.scrollTo({
+          top: topOffset,
+          behavior: 'smooth'
         });
       }
     });
