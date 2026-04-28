@@ -215,7 +215,7 @@ function handleRequest(req, res) {
   res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS')
   if (req.method === 'OPTIONS') { res.writeHead(204); res.end(); return }
 
-  const url = req.url.split('?')[0]
+  const url = req.url.split('?')[0].replace(/\/+/g, '/')
 
   // ── Skin Serving (GET /skins/:name.png) ───────────────────
   if (req.method === 'GET' && url.startsWith('/skins/')) {
