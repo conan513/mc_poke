@@ -331,8 +331,16 @@ async function ensureExtraMods() {
     { slug: 'easyauth',                       loaders: ['fabric'], gameVersions: [MC_VERSION] },
     { slug: 'serene-seasons',                 loaders: ['fabric'], gameVersions: [MC_VERSION] },
     { slug: 'seasonhud-fabric',               loaders: ['fabric'], gameVersions: [MC_VERSION] },
+    // Új modok (felhasználói kérés)
+    { slug: 'lootr',                          loaders: ['fabric'], gameVersions: [MC_VERSION] },
+    { slug: 'lootrmon',                       loaders: ['fabric'], gameVersions: [MC_VERSION] },
+    { slug: 'cobblemon-farmers',              loaders: ['fabric'], gameVersions: [MC_VERSION] },
+    { slug: 'cobblemon-auto-battle',          loaders: ['fabric'], gameVersions: [MC_VERSION] },
+    { slug: 'cobblemon_expeditions',          loaders: ['fabric'], gameVersions: [MC_VERSION] },
     // Függőségek (dependencies)
     { slug: 'cloth-config',                   loaders: ['fabric'], gameVersions: [MC_VERSION] }, // player-locator-plus
+    { slug: 'farmers-delight',                loaders: ['fabric'], gameVersions: [MC_VERSION] }, // cobblemon-farmers
+    { slug: 'expandability',                  loaders: ['fabric'], gameVersions: [MC_VERSION] }, // cobblemon_expeditions
     { slug: 'trainerattributeslib',           loaders: ['fabric'], gameVersions: [MC_VERSION] }, // trainer-accessories
     { slug: 'accessories',                    loaders: ['fabric'], gameVersions: [MC_VERSION] }, // trainer-accessories
     { slug: 'geckolib',                       loaders: ['fabric'], gameVersions: [MC_VERSION] }, // trainer-accessories
