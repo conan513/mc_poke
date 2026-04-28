@@ -313,9 +313,22 @@ async function ensureExtraMods() {
   // 'skinrestorer' (ghrZDhGW) is the FABRIC-native mod (v2.7.x) – distinct from
   // 'skinsrestorer' which is the bukkit/spigot plugin (v15.x).
   const extraMods = [
-    { slug: 'chipped',       loaders: ['fabric'], gameVersions: [MC_VERSION] },
-    { slug: 'terrablender',  loaders: ['fabric'], gameVersions: [MC_VERSION] },
-    { slug: 'skinrestorer',  loaders: ['fabric'], gameVersions: [MC_VERSION] },
+    { slug: 'chipped',                        loaders: ['fabric'], gameVersions: [MC_VERSION] },
+    { slug: 'terrablender',                   loaders: ['fabric'], gameVersions: [MC_VERSION] },
+    { slug: 'skinrestorer',                   loaders: ['fabric'], gameVersions: [MC_VERSION] },
+    // Cobblemon extra mods
+    { slug: 'player-locator-plus',            loaders: ['fabric'], gameVersions: [MC_VERSION] },
+    { slug: 'cobblemon-mount-mastery',        loaders: ['fabric'], gameVersions: [MC_VERSION] },
+    { slug: 'cobblemon-smartphone',           loaders: ['fabric'], gameVersions: [MC_VERSION] },
+    { slug: 'trainer-accessories',            loaders: ['fabric'], gameVersions: [MC_VERSION] },
+    { slug: 'cobblemon-rankeds',              loaders: ['fabric'], gameVersions: [MC_VERSION] },
+    { slug: 'more-cobblemon-stats',           loaders: ['fabric'], gameVersions: [MC_VERSION] },
+    { slug: 'cobblemon_battlecam',            loaders: ['fabric'], gameVersions: [MC_VERSION] },
+    { slug: 'cobblemon-max-level-catch-cap',  loaders: ['fabric'], gameVersions: [MC_VERSION] },
+    { slug: 'cobblemon-capture-notification', loaders: ['fabric'], gameVersions: [MC_VERSION] },
+    { slug: 'cobblemon-rustling-spots',       loaders: ['fabric'], gameVersions: [MC_VERSION] },
+    { slug: 'cobblemon-cobbled-levels',       loaders: ['fabric'], gameVersions: [MC_VERSION] },
+    { slug: 'village-spawn-point',            loaders: ['fabric'], gameVersions: [MC_VERSION] },
   ];
   console.log(`[Modrinth] Extra modok ellenőrzése: ${extraMods.map(m => m.slug).join(', ')}...`);
 
