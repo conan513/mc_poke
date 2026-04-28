@@ -966,6 +966,7 @@ async function installModpack(serverUrl = '') {
     sendProgress('modpack', 100, msg)
   })
 
+  /* 
   // 9. Modrinth Mod Updates (ensure all mods are latest 1.21.1) ──
   try {
     await updateModsFromModrinth((msg) => {
@@ -974,6 +975,7 @@ async function installModpack(serverUrl = '') {
   } catch (e) {
     console.warn('[Modrinth] Hiba az egyedi modok frissítésekor:', e.message)
   }
+  */
 
 }
 
@@ -1025,8 +1027,8 @@ async function launch({ username, ram, serverUrl }, onLog, onClose) {
   // ── Cleanup Blacklisted/Broken Mods ─────────────────────────
   await cleanupClientMods(onLog)
 
-  // ── Modrinth Individual Mod Updates ──────────────────────────
-  await updateModsFromModrinth(onLog)
+  // ── Modrinth Individual Mod Updates (Disabled - handled by server sync) ──
+  // await updateModsFromModrinth(onLog)
 
   // ── Ensure Server is in servers.dat ──────────────────────────
   if (serverUrl) {
