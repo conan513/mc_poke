@@ -18,7 +18,7 @@
     "update": "След. обновление"
   },
   "features": {
-    "title": "🔥 Почему Cobblemon Universe?",
+    "title": "Почему Cobblemon Universe?",
     "intro": "Cobblemon Universe — это профессионально созданная сборка на базе новейшего Cobblemon 1.7.3, превращающая Minecraft в полноценную игру про покемонов.",
     "f1_title": "1025+ Покемонов",
     "f1_desc": "Доступны все покемоны из каждого поколения, включая легендарных и мифических. Никаких 'фейкмонов', только классика.",
@@ -43,14 +43,14 @@
   },
   "alternatives": {
     "text": "Ищете другую платформу?",
-    "win": "🪟 Windows (.exe)",
-    "win_portable": "💼 Windows Portable (.exe)",
-    "linux_app": "🐧 Linux (.AppImage)",
-    "linux_deb": "📦 Ubuntu/Debian (.deb)",
+    "win": "Windows (.exe)",
+    "win_portable": "Windows Portable (.exe)",
+    "linux_app": "Linux (.AppImage)",
+    "linux_deb": "Ubuntu/Debian (.deb)",
     "linux_rpm": " Fedora/SUSE (.rpm)",
-    "linux_tar": "📦 Generic Linux (.tar.gz)",
+    "linux_tar": "Generic Linux (.tar.gz)",
     "linux_pacman": " Arch Linux (pacman)",
-    "mac_dmg": "🍎 macOS (.dmg)",
-    "mac_zip": "🍏 macOS (.zip)"
+    "mac_dmg": "macOS (.dmg)",
+    "mac_zip": "macOS (.zip)"
   }
 }

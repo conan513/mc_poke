@@ -18,7 +18,7 @@
     "update": "Sıradaki Güncelleme"
   },
   "features": {
-    "title": "🔥 Neden Cobblemon Universe?",
+    "title": "Neden Cobblemon Universe?",
     "intro": "Cobblemon Universe, Minecraft'ı gerçek bir Pokémon oyununa dönüştüren, en son Cobblemon 1.7.3 üzerine kurulmuş profesyonel bir mod paketidir.",
     "f1_title": "1025+ Pokémon",
     "f1_desc": "Efsanevi ve Gizemli Pokémonlar dahil tüm nesillerden tüm Pokémonlar mevcuttur. 'Fakemon' yok, sadece klasikler.",
@@ -43,14 +43,14 @@
   },
   "alternatives": {
     "text": "Başka bir platform mu arıyorsunuz?",
-    "win": "🪟 Windows (.exe)",
-    "win_portable": "💼 Windows Portable (.exe)",
-    "linux_app": "🐧 Linux (.AppImage)",
-    "linux_deb": "📦 Ubuntu/Debian (.deb)",
+    "win": "Windows (.exe)",
+    "win_portable": "Windows Portable (.exe)",
+    "linux_app": "Linux (.AppImage)",
+    "linux_deb": "Ubuntu/Debian (.deb)",
     "linux_rpm": " Fedora/SUSE (.rpm)",
-    "linux_tar": "📦 Linux (.tar.gz)",
+    "linux_tar": "Linux (.tar.gz)",
     "linux_pacman": " Arch Linux (pacman)",
-    "mac_dmg": "🍎 macOS (.dmg)",
-    "mac_zip": "🍏 macOS (.zip)"
+    "mac_dmg": "macOS (.dmg)",
+    "mac_zip": "macOS (.zip)"
   }
 }

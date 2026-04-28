@@ -18,7 +18,7 @@
     "update": "下一次更新"
   },
   "features": {
-    "title": "🔥 为什么选择 Cobblemon Universe？",
+    "title": "为什么选择 Cobblemon Universe？",
     "intro": "Cobblemon Universe 是一个基于最新 Cobblemon 1.7.3 的专业整合包，将 Minecraft 变成了一个真正的宝可梦游戏。",
     "f1_title": "1025+ 宝可梦",
     "f1_desc": "拥有所有世代的所有宝可梦，包括传说级和幻之宝可梦。没有“假想宝可梦”，只有经典的。",
@@ -43,14 +43,14 @@
   },
   "alternatives": {
     "text": "寻找其他平台？",
-    "win": "🪟 Windows (.exe)",
-    "win_portable": "💼 Windows Portable (.exe)",
-    "linux_app": "🐧 Linux (.AppImage)",
-    "linux_deb": "📦 Ubuntu/Debian (.deb)",
+    "win": "Windows (.exe)",
+    "win_portable": "Windows Portable (.exe)",
+    "linux_app": "Linux (.AppImage)",
+    "linux_deb": "Ubuntu/Debian (.deb)",
     "linux_rpm": " Fedora/SUSE (.rpm)",
-    "linux_tar": "📦 通用 Linux (.tar.gz)",
+    "linux_tar": "通用 Linux (.tar.gz)",
     "linux_pacman": " Arch Linux (pacman)",
-    "mac_dmg": "🍎 macOS (.dmg)",
-    "mac_zip": "🍏 macOS (.zip)"
+    "mac_dmg": "macOS (.dmg)",
+    "mac_zip": "macOS (.zip)"
   }
 }

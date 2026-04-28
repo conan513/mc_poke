@@ -19,7 +19,7 @@
     "update": "Köv. Frissítés"
   },
   "features": {
-    "title": "🔥 Miért a Cobblemon Universe?",
+    "title": "Miért a Cobblemon Universe?",
     "intro": "A Cobblemon Universe egy professzionálisan összeállított modpack, amely a legújabb Cobblemon 1.7.3 verzióra épül, és valódi Pokémon játékká alakítja a Minecraftot.",
     "f1_title": "1025+ Pokémon",
     "f1_desc": "Minden generáció összes Pokémonja elérhető, beleértve a Legendásokat és a Mythical lényeket is. Nincsenek 'fakemonok', csak a klasszikusok.",
@@ -44,14 +44,14 @@
   },
   "alternatives": {
     "text": "Másik platformra keresel letöltést?",
-    "win": "🪟 Windows (.exe)",
-    "win_portable": "💼 Windows Portable (.exe)",
-    "linux_app": "🐧 Linux (.AppImage)",
-    "linux_deb": "📦 Ubuntu/Debian (.deb)",
+    "win": "Windows (.exe)",
+    "win_portable": "Windows Portable (.exe)",
+    "linux_app": "Linux (.AppImage)",
+    "linux_deb": "Ubuntu/Debian (.deb)",
     "linux_rpm": " Fedora/SUSE (.rpm)",
-    "linux_tar": "📦 Generic Linux (.tar.gz)",
+    "linux_tar": "Generic Linux (.tar.gz)",
     "linux_pacman": " Arch Linux (pacman)",
-    "mac_dmg": "🍎 macOS (.dmg)",
-    "mac_zip": "🍏 macOS (.zip)"
+    "mac_dmg": "macOS (.dmg)",
+    "mac_zip": "macOS (.zip)"
   }
 }

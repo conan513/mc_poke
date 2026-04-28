@@ -18,7 +18,7 @@
     "update": "Próxima actualización"
   },
   "features": {
-    "title": "🔥 ¿Por qué Cobblemon Universe?",
+    "title": "¿Por qué Cobblemon Universe?",
     "intro": "Cobblemon Universe es un modpack profesional basado en el último Cobblemon 1.7.3, que transforma Minecraft en un verdadero juego de Pokémon.",
     "f1_title": "1025+ Pokémon",
     "f1_desc": "Todos los Pokémon de cada generación están disponibles, incluidos legendarios y singulares. Sin 'fakemons', solo los clásicos.",
@@ -43,14 +43,14 @@
   },
   "alternatives": {
     "text": "¿Buscas otra plataforma?",
-    "win": "🪟 Windows (.exe)",
-    "win_portable": "💼 Windows Portable (.exe)",
-    "linux_app": "🐧 Linux (.AppImage)",
-    "linux_deb": "📦 Ubuntu/Debian (.deb)",
+    "win": "Windows (.exe)",
+    "win_portable": "Windows Portable (.exe)",
+    "linux_app": "Linux (.AppImage)",
+    "linux_deb": "Ubuntu/Debian (.deb)",
     "linux_rpm": " Fedora/SUSE (.rpm)",
-    "linux_tar": "📦 Linux genérico (.tar.gz)",
+    "linux_tar": "Linux genérico (.tar.gz)",
     "linux_pacman": " Arch Linux (pacman)",
-    "mac_dmg": "🍎 macOS (.dmg)",
-    "mac_zip": "🍏 macOS (.zip)"
+    "mac_dmg": "macOS (.dmg)",
+    "mac_zip": "macOS (.zip)"
   }
 }
