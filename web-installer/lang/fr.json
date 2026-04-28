@@ -1,0 +1,56 @@
+{
+  "title": "Télécharger | Cobblemon Universe",
+  "hero": {
+    "title": "Cobblemon Universe",
+    "subtitle": "L'expérience Pokémon ultime dans Minecraft : 1025+ Pokémon, Méga-Évolutions et aventures épiques vous attendent !"
+  },
+  "status": {
+    "checking": "Vérification du système...",
+    "online": "SERVEUR EN LIGNE",
+    "offline": "SERVEUR HORS LIGNE",
+    "launch": "Lancer le jeu",
+    "download": "Télécharger le client",
+    "os_detected": "Système détecté : "
+  },
+  "stats": {
+    "mods": "Mods installés",
+    "minecraft": "Minecraft",
+    "update": "Prochaine mise à jour"
+  },
+  "features": {
+    "title": "🔥 Pourquoi Cobblemon Universe ?",
+    "intro": "Cobblemon Universe est un modpack professionnel basé sur le dernier Cobblemon 1.7.3, transformant Minecraft en un véritable jeu Pokémon.",
+    "f1_title": "1025+ Pokémon",
+    "f1_desc": "Tous les Pokémon de chaque génération sont disponibles, y compris les Légendaires et les Fabuleux. Pas de 'fakemons', juste les classiques.",
+    "f2_title": "Méga & Téra",
+    "f2_desc": "Maîtrisez la Méga-Évolution, la Térastallisation, le Dynamax et les capacités Z dans des combats stratégiques !",
+    "f3_title": "200+ Montures",
+    "f3_desc": "Voyagez à dos de votre Pokémon préféré ! Plus de 200 types de Pokémon chevauchables sur terre, mer et air.",
+    "f4_title": "Arènes & Badges",
+    "f4_desc": "Défiez les champions d'arène de Kanto à Sinnoh, collectionnez les badges et devenez le champion du monde !",
+    "f5_title": "HUD de combat intelligent",
+    "f5_desc": "Visualisez les taux de capture et les avantages de type en temps réel pendant les combats.",
+    "f6_title": "PC Massif",
+    "f6_desc": "Prêt pour un Living Dex ? 1800 slots PC vous attendent pour garder tous vos Pokémon en sécurité.",
+    "f7_title": "Musique réactive",
+    "f7_desc": "Une bande-son dynamique unique qui change pendant les combats et l'exploration.",
+    "f8_title": "🚀 Optimisé",
+    "f8_desc": "De nombreuses améliorations QoL et optimisations de performance pour une expérience fluide."
+  },
+  "instructions": {
+    "title": "💡 Comment rejoindre ?",
+    "text": "Cliquez sur le bouton <strong>Lancer le jeu</strong> ! Si vous avez déjà notre client, le jeu démarrera immédiatement. Sinon, nous vous proposerons l'installateur."
+  },
+  "alternatives": {
+    "text": "Vous cherchez une autre plateforme ?",
+    "win": "🪟 Windows (.exe)",
+    "win_portable": "💼 Windows Portable (.exe)",
+    "linux_app": "🐧 Linux (.AppImage)",
+    "linux_deb": "📦 Ubuntu/Debian (.deb)",
+    "linux_rpm": " Fedora/SUSE (.rpm)",
+    "linux_tar": "📦 Linux générique (.tar.gz)",
+    "linux_pacman": " Arch Linux (pacman)",
+    "mac_dmg": "🍎 macOS (.dmg)",
+    "mac_zip": "🍏 macOS (.zip)"
+  }
+}

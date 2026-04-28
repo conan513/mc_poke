@@ -13,20 +13,31 @@ let translations = {}
 // ── Translation Engine ───────────────────────────────────────
 async function loadLanguage() {
   try {
-    const locale = await window.cobble.getLocale()
-    // Handle both "hu-HU" and "hu_HU" formats across different OS
-    const langCode = locale.split(/[-_]/)[0].toLowerCase()
+    const saved = localStorage.getItem('cobble_lang')
+    if (saved) {
+      currentLang = saved
+    } else {
+      const locale = await window.cobble.getLocale()
+      const langCode = locale.split(/[-_]/)[0].toLowerCase()
+      const available = ['hu', 'en', 'de', 'fr', 'es', 'it', 'pt', 'nl', 'ru', 'ja', 'ko', 'zh', 'pl', 'tr', 'ro', 'sv', 'da', 'no', 'fi', 'cs']
+      currentLang = available.includes(langCode) ? langCode : 'en'
+    }
     
-    // Check if translation exists, otherwise fallback to English
-    const available = ['hu', 'en', 'de', 'fr', 'es', 'it', 'pt', 'nl', 'ru', 'ja', 'ko', 'zh', 'pl', 'tr', 'ro', 'sv', 'da', 'no', 'fi', 'cs']
-    currentLang = available.includes(langCode) ? langCode : 'en'
-    
-    const response = await fetch(`./lang/${currentLang}.json`)
-    translations = await response.json()
-    
-    updateUI()
+    await loadSpecificLanguage(currentLang)
   } catch (e) {
     console.error('Nyelv betöltési hiba:', e)
+  }
+}
+
+async function loadSpecificLanguage(lang) {
+  try {
+    const response = await fetch(`./lang/${lang}.json`)
+    translations = await response.json()
+    currentLang = lang
+    localStorage.setItem('cobble_lang', lang)
+    updateUI()
+  } catch (e) {
+    console.error(`Hiba a(z) ${lang} nyelv betöltésekor:`, e)
   }
 }
 
@@ -44,6 +55,22 @@ function updateUI() {
     el.placeholder = t(key)
   })
 }
+
+// Language switcher events
+$id('lang-btn-launcher').addEventListener('click', (e) => {
+  e.stopPropagation()
+  $id('lang-dropdown-launcher').classList.toggle('show')
+})
+
+document.addEventListener('click', () => {
+  $id('lang-dropdown-launcher').classList.remove('show')
+})
+
+$id('lang-dropdown-launcher').querySelectorAll('button').forEach(btn => {
+  btn.addEventListener('click', () => {
+    loadSpecificLanguage(btn.dataset.lang)
+  })
+})
 
 // ── DOM refs ─────────────────────────────────────────────────
 const screens = {
@@ -715,3 +742,4 @@ try {
 
 
 
+loadLanguage()

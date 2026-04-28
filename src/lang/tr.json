@@ -1,12 +1,12 @@
 {
   "welcome": {
-    "title": "Cobbleverse'e Hoş Geldiniz",
+    "title": "Cobblemon Universe'e Hoş Geldiniz",
     "subtitle": "Minecraft'taki en üst düzey Pokémon deneyimi",
-    "username_label": "Bir kullanıcı adı seçin:",
+    "username_label": "Kullanıcı adı seçin:",
     "username_placeholder": "Kullanıcı adı",
     "ram_label": "Bellek (RAM):",
-    "install_btn": "YÜKLE VE OYNA",
-    "disclaimer": "Yükle'ye tıklayarak yaklaşık 2 GB veri indirmeyi kabul etmiş olursunuz."
+    "install_btn": "YÜKLE & OYNA",
+    "disclaimer": "Yükle'ye tıklayarak ~2GB veri indirmeyi kabul etmiş olursunuz."
   },
   "install": {
     "title": "Kurulum",
@@ -26,20 +26,12 @@
     "running": "OYUN ÇALIŞIYOR",
     "version": "Sürüm",
     "ram": "RAM",
-    "sync_label": "Özel Mod Senkronizasyon Sunucusu (isteğe bağlı):",
-    "update_available": "Güncelleme mevcut!",
-    "download_required": "İndirme gerekli",
+    "sync_label": "Senkronizasyon Sunucusu (isteğe bağlı):",
+    "update_available": "Güncelleme Mevcut!",
+    "download_required": "İndirme gerekiyor",
     "update_btn": "Güncelle",
     "console_btn": "📋 Konsol",
     "files_btn": "📂 Dosyalar"
-  },
-  "sync": {
-    "connecting": "Sunucuya bağlanılıyor: ",
-    "deleting": "Eski senkronize edilmiş dosyalar siliniyor...",
-    "downloading": "İndiriliyor: ",
-    "error": "Senkronizasyon hatası: ",
-    "up_to_date": "Tüm dosyalar güncel.",
-    "finished": "Senkronizasyon tamamlandı! İndirilen: "
   },
   "toast": {
     "username_short": "⚠️ Kullanıcı adı en az 3 karakter olmalıdır!",

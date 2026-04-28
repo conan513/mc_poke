@@ -1,12 +1,12 @@
 {
   "welcome": {
-    "title": "Witaj w Cobbleverse",
+    "title": "Witaj w Cobblemon Universe",
     "subtitle": "Najlepsze doświadczenie Pokémon w Minecraft",
     "username_label": "Wybierz nazwę użytkownika:",
-    "username_placeholder": "Nazwa użytkownika",
+    "username_placeholder": "Użytkownik",
     "ram_label": "Pamięć (RAM):",
-    "install_btn": "INSTALUJ I GRAJ",
-    "disclaimer": "Klikając instaluj, zgadzasz się na pobranie ok. 2 GB danych."
+    "install_btn": "ZAINSTALUJ I GRAJ",
+    "disclaimer": "Klikając zainstaluj, zgadzasz się na pobranie ~2GB danych."
   },
   "install": {
     "title": "Instalacja",
@@ -26,24 +26,16 @@
     "running": "GRA URUCHOMIONA",
     "version": "Wersja",
     "ram": "RAM",
-    "sync_label": "Własny serwer synchronizacji modów (opcjonalnie):",
-    "update_available": "Dostępna aktualizacja!",
-    "download_required": "Wymagane pobranie",
+    "sync_label": "Serwer synchronizacji (opcjonalnie):",
+    "update_available": "Aktualizacja dostępna!",
+    "download_required": "Wymagane pobieranie",
     "update_btn": "Aktualizuj",
     "console_btn": "📋 Konsola",
     "files_btn": "📂 Pliki"
   },
-  "sync": {
-    "connecting": "Łączenie z serwerem: ",
-    "deleting": "Usuwanie starych zsynchronizowanych plików...",
-    "downloading": "Pobieranie: ",
-    "error": "Błąd synchronizacji: ",
-    "up_to_date": "Wszystkie pliki są aktualne.",
-    "finished": "Synchronizacja zakończona! Pobrano: "
-  },
   "toast": {
     "username_short": "⚠️ Nazwa użytkownika musi mieć co najmniej 3 znaki!",
-    "username_chars": "⚠️ Dozwolone są tylko litery, cyfry i znak _!",
+    "username_chars": "⚠️ Dozwolone są tylko litery, cyfry i _!",
     "install_error": "❌ Błąd instalacji: ",
     "update_error": "❌ Błąd aktualizacji: "
   }

@@ -1,7 +1,7 @@
 {
   "name": "cobble-launcher",
   "version": "1.0.0",
-  "description": "COBBLEVERSE Minecraft Launcher",
+  "description": "COBBLEMON UNIVERSE Minecraft Launcher",
   "main": "electron/main.js",
   "scripts": {
     "dev": "concurrently \"vite\" \"wait-on tcp:5173 && electron .\"",
@@ -30,8 +30,8 @@
     "wait-on": "^8.0.3"
   },
   "build": {
-    "appId": "hu.cobbleverse.launcher",
-    "productName": "CobbleLauncher",
+    "appId": "hu.cobblemonuniverse.launcher",
+    "productName": "Cobblemon Universe",
     "copyright": "Copyright © 2026 Cobbleverse",
     "asar": true,
     "protocols": {

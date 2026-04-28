@@ -1,0 +1,56 @@
+{
+  "title": "Downloaden | Cobblemon Universe",
+  "hero": {
+    "title": "Cobblemon Universe",
+    "subtitle": "De ultieme Pokémon-ervaring in Minecraft: 1025+ Pokémon, Mega Evoluties en epische avonturen wachten op je!"
+  },
+  "status": {
+    "checking": "Systeem controleren...",
+    "online": "SERVER ONLINE",
+    "offline": "SERVER OFFLINE",
+    "launch": "Spel Starten",
+    "download": "Client Downloaden",
+    "os_detected": "Gedetecteerd systeem: "
+  },
+  "stats": {
+    "mods": "Geïnstalleerde Mods",
+    "minecraft": "Minecraft",
+    "update": "Volgende Update"
+  },
+  "features": {
+    "title": "🔥 Waarom Cobblemon Universe?",
+    "intro": "Cobblemon Universe is een professioneel samengesteld modpack gebaseerd op de nieuwste Cobblemon 1.7.3, waarmee Minecraft verandert in een echt Pokémon-spel.",
+    "f1_title": "1025+ Pokémon",
+    "f1_desc": "Alle Pokémon van elke generatie zijn beschikbaar, inclusief legendarische en mythische. Geen 'fakemons', alleen de klassiekers.",
+    "f2_title": "Mega & Tera",
+    "f2_desc": "Beheers Mega Evolutie, Terastallisatie, Dynamax en Z-Moves in strategische gevechten!",
+    "f3_title": "200+ Berijdbaar",
+    "f3_desc": "Reis door de wereld op de rug van je favoriete Pokémon! Meer dan 200 soorten berijdbare Pokémon op land, zee en in de lucht.",
+    "f4_title": "Gyms & Badges",
+    "f4_desc": "Daag Gym Leaders uit van Kanto tot Sinnoh, verzamel badges en word de wereldkampioen!",
+    "f5_title": "Smart Battle HUD",
+    "f5_desc": "Bekijk realtime vangstpercentages en typevoordelen tijdens gevechten.",
+    "f6_title": "Enorme PC",
+    "f6_desc": "Klaar voor een Living Dex? 1800 PC-slots wachten op je om al je Pokémon veilig op te bergen.",
+    "f7_title": "Reactieve Muziek",
+    "f7_desc": "Een unieke, dynamische soundtrack die verandert tijdens gevechten en verkenning.",
+    "f8_title": "🚀 Geoptimaliseerd",
+    "f8_desc": "Tal van QoL-verbeteringen en prestatie-optimalisaties voor een soepele ervaring."
+  },
+  "instructions": {
+    "title": "💡 Hoe doe ik mee?",
+    "text": "Klik op de knop <strong>Spel Starten</strong>! Als je onze client al hebt geïnstalleerd, start het spel onmiddellijk. Zo niet, dan bieden we de installatie aan."
+  },
+  "alternatives": {
+    "text": "Op zoek naar een ander platform?",
+    "win": "🪟 Windows (.exe)",
+    "win_portable": "💼 Windows Portable (.exe)",
+    "linux_app": "🐧 Linux (.AppImage)",
+    "linux_deb": "📦 Ubuntu/Debian (.deb)",
+    "linux_rpm": " Fedora/SUSE (.rpm)",
+    "linux_tar": "📦 Linux (.tar.gz)",
+    "linux_pacman": " Arch Linux (pacman)",
+    "mac_dmg": "🍎 macOS (.dmg)",
+    "mac_zip": "🍏 macOS (.zip)"
+  }
+}

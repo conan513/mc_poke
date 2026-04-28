@@ -1,0 +1,42 @@
+{
+  "welcome": {
+    "title": "Ласкаво просимо до Cobblemon Universe",
+    "subtitle": "Найкращий досвід Pokémon у Minecraft",
+    "username_label": "Оберіть ім'я користувача:",
+    "username_placeholder": "Ім'я користувача",
+    "ram_label": "Пам'ять (RAM):",
+    "install_btn": "ВСТАНОВИТИ ТА ГРАТИ",
+    "disclaimer": "Натискаючи встановити, ви погоджуєтесь на завантаження ~2 ГБ даних."
+  },
+  "install": {
+    "title": "Встановлення",
+    "preparing": "Підготовка...",
+    "java": "Завантаження Java 21...",
+    "minecraft": "Завантаження Minecraft...",
+    "fabric": "Встановлення Fabric...",
+    "modpack": "Завантаження збірки...",
+    "waiting": "Очікування...",
+    "done": "Все встановлено! Приємної гри! 🎮",
+    "error": "Помилка встановлення: "
+  },
+  "home": {
+    "player_status": "Оффлайн режим",
+    "play_btn": "ЗАПУСТИТИ ГРУ",
+    "launching": "ЗАПУСК...",
+    "running": "ГРА ЗАПУЩЕНА",
+    "version": "Версія",
+    "ram": "RAM",
+    "sync_label": "Сервер синхронізації (опціонально):",
+    "update_available": "Доступне оновлення!",
+    "download_required": "Необхідне завантаження",
+    "update_btn": "Оновити",
+    "console_btn": "📋 Консоль",
+    "files_btn": "📂 Файли"
+  },
+  "toast": {
+    "username_short": "⚠️ Ім'я користувача має містити принаймні 3 символи!",
+    "username_chars": "⚠️ Дозволені лише літери, цифри та _!",
+    "install_error": "❌ Помилка встановлення: ",
+    "update_error": "❌ Помилка оновлення: "
+  }
+}

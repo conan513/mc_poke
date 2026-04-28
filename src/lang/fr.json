@@ -1,12 +1,12 @@
 {
   "welcome": {
-    "title": "Bienvenue sur Cobbleverse",
+    "title": "Bienvenue sur Cobblemon Universe",
     "subtitle": "L'expérience Pokémon ultime dans Minecraft",
-    "username_label": "Choisissez un nom d'utilisateur :",
-    "username_placeholder": "Nom d'utilisateur",
+    "username_label": "Choisissez un pseudo :",
+    "username_placeholder": "Pseudo",
     "ram_label": "Mémoire (RAM) :",
     "install_btn": "INSTALLER & JOUER",
-    "disclaimer": "En cliquant sur installer, vous acceptez de télécharger ~2 Go de données."
+    "disclaimer": "En cliquant sur installer, vous acceptez de télécharger ~2Go de données."
   },
   "install": {
     "title": "Installation",
@@ -26,23 +26,15 @@
     "running": "JEU EN COURS",
     "version": "Version",
     "ram": "RAM",
-    "sync_label": "Serveur de synchronisation personnalisé (optionnel) :",
+    "sync_label": "Serveur de synchro personnalisé (optionnel) :",
     "update_available": "Mise à jour disponible !",
     "download_required": "Téléchargement requis",
     "update_btn": "Mettre à jour",
     "console_btn": "📋 Console",
     "files_btn": "📂 Fichiers"
   },
-  "sync": {
-    "connecting": "Connexion au serveur : ",
-    "deleting": "Suppression des anciens fichiers synchronisés...",
-    "downloading": "Téléchargement : ",
-    "error": "Erreur de synchro : ",
-    "up_to_date": "Tous les fichiers sont à jour.",
-    "finished": "Synchro terminée ! Téléchargé : "
-  },
   "toast": {
-    "username_short": "⚠️ Le nom d'utilisateur doit comporter au moins 3 caractères !",
+    "username_short": "⚠️ Le pseudo doit faire au moins 3 caractères !",
     "username_chars": "⚠️ Seuls les lettres, chiffres et _ sont autorisés !",
     "install_error": "❌ Erreur d'installation : ",
     "update_error": "❌ Erreur de mise à jour : "

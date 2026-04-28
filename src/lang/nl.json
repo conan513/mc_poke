@@ -1,12 +1,12 @@
 {
   "welcome": {
-    "title": "Welkom bij Cobbleverse",
+    "title": "Welkom bij Cobblemon Universe",
     "subtitle": "De ultieme Pokémon-ervaring in Minecraft",
     "username_label": "Kies een gebruikersnaam:",
     "username_placeholder": "Gebruikersnaam",
     "ram_label": "Geheugen (RAM):",
     "install_btn": "INSTALLEREN & SPELEN",
-    "disclaimer": "Door op installeren te klikken, ga je akkoord met het downloaden van ca. 2GB aan gegevens."
+    "disclaimer": "Door op installeren te klikken, ga je akkoord met het downloaden van ~2GB aan data."
   },
   "install": {
     "title": "Installatie",
@@ -26,24 +26,16 @@
     "running": "SPEL DRAAIT",
     "version": "Versie",
     "ram": "RAM",
-    "sync_label": "Aangepaste Mod Sync Server (optioneel):",
+    "sync_label": "Sync Server (optioneel):",
     "update_available": "Update beschikbaar!",
     "download_required": "Download vereist",
     "update_btn": "Update",
     "console_btn": "📋 Console",
     "files_btn": "📂 Bestanden"
   },
-  "sync": {
-    "connecting": "Verbinden met server: ",
-    "deleting": "Oude gesynchroniseerde bestanden verwijderen...",
-    "downloading": "Downloaden: ",
-    "error": "Sync-fout: ",
-    "up_to_date": "Alle bestanden zijn up-to-date.",
-    "finished": "Sync voltooid! Gedownload: "
-  },
   "toast": {
     "username_short": "⚠️ Gebruikersnaam moet minimaal 3 tekens bevatten!",
-    "username_chars": "⚠️ Alleen letters, cijfers en _ zijn toegestaan!",
+    "username_chars": "⚠️ Alleen letters, cijfers en _ toegestaan!",
     "install_error": "❌ Installatiefout: ",
     "update_error": "❌ Updatefout: "
   }

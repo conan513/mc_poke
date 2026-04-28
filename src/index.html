@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>CobbleLauncher – COBBLEVERSE</title>
+  <title>Cobblemon Universe</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="./style.css" />
@@ -15,9 +15,28 @@
   <div class="titlebar" id="titlebar">
     <div class="titlebar-logo">
       <span class="pokeball-icon">⚽</span>
-      <span class="titlebar-title">CobbleLauncher</span>
+      <span class="titlebar-title">Cobblemon Universe</span>
     </div>
     <div class="titlebar-controls">
+      <div class="lang-switcher-launcher">
+        <button id="lang-btn-launcher" title="Nyelv váltása" style="margin-right: 10px;">🌐 <span>Lang</span></button>
+        <div class="lang-dropdown-launcher" id="lang-dropdown-launcher">
+          <button data-lang="hu">Magyar</button>
+          <button data-lang="en">English</button>
+          <button data-lang="de">Deutsch</button>
+          <button data-lang="fr">Français</button>
+          <button data-lang="es">Español</button>
+          <button data-lang="it">Italiano</button>
+          <button data-lang="pt">Português</button>
+          <button data-lang="ru">Русский</button>
+          <button data-lang="nl">Nederlands</button>
+          <button data-lang="pl">Polski</button>
+          <button data-lang="tr">Türkçe</button>
+          <button data-lang="zh">中文</button>
+          <button data-lang="uk">Українська</button>
+          <button data-lang="ro">Română</button>
+        </div>
+      </div>
       <button class="tb-btn minimize" id="btn-minimize" title="Minimalizálás">─</button>
       <button class="tb-btn close" id="btn-close" title="Bezárás">✕</button>
     </div>
@@ -43,7 +62,7 @@
               <div class="ball-button"></div>
             </div>
           </div>
-          <h1 class="brand-title">COBBLE<span class="brand-accent">VERSE</span></h1>
+          <h1 class="brand-title">COBBLEMON <span class="brand-accent">UNIVERSE</span></h1>
           <p class="brand-subtitle" data-i18n="welcome.subtitle">Pokémon Adventure · Minecraft 1.21.1</p>
           <div class="info-badges">
             <span class="badge">🎮 Cobblemon 1.7.3</span>
@@ -141,7 +160,7 @@
           <div class="step" id="step-modpack">
             <div class="step-icon">📦</div>
             <div class="step-info">
-              <span class="step-name">COBBLEVERSE Modpack</span>
+              <span class="step-name">COBBLEMON UNIVERSE Modpack</span>
               <span class="step-status" data-i18n="install.waiting">Várakozás...</span>
             </div>
             <div class="step-indicator idle"></div>
@@ -167,7 +186,7 @@
         <div class="home-art">
           <div class="art-overlay"></div>
           <div class="art-content">
-            <h1 class="game-title">COBBLE<br /><span>VERSE</span></h1>
+            <h1 class="game-title">COBBLEMON<br /><span>UNIVERSE</span></h1>
             <p class="game-tagline">Pokémon Adventure in Minecraft</p>
           </div>
         </div>
@@ -190,7 +209,7 @@
           </div>
 
           <div class="version-info">
-            <div class="vi-row"><span data-i18n="home.version">Verzió</span><span class="vi-val" id="home-modpack-version">COBBLEVERSE</span></div>
+            <div class="vi-row"><span data-i18n="home.version">Verzió</span><span class="vi-val" id="home-modpack-version">COBBLEMON UNIVERSE</span></div>
             <div class="vi-row"><span>Minecraft</span><span class="vi-val">1.21.1</span></div>
             <div class="vi-row"><span>Loader</span><span class="vi-val" id="home-fabric-version">Fabric</span></div>
             <div class="vi-row"><span data-i18n="home.ram">RAM</span><span class="vi-val" id="home-ram-display">4096 MB</span></div>

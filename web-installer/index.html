@@ -4,11 +4,31 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Letöltés | CobbleLauncher</title>
-  <meta name="description" content="Töltsd le a CobbleLauncher-t és csatlakozz a szerverhez egyetlen kattintással.">
+  <meta name="description" content="Töltsd le a Cobblemon Universe-t és csatlakozz a szerverhez egyetlen kattintással.">
   <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;700;800&family=Inter:wght@400;500&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
+
+  <div class="lang-switcher">
+    <button id="lang-btn" title="Change Language">🌐</button>
+    <div class="lang-dropdown" id="lang-dropdown">
+      <button data-lang="hu">Magyar</button>
+      <button data-lang="en">English</button>
+      <button data-lang="de">Deutsch</button>
+      <button data-lang="fr">Français</button>
+      <button data-lang="es">Español</button>
+      <button data-lang="it">Italiano</button>
+      <button data-lang="pt">Português</button>
+      <button data-lang="ru">Русский</button>
+      <button data-lang="nl">Nederlands</button>
+      <button data-lang="pl">Polski</button>
+      <button data-lang="tr">Türkçe</button>
+      <button data-lang="zh">中文</button>
+      <button data-lang="uk">Українська</button>
+      <button data-lang="ro">Română</button>
+    </div>
+  </div>
 
   <div class="hero-bg" style="background-image: url('hero_bg.png')"></div>
   <div class="hero-overlay"></div>
@@ -23,74 +43,100 @@
         </div>
       </div>
       
-      <h1>Cobbleverse</h1>
-      <p class="subtitle">Ahol a Minecraft és a Pokémon találkozik. Fedezd fel, kapd el, és válj a legjobbá!</p>
+      <h1 data-i18n="hero.title">Cobblemon Universe</h1>
+      <p class="subtitle" data-i18n="hero.subtitle">A legteljesebb Pokémon élmény a Minecraftban: 1025+ Pokémon, Mega Evolúciók és epikus kalandok várnak!</p>
 
       <div class="download-section">
         <a href="cobble://launch" id="main-download-btn" class="btn-main loading">
           <span id="btn-icon">⏳</span>
-          <span id="btn-text">Rendszer ellenőrzése...</span>
+          <span id="btn-text" data-i18n="status.checking">Rendszer ellenőrzése...</span>
         </a>
         <div class="os-detected">
-          <span id="os-detected-text">Kérlek várj...</span>
+          <span id="os-detected-text" data-i18n="status.checking">Kérlek várj...</span>
         </div>
 
         <div class="stats-grid">
           <div class="stat-item">
             <span class="stat-value" id="stat-mods">--</span>
-            <span class="stat-label">Telepített Mod</span>
+            <span class="stat-label" data-i18n="stats.mods">Telepített Mod</span>
           </div>
           <div class="stat-item">
             <span class="stat-value" id="stat-version">1.21.1</span>
-            <span class="stat-label">Minecraft</span>
+            <span class="stat-label" data-i18n="stats.minecraft">Minecraft</span>
           </div>
           <div class="stat-item">
             <span class="stat-value" id="stat-restart">--</span>
-            <span class="stat-label">Köv. Frissítés</span>
+            <span class="stat-label" data-i18n="stats.update">Köv. Frissítés</span>
           </div>
         </div>
       </div>
     </div>
 
     <div class="info-section container">
-      <h2>✨ Mire számíthatsz nálunk?</h2>
-      <p>A Cobbleverse nem csak egy egyszerű szerver, hanem egy folyamatosan fejlődő világ, ahol a modern technológia és a klasszikus Pokémon élmény egyesül.</p>
+      <h2 data-i18n="features.title">🔥 Miért a Cobblemon Universe?</h2>
+      <p data-i18n="features.intro">A Cobblemon Universe egy professzionálisan összeállított modpack, amely a legújabb <strong>Cobblemon 1.7.3</strong> verzióra épül, és valódi Pokémon játékká alakítja a Minecraftot.</p>
       
       <div class="features-grid">
         <div class="feature-card">
-          <span class="feature-icon">🐲</span>
-          <h3>Cobblemon 1.6+</h3>
-          <p>Több száz befogható Pokémon, látványos animációkkal és Minecraft-hű megjelenéssel.</p>
+          <span class="feature-icon">🎒</span>
+          <h3 data-i18n="features.f1_title">1025+ Pokémon</h3>
+          <p data-i18n="features.f1_desc">Minden generáció összes Pokémonja elérhető, beleértve a Legendásokat és a Mythical lényeket is. Nincsenek "fakemonok", csak a klasszikusok.</p>
         </div>
         <div class="feature-card">
-          <span class="feature-icon">🍂</span>
-          <h3>Dinamikus Évszakok</h3>
-          <p>A világ folyamatosan változik: a hóesés és a tavaszi virágzás befolyásolja a Pokémonok előfordulását is.</p>
+          <span class="feature-icon">💥</span>
+          <h3 data-i18n="features.f2_title">Mega & Tera</h3>
+          <p data-i18n="features.f2_desc">Használd a Mega Evolúciót, Terastallizációt, Dynamaxot és Z-Move-okat a stratégiai csaták során!</p>
         </div>
         <div class="feature-card">
-          <span class="feature-icon">📱</span>
-          <h3>Okostelefon Rendszer</h3>
-          <p>Kezeld a csapatodat, nézd meg a statisztikáidat és kommunikálj a többiekkel a saját in-game telefonodon.</p>
+          <span class="feature-icon">🏇</span>
+          <h3 data-i18n="features.f3_title">200+ Lovagolható</h3>
+          <p data-i18n="features.f3_desc">Közlekedj a világban a kedvenc Pokémonjaid hátán! Több mint 200 típusú Pokémonon lovagolhatsz földön, vízen és levegőben.</p>
         </div>
         <div class="feature-card">
-          <span class="feature-icon">🤝</span>
-          <h3>Aktív Közösség</h3>
-          <p>Barátságos környezet, nightly frissítések és folyamatosan bővülő tartalom minden nap.</p>
+          <span class="feature-icon">🏆</span>
+          <h3 data-i18n="features.f4_title">Gymek és Jelvények</h3>
+          <p data-i18n="features.f4_desc">Hívd ki a Gym Leadereket Kanto-tól Sinnoh-ig, gyűjtsd a jelvényeket és válj a Világbajnokká!</p>
+        </div>
+        <div class="feature-card">
+          <span class="feature-icon">📊</span>
+          <h3 data-i18n="features.f5_title">Smart Battle HUD</h3>
+          <p data-i18n="features.f5_desc">Lásd valós időben a befogási esélyeket, típus-előnyöket és a Pokéballok hatékonyságát.</p>
+        </div>
+        <div class="feature-card">
+          <span class="feature-icon">💾</span>
+          <h3 data-i18n="features.f6_title">Hatalmas PC</h3>
+          <p data-i18n="features.f6_desc">Készen állsz a Living Dexre? 1800 férőhelyes PC vár, hogy minden Pokémonodat biztonságban tudd.</p>
+        </div>
+        <div class="feature-card">
+          <span class="feature-icon">🎵</span>
+          <h3 data-i18n="features.f7_title">Reaktív Zene</h3>
+          <p data-i18n="features.f7_desc">Egyedi, dinamikus soundtrack, ami változik a csaták és a felfedezés során.</p>
+        </div>
+        <div class="feature-card">
+          <span class="feature-icon">🚀</span>
+          <h3 data-i18n="features.f8_title">🚀 Optimalizált</h3>
+          <p data-i18n="features.f8_desc">Rengeteg QoL fejlesztés és teljesítmény-optimalizálás a sima, lagmentes játékélményért.</p>
         </div>
       </div>
     </div>
 
     <div class="instructions container" id="install-instructions">
-      <h3>💡 Hogyan csatlakozz?</h3>
-      <p>Kattints a <strong>Játék Indítása</strong> gombra! Ha már telepítve van a kliensünk, a játék azonnal elindul és automatikusan beléptet a szerverre. Ha még nincs meg, felkínáljuk a telepítő letöltését.</p>
+      <h3 data-i18n="instructions.title">💡 Hogyan csatlakozz?</h3>
+      <p data-i18n="instructions.text">Kattints a <strong>Játék Indítása</strong> gombra! Ha már telepítve van a kliensünk, a játék azonnal elindul és automatikusan beléptet a szerverre. Ha még nincs meg, felkínáljuk a telepítő letöltését.</p>
     </div>
 
     <div class="alternatives container">
-      <p>Másik platformra keresel letöltést?</p>
+      <p data-i18n="alternatives.text">Másik platformra keresel letöltést?</p>
       <div class="alt-links">
-        <a href="#" id="alt-win" class="alt-link">🪟 Windows (.exe)</a>
-        <a href="#" id="alt-linux-app" class="alt-link">🐧 Linux (.AppImage)</a>
-        <a href="#" id="alt-linux-deb" class="alt-link">📦 Ubuntu/Debian (.deb)</a>
+        <a href="#" id="alt-win" class="alt-link" data-i18n="alternatives.win">🪟 Windows (.exe)</a>
+        <a href="#" id="alt-win-portable" class="alt-link" data-i18n="alternatives.win_portable">💼 Windows Portable</a>
+        <a href="#" id="alt-linux-app" class="alt-link" data-i18n="alternatives.linux_app">🐧 Linux (.AppImage)</a>
+        <a href="#" id="alt-linux-deb" class="alt-link" data-i18n="alternatives.linux_deb">📦 Ubuntu/Debian (.deb)</a>
+        <a href="#" id="alt-linux-rpm" class="alt-link" data-i18n="alternatives.linux_rpm"> Fedora (.rpm)</a>
+        <a href="#" id="alt-linux-tar" class="alt-link" data-i18n="alternatives.linux_tar">📦 Linux (.tar.gz)</a>
+        <a href="#" id="alt-linux-pacman" class="alt-link" data-i18n="alternatives.linux_pacman"> Arch (pacman)</a>
+        <a href="#" id="alt-mac-dmg" class="alt-link" data-i18n="alternatives.mac_dmg">🍎 macOS (.dmg)</a>
+        <a href="#" id="alt-mac-zip" class="alt-link" data-i18n="alternatives.mac_zip">🍏 macOS (.zip)</a>
       </div>
     </div>
   </div>

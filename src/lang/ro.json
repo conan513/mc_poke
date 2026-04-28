@@ -1,49 +1,41 @@
 {
   "welcome": {
-    "title": "Bun venit la Cobbleverse",
+    "title": "Bun venit în Cobblemon Universe",
     "subtitle": "Cea mai bună experiență Pokémon în Minecraft",
     "username_label": "Alege un nume de utilizator:",
-    "username_placeholder": "Nume de utilizator",
+    "username_placeholder": "Utilizator",
     "ram_label": "Memorie (RAM):",
     "install_btn": "INSTALEAZĂ ȘI JOACĂ",
-    "disclaimer": "Apăsând pe instalare, ești de acord să descarci aproximativ 2 GB de date."
+    "disclaimer": "Apăsând pe instalează, ești de acord să descarci ~2GB de date."
   },
   "install": {
     "title": "Instalare",
-    "preparing": "Se pregătește...",
+    "preparing": "Pregătire...",
     "java": "Se descarcă Java 21...",
     "minecraft": "Se descarcă Minecraft...",
     "fabric": "Se instalează Fabric...",
     "modpack": "Se descarcă Modpack-ul...",
-    "waiting": "Se așteaptă...",
+    "waiting": "Așteptare...",
     "done": "Totul a fost instalat! Distracție plăcută! 🎮",
     "error": "Eroare de instalare: "
   },
   "home": {
     "player_status": "Mod offline",
     "play_btn": "LANSEAZĂ JOCUL",
-    "launching": "SE LANSEAZĂ...",
+    "launching": "LANSARE...",
     "running": "JOCUL RULEAZĂ",
     "version": "Versiune",
     "ram": "RAM",
-    "sync_label": "Server de sincronizare moduri (opțional):",
+    "sync_label": "Server de sincronizare (opțional):",
     "update_available": "Actualizare disponibilă!",
     "download_required": "Descărcare necesară",
     "update_btn": "Actualizează",
     "console_btn": "📋 Consolă",
     "files_btn": "📂 Fișiere"
   },
-  "sync": {
-    "connecting": "Conectare la server: ",
-    "deleting": "Se șterg fișierele sincronizate vechi...",
-    "downloading": "Se descarcă: ",
-    "error": "Eroare de sincronizare: ",
-    "up_to_date": "Toate fișierele sunt la zi.",
-    "finished": "Sincronizare finalizată! Descărcate: "
-  },
   "toast": {
     "username_short": "⚠️ Numele de utilizator trebuie să aibă cel puțin 3 caractere!",
-    "username_chars": "⚠️ Sunt permise doar litere, cifre și _!",
+    "username_chars": "⚠️ Doar litere, cifre și _ sunt permise!",
     "install_error": "❌ Eroare de instalare: ",
     "update_error": "❌ Eroare de actualizare: "
   }

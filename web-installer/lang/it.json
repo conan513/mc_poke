@@ -1,0 +1,56 @@
+{
+  "title": "Scarica | Cobblemon Universe",
+  "hero": {
+    "title": "Cobblemon Universe",
+    "subtitle": "L'esperienza Pokémon definitiva in Minecraft: 1025+ Pokémon, Megaevoluzioni e avventure epiche ti aspettano!"
+  },
+  "status": {
+    "checking": "Verifica del sistema...",
+    "online": "SERVER ONLINE",
+    "offline": "SERVER OFFLINE",
+    "launch": "Avvia Gioco",
+    "download": "Scarica Client",
+    "os_detected": "Sistema rilevato: "
+  },
+  "stats": {
+    "mods": "Mod installate",
+    "minecraft": "Minecraft",
+    "update": "Prossimo aggiornamento"
+  },
+  "features": {
+    "title": "🔥 Perché Cobblemon Universe?",
+    "intro": "Cobblemon Universe è un modpack professionale basato sull'ultimo Cobblemon 1.7.3, che trasforma Minecraft in un vero gioco Pokémon.",
+    "f1_title": "1025+ Pokémon",
+    "f1_desc": "Tutti i Pokémon di ogni generazione sono disponibili, inclusi leggendari e misteriosi. Niente 'fakemon', solo i classici.",
+    "f2_title": "Mega e Tera",
+    "f2_desc": "Domina la Megaevoluzione, la Teracristallizzazione, il Dynamax e le mosse Z in battaglie strategiche!",
+    "f3_title": "200+ Cavalcabili",
+    "f3_desc": "Viaggia nel mondo in groppa al tuo Pokémon preferito! Oltre 200 tipi di Pokémon cavalcabili per terra, mare e aria.",
+    "f4_title": "Palestre e Medaglie",
+    "f4_desc": "Sfida i capipalestra da Kanto a Sinnoh, colleziona medaglie e diventa il campione del mondo!",
+    "f5_title": "HUD di battaglia intelligente",
+    "f5_desc": "Visualizza i tassi di cattura e i vantaggi di tipo in tempo reale durante le battaglie.",
+    "f6_title": "PC Massiccio",
+    "f6_desc": "Pronto per un Living Dex? 1800 slot PC ti aspettano per tenere tutti i tuoi Pokémon al sicuro.",
+    "f7_title": "Musica reattiva",
+    "f7_desc": "Una colonna sonora dinamica unica che cambia durante le battaglie e l'esplorazione.",
+    "f8_title": "🚀 Ottimizzato",
+    "f8_desc": "Tonnellate di miglioramenti QoL e ottimizzazioni delle prestazioni per un'esperienza fluida."
+  },
+  "instructions": {
+    "title": "💡 Come entrare?",
+    "text": "Clicca sul pulsante <strong>Avvia Gioco</strong>! Se hai già installato il nostro client, il gioco partirà immediatamente. Altrimenti, ti offriremo l'installer."
+  },
+  "alternatives": {
+    "text": "Cerchi un'altra piattaforma?",
+    "win": "🪟 Windows (.exe)",
+    "win_portable": "💼 Windows Portable (.exe)",
+    "linux_app": "🐧 Linux (.AppImage)",
+    "linux_deb": "📦 Ubuntu/Debian (.deb)",
+    "linux_rpm": " Fedora/SUSE (.rpm)",
+    "linux_tar": "📦 Linux generico (.tar.gz)",
+    "linux_pacman": " Arch Linux (pacman)",
+    "mac_dmg": "🍎 macOS (.dmg)",
+    "mac_zip": "🍏 macOS (.zip)"
+  }
+}

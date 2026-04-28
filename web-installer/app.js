@@ -1,148 +1,169 @@
 document.addEventListener('DOMContentLoaded', () => {
-  // Beállítások: Ide írd a tényleges letöltési linkeket (pl. webtárhely URL, GitHub Releases link, stb.)
+  // Config
   const DOWNLOADS = {
-    windows: './releases/CobbleLauncher%20Setup%201.0.0.exe',
-    linuxAppImage: './releases/CobbleLauncher-1.0.0.AppImage',
-    linuxDeb: './releases/cobble_launcher_1.0.0_amd64.deb'
+    win: './releases/Cobblemon%20Universe%20Setup%201.0.0.exe',
+    winPortable: './releases/Cobblemon%20Universe%201.0.0.exe',
+    linuxApp: './releases/Cobblemon-Universe-1.0.0.AppImage',
+    linuxDeb: './releases/cobblemon_universe_1.0.0_amd64.deb',
+    linuxRpm: './releases/cobblemon_universe_1.0.0.x86_64.rpm',
+    linuxTar: './releases/cobblemon_universe_1.0.0.tar.gz',
+    linuxPacman: './releases/cobblemon_universe_1.0.0.pacman',
+    macDmg: './releases/Cobblemon%20Universe-1.0.0.dmg',
+    macZip: './releases/Cobblemon%20Universe-1.0.0-mac.zip'
   };
 
+  let currentLang = 'hu';
+  let translations = {};
+
+  // DOM Elements
   const btn = document.getElementById('main-download-btn');
   const btnText = document.getElementById('btn-text');
   const btnIcon = document.getElementById('btn-icon');
   const osText = document.getElementById('os-detected-text');
+  const langBtn = document.getElementById('lang-btn');
+  const langDropdown = document.getElementById('lang-dropdown');
   const instructions = document.getElementById('install-instructions');
 
-  // Basic OS detection
-  const platform = navigator.userAgent.toLowerCase();
-  let os = 'unknown';
-
-  if (platform.includes('win')) {
-    os = 'windows';
-  } else if (platform.includes('mac')) {
-    os = 'mac';
-  } else if (platform.includes('linux')) {
-    os = 'linux';
-  }
-
-  let downloadUrl = '';
-  let osLabel = '';
-  let icon = '';
-
-  switch (os) {
-    case 'windows':
-      downloadUrl = DOWNLOADS.windows;
-      osLabel = 'Kattints az Indításra a játék futtatásához!';
-      icon = '🪟';
-      break;
-    case 'linux':
-      downloadUrl = DOWNLOADS.linuxAppImage;
-      osLabel = 'Kattints az Indításra a játék futtatásához!';
-      icon = '🐧';
-      break;
-    case 'mac':
-      downloadUrl = '#'; // Fallback
-      osLabel = 'Sajnos macOS-re jelenleg nincs támogatás.';
-      icon = '🍎';
-      btn.style.opacity = '0.5';
-      btn.style.cursor = 'not-allowed';
-      break;
-    default:
-      downloadUrl = DOWNLOADS.windows;
-      osLabel = 'Kattints az Indításra a játék futtatásához!';
-      icon = '💻';
-      break;
-  }
-
-  // Update UI to show Play Button
-  setTimeout(() => {
-    btn.classList.remove('loading');
-    btnText.textContent = 'Játék Indítása';
-    btnIcon.textContent = '🚀';
-    osText.innerHTML = `${icon} ${osLabel}`;
-
-    // Set alternative links
-    const altWin = document.getElementById('alt-win');
-    const altLinuxApp = document.getElementById('alt-linux-app');
-    const altLinuxDeb = document.getElementById('alt-linux-deb');
-    if(altWin) altWin.href = DOWNLOADS.windows;
-    if(altLinuxApp) altLinuxApp.href = DOWNLOADS.linuxAppImage;
-    if(altLinuxDeb) altLinuxDeb.href = DOWNLOADS.linuxDeb;
-  }, 500); // small delay for nice animation effect
-
-  // ── Server Status Check ─────────────────────────────────────
-  async function checkServerStatus() {
+  // ── Translation Engine ───────────────────────────────────────
+  async function loadLanguage(lang) {
     try {
-      // We fetch / with application/json to get the manifest summary instead of HTML
-      const res = await fetch('/', { headers: { 'Accept': 'application/json' } });
-      const data = await res.json();
-      
-      const statusIndicator = document.createElement('div');
-      statusIndicator.className = 'server-status-tag';
-      
-      if (data.status === 'running') {
-        statusIndicator.innerHTML = '<span class="status-dot online"></span> Szerver ONLINE';
-        btn.classList.remove('btn-offline');
-      } else {
-        statusIndicator.innerHTML = '<span class="status-dot offline"></span> Szerver OFFLINE';
-        btn.classList.add('btn-offline');
-        btnText.textContent = 'Szerver Offline';
-      }
-      
-      // Fill stats
-      if (data.modCount) document.getElementById('stat-mods').textContent = data.modCount;
-      if (data.nextRestart) {
-        const restartDate = new Date(data.nextRestart);
-        document.getElementById('stat-restart').textContent = restartDate.toLocaleTimeString('hu-HU', { hour: '2-digit', minute: '2-digit' });
-      }
-
-      // Insert before subtitle
-      const subtitle = document.querySelector('.subtitle');
-      if (subtitle) subtitle.parentNode.insertBefore(statusIndicator, subtitle);
-      
+      const response = await fetch(`./lang/${lang}.json`);
+      if (!response.ok) throw new Error('Lang not found');
+      translations = await response.json();
+      currentLang = lang;
+      localStorage.setItem('cobble_web_lang', lang);
+      updateUI();
     } catch (e) {
-      console.warn('Nem sikerült elérni a szerver állapotot:', e);
+      console.error('Translation error:', e);
+      if (lang !== 'en') loadLanguage('en'); // Fallback
     }
   }
-  checkServerStatus();
 
-  // Protocol Launch Logic
+  function t(key) {
+    return key.split('.').reduce((o, i) => o?.[i], translations) || key;
+  }
+
+  function updateUI() {
+    document.querySelectorAll('[data-i18n]').forEach(el => {
+      const key = el.getAttribute('data-i18n');
+      el.innerHTML = t(key);
+    });
+    document.title = t('title');
+    detectOS(); // Update button text with current language
+  }
+
+  // Language Switcher Logic
+  langBtn.addEventListener('click', (e) => {
+    e.stopPropagation();
+    langDropdown.classList.toggle('show');
+  });
+
+  document.addEventListener('click', () => langDropdown.classList.remove('show'));
+
+  langDropdown.querySelectorAll('button').forEach(b => {
+    b.addEventListener('click', () => loadLanguage(b.dataset.lang));
+  });
+
+  // ── OS Detection & Setup ─────────────────────────────────────
+  let currentDownloadUrl = '#';
+
+  function detectOS() {
+    const ua = navigator.userAgent.toLowerCase();
+    let os = 'unknown';
+    let icon = '💻';
+
+    if (ua.includes('win')) {
+      os = 'Windows';
+      currentDownloadUrl = DOWNLOADS.win;
+      icon = '🪟';
+    } else if (ua.includes('mac')) {
+      os = 'macOS';
+      currentDownloadUrl = DOWNLOADS.macDmg;
+      icon = '🍎';
+    } else if (ua.includes('linux')) {
+      os = 'Linux';
+      currentDownloadUrl = DOWNLOADS.linuxApp;
+      icon = '🐧';
+    }
+
+    if (osText) osText.innerHTML = `${icon} ${t('status.os_detected')} ${os}`;
+
+    if (btn) {
+      btn.classList.remove('loading');
+      btnText.textContent = t('status.launch');
+      btnIcon.textContent = '🚀';
+    }
+  }
+
+  // Setup alt links
+  const altMap = {
+    'alt-win': DOWNLOADS.win,
+    'alt-win-portable': DOWNLOADS.winPortable,
+    'alt-linux-app': DOWNLOADS.linuxApp,
+    'alt-linux-deb': DOWNLOADS.linuxDeb,
+    'alt-linux-rpm': DOWNLOADS.linuxRpm,
+    'alt-linux-tar': DOWNLOADS.linuxTar,
+    'alt-linux-pacman': DOWNLOADS.linuxPacman,
+    'alt-mac-dmg': DOWNLOADS.macDmg,
+    'alt-mac-zip': DOWNLOADS.macZip
+  };
+
+  Object.entries(altMap).forEach(([id, url]) => {
+    const el = document.getElementById(id);
+    if (el) el.href = url;
+  });
+
+  // ── Protocol Launch Logic ─────────────────────────────────────
   btn.addEventListener('click', (e) => {
-    if (os === 'mac') return; // Not supported
+    // Protocol URL
+    window.location.href = "cobble://launch";
     
-    // We set a timeout. If the window still has focus after 2 seconds, 
-    // it means the protocol prompt didn't show up, so the app is likely not installed.
     const start = Date.now();
     let hasBlurred = false;
-
-    const blurHandler = () => {
-      hasBlurred = true;
-    };
+    const blurHandler = () => { hasBlurred = true; };
     window.addEventListener('blur', blurHandler);
 
     setTimeout(() => {
       window.removeEventListener('blur', blurHandler);
-      // If user didn't leave the window (no app prompt appeared)
       if (!hasBlurred && (Date.now() - start < 2500)) {
-        // App is probably not installed, let's offer download
-        btnIcon.textContent = '⬇️';
-        btnText.textContent = 'Telepítő Letöltése';
-        osText.innerHTML = `Nincs telepítve a CobbleLauncher! Letöltés indul...`;
-        
-        // Start download automatically
-        window.location.href = downloadUrl;
-        
-        instructions.innerHTML = `
-          <h3>🚀 Hogyan telepítsd?</h3>
-          <p>1. Töltsd le a telepítőt.<br>
-             2. Futtaszt, majd kövesd az utasításokat.<br>
-             3. Miután kész, próbáld újra megnyomni az Indítás gombot az oldalon!</p>
-        `;
-      } else {
-        // App probably opened
-        btnIcon.textContent = '🎮';
-        btnText.textContent = 'Játék elindítva!';
-        osText.innerHTML = `Jó játékot!`;
+        // App is likely not installed
+        if (confirm(t('status.download') + "?")) {
+          window.location.href = currentDownloadUrl;
+        }
       }
     }, 2000);
   });
+
+  // ── Server Status Polling ───────────────────────────────────
+  async function updateStatus() {
+    try {
+      const res = await fetch('/', { headers: { 'Accept': 'application/json' } });
+      const data = await res.json();
+      
+      const modsEl = document.getElementById('stat-mods');
+      const restartEl = document.getElementById('stat-restart');
+      
+      if (modsEl) modsEl.textContent = data.modCount || '--';
+      if (restartEl && data.nextRestart) {
+        const d = new Date(data.nextRestart);
+        restartEl.textContent = d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+      }
+
+      if (btn) btn.classList.remove('btn-offline');
+    } catch (e) {
+      if (btn) {
+        btn.classList.add('btn-offline');
+        btnText.textContent = t('status.offline');
+      }
+    }
+  }
+
+  // ── Init ─────────────────────────────────────────────────────
+  const savedLang = localStorage.getItem('cobble_web_lang');
+  const browserLang = navigator.language.split('-')[0];
+  const initialLang = savedLang || (['hu', 'en', 'de', 'fr', 'es', 'it', 'pt', 'ru', 'nl', 'pl', 'tr', 'zh', 'uk', 'ro'].includes(browserLang) ? browserLang : 'en');
+  
+  loadLanguage(initialLang);
+  setInterval(updateStatus, 30000);
+  updateStatus();
 });

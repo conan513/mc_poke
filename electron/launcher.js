@@ -1151,7 +1151,7 @@ async function updateServersDat(instanceDir, serverUrl) {
   try {
     const url = new URL(serverUrl)
     const host = url.hostname
-    const name = "Cobbleverse"
+    const name = "Cobblemon Universe"
     
     // Simple NBT buffer builder for a servers.dat with ONE entry
     const nameBuf = Buffer.from(name, 'utf8')

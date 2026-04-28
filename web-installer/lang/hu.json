@@ -1,0 +1,56 @@
+{
+  "title": "Letöltés | Cobblemon Universe",
+  "hero": {
+    "title": "Cobblemon Universe",
+    "subtitle": "A legteljesebb Pokémon élmény a Minecraftban: 1025+ Pokémon, Mega Evolúciók és epikus kalandok várnak!"
+  },
+  "status": {
+    "checking": "Rendszer ellenőrzése...",
+    "online": "SZERVER ONLINE",
+    "offline": "SZERVER OFFLINE",
+    "launch": "Játék Indítása",
+    "download": "Kliens Letöltése",
+    "os_detected": "Észlelt rendszer: "
+  },
+  "stats": {
+    "mods": "Telepített Mod",
+    "minecraft": "Minecraft",
+    "update": "Köv. Frissítés"
+  },
+  "features": {
+    "title": "🔥 Miért a Cobblemon Universe?",
+    "intro": "A Cobblemon Universe egy professzionálisan összeállított modpack, amely a legújabb Cobblemon 1.7.3 verzióra épül, és valódi Pokémon játékká alakítja a Minecraftot.",
+    "f1_title": "1025+ Pokémon",
+    "f1_desc": "Minden generáció összes Pokémonja elérhető, beleértve a Legendásokat és a Mythical lényeket is. Nincsenek 'fakemonok', csak a klasszikusok.",
+    "f2_title": "Mega & Tera",
+    "f2_desc": "Használd a Mega Evolúciót, Terastallizációt, Dynamaxot és Z-Move-okat a stratégiai csaták során!",
+    "f3_title": "200+ Lovagolható",
+    "f3_desc": "Közlekedj a világban a kedvenc Pokémonjaid hátán! Több mint 200 típusú Pokémonon lovagolhatsz földön, vízen és levegőben.",
+    "f4_title": "Gymek és Jelvények",
+    "f4_desc": "Hívd ki a Gym Leadereket Kanto-tól Sinnoh-ig, gyűjtsd a jelvényeket és válj a Világbajnokká!",
+    "f5_title": "Smart Battle HUD",
+    "f5_desc": "Lásd valós időben a befogási esélyeket, típus-előnyöket és a Pokéballok hatékonyságát.",
+    "f6_title": "Hatalmas PC",
+    "f6_desc": "Készen állsz a Living Dexre? 1800 férőhelyes PC vár, hogy minden Pokémonodat biztonságban tudd.",
+    "f7_title": "Reaktív Zene",
+    "f7_desc": "Egyedi, dinamikus soundtrack, ami változik a csaták és a felfedezés során.",
+    "f8_title": "🚀 Optimalizált",
+    "f8_desc": "Rengeteg QoL fejlesztés és teljesítmény-optimalizálás a sima, lagmentes játékélményért."
+  },
+  "instructions": {
+    "title": "💡 Hogyan csatlakozz?",
+    "text": "Kattints a <strong>Játék Indítása</strong> gombra! Ha már telepítve van a kliensünk, a játék azonnal elindul és automatikusan beléptet a szerverre. Ha még nincs meg, felkínáljuk a telepítő letöltését."
+  },
+  "alternatives": {
+    "text": "Másik platformra keresel letöltést?",
+    "win": "🪟 Windows (.exe)",
+    "win_portable": "💼 Windows Portable (.exe)",
+    "linux_app": "🐧 Linux (.AppImage)",
+    "linux_deb": "📦 Ubuntu/Debian (.deb)",
+    "linux_rpm": " Fedora/SUSE (.rpm)",
+    "linux_tar": "📦 Generic Linux (.tar.gz)",
+    "linux_pacman": " Arch Linux (pacman)",
+    "mac_dmg": "🍎 macOS (.dmg)",
+    "mac_zip": "🍏 macOS (.zip)"
+  }
+}

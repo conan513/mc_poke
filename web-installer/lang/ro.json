@@ -1,0 +1,56 @@
+{
+  "title": "Descărcare | Cobblemon Universe",
+  "hero": {
+    "title": "Cobblemon Universe",
+    "subtitle": "Cea mai bună experiență Pokémon în Minecraft: peste 1025 de Pokémoni, Mega Evoluții și aventuri epice te așteaptă!"
+  },
+  "status": {
+    "checking": "Verificare sistem...",
+    "online": "SERVER ONLINE",
+    "offline": "SERVER OFFLINE",
+    "launch": "Lansează Jocul",
+    "download": "Descarcă Clientul",
+    "os_detected": "Sistem detectat: "
+  },
+  "stats": {
+    "mods": "Moduri instalate",
+    "minecraft": "Minecraft",
+    "update": "Următorul update"
+  },
+  "features": {
+    "title": "🔥 De ce Cobblemon Universe?",
+    "intro": "Cobblemon Universe este un modpack creat profesional pe baza celui mai nou Cobblemon 1.7.3, transformând Minecraft într-un adevărat joc Pokémon.",
+    "f1_title": "1025+ Pokémoni",
+    "f1_desc": "Toți Pokémonii din fiecare generație sunt disponibili, inclusiv cei Legendari și Mitici. Fără 'fakemoni', doar cei clasici.",
+    "f2_title": "Mega & Tera",
+    "f2_desc": "Stăpânește Mega Evoluția, Terastalizarea, Dynamax și mișcările Z în bătălii strategice!",
+    "f3_title": "200+ Călăribili",
+    "f3_desc": "Călătorește prin lume pe spatele Pokémonului tău preferat! Peste 200 de tipuri de Pokémoni călăribili pe uscat, mare și aer.",
+    "f4_title": "Săli & Insigne",
+    "f4_desc": "Provoacă liderii de sală de la Kanto la Sinnoh, colectează insigne și devino campion mondial!",
+    "f5_title": "HUD de luptă inteligent",
+    "f5_desc": "Vezi ratele de captură și avantajele de tip în timp real în timpul luptelor.",
+    "f6_title": "PC Masiv",
+    "f6_desc": "Ești gata pentru un Living Dex? 1800 de sloturi PC te așteaptă pentru a păstra toți Pokémonii în siguranță.",
+    "f7_title": "Muzică reactivă",
+    "f7_desc": "O coloană sonoră dinamică unică ce se schimbă în timpul luptelor și explorării.",
+    "f8_title": "🚀 Optimizat",
+    "f8_desc": "O mulțime de îmbunătățiri QoL și optimizări de performanță pentru o experiență fluidă."
+  },
+  "instructions": {
+    "title": "💡 Cum te alături?",
+    "text": "Apasă butonul <strong>Lansează Jocul</strong>! Dacă ai deja clientul nostru instalat, jocul va porni imediat. Dacă nu, îți vom oferi instalatorul."
+  },
+  "alternatives": {
+    "text": "Cauți altă platformă?",
+    "win": "🪟 Windows (.exe)",
+    "win_portable": "💼 Windows Portable (.exe)",
+    "linux_app": "🐧 Linux (.AppImage)",
+    "linux_deb": "📦 Ubuntu/Debian (.deb)",
+    "linux_rpm": " Fedora/SUSE (.rpm)",
+    "linux_tar": "📦 Generic Linux (.tar.gz)",
+    "linux_pacman": " Arch Linux (pacman)",
+    "mac_dmg": "🍎 macOS (.dmg)",
+    "mac_zip": "🍏 macOS (.zip)"
+  }
+}

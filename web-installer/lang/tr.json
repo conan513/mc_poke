@@ -1,0 +1,56 @@
+{
+  "title": "İndir | Cobblemon Universe",
+  "hero": {
+    "title": "Cobblemon Universe",
+    "subtitle": "Minecraft'ta en üst düzey Pokémon deneyimi: 1025+ Pokémon, Mega Evrimler ve destansı maceralar sizi bekliyor!"
+  },
+  "status": {
+    "checking": "Sistem kontrol ediliyor...",
+    "online": "SUNUCU ÇEVRİMİÇİ",
+    "offline": "SUNUCU ÇEVRİMDIŞI",
+    "launch": "Oyunu Başlat",
+    "download": "İstemciyi İndir",
+    "os_detected": "Tespit edilen sistem: "
+  },
+  "stats": {
+    "mods": "Yüklü Modlar",
+    "minecraft": "Minecraft",
+    "update": "Sıradaki Güncelleme"
+  },
+  "features": {
+    "title": "🔥 Neden Cobblemon Universe?",
+    "intro": "Cobblemon Universe, Minecraft'ı gerçek bir Pokémon oyununa dönüştüren, en son Cobblemon 1.7.3 üzerine kurulmuş profesyonel bir mod paketidir.",
+    "f1_title": "1025+ Pokémon",
+    "f1_desc": "Efsanevi ve Gizemli Pokémonlar dahil tüm nesillerden tüm Pokémonlar mevcuttur. 'Fakemon' yok, sadece klasikler.",
+    "f2_title": "Mega ve Tera",
+    "f2_desc": "Stratejik savaşlarda Mega Evrim, Terastalleşme, Dynamax ve Z-Hareketlerinde ustalaşın!",
+    "f3_title": "200+ Binebilir",
+    "f3_desc": "En sevdiğiniz Pokémon'un sırtında dünyayı dolaşın! Karada, denizde ve havada 200'den fazla binebilir Pokémon türü.",
+    "f4_title": "Salonlar ve Rozetler",
+    "f4_desc": "Kanto'dan Sinnoh'a kadar Salon Liderlerine meydan okuyun, rozetleri toplayın ve dünya şampiyonu olun!",
+    "f5_title": "Akıllı Savaş HUD'u",
+    "f5_desc": "Savaşlar sırasında gerçek zamanlı yakalama oranlarını ve tip avantajlarını görün.",
+    "f6_title": "Devasa PC",
+    "f6_desc": "Living Dex için hazır mısınız? Tüm Pokémonlarınızı güvende tutmak için 1800 PC yuvası sizi bekliyor.",
+    "f7_title": "Reaktif Müzik",
+    "f7_desc": "Savaşlar ve keşif sırasında değişen benzersiz, dinamik bir film müziği.",
+    "f8_title": "🚀 Optimize Edildi",
+    "f8_desc": "Sorunsuz ve gecikmesiz bir deneyim için tonlarca QoL iyileştirmesi ve performans optimizasyonu."
+  },
+  "instructions": {
+    "title": "💡 Nasıl katılırım?",
+    "text": "<strong>Oyunu Başlat</strong> düğmesine tıklayın! İstemcimiz zaten yüklüyse oyun hemen başlayacaktır. Yüklü değilse size yükleyiciyi sunacağız."
+  },
+  "alternatives": {
+    "text": "Başka bir platform mu arıyorsunuz?",
+    "win": "🪟 Windows (.exe)",
+    "win_portable": "💼 Windows Portable (.exe)",
+    "linux_app": "🐧 Linux (.AppImage)",
+    "linux_deb": "📦 Ubuntu/Debian (.deb)",
+    "linux_rpm": " Fedora/SUSE (.rpm)",
+    "linux_tar": "📦 Linux (.tar.gz)",
+    "linux_pacman": " Arch Linux (pacman)",
+    "mac_dmg": "🍎 macOS (.dmg)",
+    "mac_zip": "🍏 macOS (.zip)"
+  }
+}

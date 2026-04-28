@@ -1,49 +1,41 @@
 {
   "welcome": {
-    "title": "欢迎来到 Cobbleverse",
-    "subtitle": "Minecraft 中的终极宝可梦体验",
+    "title": "欢迎来到 Cobblemon Universe",
+    "subtitle": "Minecraft 中究极的宝可梦体验",
     "username_label": "选择用户名：",
     "username_placeholder": "用户名",
-    "ram_label": "内存 (RAM):",
+    "ram_label": "内存 (RAM)：",
     "install_btn": "安装并开始游戏",
     "disclaimer": "点击安装即表示您同意下载约 2GB 的数据。"
   },
   "install": {
-    "title": "安装",
+    "title": "安装中",
     "preparing": "准备中...",
     "java": "正在下载 Java 21...",
     "minecraft": "正在下载 Minecraft...",
     "fabric": "正在安装 Fabric...",
     "modpack": "正在下载整合包...",
     "waiting": "等待中...",
-    "done": "安装完成！祝您玩得愉快！🎮",
+    "done": "安装完成！祝你玩得开心！ 🎮",
     "error": "安装错误："
   },
   "home": {
     "player_status": "离线模式",
-    "play_btn": "开始游戏",
+    "play_btn": "启动游戏",
     "launching": "启动中...",
     "running": "游戏运行中",
     "version": "版本",
     "ram": "内存",
     "sync_label": "自定义模组同步服务器（可选）：",
-    "update_available": "发现更新！",
+    "update_available": "有可用更新！",
     "download_required": "需要下载",
     "update_btn": "更新",
     "console_btn": "📋 控制台",
     "files_btn": "📂 文件"
   },
-  "sync": {
-    "connecting": "正在连接服务器：",
-    "deleting": "正在删除旧的同步文件...",
-    "downloading": "正在下载：",
-    "error": "同步错误：",
-    "up_to_date": "所有文件已是最新。",
-    "finished": "同步完成！已下载："
-  },
   "toast": {
-    "username_short": "⚠️ 用户名必须至少包含 3 个字符！",
-    "username_chars": "⚠️ 仅允许字母、数字和下划线！",
+    "username_short": "⚠️ 用户名至少需要 3 个字符！",
+    "username_chars": "⚠️ 只允许字母、数字和下划线！",
     "install_error": "❌ 安装错误：",
     "update_error": "❌ 更新错误："
   }
