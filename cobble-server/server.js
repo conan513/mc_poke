@@ -369,7 +369,7 @@ function handleRequest(req, res) {
   }
 
   // ── Serve Web Installer assets (app.js, style.css, images, releases) ──
-  const allowedExtensions = ['.js', '.css', '.png', '.jpg', '.jpeg', '.exe', '.AppImage', '.deb', '.zip', '.dmg']
+  const allowedExtensions = ['.js', '.css', '.png', '.jpg', '.jpeg', '.exe', '.AppImage', '.deb', '.zip', '.dmg', '.json', '.ico']
   const requestedFile = url.startsWith('/') ? url.slice(1) : url
   
   // Basic security: prevent directory traversal
@@ -384,6 +384,8 @@ function handleRequest(req, res) {
       '.js': 'application/javascript',
       '.png': 'image/png',
       '.jpg': 'image/jpeg',
+      '.json': 'application/json',
+      '.ico': 'image/x-icon',
       '.exe': 'application/x-msdownload',
       '.AppImage': 'application/octet-stream',
       '.deb': 'application/vnd.debian.binary-package',
