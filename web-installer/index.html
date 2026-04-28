@@ -10,46 +10,82 @@
 </head>
 <body>
 
-  <div class="container" id="main-container">
-    <div class="logo-container">
-      <span class="logo-icon">📦</span>
-    </div>
-    
-    <h1>CobbleLauncher</h1>
-    <p class="subtitle">A hivatalos kliens a szerverhez. Telepítsd és játssz azonnal!</p>
+  <div class="hero-bg" style="background-image: url('hero_bg.png')"></div>
+  <div class="hero-overlay"></div>
 
-    <div class="download-section">
-      <a href="cobble://launch" id="main-download-btn" class="btn-main loading">
-        <span id="btn-icon">⏳</span>
-        <span id="btn-text">Rendszer ellenőrzése...</span>
-      </a>
-      <div class="os-detected">
-        <span id="os-detected-text">Kérlek várj...</span>
-      </div>
-
-      <div class="stats-grid">
-        <div class="stat-item">
-          <span class="stat-value" id="stat-mods">--</span>
-          <span class="stat-label">Telepített Mod</span>
-        </div>
-        <div class="stat-item">
-          <span class="stat-value" id="stat-version">1.21.1</span>
-          <span class="stat-label">Minecraft</span>
-        </div>
-        <div class="stat-item">
-          <span class="stat-value" id="stat-restart">--</span>
-          <span class="stat-label">Köv. Frissítés</span>
+  <div class="main-content">
+    <div class="container" id="main-container">
+      <div class="logo-container">
+        <div class="pokeball-icon">
+          <div class="pokeball-top"></div>
+          <div class="pokeball-middle"></div>
+          <div class="pokeball-bottom"></div>
         </div>
       </div>
+      
+      <h1>Cobbleverse</h1>
+      <p class="subtitle">Ahol a Minecraft és a Pokémon találkozik. Fedezd fel, kapd el, és válj a legjobbá!</p>
+
+      <div class="download-section">
+        <a href="cobble://launch" id="main-download-btn" class="btn-main loading">
+          <span id="btn-icon">⏳</span>
+          <span id="btn-text">Rendszer ellenőrzése...</span>
+        </a>
+        <div class="os-detected">
+          <span id="os-detected-text">Kérlek várj...</span>
+        </div>
+
+        <div class="stats-grid">
+          <div class="stat-item">
+            <span class="stat-value" id="stat-mods">--</span>
+            <span class="stat-label">Telepített Mod</span>
+          </div>
+          <div class="stat-item">
+            <span class="stat-value" id="stat-version">1.21.1</span>
+            <span class="stat-label">Minecraft</span>
+          </div>
+          <div class="stat-item">
+            <span class="stat-value" id="stat-restart">--</span>
+            <span class="stat-label">Köv. Frissítés</span>
+          </div>
+        </div>
+      </div>
     </div>
 
-    <div class="instructions" id="install-instructions">
-      <!-- JS fills this -->
-      <h3>💡 Hogyan működik?</h3>
-      <p>Kattints a fenti gombra! Ha már telepítve van a kliens, a játék azonnal elindul. Ha még nincs, felkínáljuk a letöltést.</p>
+    <div class="info-section container">
+      <h2>✨ Mire számíthatsz nálunk?</h2>
+      <p>A Cobbleverse nem csak egy egyszerű szerver, hanem egy folyamatosan fejlődő világ, ahol a modern technológia és a klasszikus Pokémon élmény egyesül.</p>
+      
+      <div class="features-grid">
+        <div class="feature-card">
+          <span class="feature-icon">🐲</span>
+          <h3>Cobblemon 1.6+</h3>
+          <p>Több száz befogható Pokémon, látványos animációkkal és Minecraft-hű megjelenéssel.</p>
+        </div>
+        <div class="feature-card">
+          <span class="feature-icon">🍂</span>
+          <h3>Dinamikus Évszakok</h3>
+          <p>A világ folyamatosan változik: a hóesés és a tavaszi virágzás befolyásolja a Pokémonok előfordulását is.</p>
+        </div>
+        <div class="feature-card">
+          <span class="feature-icon">📱</span>
+          <h3>Okostelefon Rendszer</h3>
+          <p>Kezeld a csapatodat, nézd meg a statisztikáidat és kommunikálj a többiekkel a saját in-game telefonodon.</p>
+        </div>
+        <div class="feature-card">
+          <span class="feature-icon">🤝</span>
+          <h3>Aktív Közösség</h3>
+          <p>Barátságos környezet, nightly frissítések és folyamatosan bővülő tartalom minden nap.</p>
+        </div>
+      </div>
     </div>
 
-    <div class="alternatives">
+    <div class="instructions container" id="install-instructions">
+      <h3>💡 Hogyan csatlakozz?</h3>
+      <p>Kattints a <strong>Játék Indítása</strong> gombra! Ha már telepítve van a kliensünk, a játék azonnal elindul és automatikusan beléptet a szerverre. Ha még nincs meg, felkínáljuk a telepítő letöltését.</p>
+    </div>
+
+    <div class="alternatives container">
       <p>Másik platformra keresel letöltést?</p>
       <div class="alt-links">
         <a href="#" id="alt-win" class="alt-link">🪟 Windows (.exe)</a>

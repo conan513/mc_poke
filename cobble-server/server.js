@@ -368,14 +368,19 @@ function handleRequest(req, res) {
     return
   }
 
-  // ── Serve Web Installer assets (app.js, style.css) ─────────
-  const webInstallerFiles = ['app.js', 'style.css']
+  // ── Serve Web Installer assets (app.js, style.css, images) ──
+  const webInstallerFiles = ['app.js', 'style.css', 'hero_bg.png']
   const requestedFile = url.startsWith('/') ? url.slice(1) : url
   if (webInstallerFiles.includes(requestedFile)) {
     const filePath = path.join(WEB_INSTALLER_DIR, requestedFile)
     if (fs.existsSync(filePath)) {
       const ext = path.extname(requestedFile)
-      const mimeTypes = { '.css': 'text/css', '.js': 'application/javascript' }
+      const mimeTypes = { 
+        '.css': 'text/css', 
+        '.js': 'application/javascript',
+        '.png': 'image/png',
+        '.jpg': 'image/jpeg'
+      }
       res.writeHead(200, { 'Content-Type': mimeTypes[ext] || 'text/plain' })
       fs.createReadStream(filePath).pipe(res)
       return
