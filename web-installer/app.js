@@ -3,14 +3,18 @@ document.addEventListener('DOMContentLoaded', () => {
   const DOWNLOADS = {
     win: './releases/Cobblemon-Universe-Setup.exe',
     winPortable: './releases/Cobblemon-Universe.exe',
-    linuxApp: './releases/Cobblemon-Universe-x64.AppImage',
-    linuxDeb: './releases/Cobblemon-Universe-x64.deb',
-    linuxRpm: './releases/Cobblemon-Universe-x64.rpm',
-    linuxTar: './releases/Cobblemon-Universe-x64.tar.gz',
-    linuxPacman: './releases/Cobblemon-Universe-x64.pacman',
-    linuxFlatpak: './releases/Cobblemon-Universe-x64.flatpak',
+    linuxApp: './releases/Cobblemon-Universe-x86_64.AppImage',
+    linuxAppArm64: './releases/Cobblemon-Universe-arm64.AppImage',
+    linuxDeb: './releases/Cobblemon-Universe-x86_64.deb',
+    linuxRpm: './releases/Cobblemon-Universe-x86_64.rpm',
+    linuxTar: './releases/Cobblemon-Universe-x86_64.tar.gz',
+    linuxTarArm64: './releases/Cobblemon-Universe-arm64.tar.gz',
+    linuxPacman: './releases/Cobblemon-Universe-x86_64.pacman',
+    linuxFlatpak: './releases/Cobblemon-Universe.flatpak',
     macDmg: './releases/Cobblemon-Universe-x64.dmg',
-    macZip: './releases/Cobblemon-Universe-x64.zip'
+    macDmgArm64: './releases/Cobblemon-Universe-arm64.dmg',
+    macZip: './releases/Cobblemon-Universe-x64.zip',
+    macZipArm64: './releases/Cobblemon-Universe-arm64.zip'
   };
 
   let currentLang = 'hu';
@@ -101,13 +105,17 @@ document.addEventListener('DOMContentLoaded', () => {
     'alt-win': DOWNLOADS.win,
     'alt-win-portable': DOWNLOADS.winPortable,
     'alt-linux-app': DOWNLOADS.linuxApp,
+    'alt-linux-app-arm64': DOWNLOADS.linuxAppArm64,
     'alt-linux-deb': DOWNLOADS.linuxDeb,
     'alt-linux-rpm': DOWNLOADS.linuxRpm,
     'alt-linux-tar': DOWNLOADS.linuxTar,
+    'alt-linux-tar-arm64': DOWNLOADS.linuxTarArm64,
     'alt-linux-pacman': DOWNLOADS.linuxPacman,
     'alt-linux-flatpak': DOWNLOADS.linuxFlatpak,
     'alt-mac-dmg': DOWNLOADS.macDmg,
-    'alt-mac-zip': DOWNLOADS.macZip
+    'alt-mac-dmg-arm64': DOWNLOADS.macDmgArm64,
+    'alt-mac-zip': DOWNLOADS.macZip,
+    'alt-mac-zip-arm64': DOWNLOADS.macZipArm64
   };
 
   Object.entries(altMap).forEach(([id, url]) => {

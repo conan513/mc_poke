@@ -1,63 +1,67 @@
 {
-  "title": "Letöltés | Cobblemon Universe",
+  "alternatives": {
+    "linux_app": "AppImage (x86_64)",
+    "linux_app_arm64": "AppImage (ARM64)",
+    "linux_deb": "Ubuntu/Debian (.deb)",
+    "linux_flatpak": "Flatpak",
+    "linux_pacman": "Arch Linux (pacman)",
+    "linux_rpm": "Fedora/SUSE (.rpm)",
+    "linux_tar": "Generic (.tar.gz)",
+    "linux_tar_arm64": "Generic (.tar.gz) ARM64",
+    "mac_dmg": "macOS Intel (.dmg)",
+    "mac_dmg_arm64": "Apple Silicon (.dmg)",
+    "mac_zip": "macOS Intel (.zip)",
+    "mac_zip_arm64": "Apple Silicon (.zip)",
+    "platform_linux": "Linux",
+    "platform_mac": "macOS",
+    "platform_win": "Windows",
+    "text": "Másik platformra keresel letöltést?",
+    "title": "Összes letöltés",
+    "win": "Telepítő (.exe)",
+    "win_portable": "Portable (.exe)"
+  },
+  "features": {
+    "f1_desc": "Minden generáció összes Pokémonja elérhető, beleértve a Legendásokat és a Mythical lényeket is. Nincsenek 'fakemonok', csak a klasszikusok.",
+    "f1_title": "1025+ Pokémon",
+    "f2_desc": "Használd a Mega Evolúciót, Terastallizációt, Dynamaxot és Z-Move-okat a stratégiai csaták során!",
+    "f2_title": "Mega & Tera",
+    "f3_desc": "Közlekedj a világban a kedvenc Pokémonjaid hátán! Több mint 200 típusú Pokémonon lovagolhatsz földön, vízen és levegőben.",
+    "f3_title": "200+ Lovagolható",
+    "f4_desc": "Hívd ki a Gym Leadereket Kanto-tól Sinnoh-ig, gyűjtsd a jelvényeket és válj a Világbajnokká!",
+    "f4_title": "Gymek és Jelvények",
+    "f5_desc": "Lásd valós időben a befogási esélyeket, típus-előnyöket és a Pokéballok hatékonyságát.",
+    "f5_title": "Smart Battle HUD",
+    "f6_desc": "Készen állsz a Living Dexre? 1800 férőhelyes PC vár, hogy minden Pokémonodat biztonságban tudd.",
+    "f6_title": "Hatalmas PC",
+    "f7_desc": "Egyedi, dinamikus soundtrack, ami változik a csaták és a felfedezés során.",
+    "f7_title": "Reaktív Zene",
+    "f8_desc": "Rengeteg QoL fejlesztés és teljesítmény-optimalizálás a sima, lagmentes játékélményért.",
+    "f8_title": "Optimalizált",
+    "intro": "A Cobblemon Universe egy professzionálisan összeállított modpack, amely a legújabb Cobblemon 1.7.3 verzióra épül, és valódi Pokémon játékká alakítja a Minecraftot.",
+    "title": "Miért a Cobblemon Universe?"
+  },
   "hero": {
-    "title": "Cobblemon Universe",
-    "subtitle": "A legteljesebb Pokémon élmény a Minecraftban: 1025+ Pokémon, Mega Evolúciók és epikus kalandok várnak!"
+    "subtitle": "A legteljesebb Pokémon élmény a Minecraftban: 1025+ Pokémon, Mega Evolúciók és epikus kalandok várnak!",
+    "title": "Cobblemon Universe"
+  },
+  "instructions": {
+    "text": "Kattints a <strong>Letöltés</strong> gombra! A rendszer automatikusan felajánlja az operációs rendszerednek megfelelő telepítőt. Telepítés után a Cobblemon Universe készen áll az indításra.",
+    "title": "Hogyan csatlakozz?"
+  },
+  "stats": {
+    "minecraft": "Minecraft",
+    "mods": "Telepített Mod",
+    "update": "Köv. Frissítés"
   },
   "status": {
     "checking": "Rendszer ellenőrzése...",
-    "online": "SZERVER ONLINE",
-    "offline": "SZERVER OFFLINE",
-    "launch": "Játék Indítása",
-    "see_all": "Más verziót keresel? Összes letöltés megtekintése",
     "download": "Letöltés",
     "download_confirm": "A launcher nem található a számítógépeden. Szeretnéd letölteni a telepítőt?",
-    "os_detected": "Észlelt rendszer: "
+    "launch": "Játék Indítása",
+    "offline": "SZERVER OFFLINE",
+    "online": "SZERVER ONLINE",
+    "os_detected": "Észlelt rendszer: ",
+    "see_all": "Más verziót keresel? Összes letöltés megtekintése"
   },
-  "stats": {
-    "mods": "Telepített Mod",
-    "minecraft": "Minecraft",
-    "update": "Köv. Frissítés"
-  },
-  "features": {
-    "title": "Miért a Cobblemon Universe?",
-    "intro": "A Cobblemon Universe egy professzionálisan összeállított modpack, amely a legújabb Cobblemon 1.7.3 verzióra épül, és valódi Pokémon játékká alakítja a Minecraftot.",
-    "f1_title": "1025+ Pokémon",
-    "f1_desc": "Minden generáció összes Pokémonja elérhető, beleértve a Legendásokat és a Mythical lényeket is. Nincsenek 'fakemonok', csak a klasszikusok.",
-    "f2_title": "Mega & Tera",
-    "f2_desc": "Használd a Mega Evolúciót, Terastallizációt, Dynamaxot és Z-Move-okat a stratégiai csaták során!",
-    "f3_title": "200+ Lovagolható",
-    "f3_desc": "Közlekedj a világban a kedvenc Pokémonjaid hátán! Több mint 200 típusú Pokémonon lovagolhatsz földön, vízen és levegőben.",
-    "f4_title": "Gymek és Jelvények",
-    "f4_desc": "Hívd ki a Gym Leadereket Kanto-tól Sinnoh-ig, gyűjtsd a jelvényeket és válj a Világbajnokká!",
-    "f5_title": "Smart Battle HUD",
-    "f5_desc": "Lásd valós időben a befogási esélyeket, típus-előnyöket és a Pokéballok hatékonyságát.",
-    "f6_title": "Hatalmas PC",
-    "f6_desc": "Készen állsz a Living Dexre? 1800 férőhelyes PC vár, hogy minden Pokémonodat biztonságban tudd.",
-    "f7_title": "Reaktív Zene",
-    "f7_desc": "Egyedi, dinamikus soundtrack, ami változik a csaták és a felfedezés során.",
-    "f8_title": "Optimalizált",
-    "f8_desc": "Rengeteg QoL fejlesztés és teljesítmény-optimalizálás a sima, lagmentes játékélményért."
-  },
-  "instructions": {
-    "title": "Hogyan csatlakozz?",
-    "text": "Kattints a <strong>Letöltés</strong> gombra! A rendszer automatikusan felajánlja az operációs rendszerednek megfelelő telepítőt. Telepítés után a Cobblemon Universe készen áll az indításra."
-  },
-  "alternatives": {
-    "title": "Összes letöltés",
-    "text": "Másik platformra keresel letöltést?",
-    "platform_win": "Windows",
-    "platform_linux": "Linux",
-    "platform_mac": "macOS",
-    "win": "Telepítő (.exe)",
-    "win_portable": "Portable (.exe)",
-    "linux_app": "AppImage",
-    "linux_deb": "Ubuntu/Debian (.deb)",
-    "linux_rpm": "Fedora/SUSE (.rpm)",
-    "linux_tar": "Generic (.tar.gz)",
-    "linux_pacman": "Arch Linux (pacman)",
-    "linux_flatpak": "Flatpak",
-    "mac_dmg": "macOS (.dmg)",
-    "mac_zip": "macOS (.zip)"
-  }
+  "title": "Letöltés | Cobblemon Universe"
 }

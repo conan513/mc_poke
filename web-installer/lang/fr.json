@@ -1,63 +1,67 @@
 {
-  "title": "Télécharger | Cobblemon Universe",
+  "alternatives": {
+    "linux_app": "AppImage",
+    "linux_app_arm64": "AppImage (ARM64)",
+    "linux_deb": "Ubuntu/Debian (.deb)",
+    "linux_flatpak": "Flatpak",
+    "linux_pacman": "Arch Linux (pacman)",
+    "linux_rpm": "Fedora/SUSE (.rpm)",
+    "linux_tar": "Linux générique (.tar.gz)",
+    "linux_tar_arm64": "Generic (.tar.gz) ARM64",
+    "mac_dmg": "macOS (.dmg)",
+    "mac_dmg_arm64": "Apple Silicon (.dmg)",
+    "mac_zip": "macOS (.zip)",
+    "mac_zip_arm64": "Apple Silicon (.zip)",
+    "platform_linux": "Linux",
+    "platform_mac": "macOS",
+    "platform_win": "Windows",
+    "text": "Vous cherchez une autre plateforme ?",
+    "title": "Vous cherchez une autre plateforme ?",
+    "win": "Installer (.exe)",
+    "win_portable": "Portable (.exe)"
+  },
+  "features": {
+    "f1_desc": "Tous les Pokémon de chaque génération sont disponibles, y compris les Légendaires et les Fabuleux. Pas de 'fakemons', juste les classiques.",
+    "f1_title": "1025+ Pokémon",
+    "f2_desc": "Maîtrisez la Méga-Évolution, la Térastallisation, le Dynamax et les capacités Z dans des combats stratégiques !",
+    "f2_title": "Méga & Téra",
+    "f3_desc": "Voyagez à dos de votre Pokémon préféré ! Plus de 200 types de Pokémon chevauchables sur terre, mer et air.",
+    "f3_title": "200+ Montures",
+    "f4_desc": "Défiez les champions d'arène de Kanto à Sinnoh, collectionnez les badges et devenez le champion du monde !",
+    "f4_title": "Arènes & Badges",
+    "f5_desc": "Visualisez les taux de capture et les avantages de type en temps réel pendant les combats.",
+    "f5_title": "HUD de combat intelligent",
+    "f6_desc": "Prêt pour un Living Dex ? 1800 slots PC vous attendent pour garder tous vos Pokémon en sécurité.",
+    "f6_title": "PC Massif",
+    "f7_desc": "Une bande-son dynamique unique qui change pendant les combats et l'exploration.",
+    "f7_title": "Musique réactive",
+    "f8_desc": "Des dizaines d'améliorations QoL et d'optimisations de performance pour une expérience fluide et sans lag.",
+    "f8_title": "Optimisé",
+    "intro": "Cobblemon Universe est un modpack professionnel basé sur le dernier Cobblemon 1.7.3, transformant Minecraft en un véritable jeu Pokémon.",
+    "title": "Pourquoi Cobblemon Universe ?"
+  },
   "hero": {
-    "title": "Cobblemon Universe",
-    "subtitle": "L'expérience Pokémon ultime dans Minecraft : 1025+ Pokémon, Méga-Évolutions et aventures épiques vous attendent !"
+    "subtitle": "L'expérience Pokémon ultime dans Minecraft : 1025+ Pokémon, Méga-Évolutions et aventures épiques vous attendent !",
+    "title": "Cobblemon Universe"
+  },
+  "instructions": {
+    "text": "Cliquez sur le bouton <strong>Télécharger</strong> ! Le système vous proposera automatiquement l'installeur correspondant à votre OS. Après l'installation, Cobblemon Universe est prêt à être lancé.",
+    "title": "Comment rejoindre ?"
+  },
+  "stats": {
+    "minecraft": "Minecraft",
+    "mods": "Mods installés",
+    "update": "Prochaine mise à jour"
   },
   "status": {
     "checking": "Vérification du système...",
-    "online": "SERVEUR EN LIGNE",
-    "offline": "SERVEUR HORS LIGNE",
-    "launch": "Lancer le jeu",
     "download": "Télécharger le client",
+    "download_confirm": "The launcher was not found on your computer. Would you like to download the installer?",
+    "launch": "Lancer le jeu",
+    "offline": "SERVEUR HORS LIGNE",
+    "online": "SERVEUR EN LIGNE",
     "os_detected": "Système détecté : ",
     "see_all": "Vous cherchez une autre version ? Voir tous les téléchargements"
   },
-  "stats": {
-    "mods": "Mods installés",
-    "minecraft": "Minecraft",
-    "update": "Prochaine mise à jour"
-  },
-  "features": {
-    "title": "Pourquoi Cobblemon Universe ?",
-    "intro": "Cobblemon Universe est un modpack professionnel basé sur le dernier Cobblemon 1.7.3, transformant Minecraft en un véritable jeu Pokémon.",
-    "f1_title": "1025+ Pokémon",
-    "f1_desc": "Tous les Pokémon de chaque génération sont disponibles, y compris les Légendaires et les Fabuleux. Pas de 'fakemons', juste les classiques.",
-    "f2_title": "Méga & Téra",
-    "f2_desc": "Maîtrisez la Méga-Évolution, la Térastallisation, le Dynamax et les capacités Z dans des combats stratégiques !",
-    "f3_title": "200+ Montures",
-    "f3_desc": "Voyagez à dos de votre Pokémon préféré ! Plus de 200 types de Pokémon chevauchables sur terre, mer et air.",
-    "f4_title": "Arènes & Badges",
-    "f4_desc": "Défiez les champions d'arène de Kanto à Sinnoh, collectionnez les badges et devenez le champion du monde !",
-    "f5_title": "HUD de combat intelligent",
-    "f5_desc": "Visualisez les taux de capture et les avantages de type en temps réel pendant les combats.",
-    "f6_title": "PC Massif",
-    "f6_desc": "Prêt pour un Living Dex ? 1800 slots PC vous attendent pour garder tous vos Pokémon en sécurité.",
-    "f7_title": "Musique réactive",
-    "f7_desc": "Une bande-son dynamique unique qui change pendant les combats et l'exploration.",
-    "f8_title": "Optimisé",
-    "f8_desc": "Des dizaines d'améliorations QoL et d'optimisations de performance pour une expérience fluide et sans lag."
-  },
-  "instructions": {
-    "title": "Comment rejoindre ?",
-    "text": "Cliquez sur le bouton <strong>Télécharger</strong> ! Le système vous proposera automatiquement l'installeur correspondant à votre OS. Après l'installation, Cobblemon Universe est prêt à être lancé."
-  },
-  "alternatives": {
-    "title": "Tous les téléchargements",
-    "text": "Vous cherchez une autre plateforme ?",
-    "win": "Installer (.exe)",
-    "win_portable": "Portable (.exe)",
-    "linux_app": "AppImage",
-    "linux_deb": "Ubuntu/Debian (.deb)",
-    "linux_rpm": "Fedora/SUSE (.rpm)",
-    "linux_tar": "Linux générique (.tar.gz)",
-    "linux_pacman": "Arch Linux (pacman)",
-    "mac_dmg": "macOS (.dmg)",
-    "mac_zip": "macOS (.zip)",
-    "title": "Vous cherchez une autre plateforme ?",
-    "platform_win": "Windows",
-    "platform_linux": "Linux",
-    "platform_mac": "macOS",
-    "linux_flatpak": "Flatpak"
-  }
+  "title": "Télécharger | Cobblemon Universe"
 }

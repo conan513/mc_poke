@@ -1,63 +1,67 @@
 {
-  "title": "Downloaden | Cobblemon Universe",
+  "alternatives": {
+    "linux_app": "AppImage",
+    "linux_app_arm64": "AppImage (ARM64)",
+    "linux_deb": "Ubuntu/Debian (.deb)",
+    "linux_flatpak": "Flatpak",
+    "linux_pacman": "Arch Linux (pacman)",
+    "linux_rpm": "Fedora/SUSE (.rpm)",
+    "linux_tar": "Linux (.tar.gz)",
+    "linux_tar_arm64": "Generic (.tar.gz) ARM64",
+    "mac_dmg": "macOS (.dmg)",
+    "mac_dmg_arm64": "Apple Silicon (.dmg)",
+    "mac_zip": "macOS (.zip)",
+    "mac_zip_arm64": "Apple Silicon (.zip)",
+    "platform_linux": "Linux",
+    "platform_mac": "macOS",
+    "platform_win": "Windows",
+    "text": "Op zoek naar een ander platform?",
+    "title": "Op zoek naar een ander platform?",
+    "win": "Installer (.exe)",
+    "win_portable": "Portable (.exe)"
+  },
+  "features": {
+    "f1_desc": "Alle Pokémon van elke generatie zijn beschikbaar, inclusief legendarische en mythische. Geen 'fakemons', alleen de klassiekers.",
+    "f1_title": "1025+ Pokémon",
+    "f2_desc": "Beheers Mega Evolutie, Terastallisatie, Dynamax en Z-Moves in strategische gevechten!",
+    "f2_title": "Mega & Tera",
+    "f3_desc": "Reis door de wereld op de rug van je favoriete Pokémon! Meer dan 200 soorten berijdbare Pokémon op land, zee en in de lucht.",
+    "f3_title": "200+ Berijdbaar",
+    "f4_desc": "Daag Gym Leaders uit van Kanto tot Sinnoh, verzamel badges en word de wereldkampioen!",
+    "f4_title": "Gyms & Badges",
+    "f5_desc": "Bekijk realtime vangstpercentages en typevoordelen tijdens gevechten.",
+    "f5_title": "Smart Battle HUD",
+    "f6_desc": "Klaar voor een Living Dex? 1800 PC-slots wachten op je om al je Pokémon veilig op te bergen.",
+    "f6_title": "Enorme PC",
+    "f7_desc": "Een unieke, dynamische soundtrack die verandert tijdens gevechten en verkenning.",
+    "f7_title": "Reactieve Muziek",
+    "f8_desc": "Tientallen QoL-verbeteringen en prestatie-optimalisaties voor een soepele, lag-vrije ervaring.",
+    "f8_title": "Geoptimaliseerd",
+    "intro": "Cobblemon Universe is een professioneel samengesteld modpack gebaseerd op de nieuwste Cobblemon 1.7.3, waarmee Minecraft verandert in een echt Pokémon-spel.",
+    "title": "Waarom Cobblemon Universe?"
+  },
   "hero": {
-    "title": "Cobblemon Universe",
-    "subtitle": "De ultieme Pokémon-ervaring in Minecraft: 1025+ Pokémon, Mega Evoluties en epische avonturen wachten op je!"
+    "subtitle": "De ultieme Pokémon-ervaring in Minecraft: 1025+ Pokémon, Mega Evoluties en epische avonturen wachten op je!",
+    "title": "Cobblemon Universe"
+  },
+  "instructions": {
+    "text": "Klik op de <strong>Download</strong> knop! Het systeem biedt automatisch de juiste installer aan voor jouw besturingssysteem. Na installatie is Cobblemon Universe klaar om te starten.",
+    "title": "Hoe doe je mee?"
+  },
+  "stats": {
+    "minecraft": "Minecraft",
+    "mods": "Geïnstalleerde Mods",
+    "update": "Volgende Update"
   },
   "status": {
     "checking": "Systeem controleren...",
-    "online": "SERVER ONLINE",
-    "offline": "SERVER OFFLINE",
-    "launch": "Spel Starten",
     "download": "Client Downloaden",
+    "download_confirm": "The launcher was not found on your computer. Would you like to download the installer?",
+    "launch": "Spel Starten",
+    "offline": "SERVER OFFLINE",
+    "online": "SERVER ONLINE",
     "os_detected": "Gedetecteerd systeem: ",
     "see_all": "Op zoek naar een andere versie? Bekijk alle downloads"
   },
-  "stats": {
-    "mods": "Geïnstalleerde Mods",
-    "minecraft": "Minecraft",
-    "update": "Volgende Update"
-  },
-  "features": {
-    "title": "Waarom Cobblemon Universe?",
-    "intro": "Cobblemon Universe is een professioneel samengesteld modpack gebaseerd op de nieuwste Cobblemon 1.7.3, waarmee Minecraft verandert in een echt Pokémon-spel.",
-    "f1_title": "1025+ Pokémon",
-    "f1_desc": "Alle Pokémon van elke generatie zijn beschikbaar, inclusief legendarische en mythische. Geen 'fakemons', alleen de klassiekers.",
-    "f2_title": "Mega & Tera",
-    "f2_desc": "Beheers Mega Evolutie, Terastallisatie, Dynamax en Z-Moves in strategische gevechten!",
-    "f3_title": "200+ Berijdbaar",
-    "f3_desc": "Reis door de wereld op de rug van je favoriete Pokémon! Meer dan 200 soorten berijdbare Pokémon op land, zee en in de lucht.",
-    "f4_title": "Gyms & Badges",
-    "f4_desc": "Daag Gym Leaders uit van Kanto tot Sinnoh, verzamel badges en word de wereldkampioen!",
-    "f5_title": "Smart Battle HUD",
-    "f5_desc": "Bekijk realtime vangstpercentages en typevoordelen tijdens gevechten.",
-    "f6_title": "Enorme PC",
-    "f6_desc": "Klaar voor een Living Dex? 1800 PC-slots wachten op je om al je Pokémon veilig op te bergen.",
-    "f7_title": "Reactieve Muziek",
-    "f7_desc": "Een unieke, dynamische soundtrack die verandert tijdens gevechten en verkenning.",
-    "f8_title": "Geoptimaliseerd",
-    "f8_desc": "Tientallen QoL-verbeteringen en prestatie-optimalisaties voor een soepele, lag-vrije ervaring."
-  },
-  "instructions": {
-    "title": "Hoe doe je mee?",
-    "text": "Klik op de <strong>Download</strong> knop! Het systeem biedt automatisch de juiste installer aan voor jouw besturingssysteem. Na installatie is Cobblemon Universe klaar om te starten."
-  },
-  "alternatives": {
-    "title": "Alle downloads",
-    "text": "Op zoek naar een ander platform?",
-    "win": "Installer (.exe)",
-    "win_portable": "Portable (.exe)",
-    "linux_app": "AppImage",
-    "linux_deb": "Ubuntu/Debian (.deb)",
-    "linux_rpm": "Fedora/SUSE (.rpm)",
-    "linux_tar": "Linux (.tar.gz)",
-    "linux_pacman": "Arch Linux (pacman)",
-    "mac_dmg": "macOS (.dmg)",
-    "mac_zip": "macOS (.zip)",
-    "title": "Op zoek naar een ander platform?",
-    "platform_win": "Windows",
-    "platform_linux": "Linux",
-    "platform_mac": "macOS",
-    "linux_flatpak": "Flatpak"
-  }
+  "title": "Downloaden | Cobblemon Universe"
 }

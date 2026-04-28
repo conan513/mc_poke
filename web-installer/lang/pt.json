@@ -1,61 +1,67 @@
 {
-  "title": "Download | Cobblemon Universe",
+  "alternatives": {
+    "linux_app": "AppImage",
+    "linux_app_arm64": "AppImage (ARM64)",
+    "linux_deb": "Ubuntu/Debian (.deb)",
+    "linux_flatpak": "Flatpak",
+    "linux_pacman": "Arch Linux (pacman)",
+    "linux_rpm": "Fedora/SUSE (.rpm)",
+    "linux_tar": "Linux genérico (.tar.gz)",
+    "linux_tar_arm64": "Generic (.tar.gz) ARM64",
+    "mac_dmg": "macOS (.dmg)",
+    "mac_dmg_arm64": "Apple Silicon (.dmg)",
+    "mac_zip": "macOS (.zip)",
+    "mac_zip_arm64": "Apple Silicon (.zip)",
+    "platform_linux": "Linux",
+    "platform_mac": "macOS",
+    "platform_win": "Windows",
+    "text": "Looking for another platform?",
+    "title": "Procurando outra plataforma?",
+    "win": "Installer (.exe)",
+    "win_portable": "Portable (.exe)"
+  },
+  "features": {
+    "f1_desc": "Todos os Pokémon de cada geração estão disponíveis, incluindo lendários e míticos. Sem 'fakemons', apenas os clássicos.",
+    "f1_title": "1025+ Pokémon",
+    "f2_desc": "Domine a Mega Evolução, Terastalização, Dynamax e movimentos Z em batalhas estratégicas!",
+    "f2_title": "Mega e Tera",
+    "f3_desc": "Viaje pelo mundo nas costas do seu Pokémon favorito! Mais de 200 tipos de Pokémon montáveis por terra, mar e ar.",
+    "f3_title": "200+ Montarias",
+    "f4_desc": "Desafie líderes de ginásio de Kanto a Sinnoh, colecione insígnias e torne-se o campeão mundial!",
+    "f4_title": "Ginásios e Insígnias",
+    "f5_desc": "Veja taxas de captura e vantagens de tipo em tempo real durante as batalhas.",
+    "f5_title": "HUD de batalha inteligente",
+    "f6_desc": "Pronto para uma Living Dex? 1800 slots de PC esperam por você para guardar todos os seus Pokémon com segurança.",
+    "f6_title": "PC Massivo",
+    "f7_desc": "Uma trilha sonora dinâmica única que muda durante as batalhas e exploração.",
+    "f7_title": "Música reativa",
+    "f8_desc": "Dezenas de melhorias de QoL e otimizações de desempenho para uma experiência fluida e sem lag.",
+    "f8_title": "Otimizado",
+    "intro": "Cobblemon Universe é um modpack profissional baseado no último Cobblemon 1.7.3, transformando o Minecraft em um verdadeiro jogo Pokémon.",
+    "title": "Por que Cobblemon Universe?"
+  },
   "hero": {
-    "title": "Cobblemon Universe",
-    "subtitle": "A experiência Pokémon definitiva no Minecraft: mais de 1025 Pokémon, Mega Evoluções e aventuras épicas esperam por você!"
+    "subtitle": "A experiência Pokémon definitiva no Minecraft: mais de 1025 Pokémon, Mega Evoluções e aventuras épicas esperam por você!",
+    "title": "Cobblemon Universe"
+  },
+  "instructions": {
+    "text": "Clique no botão <strong>Download</strong>! O sistema oferecerá automaticamente o instalador correto para o seu sistema operacional. Após a instalação, o Cobblemon Universe estará pronto para ser lançado.",
+    "title": "Como entrar?"
+  },
+  "stats": {
+    "minecraft": "Minecraft",
+    "mods": "Mods instalados",
+    "update": "Próxima atualização"
   },
   "status": {
     "checking": "Verificando sistema...",
-    "online": "SERVIDOR ONLINE",
-    "offline": "SERVIDOR OFFLINE",
-    "launch": "Iniciar Jogo",
     "download": "Baixar Cliente",
+    "download_confirm": "The launcher was not found on your computer. Would you like to download the installer?",
+    "launch": "Iniciar Jogo",
+    "offline": "SERVIDOR OFFLINE",
+    "online": "SERVIDOR ONLINE",
     "os_detected": "Sistema detectado: ",
     "see_all": "Procurando outra versão? Ver todos os downloads"
   },
-  "stats": {
-    "mods": "Mods instalados",
-    "minecraft": "Minecraft",
-    "update": "Próxima atualização"
-  },
-  "features": {
-    "title": "Por que Cobblemon Universe?",
-    "intro": "Cobblemon Universe é um modpack profissional baseado no último Cobblemon 1.7.3, transformando o Minecraft em um verdadeiro jogo Pokémon.",
-    "f1_title": "1025+ Pokémon",
-    "f1_desc": "Todos os Pokémon de cada geração estão disponíveis, incluindo lendários e míticos. Sem 'fakemons', apenas os clássicos.",
-    "f2_title": "Mega e Tera",
-    "f2_desc": "Domine a Mega Evolução, Terastalização, Dynamax e movimentos Z em batalhas estratégicas!",
-    "f3_title": "200+ Montarias",
-    "f3_desc": "Viaje pelo mundo nas costas do seu Pokémon favorito! Mais de 200 tipos de Pokémon montáveis por terra, mar e ar.",
-    "f4_title": "Ginásios e Insígnias",
-    "f4_desc": "Desafie líderes de ginásio de Kanto a Sinnoh, colecione insígnias e torne-se o campeão mundial!",
-    "f5_title": "HUD de batalha inteligente",
-    "f5_desc": "Veja taxas de captura e vantagens de tipo em tempo real durante as batalhas.",
-    "f6_title": "PC Massivo",
-    "f6_desc": "Pronto para uma Living Dex? 1800 slots de PC esperam por você para guardar todos os seus Pokémon com segurança.",
-    "f7_title": "Música reativa",
-    "f7_desc": "Uma trilha sonora dinâmica única que muda durante as batalhas e exploração.",
-    "f8_title": "Otimizado",
-    "f8_desc": "Dezenas de melhorias de QoL e otimizações de desempenho para uma experiência fluida e sem lag."
-  },
-  "instructions": {
-    "title": "Como entrar?",
-    "text": "Clique no botão <strong>Download</strong>! O sistema oferecerá automaticamente o instalador correto para o seu sistema operacional. Após a instalação, o Cobblemon Universe estará pronto para ser lançado."
-  },
-  "alternatives": {
-    "win": "Installer (.exe)",
-    "win_portable": "Portable (.exe)",
-    "linux_app": "AppImage",
-    "linux_deb": "Ubuntu/Debian (.deb)",
-    "linux_rpm": "Fedora/SUSE (.rpm)",
-    "linux_tar": "Linux genérico (.tar.gz)",
-    "linux_pacman": "Arch Linux (pacman)",
-    "mac_dmg": "macOS (.dmg)",
-    "mac_zip": "macOS (.zip)",
-    "title": "Procurando outra plataforma?",
-    "platform_win": "Windows",
-    "platform_linux": "Linux",
-    "platform_mac": "macOS",
-    "linux_flatpak": "Flatpak"
-  }
+  "title": "Download | Cobblemon Universe"
 }

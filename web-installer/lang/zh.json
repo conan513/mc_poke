@@ -1,61 +1,67 @@
 {
-  "title": "下载 | Cobblemon Universe",
+  "alternatives": {
+    "linux_app": "AppImage",
+    "linux_app_arm64": "AppImage (ARM64)",
+    "linux_deb": "Ubuntu/Debian (.deb)",
+    "linux_flatpak": "Flatpak",
+    "linux_pacman": "Arch Linux (pacman)",
+    "linux_rpm": "Fedora/SUSE (.rpm)",
+    "linux_tar": "通用 Linux (.tar.gz)",
+    "linux_tar_arm64": "Generic (.tar.gz) ARM64",
+    "mac_dmg": "macOS (.dmg)",
+    "mac_dmg_arm64": "Apple Silicon (.dmg)",
+    "mac_zip": "macOS (.zip)",
+    "mac_zip_arm64": "Apple Silicon (.zip)",
+    "platform_linux": "Linux",
+    "platform_mac": "macOS",
+    "platform_win": "Windows",
+    "text": "Looking for another platform?",
+    "title": "寻找其他平台？",
+    "win": "Installer (.exe)",
+    "win_portable": "Portable (.exe)"
+  },
+  "features": {
+    "f1_desc": "拥有所有世代的所有宝可梦，包括传说级和幻之宝可梦。没有“假想宝可梦”，只有经典的。",
+    "f1_title": "1025+ 宝可梦",
+    "f2_desc": "在策略对战中掌握超级进化、太晶化、极巨化和 Z 招式！",
+    "f2_title": "超级进化与太晶化",
+    "f3_desc": "骑在您最喜欢的宝可梦背上周游世界！超过 200 种可骑乘的宝可梦，跨越陆海空。",
+    "f3_title": "200+ 可骑乘",
+    "f4_desc": "挑战从关都到神奥的道馆馆主，收集徽章，成为世界冠军！",
+    "f4_title": "道馆与徽章",
+    "f5_desc": "在对战中查看实时的捕获率、属性克制和精灵球效果。",
+    "f5_title": "智能战斗 HUD",
+    "f6_desc": "准备好收集活体图鉴了吗？1800 个 PC 插槽正等着您安全地存储所有的宝可梦。",
+    "f6_title": "海量 PC 存储",
+    "f7_desc": "独特的动态原声带，会根据战斗和探索情况实时切换。",
+    "f7_title": "动态音乐",
+    "f8_desc": "数十项 QoL 改进和性能优化，确保流畅、无卡顿的体验。",
+    "f8_title": "性能优化",
+    "intro": "Cobblemon Universe 是一个基于最新 Cobblemon 1.7.3 的专业整合包，将 Minecraft 变成了一个真正的宝可梦游戏。",
+    "title": "为什么选择 Cobblemon Universe？"
+  },
   "hero": {
-    "title": "Cobblemon Universe",
-    "subtitle": "Minecraft 中究极的宝可梦体验：1025+ 宝可梦、超级进化和史诗般的冒险正等着你！"
+    "subtitle": "Minecraft 中究极的宝可梦体验：1025+ 宝可梦、超级进化和史诗般的冒险正等着你！",
+    "title": "Cobblemon Universe"
+  },
+  "instructions": {
+    "text": "点击 <strong>下载</strong> 按钮！系统会自动为您提供适合您操作系统的安装程序。安装完成后，Cobblemon Universe 即可启动。",
+    "title": "如何加入？"
+  },
+  "stats": {
+    "minecraft": "Minecraft",
+    "mods": "已安装模组",
+    "update": "下一次更新"
   },
   "status": {
     "checking": "系统检查中...",
-    "online": "服务器在线",
-    "offline": "服务器离线",
-    "launch": "启动游戏",
     "download": "下载客户端",
+    "download_confirm": "The launcher was not found on your computer. Would you like to download the installer?",
+    "launch": "启动游戏",
+    "offline": "服务器离线",
+    "online": "服务器在线",
     "os_detected": "检测到的系统： ",
     "see_all": "寻找其他版本？查看所有下载"
   },
-  "stats": {
-    "mods": "已安装模组",
-    "minecraft": "Minecraft",
-    "update": "下一次更新"
-  },
-  "features": {
-    "title": "为什么选择 Cobblemon Universe？",
-    "intro": "Cobblemon Universe 是一个基于最新 Cobblemon 1.7.3 的专业整合包，将 Minecraft 变成了一个真正的宝可梦游戏。",
-    "f1_title": "1025+ 宝可梦",
-    "f1_desc": "拥有所有世代的所有宝可梦，包括传说级和幻之宝可梦。没有“假想宝可梦”，只有经典的。",
-    "f2_title": "超级进化与太晶化",
-    "f2_desc": "在策略对战中掌握超级进化、太晶化、极巨化和 Z 招式！",
-    "f3_title": "200+ 可骑乘",
-    "f3_desc": "骑在您最喜欢的宝可梦背上周游世界！超过 200 种可骑乘的宝可梦，跨越陆海空。",
-    "f4_title": "道馆与徽章",
-    "f4_desc": "挑战从关都到神奥的道馆馆主，收集徽章，成为世界冠军！",
-    "f5_title": "智能战斗 HUD",
-    "f5_desc": "在对战中查看实时的捕获率、属性克制和精灵球效果。",
-    "f6_title": "海量 PC 存储",
-    "f6_desc": "准备好收集活体图鉴了吗？1800 个 PC 插槽正等着您安全地存储所有的宝可梦。",
-    "f7_title": "动态音乐",
-    "f7_desc": "独特的动态原声带，会根据战斗和探索情况实时切换。",
-    "f8_title": "性能优化",
-    "f8_desc": "数十项 QoL 改进和性能优化，确保流畅、无卡顿的体验。"
-  },
-  "instructions": {
-    "title": "如何加入？",
-    "text": "点击 <strong>下载</strong> 按钮！系统会自动为您提供适合您操作系统的安装程序。安装完成后，Cobblemon Universe 即可启动。"
-  },
-  "alternatives": {
-    "win": "Installer (.exe)",
-    "win_portable": "Portable (.exe)",
-    "linux_app": "AppImage",
-    "linux_deb": "Ubuntu/Debian (.deb)",
-    "linux_rpm": "Fedora/SUSE (.rpm)",
-    "linux_tar": "通用 Linux (.tar.gz)",
-    "linux_pacman": "Arch Linux (pacman)",
-    "mac_dmg": "macOS (.dmg)",
-    "mac_zip": "macOS (.zip)",
-    "title": "寻找其他平台？",
-    "platform_win": "Windows",
-    "platform_linux": "Linux",
-    "platform_mac": "macOS",
-    "linux_flatpak": "Flatpak"
-  }
+  "title": "下载 | Cobblemon Universe"
 }

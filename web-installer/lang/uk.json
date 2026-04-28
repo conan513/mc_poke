@@ -1,63 +1,67 @@
 {
-  "title": "Завантажити | Cobblemon Universe",
+  "alternatives": {
+    "linux_app": "AppImage",
+    "linux_app_arm64": "AppImage (ARM64)",
+    "linux_deb": "Ubuntu/Debian (.deb)",
+    "linux_flatpak": "Flatpak",
+    "linux_pacman": "Arch Linux (pacman)",
+    "linux_rpm": "Fedora/SUSE (.rpm)",
+    "linux_tar": "Generic (.tar.gz)",
+    "linux_tar_arm64": "Generic (.tar.gz) ARM64",
+    "mac_dmg": "macOS (.dmg)",
+    "mac_dmg_arm64": "Apple Silicon (.dmg)",
+    "mac_zip": "macOS (.zip)",
+    "mac_zip_arm64": "Apple Silicon (.zip)",
+    "platform_linux": "Linux",
+    "platform_mac": "macOS",
+    "platform_win": "Windows",
+    "text": "Шукаєте іншу платформу?",
+    "title": "Шукаєте іншу платформу?",
+    "win": "Installer (.exe)",
+    "win_portable": "Portable (.exe)"
+  },
+  "features": {
+    "f1_desc": "Доступні всі покемони з кожного покоління, включаючи легендарних та міфічних. Жодних 'фейкмонів', тільки класика.",
+    "f1_title": "1025+ Покемонів",
+    "f2_desc": "Опануйте Мега-еволюцію, Терасталізацію, Динамакс та Z-атаки у стратегічних битвах!",
+    "f2_title": "Мега та Тера",
+    "f3_desc": "Подорожуйте світом верхи на улюбленому покемоні! Понад 200 видів їздових покемонів на суші, морі та в повітрі.",
+    "f3_title": "200+ Їздових",
+    "f4_desc": "Киньте виклик лідерам гімів від Канто до Сінно, збирайте значки та станьте чемпіоном світу!",
+    "f4_title": "Гіми та Значки",
+    "f5_desc": "Переглядайте шанси на поімку та переваги типів у реальному часі під час бою.",
+    "f5_title": "Розумний HUD битви",
+    "f6_desc": "Готові до Living Dex? 1800 слотів у ПК чекають, щоб зберегти всіх ваших покемонів у безпеці.",
+    "f6_title": "Величезний ПК",
+    "f7_desc": "Унікальний динамічний саундтрек, який змінюється під час битв та досліджень.",
+    "f7_title": "Реактивна музика",
+    "f8_desc": "Десятки покращень QoL та оптимізацій продуктивності для плавного ігрового процесу без лагів.",
+    "f8_title": "Оптимізовано",
+    "intro": "Cobblemon Universe — це професійно створена збірка на базі найновішого Cobblemon 1.7.3, що перетворює Minecraft на справжню гру про покемонів.",
+    "title": "Чому Cobblemon Universe?"
+  },
   "hero": {
-    "title": "Cobblemon Universe",
-    "subtitle": "Найкращий досвід Pokémon у Minecraft: 1025+ покемонів, Мега-еволюції та епічні пригоди чекають на вас!"
+    "subtitle": "Найкращий досвід Pokémon у Minecraft: 1025+ покемонів, Мега-еволюції та епічні пригоди чекають на вас!",
+    "title": "Cobblemon Universe"
+  },
+  "instructions": {
+    "text": "Натисніть кнопку <strong>Завантажити</strong>! Система автоматично запропонує відповідний інсталятор для вашої ОС. Після встановлення Cobblemon Universe буде готовий до запуску.",
+    "title": "Як приєднатися?"
+  },
+  "stats": {
+    "minecraft": "Minecraft",
+    "mods": "Встановлено модів",
+    "update": "Наст. оновлення"
   },
   "status": {
     "checking": "Перевірка системи...",
-    "online": "СЕРВЕР ОНЛАЙН",
-    "offline": "СЕРВЕР ОФФЛАЙН",
-    "launch": "Запустити гру",
     "download": "Завантажити клієнт",
+    "download_confirm": "The launcher was not found on your computer. Would you like to download the installer?",
+    "launch": "Запустити гру",
+    "offline": "СЕРВЕР ОФФЛАЙН",
+    "online": "СЕРВЕР ОНЛАЙН",
     "os_detected": "Виявлена система: ",
     "see_all": "Шукаєте іншу версію? Переглянути всі завантаження"
   },
-  "stats": {
-    "mods": "Встановлено модів",
-    "minecraft": "Minecraft",
-    "update": "Наст. оновлення"
-  },
-  "features": {
-    "title": "Чому Cobblemon Universe?",
-    "intro": "Cobblemon Universe — це професійно створена збірка на базі найновішого Cobblemon 1.7.3, що перетворює Minecraft на справжню гру про покемонів.",
-    "f1_title": "1025+ Покемонів",
-    "f1_desc": "Доступні всі покемони з кожного покоління, включаючи легендарних та міфічних. Жодних 'фейкмонів', тільки класика.",
-    "f2_title": "Мега та Тера",
-    "f2_desc": "Опануйте Мега-еволюцію, Терасталізацію, Динамакс та Z-атаки у стратегічних битвах!",
-    "f3_title": "200+ Їздових",
-    "f3_desc": "Подорожуйте світом верхи на улюбленому покемоні! Понад 200 видів їздових покемонів на суші, морі та в повітрі.",
-    "f4_title": "Гіми та Значки",
-    "f4_desc": "Киньте виклик лідерам гімів від Канто до Сінно, збирайте значки та станьте чемпіоном світу!",
-    "f5_title": "Розумний HUD битви",
-    "f5_desc": "Переглядайте шанси на поімку та переваги типів у реальному часі під час бою.",
-    "f6_title": "Величезний ПК",
-    "f6_desc": "Готові до Living Dex? 1800 слотів у ПК чекають, щоб зберегти всіх ваших покемонів у безпеці.",
-    "f7_title": "Реактивна музика",
-    "f7_desc": "Унікальний динамічний саундтрек, який змінюється під час битв та досліджень.",
-    "f8_title": "Оптимізовано",
-    "f8_desc": "Десятки покращень QoL та оптимізацій продуктивності для плавного ігрового процесу без лагів."
-  },
-  "instructions": {
-    "title": "Як приєднатися?",
-    "text": "Натисніть кнопку <strong>Завантажити</strong>! Система автоматично запропонує відповідний інсталятор для вашої ОС. Після встановлення Cobblemon Universe буде готовий до запуску."
-  },
-  "alternatives": {
-    "title": "Усі завантаження",
-    "text": "Шукаєте іншу платформу?",
-    "win": "Installer (.exe)",
-    "win_portable": "Portable (.exe)",
-    "linux_app": "AppImage",
-    "linux_deb": "Ubuntu/Debian (.deb)",
-    "linux_rpm": "Fedora/SUSE (.rpm)",
-    "linux_tar": "Generic (.tar.gz)",
-    "linux_pacman": "Arch Linux (pacman)",
-    "mac_dmg": "macOS (.dmg)",
-    "mac_zip": "macOS (.zip)",
-    "title": "Шукаєте іншу платформу?",
-    "platform_win": "Windows",
-    "platform_linux": "Linux",
-    "platform_mac": "macOS",
-    "linux_flatpak": "Flatpak"
-  }
+  "title": "Завантажити | Cobblemon Universe"
 }

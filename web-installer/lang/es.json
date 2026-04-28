@@ -1,63 +1,67 @@
 {
-  "title": "Descargar | Cobblemon Universe",
+  "alternatives": {
+    "linux_app": "AppImage",
+    "linux_app_arm64": "AppImage (ARM64)",
+    "linux_deb": "Ubuntu/Debian (.deb)",
+    "linux_flatpak": "Flatpak",
+    "linux_pacman": "Arch Linux (pacman)",
+    "linux_rpm": "Fedora/SUSE (.rpm)",
+    "linux_tar": "Linux genérico (.tar.gz)",
+    "linux_tar_arm64": "Generic (.tar.gz) ARM64",
+    "mac_dmg": "macOS (.dmg)",
+    "mac_dmg_arm64": "Apple Silicon (.dmg)",
+    "mac_zip": "macOS (.zip)",
+    "mac_zip_arm64": "Apple Silicon (.zip)",
+    "platform_linux": "Linux",
+    "platform_mac": "macOS",
+    "platform_win": "Windows",
+    "text": "¿Buscas otra plataforma?",
+    "title": "¿Buscas otra plataforma?",
+    "win": "Installer (.exe)",
+    "win_portable": "Portable (.exe)"
+  },
+  "features": {
+    "f1_desc": "Todos los Pokémon de cada generación están disponibles, incluidos legendarios y singulares. Sin 'fakemons', solo los clásicos.",
+    "f1_title": "1025+ Pokémon",
+    "f2_desc": "¡Domina la megaevolución, la terastalización, el Dynamax y los movimientos Z en batallas estratégicas!",
+    "f2_title": "Mega y Tera",
+    "f3_desc": "¡Viaja por el mundo a lomos de tu Pokémon favorito! Más de 200 tipos de Pokémon montables por tierra, mar y aire.",
+    "f3_title": "200+ Monturas",
+    "f4_desc": "¡Desafía a los líderes de gimnasio de Kanto a Sinnoh, colecciona medallas y conviértete en el campeón mundial!",
+    "f4_title": "Gimnasios y Medallas",
+    "f5_desc": "Visualiza ratios de captura y ventajas de tipo en tiempo real durante las batallas.",
+    "f5_title": "HUD de batalla inteligente",
+    "f6_desc": "¿Listo para una Pokédex completa? 1800 espacios de PC te esperan para guardar todos tus Pokémon.",
+    "f6_title": "PC Masivo",
+    "f7_desc": "Una banda sonora dinámica única que cambia durante las batallas y la exploración.",
+    "f7_title": "Música reactiva",
+    "f8_desc": "Docenas de mejoras de QoL y optimizaciones de rendimiento para una experiencia fluida y sin lag.",
+    "f8_title": "Optimizado",
+    "intro": "Cobblemon Universe es un modpack profesional basado en el último Cobblemon 1.7.3, que transforma Minecraft en un verdadero juego de Pokémon.",
+    "title": "¿Por qué Cobblemon Universe?"
+  },
   "hero": {
-    "title": "Cobblemon Universe",
-    "subtitle": "¡La experiencia Pokémon definitiva en Minecraft: más de 1025 Pokémon, Megaevoluciones y aventuras épicas te esperan!"
+    "subtitle": "¡La experiencia Pokémon definitiva en Minecraft: más de 1025 Pokémon, Megaevoluciones y aventuras épicas te esperan!",
+    "title": "Cobblemon Universe"
+  },
+  "instructions": {
+    "text": "¡Haz clic en el botón <strong>Descargar</strong>! El sistema te ofrecerá automáticamente el instalador correcto para tu sistema operativo. Después de la instalación, Cobblemon Universe estará listo para jugar.",
+    "title": "¿Cómo unirse?"
+  },
+  "stats": {
+    "minecraft": "Minecraft",
+    "mods": "Mods instalados",
+    "update": "Próxima actualización"
   },
   "status": {
     "checking": "Comprobando sistema...",
-    "online": "SERVIDOR EN LÍNEA",
-    "offline": "SERVIDOR DESCONECTADO",
-    "launch": "Iniciar juego",
     "download": "Descargar cliente",
+    "download_confirm": "The launcher was not found on your computer. Would you like to download the installer?",
+    "launch": "Iniciar juego",
+    "offline": "SERVIDOR DESCONECTADO",
+    "online": "SERVIDOR EN LÍNEA",
     "os_detected": "Sistema detectado: ",
     "see_all": "¿Buscas otra versión? Ver todas las descargas"
   },
-  "stats": {
-    "mods": "Mods instalados",
-    "minecraft": "Minecraft",
-    "update": "Próxima actualización"
-  },
-  "features": {
-    "title": "¿Por qué Cobblemon Universe?",
-    "intro": "Cobblemon Universe es un modpack profesional basado en el último Cobblemon 1.7.3, que transforma Minecraft en un verdadero juego de Pokémon.",
-    "f1_title": "1025+ Pokémon",
-    "f1_desc": "Todos los Pokémon de cada generación están disponibles, incluidos legendarios y singulares. Sin 'fakemons', solo los clásicos.",
-    "f2_title": "Mega y Tera",
-    "f2_desc": "¡Domina la megaevolución, la terastalización, el Dynamax y los movimientos Z en batallas estratégicas!",
-    "f3_title": "200+ Monturas",
-    "f3_desc": "¡Viaja por el mundo a lomos de tu Pokémon favorito! Más de 200 tipos de Pokémon montables por tierra, mar y aire.",
-    "f4_title": "Gimnasios y Medallas",
-    "f4_desc": "¡Desafía a los líderes de gimnasio de Kanto a Sinnoh, colecciona medallas y conviértete en el campeón mundial!",
-    "f5_title": "HUD de batalla inteligente",
-    "f5_desc": "Visualiza ratios de captura y ventajas de tipo en tiempo real durante las batallas.",
-    "f6_title": "PC Masivo",
-    "f6_desc": "¿Listo para una Pokédex completa? 1800 espacios de PC te esperan para guardar todos tus Pokémon.",
-    "f7_title": "Música reactiva",
-    "f7_desc": "Una banda sonora dinámica única que cambia durante las batallas y la exploración.",
-    "f8_title": "Optimizado",
-    "f8_desc": "Docenas de mejoras de QoL y optimizaciones de rendimiento para una experiencia fluida y sin lag."
-  },
-  "instructions": {
-    "title": "¿Cómo unirse?",
-    "text": "¡Haz clic en el botón <strong>Descargar</strong>! El sistema te ofrecerá automáticamente el instalador correcto para tu sistema operativo. Después de la instalación, Cobblemon Universe estará listo para jugar."
-  },
-  "alternatives": {
-    "title": "Todas las descargas",
-    "text": "¿Buscas otra plataforma?",
-    "win": "Installer (.exe)",
-    "win_portable": "Portable (.exe)",
-    "linux_app": "AppImage",
-    "linux_deb": "Ubuntu/Debian (.deb)",
-    "linux_rpm": "Fedora/SUSE (.rpm)",
-    "linux_tar": "Linux genérico (.tar.gz)",
-    "linux_pacman": "Arch Linux (pacman)",
-    "mac_dmg": "macOS (.dmg)",
-    "mac_zip": "macOS (.zip)",
-    "title": "¿Buscas otra plataforma?",
-    "platform_win": "Windows",
-    "platform_linux": "Linux",
-    "platform_mac": "macOS",
-    "linux_flatpak": "Flatpak"
-  }
+  "title": "Descargar | Cobblemon Universe"
 }
