@@ -179,8 +179,8 @@ function applySkinFromLocal(req, username, res) {
   const host = req.headers['host'] || `localhost:${PORT}`
   const skinPublicUrl = `http://${host}/skins/${username}.png`
 
-  console.log(`[Skins] SR parancs küldése: skin set "${skinPublicUrl}" ${username}`)
-  sendCommand(`skin set "${skinPublicUrl}" ${username}`)
+  console.log(`[Skins] SR parancs küldése: skin set ${username} url "${skinPublicUrl}"`)
+  sendCommand(`skin set ${username} url "${skinPublicUrl}"`)
 
   if (!res.writableEnded) {
     res.writeHead(200, { 'Content-Type': 'application/json' })
