@@ -696,12 +696,14 @@ async function uploadSkinToServer() {
   const serverUrl = $id('input-server-url').value.trim()
   if (!serverUrl) return
 
-  const payload = { username, skinData: currentSkinVal, isUrl: false }
+  const payload = { username, skinData: currentSkinVal, isUrl: false, skinType: currentSkinType }
 
   if (currentSkinType === 'mojang') {
-    // ✅ Send the actual skin TEXTURE URL (64x64 PNG), not the rendered body image
-    payload.skinData = `https://mc-heads.net/skin/${currentSkinVal}`
-    payload.isUrl = true
+    // For Mojang skins: server will use 'skin set mojang <username>' directly
+    // No need to download/re-host the PNG — the mod fetches it from Mojang
+    payload.skinData = currentSkinVal  // just the Mojang username
+    payload.isUrl = false
+    payload.mojangUsername = currentSkinVal
   } else if (currentSkinType === 'url') {
     payload.skinData = currentSkinVal
     payload.isUrl = true

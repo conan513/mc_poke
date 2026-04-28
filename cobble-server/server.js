@@ -171,8 +171,23 @@ function buildManifest() {
 }
 
 /**
- * Applies the saved skin via SkinsRestorer using the server's own skin URL.
- * No external services required – the skin PNG is served directly from this server.
+ * Applies a Mojang skin by username – no external URL hosting needed.
+ * The mod fetches the skin directly from Mojang's CDN.
+ */
+function applySkinMojang(username, mojangUsername, res) {
+  const cmd = `skin set mojang ${mojangUsername} ${username}`
+  console.log(`[Skins] SR parancs küldése (mojang): ${cmd}`)
+  sendCommand(cmd)
+
+  if (!res.writableEnded) {
+    res.writeHead(200, { 'Content-Type': 'application/json' })
+    res.end(JSON.stringify({ success: true, type: 'mojang', skinSource: mojangUsername }))
+  }
+}
+
+/**
+ * Applies a skin from a URL hosted on this server via the MineSkin API.
+ * NOTE: The skin URL must be publicly accessible from the internet (mineskin.org fetches it).
  */
 function applySkinFromLocal(req, username, res) {
   // Derive the public base URL from the incoming request's Host header
@@ -182,7 +197,7 @@ function applySkinFromLocal(req, username, res) {
   // The server runs the Fabric-native "Skin Restorer" mod (slug: skinrestorer, v2.7.x).
   // Its command syntax is: skin set web (classic|slim) "<url>" [<targets>]
   const cmd = `skin set web classic "${skinPublicUrl}" ${username}`
-  console.log(`[Skins] SR parancs küldése: ${cmd}`)
+  console.log(`[Skins] SR parancs küldése (web): ${cmd}`)
   sendCommand(cmd)
 
   if (!res.writableEnded) {
@@ -204,14 +219,23 @@ function handleRequest(req, res) {
 
   // ── Skin Serving (GET /skins/:name.png) ───────────────────
   if (req.method === 'GET' && url.startsWith('/skins/')) {
-    const fileName = path.basename(url)
-    const filePath = path.join(SKINS_DIR, fileName)
-    if (fs.existsSync(filePath)) {
-      res.writeHead(200, { 'Content-Type': 'image/png' })
+    // Clean filename (remove trailing quotes or spaces that might come from copy-paste)
+    const fileName = path.basename(url).replace(/['"\s]/g, '')
+    const filePath = path.resolve(SKINS_DIR, fileName)
+    
+    console.log(`[Skins-GET] Request: ${url} -> Checking path: ${filePath}`)
+
+    if (fs.existsSync(filePath) && fs.statSync(filePath).isFile()) {
+      res.writeHead(200, { 
+        'Content-Type': 'image/png',
+        'Access-Control-Allow-Origin': '*',
+        'Cache-Control': 'public, max-age=3600' 
+      })
       return fs.createReadStream(filePath).pipe(res)
     } else {
-      res.writeHead(404)
-      return res.end()
+      console.warn(`[Skins-GET] 404 - File not found: ${filePath}`)
+      res.writeHead(404, { 'Content-Type': 'application/json' })
+      return res.end(JSON.stringify({ error: 'Skin not found', path: filePath }))
     }
   }
 
@@ -222,14 +246,20 @@ function handleRequest(req, res) {
     req.on('data', chunk => body += chunk)
     req.on('end', () => {
       try {
-        const { username, skinData, isUrl } = JSON.parse(body)
+        const { username, skinData, isUrl, skinType, mojangUsername } = JSON.parse(body)
         if (!username || !skinData) throw new Error('Hiányzó adatok.')
+
+        // ── Mojang skin: no file download needed ─────────────────
+        if (skinType === 'mojang' && mojangUsername) {
+          applySkinMojang(username, mojangUsername, res)
+          return
+        }
 
         const savePath = path.join(SKINS_DIR, `${username}.png`)
 
         const onSaved = () => {
           console.log(`[Skins] Skin mentve: ${username}`)
-          // Apply via SkinsRestorer using this server's own public URL
+          // Apply via SkinRestorer using this server's own public URL
           applySkinFromLocal(req, username, res)
         }
 
