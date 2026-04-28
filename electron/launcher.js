@@ -1027,6 +1027,16 @@ async function launch({ username, ram, serverUrl }, onLog, onClose) {
   // ── Modrinth Individual Mod Updates ──────────────────────────
   await updateModsFromModrinth(onLog)
 
+  // ── Ensure Server is in servers.dat ──────────────────────────
+  if (serverUrl) {
+    try {
+      await updateServersDat(instanceDir, serverUrl)
+      onLog?.(`[Launcher] Szerver lista frissítve: ${serverUrl}`)
+    } catch (e) {
+      onLog?.(`[Launcher-Hiba] Nem sikerült frissíteni a szerver listát: ${e.message}`)
+    }
+  }
+
   const client = new Client()
 
 
@@ -1130,6 +1140,52 @@ async function prepareLocalSkinConfig(instanceDir, username, serverUrl) {
     console.log(`[Launcher] Singleplayer-ben in-game parancs: /skin url ${skinUrl}`)
   } catch (e) {
     console.warn(`[Launcher-Warning] Skin URL log hiba: ${e.message}`)
+  }
+}
+
+/**
+ * Updates or creates the servers.dat file to ensure the target server is in the list.
+ * This writes a raw NBT buffer to avoid heavy dependencies.
+ */
+async function updateServersDat(instanceDir, serverUrl) {
+  try {
+    const url = new URL(serverUrl)
+    const host = url.hostname
+    const name = "Cobbleverse"
+    
+    // Simple NBT buffer builder for a servers.dat with ONE entry
+    const nameBuf = Buffer.from(name, 'utf8')
+    const hostBuf = Buffer.from(host, 'utf8')
+    
+    const parts = [
+      Buffer.from([0x0A, 0x00, 0x00]), // Root Compound
+      Buffer.from([0x09, 0x00, 0x07]), // List Tag "servers"
+      Buffer.from("servers", 'utf8'),
+      Buffer.from([0x0A]),             // Compound Type
+      Buffer.from([0x00, 0x00, 0x00, 0x01]), // List Length: 1
+      
+      Buffer.from([0x0A]),             // Server Compound Start
+      Buffer.from([0x08, 0x00, 0x04]), // String Tag "name"
+      Buffer.from("name", 'utf8'),
+      Buffer.from([Math.floor(nameBuf.length / 256), nameBuf.length % 256]), // Name length
+      nameBuf,
+      
+      Buffer.from([0x08, 0x00, 0x02]), // String Tag "ip"
+      Buffer.from("ip", 'utf8'),
+      Buffer.from([Math.floor(hostBuf.length / 256), hostBuf.length % 256]), // Host length
+      hostBuf,
+      
+      Buffer.from([0x00]),             // End Server Compound
+      Buffer.from([0x00])              // End Root Compound
+    ]
+    
+    const finalBuf = Buffer.concat(parts)
+    const serversDatPath = path.join(instanceDir, 'servers.dat')
+    
+    fs.writeFileSync(serversDatPath, finalBuf)
+  } catch (e) {
+    console.error('[Launcher] servers.dat hiba:', e.message)
+    throw e
   }
 }
 
