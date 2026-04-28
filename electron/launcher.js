@@ -1076,7 +1076,7 @@ async function launch({ username, ram, serverUrl }, onLog, onClose) {
 function isInstalled() {
   const state = readState()
   const modsDir = path.join(getModpackDir(), 'mods')
-  const clientJar = path.join(getGameDir(), 'minecraft', 'versions', MC_VERSION, `${MC_VERSION}.jar`)
+  const clientJar = path.join(getGameDir(), 'versions', MC_VERSION, `${MC_VERSION}.jar`)
   const javaExe = getJavaExecutable()
   const modpackOk = !!state.modpackVersionId && fs.existsSync(modsDir)
   return {
@@ -1149,27 +1149,33 @@ async function prepareLocalSkinConfig(instanceDir, username, serverUrl) {
  */
 async function updateServersDat(instanceDir, serverUrl) {
   try {
-    const zlib = require('zlib')
-    const url = new URL(serverUrl)
-    const host = url.hostname
-    const name = "Cobblemon Universe"
+    let host = "94.72.100.43" // Default fallback
     
+    if (serverUrl && serverUrl.trim() !== '') {
+      try {
+        let cleanUrl = serverUrl.trim()
+        if (!cleanUrl.startsWith('http')) cleanUrl = 'http://' + cleanUrl
+        const url = new URL(cleanUrl)
+        host = url.hostname || serverUrl.trim().split(':')[0]
+      } catch (e) {
+        host = serverUrl.trim().split(':')[0]
+      }
+    }
+
+    const name = "Cobblemon Universe"
     const serversDatPath = path.join(instanceDir, 'servers.dat')
     
     // Check if it already exists and if our host is in there
     if (fs.existsSync(serversDatPath)) {
       try {
         const existingData = fs.readFileSync(serversDatPath)
-        const decompressed = zlib.gunzipSync(existingData)
-        // Simple check: if the host string is anywhere in the NBT, we assume it's already there
-        // This is safer than overwriting and losing other servers.
-        if (decompressed.includes(Buffer.from(host, 'utf8'))) {
-          console.log(`[Launcher] A szerver (${host}) már szerepel a listán, nem módosítom.`)
+        // servers.dat is NOT compressed in modern MC
+        if (existingData.includes(Buffer.from(host, 'utf8'))) {
+          console.log(`[Launcher] A szerver (${host}) mar szerepel a listan.`)
           return
         }
       } catch (e) {
-        // If decompression fails or it's not a valid GZip/NBT, we'll proceed to create a new one
-        console.warn('[Launcher] Meglévő servers.dat beolvasása sikertelen, új létrehozása...')
+        console.warn('[Launcher] Meglevo servers.dat olvasasa sikertelen.')
       }
     }
     
@@ -1212,9 +1218,7 @@ async function updateServersDat(instanceDir, serverUrl) {
     ]
     
     const uncompressed = Buffer.concat(parts)
-    const compressed = zlib.gzipSync(uncompressed)
-    
-    fs.writeFileSync(serversDatPath, compressed)
+    fs.writeFileSync(serversDatPath, uncompressed)
   } catch (e) {
     console.error('[Launcher] servers.dat hiba:', e.message)
   }
