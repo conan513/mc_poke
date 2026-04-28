@@ -89,6 +89,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (btnDownload) {
        btnDownload.href = currentDownloadUrl;
        const btnText = document.getElementById('btn-download-text');
+       if (btnText) {
          btnText.textContent = t('status.download') + " (" + os + ")";
        }
     }
