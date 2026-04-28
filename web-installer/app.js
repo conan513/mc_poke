@@ -156,27 +156,44 @@ document.addEventListener('DOMContentLoaded', () => {
   updateStatus();
 
   // Robust Smooth Scroll (Event Delegation)
+  // Handles both local "#hash" hrefs AND full external URLs that contain a hash
+  // pointing to an element on the current page (e.g. http://host/#alternatives).
   document.addEventListener('click', function (e) {
-    const trigger = e.target.closest('.alt-trigger-link');
-    if (trigger) {
-      e.preventDefault();
-      const targetId = trigger.getAttribute('href').slice(1);
-      const targetElement = document.getElementById(targetId);
-      
-      if (targetElement) {
-        // Method 1: Smooth scroll
-        window.scrollTo({
-          top: targetElement.offsetTop - 20,
-          behavior: 'smooth'
-        });
-        
-        // Method 2: Fallback jump if smooth scroll is blocked/slow
-        setTimeout(() => {
-          if (Math.abs(window.pageYOffset - (targetElement.offsetTop - 20)) > 100) {
-            targetElement.scrollIntoView();
-          }
-        }, 500);
-      }
+    const trigger = e.target.closest('a[href]');
+    if (!trigger) return;
+
+    const href = trigger.getAttribute('href') || '';
+
+    // Determine the hash fragment (works for both "#foo" and "http://.../#foo")
+    let hash = '';
+    if (href.startsWith('#')) {
+      hash = href.slice(1);
+    } else {
+      try {
+        const url = new URL(href, window.location.href);
+        // Only intercept if the hash fragment resolves to an element on THIS page
+        if (url.hash) hash = url.hash.slice(1);
+      } catch (_) { /* invalid URL, ignore */ }
     }
+
+    if (!hash) return;
+
+    const targetElement = document.getElementById(hash);
+    if (!targetElement) return;
+
+    // We have a matching on-page element → smooth scroll instead of navigating
+    e.preventDefault();
+
+    window.scrollTo({
+      top: targetElement.offsetTop - 20,
+      behavior: 'smooth'
+    });
+
+    // Fallback: if smooth scroll is blocked/slow, jump directly
+    setTimeout(() => {
+      if (Math.abs(window.pageYOffset - (targetElement.offsetTop - 20)) > 100) {
+        targetElement.scrollIntoView();
+      }
+    }, 600);
   });
 });
