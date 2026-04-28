@@ -2,6 +2,7 @@ const { app, BrowserWindow, ipcMain, shell } = require('electron')
 const path = require('path')
 const fs = require('fs')
 const launcher = require('./launcher')
+const { setupAutoUpdater } = require('./auto-updater')
 
 const isDev = process.env.NODE_ENV === 'development' || !app.isPackaged
 
@@ -95,6 +96,9 @@ function createWindow() {
   } else {
     mainWindow.loadFile(path.join(__dirname, '../dist/index.html'))
   }
+
+  // Initialize auto-updater
+  setupAutoUpdater(mainWindow)
 }
 
 app.whenReady().then(() => {

@@ -437,8 +437,11 @@ animateParticles()
     const savedUrl = localStorage.getItem('cobble_server_url')
     if (savedUrl) {
       $id('input-server-url').value = savedUrl
+      window.cobble.setUpdateServerUrl(savedUrl)
     } else {
-      $id('input-server-url').value = 'http://94.72.100.43:8080'
+      const defaultUrl = 'http://94.72.100.43:8080'
+      $id('input-server-url').value = defaultUrl
+      window.cobble.setUpdateServerUrl(defaultUrl)
     }
 
     const savedRam = localStorage.getItem('cobble_ram')
@@ -455,7 +458,11 @@ animateParticles()
     try { localStorage.setItem('cobble_username', e.target.value.trim()) } catch(e2) {}
   })
   $id('input-server-url').addEventListener('input', (e) => {
-    try { localStorage.setItem('cobble_server_url', e.target.value.trim()) } catch(e2) {}
+    const url = e.target.value.trim()
+    try { localStorage.setItem('cobble_server_url', url) } catch(e2) {}
+    if (url.startsWith('http')) {
+      window.cobble.setUpdateServerUrl(url)
+    }
   })
   document.querySelectorAll('.ram-btn').forEach(btn => {
     btn.addEventListener('click', () => {

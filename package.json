@@ -18,7 +18,9 @@
   "dependencies": {
     "adm-zip": "^0.5.16",
     "extract-zip": "^2.0.1",
+    "electron-log": "^5.2.4",
     "fs-extra": "^11.3.0",
+    "electron-updater": "^6.3.9",
     "minecraft-launcher-core": "^3.18.2",
     "node-fetch": "^3.3.2",
     "punycode": "^2.3.1"
@@ -34,6 +36,12 @@
     "appId": "hu.cobblemonuniverse.launcher",
     "productName": "Cobblemon-Universe",
     "copyright": "Copyright © 2026 Cobbleverse",
+    "publish": [
+      {
+        "provider": "generic",
+        "url": "http://94.72.100.43:8080/releases/"
+      }
+    ],
     "asar": true,
     "protocols": {
       "name": "Cobble Protocol",
