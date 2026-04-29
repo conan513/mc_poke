@@ -675,35 +675,89 @@ function renderVisualEditor() {
   
   let html = ''
   let foundSettings = 0
+  let currentComments = []
   
-  // RegEx minták (Támogatja: JSON, TOML, Properties)
-  // Példák: "key": true, key = false, key=123, "key": "value"
+  let inArray = false
+  let arrayKey = ''
+  let arrayStartIndex = -1
+  let arrayItems = []
+  
+  // RegEx minták
   const boolRegex = /^(\s*"?([a-zA-Z0-9_\-\.]+)"?\s*[:=]\s*)(true|false)(\s*,?.*)$/i
   const numRegex = /^(\s*"?([a-zA-Z0-9_\-\.]+)"?\s*[:=]\s*)(-?[0-9]*\.?[0-9]+)(\s*,?.*)$/
   const strRegex = /^(\s*"?([a-zA-Z0-9_\-\.]+)"?\s*[:=]\s*)"([^"]*)"(\s*,?.*)$/
+  const arrayStartRegex = /^(\s*"?([a-zA-Z0-9_\-\.]+)"?\s*[:=]\s*\[)\s*$/
   
   lines.forEach((line, index) => {
-    // Kiszűrjük a tiszta kommenteket (bár néha a sor végén is van komment)
-    if (line.trim().startsWith('//') || line.trim().startsWith('#')) return
+    // 1. Tömb (Array) feldolgozása
+    if (inArray) {
+      if (line.trim() === ']' || line.trim() === '],') {
+        html += `<div class="config-ui-row">
+          <div class="config-ui-label" title="${arrayKey}">
+            <div class="config-ui-label-title">${arrayKey}</div>
+            ${currentComments.length ? `<div class="config-ui-desc">${currentComments.join('\n')}</div>` : ''}
+          </div>
+          <textarea class="config-ui-textarea" data-start="${arrayStartIndex}" data-end="${index}" data-type="array">${arrayItems.join('\n')}</textarea>
+        </div>`
+        currentComments = []
+        inArray = false
+        foundSettings++
+        return
+      }
+      
+      // Tömb elem megtisztítása (idézőjelek, vesszők eltávolítása)
+      let item = line.trim()
+      item = item.replace(/,$/, '').replace(/^"(.*)"$/, '$1').replace(/^'(.*)'$/, '$1')
+      if (item) arrayItems.push(item)
+      return
+    }
     
-    let match, type, key, val, prefix, suffix
+    // 2. Üres sor törli az eddigi kommenteket
+    if (!line.trim()) {
+      currentComments = []
+      return
+    }
     
+    // 3. Komment sorok felismerése és kigyűjtése
+    const commentMatch = line.match(/^\s*(\/\/|#)\s*(.*)$/)
+    if (commentMatch) {
+      currentComments.push(commentMatch[2])
+      return
+    }
+    
+    // 4. Tömb kezdetének felismerése
+    let match
+    if ((match = line.match(arrayStartRegex))) {
+      inArray = true
+      arrayKey = match[2]
+      arrayStartIndex = index
+      arrayItems = []
+      return
+    }
+    
+    // 5. Szimpla értékek felismerése
+    let type, key, val
     if ((match = line.match(boolRegex))) {
-      type = 'boolean'; prefix = match[1]; key = match[2]; val = match[3].toLowerCase() === 'true'; suffix = match[4];
+      type = 'boolean'; key = match[2]; val = match[3].toLowerCase() === 'true';
     } else if ((match = line.match(numRegex))) {
-      type = 'number'; prefix = match[1]; key = match[2]; val = match[3]; suffix = match[4];
+      type = 'number'; key = match[2]; val = match[3];
     } else if ((match = line.match(strRegex))) {
-      type = 'string'; prefix = match[1]; key = match[2]; val = match[3]; suffix = match[4];
+      type = 'string'; key = match[2]; val = match[3];
     } else {
-      return // Nem felismert sor (pl. bracket, array)
+      return // Nem felismert sor
     }
     
     foundSettings++
     
     html += `<div class="config-ui-row">
-      <div class="config-ui-label" title="${key}">${key}</div>
+      <div class="config-ui-label" title="${key}">
+        <div class="config-ui-label-title">${key}</div>
+        ${currentComments.length ? `<div class="config-ui-desc">${currentComments.join('\n')}</div>` : ''}
+      </div>
       ${renderInput(type, val, index)}
     </div>`
+    
+    currentComments = [] // Felhasználtuk a kommentet, ürítjük
   })
   
   if (foundSettings === 0) {
@@ -711,10 +765,9 @@ function renderVisualEditor() {
   } else {
     container.innerHTML = html
     
-    // Eseménykezelők felcsatolása
-    container.querySelectorAll('input').forEach(input => {
+    container.querySelectorAll('input, textarea').forEach(input => {
       input.addEventListener('change', (e) => {
-        updateRawText(parseInt(e.target.dataset.line), e.target.type === 'checkbox' ? e.target.checked : e.target.value, e.target.dataset.type)
+        updateRawText(e.target)
       })
     })
   }
@@ -733,8 +786,33 @@ function renderInput(type, value, lineIndex) {
   }
 }
 
-function updateRawText(lineIndex, newValue, type) {
+function updateRawText(target) {
+  const type = target.dataset.type
   const lines = $id('config-textarea').value.split('\n')
+  
+  if (type === 'array') {
+    const startLine = parseInt(target.dataset.start)
+    const endLine = parseInt(target.dataset.end)
+    const prefixLine = lines[startLine]
+    
+    // Azonosítjuk a behúzást (indentációt)
+    const indent = prefixLine.match(/^\s*/)[0] + '\t' // Minecraft configok általában tabot vagy dupla szóközt használnak
+    
+    // Új elemek generálása
+    const items = target.value.split('\n').map(i => i.trim()).filter(i => i)
+    const formattedItems = items.map((item, i) => `${indent}"${item}"${i < items.length - 1 ? ',' : ''}`)
+    
+    // Régi elemek cseréje az újakra (splice)
+    lines.splice(startLine + 1, endLine - startLine - 1, ...formattedItems)
+    
+    $id('config-textarea').value = lines.join('\n')
+    renderVisualEditor() // Újra kell rajzolni, mert megváltozhattak a sor indexek (data-line)
+    return
+  }
+  
+  // Szimpla értékek frissítése
+  const lineIndex = parseInt(target.dataset.line)
+  const newValue = type === 'boolean' ? target.checked : target.value
   let line = lines[lineIndex]
   
   const boolRegex = /^(\s*"?([a-zA-Z0-9_\-\.]+)"?\s*[:=]\s*)(true|false)(\s*,?.*)$/i
