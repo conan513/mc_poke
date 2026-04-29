@@ -168,6 +168,10 @@
         <div class="config-editor-area">
           <div id="config-editor-header" class="config-editor-header hidden">
             <span id="config-current-file">Kiválasztott fájl: nincs</span>
+            <div class="config-view-toggles">
+              <button id="btn-view-visual" class="btn-view active">UI Nézet</button>
+              <button id="btn-view-code" class="btn-view">Nyers Kód</button>
+            </div>
             <div class="config-actions">
               <button id="btn-config-save" class="btn-success">Mentés</button>
             </div>
@@ -176,6 +180,7 @@
             <div id="config-placeholder" class="config-placeholder">
               Kérlek válassz ki egy fájlt a bal oldali listából a szerkesztéshez.
             </div>
+            <div id="config-visual-editor" class="config-visual-editor hidden"></div>
             <textarea id="config-textarea" class="config-textarea hidden" spellcheck="false" wrap="off"></textarea>
           </div>
         </div>

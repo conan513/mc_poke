@@ -715,3 +715,112 @@ select option { background: #1a1a2e; }
 .config-textarea:focus {
   outline: none;
 }
+
+/* ── Config Visual Editor ── */
+.config-view-toggles {
+  display: flex;
+  gap: 4px;
+  background: var(--bg);
+  padding: 4px;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+}
+.btn-view {
+  background: transparent;
+  color: var(--text-muted);
+  border: none;
+  border-radius: 6px;
+  padding: 6px 12px;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: 0.2s;
+}
+.btn-view:hover { color: var(--text-primary); }
+.btn-view.active {
+  background: var(--surface);
+  color: var(--accent-blue);
+  box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+}
+
+.config-visual-editor {
+  flex: 1;
+  overflow-y: auto;
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.config-ui-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: var(--surface);
+  padding: 14px 20px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  gap: 20px;
+}
+
+.config-ui-label {
+  flex: 1;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 14px;
+  color: #e2e8f0;
+  word-break: break-word;
+}
+
+.config-ui-input {
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 8px 12px;
+  color: var(--text-primary);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 13px;
+  min-width: 150px;
+  max-width: 300px;
+  outline: none;
+}
+.config-ui-input:focus { border-color: var(--accent-blue); }
+
+/* Switch Toggle */
+.switch {
+  position: relative;
+  display: inline-block;
+  width: 44px;
+  height: 24px;
+  flex-shrink: 0;
+}
+.switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+.slider {
+  position: absolute;
+  cursor: pointer;
+  inset: 0;
+  background-color: rgba(255,255,255,0.1);
+  transition: .3s;
+  border-radius: 24px;
+}
+.slider:before {
+  position: absolute;
+  content: "";
+  height: 18px;
+  width: 18px;
+  left: 3px;
+  bottom: 3px;
+  background-color: var(--text-muted);
+  transition: .3s;
+  border-radius: 50%;
+}
+input:checked + .slider {
+  background-color: var(--accent-blue);
+}
+input:checked + .slider:before {
+  transform: translateX(20px);
+  background-color: white;
+}

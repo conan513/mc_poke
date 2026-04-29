@@ -615,16 +615,36 @@ function renderConfigList() {
 
 $id('config-search').addEventListener('input', renderConfigList)
 
-async function openConfig(filename) {
-  if (activeConfigFile && activeConfigFile !== filename) {
-    // Lehetne dirty state ellenőrzés is, de most egyelőre egyszerűen váltunk
+let activeConfigView = 'visual' // 'visual' vagy 'code'
+
+$id('btn-view-visual').addEventListener('click', () => setConfigView('visual'))
+$id('btn-view-code').addEventListener('click', () => setConfigView('code'))
+
+function setConfigView(view) {
+  activeConfigView = view
+  $id('btn-view-visual').classList.toggle('active', view === 'visual')
+  $id('btn-view-code').classList.toggle('active', view === 'code')
+  
+  if (view === 'visual') {
+    $id('config-textarea').classList.add('hidden')
+    $id('config-visual-editor').classList.remove('hidden')
+    renderVisualEditor()
+  } else {
+    $id('config-textarea').classList.remove('hidden')
+    $id('config-visual-editor').classList.add('hidden')
   }
+}
+
+async function openConfig(filename) {
+  if (activeConfigFile && activeConfigFile !== filename) { }
   
   activeConfigFile = filename
-  renderConfigList() // Hogy a kijelölés (active class) frissüljön
+  renderConfigList()
   
   $id('config-editor-header').classList.remove('hidden')
   $id('config-textarea').classList.add('hidden')
+  $id('config-visual-editor').classList.add('hidden')
+  
   $id('config-placeholder').classList.remove('hidden')
   $id('config-placeholder').innerHTML = '<div class="loading-spinner"></div> Betöltés...'
   
@@ -638,12 +658,99 @@ async function openConfig(filename) {
     })
     
     $id('config-placeholder').classList.add('hidden')
-    $id('config-textarea').classList.remove('hidden')
     $id('config-textarea').value = data.content
+    
+    setConfigView(activeConfigView)
     
   } catch (e) {
     $id('config-placeholder').innerHTML = `<span style="color:red">Hiba a fájl olvasásakor: ${e.message}</span>`
   }
+}
+
+// ── Smart Regex Visual Editor ──
+function renderVisualEditor() {
+  const container = $id('config-visual-editor')
+  const text = $id('config-textarea').value
+  const lines = text.split('\n')
+  
+  let html = ''
+  let foundSettings = 0
+  
+  // RegEx minták (Támogatja: JSON, TOML, Properties)
+  // Példák: "key": true, key = false, key=123, "key": "value"
+  const boolRegex = /^(\s*"?([a-zA-Z0-9_\-\.]+)"?\s*[:=]\s*)(true|false)(\s*,?.*)$/i
+  const numRegex = /^(\s*"?([a-zA-Z0-9_\-\.]+)"?\s*[:=]\s*)(-?[0-9]*\.?[0-9]+)(\s*,?.*)$/
+  const strRegex = /^(\s*"?([a-zA-Z0-9_\-\.]+)"?\s*[:=]\s*)"([^"]*)"(\s*,?.*)$/
+  
+  lines.forEach((line, index) => {
+    // Kiszűrjük a tiszta kommenteket (bár néha a sor végén is van komment)
+    if (line.trim().startsWith('//') || line.trim().startsWith('#')) return
+    
+    let match, type, key, val, prefix, suffix
+    
+    if ((match = line.match(boolRegex))) {
+      type = 'boolean'; prefix = match[1]; key = match[2]; val = match[3].toLowerCase() === 'true'; suffix = match[4];
+    } else if ((match = line.match(numRegex))) {
+      type = 'number'; prefix = match[1]; key = match[2]; val = match[3]; suffix = match[4];
+    } else if ((match = line.match(strRegex))) {
+      type = 'string'; prefix = match[1]; key = match[2]; val = match[3]; suffix = match[4];
+    } else {
+      return // Nem felismert sor (pl. bracket, array)
+    }
+    
+    foundSettings++
+    
+    html += `<div class="config-ui-row">
+      <div class="config-ui-label" title="${key}">${key}</div>
+      ${renderInput(type, val, index)}
+    </div>`
+  })
+  
+  if (foundSettings === 0) {
+    container.innerHTML = '<div style="color:var(--text-muted);text-align:center;padding:40px">Ebből a fájlból nem sikerült vizuálisan szerkeszthető értékeket kinyerni. Használd a "Nyers Kód" nézetet!</div>'
+  } else {
+    container.innerHTML = html
+    
+    // Eseménykezelők felcsatolása
+    container.querySelectorAll('input').forEach(input => {
+      input.addEventListener('change', (e) => {
+        updateRawText(parseInt(e.target.dataset.line), e.target.type === 'checkbox' ? e.target.checked : e.target.value, e.target.dataset.type)
+      })
+    })
+  }
+}
+
+function renderInput(type, value, lineIndex) {
+  if (type === 'boolean') {
+    return `<label class="switch">
+      <input type="checkbox" data-line="${lineIndex}" data-type="boolean" ${value ? 'checked' : ''}>
+      <span class="slider"></span>
+    </label>`
+  } else if (type === 'number') {
+    return `<input type="number" class="config-ui-input" data-line="${lineIndex}" data-type="number" step="any" value="${value}">`
+  } else {
+    return `<input type="text" class="config-ui-input" data-line="${lineIndex}" data-type="string" value="${value.replace(/"/g, '&quot;')}">`
+  }
+}
+
+function updateRawText(lineIndex, newValue, type) {
+  const lines = $id('config-textarea').value.split('\n')
+  let line = lines[lineIndex]
+  
+  const boolRegex = /^(\s*"?([a-zA-Z0-9_\-\.]+)"?\s*[:=]\s*)(true|false)(\s*,?.*)$/i
+  const numRegex = /^(\s*"?([a-zA-Z0-9_\-\.]+)"?\s*[:=]\s*)(-?[0-9]*\.?[0-9]+)(\s*,?.*)$/
+  const strRegex = /^(\s*"?([a-zA-Z0-9_\-\.]+)"?\s*[:=]\s*)"([^"]*)"(\s*,?.*)$/
+  
+  if (type === 'boolean') {
+    line = line.replace(boolRegex, `$1${newValue ? 'true' : 'false'}$4`)
+  } else if (type === 'number') {
+    line = line.replace(numRegex, `$1${newValue}$4`)
+  } else if (type === 'string') {
+    line = line.replace(strRegex, `$1"${newValue}"$4`)
+  }
+  
+  lines[lineIndex] = line
+  $id('config-textarea').value = lines.join('\n')
 }
 
 $id('btn-config-save').addEventListener('click', async () => {
