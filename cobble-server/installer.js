@@ -818,6 +818,19 @@ async function install() {
   // 7. Modrinth Mod Updates
   await updateModsFromModrinth()
 
+  // Regenerate .modpack-files.json from the actual current mods folder.
+  // updateModsFromModrinth() may have replaced jars (e.g. 4.0.2 → 4.0.3),
+  // so the old filenames in .modpack-files.json would be stale, causing a
+  // false integrity failure and a full reinstall on every subsequent startup.
+  if (fs.existsSync(MODS_DIR)) {
+    const currentJars = fs.readdirSync(MODS_DIR).filter(f => f.endsWith('.jar'))
+    fs.writeFileSync(
+      path.join(SERVER_DIR, '.modpack-files.json'),
+      JSON.stringify(currentJars, null, 2)
+    )
+    logInfo(`[Installer] .modpack-files.json frissítve (${currentJars.length} mod).`)
+  }
+
   state.lastCheckTime = Date.now()
   state.blacklistedMods = JSON.stringify(BLACKLISTED_MODS)
   state.extraMods = JSON.stringify(EXTRA_MODS.map(m => m.slug))
