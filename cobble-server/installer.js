@@ -28,8 +28,11 @@ const SERVER_DIR = path.join(__dirname, 'server-data')
 const MODS_DIR = path.join(SERVER_DIR, 'mods')
 
 const BLACKLISTED_MODS = [
-  'no hunger', 'mobsbegone', 'no ender dragon', 'soundsbegone', 
-  'interactic', 'custom-splash-screen', 'customsplashscreen', 'battlecam', 'lenientdeath'
+  'no hunger', 'mobsbegone', 'no ender dragon', 'soundsbegone',
+  'interactic', 'custom-splash-screen', 'customsplashscreen', 'battlecam', 'lenientdeath',
+  // libjf-unsafe-v0 (any version) conflicts with fabric-resource-loader-v0's LanguageMixin
+  // causing a fatal ASM injection error on startup. glitchcore brings it in transitively.
+  'libjf-unsafe-v0',
 ];
 
 const JAVA_URLS = {
@@ -399,11 +402,10 @@ const EXTRA_MODS = [
   { slug: 'accessories',                    loaders: ['fabric'], gameVersions: [MC_VERSION] }, // trainer-accessories
   { slug: 'geckolib',                       loaders: ['fabric'], gameVersions: [MC_VERSION] }, // trainer-accessories
   { slug: 'collective',                     loaders: ['fabric'], gameVersions: [MC_VERSION] }, // village-spawn-point
-  { slug: 'glitchcore',                     loaders: ['fabric'], gameVersions: [MC_VERSION] }, // serene-seasons
+  // NOTE: glitchcore removed — it transitively installs libjf-unsafe-v0 which fatally
+  // conflicts with fabric-resource-loader-v0's LanguageMixin. serene-seasons does not
+  // actually require glitchcore (its real deps: Fabric API + optional Cloth Config).
   { slug: 'forge-config-api-port',          loaders: ['fabric'], gameVersions: [MC_VERSION] }, // seasonhud-fabric
-  // libjf-unsafe-v0: pulled in by glitchcore/serene-seasons. v3.17.5 has a known ASM conflict
-  // with fabric-resource-loader-v0's LanguageMixin — keeping it updated avoids the crash.
-  { slug: 'libjf-unsafe-v0',               loaders: ['fabric'], gameVersions: [MC_VERSION] },
 ];
 
 /**
