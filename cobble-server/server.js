@@ -99,8 +99,18 @@ setInterval(() => {
 
 function startMinecraft() {
   if (mcStatus === 'running' || !activeJavaPath) return
-  console.log('[Minecraft] Szerver indítása (java -jar fabric-server-launch.jar nogui)...')
-  mcProcess = spawn(activeJavaPath, ['-Xmx4G', '-Xms2G', '-jar', 'fabric-server-launch.jar', 'nogui'], {
+  console.log('[Minecraft] Szerver indítása (Aikar\\'s flags, 8GB RAM)...')
+  const javaArgs = [
+    '-Xmx8G', '-Xms2G',
+    '-XX:+UseG1GC', '-XX:+ParallelRefProcEnabled', '-XX:MaxGCPauseMillis=200',
+    '-XX:+UnlockExperimentalVMOptions', '-XX:+DisableExplicitGC', '-XX:G1NewSizePercent=30',
+    '-XX:G1MaxNewSizePercent=40', '-XX:G1HeapRegionSize=8M', '-XX:G1ReservePercent=20',
+    '-XX:G1HeapWastePercent=5', '-XX:G1MixedGCCountTarget=4', '-XX:InitiatingHeapOccupancyPercent=15',
+    '-XX:G1MixedGCLiveThresholdPercent=90', '-XX:G1RSetUpdatingPauseTimePercent=5',
+    '-XX:SurvivorRatio=32', '-XX:+PerfDisableSharedMem', '-XX:MaxTenuringThreshold=1',
+    '-jar', 'fabric-server-launch.jar', 'nogui'
+  ]
+  mcProcess = spawn(activeJavaPath, javaArgs, {
     cwd: DATA_DIR,
     stdio: ['pipe', 'inherit', 'inherit']
   })
@@ -128,6 +138,20 @@ function stopMinecraft() {
 }
 
 // ── Manifest builder ─────────────────────────────────────────
+
+let cachedManifest = null
+
+function getManifest() {
+  if (!cachedManifest) {
+    console.log('[Manifest] Új manifest generálása és gyorsítótárazása...')
+    cachedManifest = buildManifest()
+  }
+  return cachedManifest
+}
+
+function invalidateManifest() {
+  cachedManifest = null
+}
 
 function buildManifest() {
   const getFilesRecursive = (dir, baseDir = dir) => {
@@ -399,7 +423,7 @@ function handleRequest(req, res) {
     }
 
     // Egyébként marad a JSON manifest (kompatibilitás miatt)
-    const manifest = buildManifest()
+    const manifest = getManifest()
     const info = {
       server: 'CobbleServer',
       status: mcStatus,
@@ -450,7 +474,7 @@ function handleRequest(req, res) {
   if (url === '/manifest') {
     let manifest
     try {
-      manifest = buildManifest()
+      manifest = getManifest()
     } catch (err) {
       res.writeHead(500, { 'Content-Type': 'application/json' })
       res.end(JSON.stringify({ error: err.message }))
@@ -500,7 +524,7 @@ function handleRequest(req, res) {
 
   // ── Admin API ─────────────────────────────────────────────
   if (url === '/admin/api/mods') {
-    const manifest = buildManifest()
+    const manifest = getManifest()
     let baseFiles = []
     try {
       baseFiles = JSON.parse(fs.readFileSync(path.join(DATA_DIR, '.modpack-files.json'), 'utf8'))
@@ -531,6 +555,7 @@ function handleRequest(req, res) {
         if (filename && !filename.includes('..')) {
           const fp = path.join(MODS_DIR, filename)
           if (fs.existsSync(fp)) fs.unlinkSync(fp)
+          invalidateManifest()
           res.writeHead(200, { 'Content-Type': 'application/json' })
           res.end(JSON.stringify({ success: true }))
         } else {
@@ -635,6 +660,7 @@ function handleRequest(req, res) {
                 const oldPath = path.join(MODS_DIR, oldFilename)
                 if (fs.existsSync(oldPath)) fs.unlinkSync(oldPath)
               }
+              invalidateManifest()
               res.writeHead(200, { 'Content-Type': 'application/json' })
               res.end(JSON.stringify({ success: true, filename: file.filename }))
             }).catch(e => {
@@ -761,6 +787,7 @@ function scheduleNightlyRestart() {
     try {
       const javaPath = await installer.install()
       activeJavaPath = javaPath
+      invalidateManifest()
       const msgDone = '[Scheduler] ✅ Updates complete, restarting Minecraft...'
       console.log(msgDone)
       fs.appendFileSync(path.join(DATA_DIR, 'updater.log'), `[${new Date().toISOString()}] ${msgDone}\n`)
@@ -783,6 +810,7 @@ async function start() {
   try {
     // 1. Install / Update Modpack and Fabric Server
     const javaPath = await installer.install()
+    invalidateManifest()
     
     // 2. Start HTTP Sync Server
     const server = http.createServer(handleRequest)

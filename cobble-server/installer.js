@@ -391,6 +391,8 @@ async function ensureExtraMods() {
     { slug: 'cobblemon-farmers',              loaders: ['fabric'], gameVersions: [MC_VERSION] },
     { slug: 'cobblemon-auto-battle',          loaders: ['fabric'], gameVersions: [MC_VERSION] },
     { slug: 'cobblemon_expeditions',          loaders: ['fabric'], gameVersions: [MC_VERSION] },
+    { slug: 'distanthorizons',                loaders: ['fabric'], gameVersions: [MC_VERSION] },
+    { slug: 'serene-seasons-x-distant-horizons', loaders: ['fabric'], gameVersions: [MC_VERSION] },
     // Függőségek (dependencies)
     { slug: 'cloth-config',                   loaders: ['fabric'], gameVersions: [MC_VERSION] }, // player-locator-plus
     { slug: 'farmers-delight',                loaders: ['fabric'], gameVersions: [MC_VERSION] }, // cobblemon-farmers
@@ -709,7 +711,7 @@ async function install() {
     logInfo('[Installer] EULA automatikusan elfogadva.')
   }
 
-  // 3b. server.properties – online-mode=false (offline mód) biztosítása
+  // 3b. server.properties – optimalizált beállítások (offline mód, view-distance)
   const serverPropsPath = path.join(SERVER_DIR, 'server.properties')
   if (!fs.existsSync(serverPropsPath)) {
     // A fájl még nem létezik (első indítás előtt) – létrehozzuk a minimális beállításokkal
@@ -723,21 +725,44 @@ async function install() {
       'max-players=20',
       'motd=CobbleVerse Server',
       'spawn-protection=0',
+      'view-distance=8',
+      'simulation-distance=6'
     ].join('\n') + '\n')
-    logInfo('[Installer] server.properties létrehozva (online-mode=false).')
+    logInfo('[Installer] server.properties létrehozva (online-mode=false, DH optimalizált).')
   } else {
-    // A fájl már létezik – meggyőzödünk róla, hogy online-mode=false
+    // A fájl már létezik – beállítások ellenőrzése
     let props = fs.readFileSync(serverPropsPath, 'utf8')
+    let modified = false
+    
     if (/^online-mode\s*=\s*true/m.test(props)) {
       props = props.replace(/^online-mode\s*=\s*true/m, 'online-mode=false')
-      fs.writeFileSync(serverPropsPath, props)
-      logInfo('[Installer] server.properties: online-mode=true → false (offline mód bekapcsolva).')
+      modified = true
     } else if (!/^online-mode\s*=/m.test(props)) {
-      // Nincs benne online-mode sor egyáltalán – hozzáadjuk
-      fs.writeFileSync(serverPropsPath, props.trimEnd() + '\nonline-mode=false\n')
-      logInfo('[Installer] server.properties: online-mode=false sor hozzáadva.')
+      props = props.trimEnd() + '\nonline-mode=false\n'
+      modified = true
+    }
+
+    if (/^view-distance\s*=\s*(?!8$).*/m.test(props)) {
+      props = props.replace(/^view-distance\s*=.*/m, 'view-distance=8')
+      modified = true
+    } else if (!/^view-distance\s*=/m.test(props)) {
+      props = props.trimEnd() + '\nview-distance=8\n'
+      modified = true
+    }
+
+    if (/^simulation-distance\s*=\s*(?!6$).*/m.test(props)) {
+      props = props.replace(/^simulation-distance\s*=.*/m, 'simulation-distance=6')
+      modified = true
+    } else if (!/^simulation-distance\s*=/m.test(props)) {
+      props = props.trimEnd() + '\nsimulation-distance=6\n'
+      modified = true
+    }
+
+    if (modified) {
+      fs.writeFileSync(serverPropsPath, props)
+      logInfo('[Installer] server.properties frissítve (offline mód, view/simulation distance DH-hoz).')
     } else {
-      logInfo('[Installer] server.properties: online-mode már false, nincs teendő.')
+      logInfo('[Installer] server.properties megfelelő, nincs teendő.')
     }
   }
 
