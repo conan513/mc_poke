@@ -387,6 +387,7 @@ async function ensureExtraMods() {
     { slug: 'seasonhud-fabric',               loaders: ['fabric'], gameVersions: [MC_VERSION] },
     // Új modok (felhasználói kérés)
     { slug: 'pneumono_gravestones',           loaders: ['fabric'], gameVersions: [MC_VERSION] },
+    { slug: 'pneumono_core',                  loaders: ['fabric'], gameVersions: [MC_VERSION] },
     { slug: 'lootr',                          loaders: ['fabric'], gameVersions: [MC_VERSION] },
     { slug: 'lootrmon',                       loaders: ['fabric'], gameVersions: [MC_VERSION] },
     { slug: 'cobblemon-farmers',              loaders: ['fabric'], gameVersions: [MC_VERSION] },
