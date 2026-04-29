@@ -27,6 +27,12 @@ const FABRIC_INSTALLER_META_URL = 'https://meta.fabricmc.net/v2/versions/install
 const SERVER_DIR = path.join(__dirname, 'server-data')
 const MODS_DIR = path.join(SERVER_DIR, 'mods')
 
+const BLACKLISTED_MODS = [
+  'no hunger', 'mobsbegone', 'no ender dragon', 'soundsbegone', 
+  'interactic', 'custom-splash-screen', 'customsplashscreen', 'battlecam',
+  'immediatelyfast', 'sodium', 'c2me'
+];
+
 const JAVA_URLS = {
   linux_x64: 'https://github.com/adoptium/temurin21-binaries/releases/download/jdk-21.0.5%2B11/OpenJDK21U-jdk_x64_linux_hotspot_21.0.5_11.tar.gz',
   linux_arm64: 'https://github.com/adoptium/temurin21-binaries/releases/download/jdk-21.0.5%2B11/OpenJDK21U-jdk_aarch64_linux_hotspot_21.0.5_11.tar.gz',
@@ -440,12 +446,11 @@ async function ensureExtraMods() {
  * Removes any mods that are on the blacklist from the mods folder.
  */
 async function cleanupBlacklistedMods() {
-  const blacklist = ['no hunger', 'mobsbegone', 'no ender dragon', 'soundsbegone', 'interactic', 'custom-splash-screen', 'customsplashscreen', 'battlecam'];
   if (fs.existsSync(MODS_DIR)) {
     const files = fs.readdirSync(MODS_DIR);
     for (const file of files) {
       const lower = file.toLowerCase();
-      if (blacklist.some(b => lower.includes(b))) {
+      if (BLACKLISTED_MODS.some(b => lower.includes(b))) {
         logInfo(`[Installer] Feketelistás mod törlése: ${file}`);
         try {
           fs.unlinkSync(path.join(MODS_DIR, file));
@@ -563,7 +568,7 @@ async function install() {
       for (const entry of zip.getEntries()) {
         if (entry.isDirectory) continue
         const lowerName = entry.entryName.toLowerCase()
-        if (lowerName.includes('no hunger') || lowerName.includes('mobsbegone') || lowerName.includes('no ender dragon') || lowerName.includes('soundsbegone') || lowerName.includes('interactic') || lowerName.includes('custom-splash-screen') || lowerName.includes('customsplashscreen')) continue
+        if (BLACKLISTED_MODS.some(b => lowerName.includes(b))) continue
 
         let destPath = null
         if (entry.entryName.startsWith('server-overrides/')) {
@@ -583,7 +588,7 @@ async function install() {
       const serverFiles = files.filter(f => {
         if (f.env && f.env.server === 'unsupported') return false
         const lowerPath = f.path.toLowerCase()
-        if (lowerPath.includes('no hunger') || lowerPath.includes('mobsbegone') || lowerPath.includes('no ender dragon') || lowerPath.includes('soundsbegone') || lowerPath.includes('interactic') || lowerPath.includes('custom-splash-screen') || lowerPath.includes('customsplashscreen')) return false
+        if (BLACKLISTED_MODS.some(b => lowerPath.includes(b))) return false
         return true
       })
       
