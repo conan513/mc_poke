@@ -29,7 +29,7 @@ const MODS_DIR = path.join(SERVER_DIR, 'mods')
 
 const BLACKLISTED_MODS = [
   'no hunger', 'mobsbegone', 'no ender dragon', 'soundsbegone', 
-  'interactic', 'custom-splash-screen', 'customsplashscreen', 'battlecam'
+  'interactic', 'custom-splash-screen', 'customsplashscreen', 'battlecam', 'lenientdeath'
 ];
 
 const JAVA_URLS = {
@@ -386,6 +386,7 @@ async function ensureExtraMods() {
     { slug: 'serene-seasons',                 loaders: ['fabric'], gameVersions: [MC_VERSION] },
     { slug: 'seasonhud-fabric',               loaders: ['fabric'], gameVersions: [MC_VERSION] },
     // Új modok (felhasználói kérés)
+    { slug: 'pneumono_gravestones',           loaders: ['fabric'], gameVersions: [MC_VERSION] },
     { slug: 'lootr',                          loaders: ['fabric'], gameVersions: [MC_VERSION] },
     { slug: 'lootrmon',                       loaders: ['fabric'], gameVersions: [MC_VERSION] },
     { slug: 'cobblemon-farmers',              loaders: ['fabric'], gameVersions: [MC_VERSION] },
