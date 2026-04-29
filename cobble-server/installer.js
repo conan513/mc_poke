@@ -362,53 +362,54 @@ async function updateModsFromModrinth() {
  * returns no results and a wrong version is downloaded. We therefore query
  * SkinsRestorer WITHOUT a loader filter but WITH a game_version constraint.
  */
-async function ensureExtraMods() {
-  // Each entry: slug, optional loaders array, optional gameVersions array
-  // 'skinrestorer' (ghrZDhGW) is the FABRIC-native mod (v2.7.x) – distinct from
-  // 'skinsrestorer' which is the bukkit/spigot plugin (v15.x).
-  const extraMods = [
-    { slug: 'chipped',                        loaders: ['fabric'], gameVersions: [MC_VERSION] },
-    { slug: 'terrablender',                   loaders: ['fabric'], gameVersions: [MC_VERSION] },
-    { slug: 'skinrestorer',                   loaders: ['fabric'], gameVersions: [MC_VERSION] },
-    // Cobblemon extra mods
-    { slug: 'player-locator-plus',            loaders: ['fabric'], gameVersions: [MC_VERSION] },
-    { slug: 'cobblemon-mount-mastery',        loaders: ['fabric'], gameVersions: [MC_VERSION] },
-    { slug: 'cobblemon-smartphone',           loaders: ['fabric'], gameVersions: [MC_VERSION] },
-    { slug: 'trainer-accessories',            loaders: ['fabric'], gameVersions: [MC_VERSION] },
-    { slug: 'cobblemon-rankeds',              loaders: ['fabric'], gameVersions: [MC_VERSION] },
-    { slug: 'more-cobblemon-stats',           loaders: ['fabric'], gameVersions: [MC_VERSION] },
-    { slug: 'cobblemon-max-level-catch-cap',  loaders: ['fabric'], gameVersions: [MC_VERSION] },
-    { slug: 'cobblemon-capture-notification', loaders: ['fabric'], gameVersions: [MC_VERSION] },
-    { slug: 'cobblemon-rustling-spots',       loaders: ['fabric'], gameVersions: [MC_VERSION] },
-    { slug: 'cobblemon-cobbled-levels',       loaders: ['fabric'], gameVersions: [MC_VERSION] },
-    { slug: 'village-spawn-point',            loaders: ['fabric'], gameVersions: [MC_VERSION] },
-    { slug: 'easyauth',                       loaders: ['fabric'], gameVersions: [MC_VERSION] },
-    { slug: 'serene-seasons',                 loaders: ['fabric'], gameVersions: [MC_VERSION] },
-    { slug: 'seasonhud-fabric',               loaders: ['fabric'], gameVersions: [MC_VERSION] },
-    // Új modok (felhasználói kérés)
-    { slug: 'pneumono_gravestones',           loaders: ['fabric'], gameVersions: [MC_VERSION] },
-    { slug: 'pneumono_core',                  loaders: ['fabric'], gameVersions: [MC_VERSION] },
-    { slug: 'lootr',                          loaders: ['fabric'], gameVersions: [MC_VERSION] },
-    { slug: 'lootrmon',                       loaders: ['fabric'], gameVersions: [MC_VERSION] },
-    { slug: 'cobblemon-farmers',              loaders: ['fabric'], gameVersions: [MC_VERSION] },
-    { slug: 'cobblemon-auto-battle',          loaders: ['fabric'], gameVersions: [MC_VERSION] },
-    { slug: 'cobblemon_expeditions',          loaders: ['fabric'], gameVersions: [MC_VERSION] },
-    { slug: 'distanthorizons',                loaders: ['fabric'], gameVersions: [MC_VERSION] },
-    { slug: 'serene-seasons-x-distant-horizons', loaders: ['fabric'], gameVersions: [MC_VERSION] },
-    // Függőségek (dependencies)
-    { slug: 'cloth-config',                   loaders: ['fabric'], gameVersions: [MC_VERSION] }, // player-locator-plus
-    { slug: 'farmers-delight',                loaders: ['fabric'], gameVersions: [MC_VERSION] }, // cobblemon-farmers
-    { slug: 'expandability',                  loaders: ['fabric'], gameVersions: [MC_VERSION] }, // cobblemon_expeditions
-    { slug: 'trainerattributeslib',           loaders: ['fabric'], gameVersions: [MC_VERSION] }, // trainer-accessories
-    { slug: 'accessories',                    loaders: ['fabric'], gameVersions: [MC_VERSION] }, // trainer-accessories
-    { slug: 'geckolib',                       loaders: ['fabric'], gameVersions: [MC_VERSION] }, // trainer-accessories
-    { slug: 'collective',                     loaders: ['fabric'], gameVersions: [MC_VERSION] }, // village-spawn-point
-    { slug: 'glitchcore',                     loaders: ['fabric'], gameVersions: [MC_VERSION] }, // serene-seasons
-    { slug: 'forge-config-api-port',          loaders: ['fabric'], gameVersions: [MC_VERSION] }, // seasonhud-fabric
-  ];
-  logInfo(`[Modrinth] Extra modok ellenőrzése: ${extraMods.map(m => m.slug).join(', ')}...`);
+const EXTRA_MODS = [
+  { slug: 'chipped',                        loaders: ['fabric'], gameVersions: [MC_VERSION] },
+  { slug: 'terrablender',                   loaders: ['fabric'], gameVersions: [MC_VERSION] },
+  { slug: 'skinrestorer',                   loaders: ['fabric'], gameVersions: [MC_VERSION] },
+  // Cobblemon extra mods
+  { slug: 'player-locator-plus',            loaders: ['fabric'], gameVersions: [MC_VERSION] },
+  { slug: 'cobblemon-mount-mastery',        loaders: ['fabric'], gameVersions: [MC_VERSION] },
+  { slug: 'cobblemon-smartphone',           loaders: ['fabric'], gameVersions: [MC_VERSION] },
+  { slug: 'trainer-accessories',            loaders: ['fabric'], gameVersions: [MC_VERSION] },
+  { slug: 'cobblemon-rankeds',              loaders: ['fabric'], gameVersions: [MC_VERSION] },
+  { slug: 'more-cobblemon-stats',           loaders: ['fabric'], gameVersions: [MC_VERSION] },
+  { slug: 'cobblemon-max-level-catch-cap',  loaders: ['fabric'], gameVersions: [MC_VERSION] },
+  { slug: 'cobblemon-capture-notification', loaders: ['fabric'], gameVersions: [MC_VERSION] },
+  { slug: 'cobblemon-rustling-spots',       loaders: ['fabric'], gameVersions: [MC_VERSION] },
+  { slug: 'cobblemon-cobbled-levels',       loaders: ['fabric'], gameVersions: [MC_VERSION] },
+  { slug: 'village-spawn-point',            loaders: ['fabric'], gameVersions: [MC_VERSION] },
+  { slug: 'easyauth',                       loaders: ['fabric'], gameVersions: [MC_VERSION] },
+  { slug: 'serene-seasons',                 loaders: ['fabric'], gameVersions: [MC_VERSION] },
+  { slug: 'seasonhud-fabric',               loaders: ['fabric'], gameVersions: [MC_VERSION] },
+  // Új modok (felhasználói kérés)
+  { slug: 'pneumono_gravestones',           loaders: ['fabric'], gameVersions: [MC_VERSION] },
+  { slug: 'pneumono_core',                  loaders: ['fabric'], gameVersions: [MC_VERSION] },
+  { slug: 'lootr',                          loaders: ['fabric'], gameVersions: [MC_VERSION] },
+  { slug: 'lootrmon',                       loaders: ['fabric'], gameVersions: [MC_VERSION] },
+  { slug: 'cobblemon-farmers',              loaders: ['fabric'], gameVersions: [MC_VERSION] },
+  { slug: 'cobblemon-auto-battle',          loaders: ['fabric'], gameVersions: [MC_VERSION] },
+  { slug: 'cobblemon_expeditions',          loaders: ['fabric'], gameVersions: [MC_VERSION] },
+  { slug: 'distanthorizons',                loaders: ['fabric'], gameVersions: [MC_VERSION] },
+  { slug: 'serene-seasons-x-distant-horizons', loaders: ['fabric'], gameVersions: [MC_VERSION] },
+  // Függőségek (dependencies)
+  { slug: 'cloth-config',                   loaders: ['fabric'], gameVersions: [MC_VERSION] }, // player-locator-plus
+  { slug: 'farmers-delight',                loaders: ['fabric'], gameVersions: [MC_VERSION] }, // cobblemon-farmers
+  { slug: 'expandability',                  loaders: ['fabric'], gameVersions: [MC_VERSION] }, // cobblemon_expeditions
+  { slug: 'trainerattributeslib',           loaders: ['fabric'], gameVersions: [MC_VERSION] }, // trainer-accessories
+  { slug: 'accessories',                    loaders: ['fabric'], gameVersions: [MC_VERSION] }, // trainer-accessories
+  { slug: 'geckolib',                       loaders: ['fabric'], gameVersions: [MC_VERSION] }, // trainer-accessories
+  { slug: 'collective',                     loaders: ['fabric'], gameVersions: [MC_VERSION] }, // village-spawn-point
+  { slug: 'glitchcore',                     loaders: ['fabric'], gameVersions: [MC_VERSION] }, // serene-seasons
+  { slug: 'forge-config-api-port',          loaders: ['fabric'], gameVersions: [MC_VERSION] }, // seasonhud-fabric
+];
 
-  for (const { slug, loaders, gameVersions } of extraMods) {
+/**
+ * Ensures specific extra mods are present.
+ */
+async function ensureExtraMods() {
+  logInfo(`[Modrinth] Extra modok ellenőrzése: ${EXTRA_MODS.map(m => m.slug).join(', ')}...`);
+
+  for (const { slug, loaders, gameVersions } of EXTRA_MODS) {
     try {
       const params = [];
       if (loaders)      params.push(`loaders=${encodeURIComponent(JSON.stringify(loaders))}`);
@@ -540,6 +541,13 @@ async function verifyIntegrity(state) {
     }
   }
 
+  // 6. Extra mods list check
+  const currentExtraMods = JSON.stringify(EXTRA_MODS.map(m => m.slug))
+  if (state.extraMods !== currentExtraMods) {
+    console.warn('[Installer] Extra modok listája megváltozott, frissítés szükséges.')
+    return false
+  }
+
   return true
 }
 
@@ -562,11 +570,18 @@ async function install() {
   if (fs.existsSync(stateFile)) state = JSON.parse(fs.readFileSync(stateFile, 'utf8'))
 
   const integrityOk = await verifyIntegrity(state)
+  const lastCheck = state.lastCheckTime || 0
+  const isFresh = (Date.now() - lastCheck) < 12 * 3600 * 1000 // 12 órán belüli ellenőrzés "friss"
 
-  if (state.modpackId === latestPack.id && integrityOk) {
-    logInfo(`[Installer] Modpack (${latestPack.version_number}) és alap fájlok rendben.`)
+  if (state.modpackId === latestPack.id && integrityOk && isFresh) {
+    logInfo(`[Installer] Modpack (${latestPack.version_number}) és alap fájlok rendben. (Utolsó ellenőrzés: ${new Date(lastCheck).toLocaleString('hu-HU')})`)
+    return javaPath
   } else {
-    logInfo(`[Installer] Új modpack telepítése: ${latestPack.version_number}`)
+    if (state.modpackId === latestPack.id && integrityOk) {
+      logInfo(`[Installer] Modpack verzió egyezik, de frissítések ellenőrzése szükséges...`)
+    } else {
+      logInfo(`[Installer] Új modpack telepítése: ${latestPack.version_number}`)
+    }
     const mrpackPath = path.join(SERVER_DIR, 'modpack.mrpack')
     const MODS_STAGING = path.join(SERVER_DIR, 'mods.new')
     const MODS_BACKUP = path.join(SERVER_DIR, 'mods.old')
@@ -657,6 +672,8 @@ async function install() {
 
       state.modpackId = latestPack.id
       state.blacklistedMods = JSON.stringify(BLACKLISTED_MODS)
+      state.extraMods = JSON.stringify(EXTRA_MODS.map(m => m.slug))
+      state.lastCheckTime = Date.now()
       fs.writeFileSync(stateFile, JSON.stringify(state, null, 2))
       logInfo('[Installer] Modpack frissítés sikeres.')
 
@@ -811,7 +828,12 @@ async function install() {
   // 7. Modrinth Mod Updates
   await updateModsFromModrinth()
 
-  logInfo('[Installer] Telepítés sikeres! Minden készen áll.')
+  state.lastCheckTime = Date.now()
+  state.blacklistedMods = JSON.stringify(BLACKLISTED_MODS)
+  state.extraMods = JSON.stringify(EXTRA_MODS.map(m => m.slug))
+  fs.writeFileSync(stateFile, JSON.stringify(state, null, 2))
+
+  logInfo('[Installer] Telepítés/frissítés sikeres! Minden készen áll.')
 
   return javaPath
 }
