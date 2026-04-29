@@ -383,11 +383,8 @@ const EXTRA_MODS = [
   { slug: 'cobblemon-cobbled-levels',       loaders: ['fabric'], gameVersions: [MC_VERSION] },
   { slug: 'village-spawn-point',            loaders: ['fabric'], gameVersions: [MC_VERSION] },
   { slug: 'easyauth',                       loaders: ['fabric'], gameVersions: [MC_VERSION] },
-  // NOTE: serene-seasons stack REMOVED (serene-seasons, seasonhud-fabric,
-  // serene-seasons-x-distant-horizons, forge-config-api-port).
-  // serene-seasons has a REQUIRED dependency on glitchcore (confirmed via Modrinth API),
-  // which installs libjf-unsafe-v0, which fatally crashes the server.
-  // The whole stack must stay off until a version of glitchcore without libjf-unsafe is released.
+  { slug: 'serene-seasons',                 loaders: ['fabric'], gameVersions: [MC_VERSION] },
+  { slug: 'seasonhud-fabric',               loaders: ['fabric'], gameVersions: [MC_VERSION] },
   // Új modok (felhasználói kérés)
   { slug: 'pneumono_gravestones',           loaders: ['fabric'], gameVersions: [MC_VERSION] },
   { slug: 'pneumono_core',                  loaders: ['fabric'], gameVersions: [MC_VERSION] },
@@ -396,7 +393,7 @@ const EXTRA_MODS = [
   { slug: 'cobblemon-farmers',              loaders: ['fabric'], gameVersions: [MC_VERSION] },
   { slug: 'cobblemon-auto-battle',          loaders: ['fabric'], gameVersions: [MC_VERSION] },
   { slug: 'cobblemon_expeditions',          loaders: ['fabric'], gameVersions: [MC_VERSION] },
-  { slug: 'distanthorizons',                loaders: ['fabric'], gameVersions: [MC_VERSION] },
+  // distanthorizons ELTÁVOLÍTVA (felhasználói kérés) — serene-seasons-x-distant-horizons szintén
   // Függőségek (dependencies)
   { slug: 'cloth-config',                   loaders: ['fabric'], gameVersions: [MC_VERSION] }, // player-locator-plus
   { slug: 'farmers-delight',                loaders: ['fabric'], gameVersions: [MC_VERSION] }, // cobblemon-farmers
@@ -405,6 +402,8 @@ const EXTRA_MODS = [
   { slug: 'accessories',                    loaders: ['fabric'], gameVersions: [MC_VERSION] }, // trainer-accessories
   { slug: 'geckolib',                       loaders: ['fabric'], gameVersions: [MC_VERSION] }, // trainer-accessories
   { slug: 'collective',                     loaders: ['fabric'], gameVersions: [MC_VERSION] }, // village-spawn-point
+  { slug: 'glitchcore',                     loaders: ['fabric'], gameVersions: [MC_VERSION] }, // serene-seasons (kötelező dep)
+  { slug: 'forge-config-api-port',          loaders: ['fabric'], gameVersions: [MC_VERSION] }, // seasonhud-fabric
 ];
 
 /**
