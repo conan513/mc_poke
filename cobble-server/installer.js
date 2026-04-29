@@ -27,6 +27,11 @@ const FABRIC_INSTALLER_META_URL = 'https://meta.fabricmc.net/v2/versions/install
 const SERVER_DIR = path.join(__dirname, 'server-data')
 const MODS_DIR = path.join(SERVER_DIR, 'mods')
 
+const BLACKLISTED_MODS = [
+  'no hunger', 'mobsbegone', 'no ender dragon', 'soundsbegone', 
+  'interactic', 'custom-splash-screen', 'customsplashscreen', 'battlecam'
+];
+
 const JAVA_URLS = {
   linux_x64: 'https://github.com/adoptium/temurin21-binaries/releases/download/jdk-21.0.5%2B11/OpenJDK21U-jdk_x64_linux_hotspot_21.0.5_11.tar.gz',
   linux_arm64: 'https://github.com/adoptium/temurin21-binaries/releases/download/jdk-21.0.5%2B11/OpenJDK21U-jdk_aarch64_linux_hotspot_21.0.5_11.tar.gz',
@@ -438,12 +443,11 @@ async function ensureExtraMods() {
  * Removes any mods that are on the blacklist from the mods folder.
  */
 async function cleanupBlacklistedMods() {
-  const blacklist = ['no hunger', 'mobsbegone', 'no ender dragon', 'soundsbegone', 'interactic', 'custom-splash-screen', 'customsplashscreen', 'battlecam'];
   if (fs.existsSync(MODS_DIR)) {
     const files = fs.readdirSync(MODS_DIR);
     for (const file of files) {
       const lower = file.toLowerCase();
-      if (blacklist.some(b => lower.includes(b))) {
+      if (BLACKLISTED_MODS.some(b => lower.includes(b))) {
         logInfo(`[Installer] Feketelistás mod törlése: ${file}`);
         try {
           fs.unlinkSync(path.join(MODS_DIR, file));
@@ -508,6 +512,30 @@ async function verifyIntegrity(state) {
     return false
   }
 
+  // 4. Blacklist change check
+  const currentBlacklist = JSON.stringify(BLACKLISTED_MODS)
+  if (state.blacklistedMods !== currentBlacklist) {
+    console.warn('[Installer] Feketelista megváltozott, modpack frissítése szükséges.')
+    return false
+  }
+
+  // 5. Detailed file check based on .modpack-files.json
+  const modpackFilesPath = path.join(SERVER_DIR, '.modpack-files.json')
+  if (fs.existsSync(modpackFilesPath)) {
+    try {
+      const expectedFiles = JSON.parse(fs.readFileSync(modpackFilesPath, 'utf8'))
+      for (const file of expectedFiles) {
+        if (!fs.existsSync(path.join(MODS_DIR, file))) {
+          console.warn(`[Installer] Hiányzó modpack fájl észlelve: ${file}, modpack újratelepítése szükséges.`)
+          return false
+        }
+      }
+    } catch (e) {
+      console.warn('[Installer] Hiba a .modpack-files.json olvasásakor, újratelepítés javasolt.')
+      return false
+    }
+  }
+
   return true
 }
 
@@ -561,7 +589,7 @@ async function install() {
       for (const entry of zip.getEntries()) {
         if (entry.isDirectory) continue
         const lowerName = entry.entryName.toLowerCase()
-        if (lowerName.includes('no hunger') || lowerName.includes('mobsbegone') || lowerName.includes('no ender dragon') || lowerName.includes('soundsbegone') || lowerName.includes('interactic') || lowerName.includes('custom-splash-screen') || lowerName.includes('customsplashscreen')) continue
+        if (BLACKLISTED_MODS.some(b => lowerName.includes(b))) continue
 
         let destPath = null
         if (entry.entryName.startsWith('server-overrides/')) {
@@ -581,7 +609,7 @@ async function install() {
       const serverFiles = files.filter(f => {
         if (f.env && f.env.server === 'unsupported') return false
         const lowerPath = f.path.toLowerCase()
-        if (lowerPath.includes('no hunger') || lowerPath.includes('mobsbegone') || lowerPath.includes('no ender dragon') || lowerPath.includes('soundsbegone') || lowerPath.includes('interactic') || lowerPath.includes('custom-splash-screen') || lowerPath.includes('customsplashscreen')) return false
+        if (BLACKLISTED_MODS.some(b => lowerPath.includes(b))) return false
         return true
       })
       
@@ -624,6 +652,7 @@ async function install() {
       if (fs.existsSync(MODS_BACKUP)) fs.rmSync(MODS_BACKUP, { recursive: true, force: true })
 
       state.modpackId = latestPack.id
+      state.blacklistedMods = JSON.stringify(BLACKLISTED_MODS)
       fs.writeFileSync(stateFile, JSON.stringify(state, null, 2))
       logInfo('[Installer] Modpack frissítés sikeres.')
 
