@@ -39,6 +39,7 @@ const MODS_DIR = DIRS['mods']
 
 const PUBLIC_DIR = path.join(__dirname, 'public')
 const WEB_INSTALLER_DIR = path.join(__dirname, '..', 'web-installer')
+const DIST_DIR = path.join(__dirname, '..', 'dist')
 
 let mcProcess = null
 let mcStatus = 'stopped'
@@ -416,6 +417,46 @@ function handleRequest(req, res) {
   // ── Auth guard – minden /admin/api/* végpont védelme ─────────
   if (url.startsWith('/admin/api/')) {
     if (!checkAuth(req, res)) return
+  }
+
+  // ── Serve Launcher App (at /app) ───────────────────────────
+  if (url === '/app' || url === '/app/' || url === '/app/index.html') {
+    const filePath = path.join(DIST_DIR, 'index.html')
+    if (fs.existsSync(filePath)) {
+      res.writeHead(200, { 'Content-Type': 'text/html' })
+      fs.createReadStream(filePath).pipe(res)
+      return
+    }
+  }
+
+  // Handle assets for /app (e.g. /app/assets/...)
+  if (url.startsWith('/app/')) {
+    const relPath = url.slice(5) // remove /app/
+    const filePath = path.join(DIST_DIR, relPath)
+    if (!relPath.includes('..') && fs.existsSync(filePath) && fs.statSync(filePath).isFile()) {
+      const ext = path.extname(relPath)
+      const mimeTypes = { 
+        '.html': 'text/html',
+        '.css': 'text/css', 
+        '.js': 'application/javascript',
+        '.png': 'image/png',
+        '.jpg': 'image/jpeg',
+        '.svg': 'image/svg+xml',
+        '.json': 'application/json',
+        '.ico': 'image/x-icon',
+        '.woff': 'font/woff',
+        '.woff2': 'font/woff2',
+        '.ttf': 'font/ttf'
+      }
+      // Add aggressive caching for images and fonts
+      const isAsset = ['.png', '.jpg', '.jpeg', '.svg', '.woff', '.woff2', '.ttf'].includes(ext)
+      res.writeHead(200, { 
+        'Content-Type': mimeTypes[ext] || 'application/octet-stream',
+        'Cache-Control': isAsset ? 'public, max-age=31536000, immutable' : 'no-cache'
+      })
+      fs.createReadStream(filePath).pipe(res)
+      return
+    }
   }
 
   // ── Root / Landing Page ───────────────────────────────────

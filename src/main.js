@@ -47,6 +47,12 @@ function updateUI() {
     const key = el.getAttribute('data-i18n')
     el.innerHTML = t(key)
   })
+
+  // Update dynamic player name
+  const nameDisplay = $id('player-name-display')
+  if (nameDisplay) {
+    nameDisplay.textContent = username || t('home.trainer_placeholder')
+  }
   document.querySelectorAll('[data-i18n-title]').forEach(el => {
     const key = el.getAttribute('data-i18n-title')
     el.title = t(key)

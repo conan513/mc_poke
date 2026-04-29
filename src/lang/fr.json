@@ -31,7 +31,8 @@
     "download_required": "Téléchargement requis",
     "update_btn": "Mettre à jour",
     "console_btn": "Console",
-    "files_btn": "Fichiers"
+    "files_btn": "Fichiers",
+    "trainer_placeholder": "Dresseur"
   },
   "toast": {
     "username_short": "Le pseudo doit faire au moins 3 caractères !",

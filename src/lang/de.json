@@ -31,7 +31,8 @@
     "download_required": "Download erforderlich",
     "update_btn": "Update",
     "console_btn": "Konsole",
-    "files_btn": "Dateien"
+    "files_btn": "Dateien",
+    "trainer_placeholder": "Trainer"
   },
   "toast": {
     "username_short": "Benutzername muss mindestens 3 Zeichen lang sein!",

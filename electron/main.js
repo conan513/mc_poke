@@ -90,12 +90,26 @@ function createWindow() {
     },
   })
 
+  const remoteUrl = 'http://94.72.100.43:8080/app'
+  const localFile = path.join(__dirname, '../dist/index.html')
+
   if (isDev) {
     mainWindow.loadURL('http://localhost:5173')
     // mainWindow.webContents.openDevTools()
   } else {
-    mainWindow.loadFile(path.join(__dirname, '../dist/index.html'))
+    mainWindow.loadURL(remoteUrl).catch(() => {
+      console.log('[Electron] Remote UI load failed, falling back to local file.')
+      mainWindow.loadFile(localFile)
+    })
   }
+
+  // Handle load failures (e.g. server down or no internet)
+  mainWindow.webContents.on('did-fail-load', (event, errorCode, errorDescription, validatedURL) => {
+    if (validatedURL === remoteUrl) {
+      console.warn(`[Electron] Failed to load remote UI: ${errorDescription} (${errorCode})`)
+      mainWindow.loadFile(localFile)
+    }
+  })
 
   // Initialize auto-updater
   setupAutoUpdater(mainWindow)
