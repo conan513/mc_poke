@@ -198,8 +198,9 @@ function buildManifest() {
     manifest.folders[f] = manifest[f].length
   })
 
-  // Provide a convenient modCount property (number of files in the 'mods' folder)
-  manifest.modCount = (manifest['mods'] || []).length
+  // Provide a convenient modCount property (number of .jar files in the 'mods' folder)
+  const allMods = manifest['mods'] || []
+  manifest.modCount = allMods.filter(f => f.filename.endsWith('.jar')).length
 
   return manifest
 }

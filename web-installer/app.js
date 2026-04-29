@@ -148,7 +148,8 @@ document.addEventListener('DOMContentLoaded', () => {
       try {
         const res = await fetch('/manifest');
         const data = await res.json();
-        modsData = data.mods || [];
+        // Csak a .jar fájlokat tekintjük modnak a listában
+        modsData = (data.mods || []).filter(m => m.filename.endsWith('.jar'));
         renderModList();
       } catch (e) {
         modListContent.innerHTML = '<p style="text-align:center;color:var(--accent-red)">Hiba a lista betöltésekor.</p>';
