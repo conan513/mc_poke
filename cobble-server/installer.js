@@ -669,7 +669,7 @@ async function install() {
     }
   } else if (isFresh) {
     logInfo(`[Installer] Modpack (${latestPack.version_number}) rendben. (Utolsó ellenőrzés: ${new Date(lastCheck).toLocaleString('hu-HU')})`)
-    return javaPath
+    // Csak a modpack letöltést ugorjuk át, de a lenti cleanup/extra mods részekre továbbmegyünk
   } else {
     logInfo(`[Installer] Modpack verzió egyezik, de frissítések ellenőrzése szükséges...`)
   }
