@@ -573,11 +573,44 @@ function renderConfigList() {
     return
   }
   
-  listEl.innerHTML = filtered.map(f => `
-    <div class="config-item ${f === activeConfigFile ? 'active' : ''}" onclick="openConfig('${f}')" title="${f}">
-      📄 ${f}
-    </div>
-  `).join('')
+  // Csoportosítás a fő mappa alapján
+  const groups = {}
+  filtered.forEach(f => {
+    const parts = f.split('/')
+    const groupName = parts.length > 1 ? parts[0] : 'Gyökér mappa'
+    if (!groups[groupName]) groups[groupName] = []
+    
+    // Csak a mappanév utáni részt jelenítjük meg (hogy ne ismétlődjön)
+    const displayName = parts.length > 1 ? parts.slice(1).join('/') : f
+    
+    groups[groupName].push({
+      fullPath: f,
+      displayName: displayName
+    })
+  })
+  
+  // Rendezés: mappák abc sorrendben, 'Gyökér mappa' a végén
+  const sortedGroups = Object.keys(groups).sort((a, b) => {
+    if (a === 'Gyökér mappa') return 1
+    if (b === 'Gyökér mappa') return -1
+    return a.localeCompare(b)
+  })
+  
+  let html = ''
+  sortedGroups.forEach(g => {
+    html += `
+      <div class="config-group">
+        <div class="config-group-title">📂 ${g}</div>
+        ${groups[g].map(file => `
+          <div class="config-item ${file.fullPath === activeConfigFile ? 'active' : ''}" onclick="openConfig('${file.fullPath}')" title="${file.fullPath}">
+            📄 ${file.displayName}
+          </div>
+        `).join('')}
+      </div>
+    `
+  })
+  
+  listEl.innerHTML = html
 }
 
 $id('config-search').addEventListener('input', renderConfigList)
