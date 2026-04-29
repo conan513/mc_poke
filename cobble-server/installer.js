@@ -30,7 +30,7 @@ const MODS_DIR = path.join(SERVER_DIR, 'mods')
 const BLACKLISTED_MODS = [
   'no hunger', 'mobsbegone', 'no ender dragon', 'soundsbegone', 
   'interactic', 'custom-splash-screen', 'customsplashscreen', 'battlecam',
-  'immediatelyfast', 'sodium', 'c2me'
+  'immediatelyfast', 'sodium', 'c2me', 'iris'
 ];
 
 const JAVA_URLS = {
