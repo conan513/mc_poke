@@ -99,7 +99,7 @@ setInterval(() => {
 
 function startMinecraft() {
   if (mcStatus === 'running' || !activeJavaPath) return
-  console.log('[Minecraft] Szerver indítása (Aikar\\'s flags, 8GB RAM)...')
+  console.log("[Minecraft] Szerver indítása (Aikar's flags, 8GB RAM)...")
   const javaArgs = [
     '-Xmx8G', '-Xms2G',
     '-XX:+UseG1GC', '-XX:+ParallelRefProcEnabled', '-XX:MaxGCPauseMillis=200',
