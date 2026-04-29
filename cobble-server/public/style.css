@@ -661,6 +661,8 @@ select option { background: #1a1a2e; }
   flex-direction: column;
   background: rgba(0,0,0,0.1);
   position: relative;
+  min-height: 0;
+  min-width: 0;
 }
 
 .config-editor-header {
@@ -683,6 +685,9 @@ select option { background: #1a1a2e; }
   flex: 1;
   position: relative;
   display: flex;
+  flex-direction: column;
+  min-height: 0;
+  min-width: 0;
 }
 
 .config-placeholder {
