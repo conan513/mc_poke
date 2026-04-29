@@ -401,6 +401,9 @@ const EXTRA_MODS = [
   { slug: 'collective',                     loaders: ['fabric'], gameVersions: [MC_VERSION] }, // village-spawn-point
   { slug: 'glitchcore',                     loaders: ['fabric'], gameVersions: [MC_VERSION] }, // serene-seasons
   { slug: 'forge-config-api-port',          loaders: ['fabric'], gameVersions: [MC_VERSION] }, // seasonhud-fabric
+  // libjf-unsafe-v0: pulled in by glitchcore/serene-seasons. v3.17.5 has a known ASM conflict
+  // with fabric-resource-loader-v0's LanguageMixin — keeping it updated avoids the crash.
+  { slug: 'libjf-unsafe-v0',               loaders: ['fabric'], gameVersions: [MC_VERSION] },
 ];
 
 /**
