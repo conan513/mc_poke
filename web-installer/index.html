@@ -6,7 +6,7 @@
   <title>Letöltés | CobbleLauncher</title>
   <meta name="description" content="Töltsd le a Cobblemon Universe-t és csatlakozz a szerverhez egyetlen kattintással.">
   <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;700;800&family=Inter:wght@400;500&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="style.css?v=1.2">
+  <link rel="stylesheet" href="style.css?v=1.3">
 </head>
 <body>
 
@@ -72,7 +72,7 @@
           <span class="stat-label" data-i18n="stats.mods">Telepített Mod</span>
         </div>
         <div class="stat-item">
-          <a href="https://cobblemon.com/wiki" target="_blank" class="stat-link-wrapper">
+          <a href="https://minecraft.wiki/w/Java_Edition_1.21.1" target="_blank" class="stat-link-wrapper">
             <span class="stat-value" id="stat-version">1.21.1</span>
             <span class="stat-label" data-i18n="stats.minecraft">Minecraft</span>
           </a>
@@ -260,20 +260,22 @@
         </div>
 
       </div>
-    <div class="modal-overlay" id="mod-modal">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h2 data-i18n="modal.mods_title">Telepített Modok</h2>
-          <button class="modal-close" id="modal-close">&times;</button>
-        </div>
-        <div class="modal-body" id="mod-list-container">
-          <div class="loading-spinner"></div>
-        </div>
-      </div>
-    </div>
+    </div> <!-- alternatives -->
 
   </div> <!-- main-content -->
 
-  <script src="app.js?v=1.3"></script>
+  <div class="modal-overlay" id="mod-modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2 data-i18n="modal.mods_title">Telepített Modok</h2>
+        <button class="modal-close" id="modal-close">&times;</button>
+      </div>
+      <div class="modal-body" id="mod-list-container">
+        <div class="loading-spinner"></div>
+      </div>
+    </div>
+  </div>
+
+  <script src="app.js?v=1.5"></script>
 </body>
 </html>
