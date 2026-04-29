@@ -45,6 +45,9 @@ let mcStatus = 'stopped'
 let activeJavaPath = null
 let nextRestartTime = null
 
+// Játékosok nyomon követése
+const onlinePlayers = new Set()
+
 // Ensure sync directories exist
 SYNC_FOLDERS.forEach(f => {
   fs.mkdirSync(DIRS[f], { recursive: true })
@@ -102,14 +105,30 @@ function startMinecraft() {
   console.log('[Minecraft] Szerver indítása (java -jar fabric-server-launch.jar nogui)...')
   mcProcess = spawn(activeJavaPath, ['-Xmx4G', '-Xms2G', '-jar', 'fabric-server-launch.jar', 'nogui'], {
     cwd: DATA_DIR,
-    stdio: ['pipe', 'inherit', 'inherit']
+    stdio: ['pipe', 'pipe', 'inherit'] // stdout 'pipe', hogy tudjuk olvasni a játékos csatlakozásokat
   })
   mcStatus = 'running'
   
+  mcProcess.stdout.on('data', (data) => {
+    process.stdout.write(data) // Továbbítjuk a konzolra
+    
+    const lines = data.toString().split('\n')
+    for (const line of lines) {
+      // "Herobrine joined the game"
+      const joinMatch = line.match(/:\s+([a-zA-Z0-9_]{3,16})\s+joined the game/)
+      if (joinMatch) onlinePlayers.add(joinMatch[1])
+      
+      // "Herobrine left the game"
+      const leaveMatch = line.match(/:\s+([a-zA-Z0-9_]{3,16})\s+left the game/)
+      if (leaveMatch) onlinePlayers.delete(leaveMatch[1])
+    }
+  })
+
   mcProcess.on('close', (code) => {
     console.log(`[Minecraft] Szerver leállt (kód: ${code}).`)
     mcStatus = 'stopped'
     mcProcess = null
+    onlinePlayers.clear()
   })
 }
 
@@ -420,11 +439,24 @@ function handleRequest(req, res) {
       port: PORT,
       modCount: manifest.modCount,
       modsDir: MODS_DIR,
-      endpoints: ['/manifest', '/mods/:filename'],
+      endpoints: ['/manifest', '/mods/:filename', '/api/status'],
       nextRestart: nextRestartTime,
+      playersOnline: onlinePlayers.size,
+      players: Array.from(onlinePlayers)
     }
     res.writeHead(200, { 'Content-Type': 'application/json' })
     res.end(JSON.stringify(info, null, 2))
+    return
+  }
+
+  // ── Public API (Online Játékosok lekérdezése) ─────────────
+  if (url === '/api/status' && req.method === 'GET') {
+    res.writeHead(200, { 'Content-Type': 'application/json' })
+    res.end(JSON.stringify({
+      status: mcStatus,
+      playersOnline: onlinePlayers.size,
+      players: Array.from(onlinePlayers)
+    }))
     return
   }
 

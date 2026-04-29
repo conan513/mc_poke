@@ -225,6 +225,8 @@ document.addEventListener('DOMContentLoaded', () => {
       const restartEl = document.getElementById('stat-restart');
       const statusDot = document.getElementById('status-dot');
       const statusText = document.getElementById('status-text');
+      const playerCount = document.getElementById('player-count');
+      const playerCountVal = document.getElementById('player-count-val');
       
       if (modsEl) modsEl.textContent = data.modCount || '--';
       if (data.nextRestart) {
@@ -237,16 +239,32 @@ document.addEventListener('DOMContentLoaded', () => {
       }
       if (statusText) statusText.textContent = t('status.online');
 
+      // Online játékosszám beállítása
+      if (playerCount && playerCountVal && typeof data.playersOnline !== 'undefined') {
+        playerCount.style.display = 'inline-block';
+        playerCountVal.textContent = data.playersOnline;
+        
+        // Játékosnevek listázása tooltipként, ha van legalább 1
+        if (data.players && data.players.length > 0) {
+          playerCount.title = 'Online: ' + data.players.join(', ');
+        } else {
+          playerCount.title = 'Nincs játékos online';
+        }
+      }
+
       if (btnDownload) btnDownload.classList.remove('btn-offline');
     } catch (e) {
       const statusDot = document.getElementById('status-dot');
       const statusText = document.getElementById('status-text');
+      const playerCount = document.getElementById('player-count');
       
       if (statusDot) {
         statusDot.classList.remove('online');
         statusDot.classList.add('offline');
       }
       if (statusText) statusText.textContent = t('status.offline');
+      
+      if (playerCount) playerCount.style.display = 'none';
 
       if (btnDownload) {
         btnDownload.classList.add('btn-offline');
