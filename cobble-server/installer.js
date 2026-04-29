@@ -573,15 +573,8 @@ async function install() {
   const lastCheck = state.lastCheckTime || 0
   const isFresh = (Date.now() - lastCheck) < 12 * 3600 * 1000 // 12 órán belüli ellenőrzés "friss"
 
-  if (state.modpackId === latestPack.id && integrityOk && isFresh) {
-    logInfo(`[Installer] Modpack (${latestPack.version_number}) és alap fájlok rendben. (Utolsó ellenőrzés: ${new Date(lastCheck).toLocaleString('hu-HU')})`)
-    return javaPath
-  } else {
-    if (state.modpackId === latestPack.id && integrityOk) {
-      logInfo(`[Installer] Modpack verzió egyezik, de frissítések ellenőrzése szükséges...`)
-    } else {
-      logInfo(`[Installer] Új modpack telepítése: ${latestPack.version_number}`)
-    }
+  if (state.modpackId !== latestPack.id || !integrityOk) {
+    logInfo(`[Installer] Modpack telepítése/frissítése: ${latestPack.version_number}`)
     const mrpackPath = path.join(SERVER_DIR, 'modpack.mrpack')
     const MODS_STAGING = path.join(SERVER_DIR, 'mods.new')
     const MODS_BACKUP = path.join(SERVER_DIR, 'mods.old')
@@ -602,9 +595,6 @@ async function install() {
       const zip = new AdmZip(mrpackPath)
       const index = JSON.parse(zip.readAsText('modrinth.index.json'))
 
-      // Extract overrides to a temporary location first or apply carefully
-      // Overrides are tricky because they go into SERVER_DIR directly.
-      // For now, we extract them directly but they are usually small config files.
       for (const entry of zip.getEntries()) {
         if (entry.isDirectory) continue
         const lowerName = entry.entryName.toLowerCase()
@@ -623,7 +613,6 @@ async function install() {
         }
       }
 
-      // Download mods to STAGING
       const files = index.files || []
       const serverFiles = files.filter(f => {
         if (f.env && f.env.server === 'unsupported') return false
@@ -636,12 +625,9 @@ async function install() {
 
       const baseFilenames = []
       let done = 0
-      // Download in batches
       for (let i = 0; i < serverFiles.length; i += 5) {
         const batch = serverFiles.slice(i, i + 5)
         await Promise.all(batch.map(async f => {
-          // Inside mrpack, f.path is usually "mods/something.jar"
-          // We want to put it in MODS_STAGING, so we take the basename.
           const filename = path.basename(f.path)
           const dest = path.join(MODS_STAGING, filename)
           baseFilenames.push(filename)
@@ -658,13 +644,11 @@ async function install() {
       }
       logInfo()
 
-      // SUCCESS! Now swap the mods folder.
       logInfo('[Installer] Modok cseréje...')
       if (fs.existsSync(MODS_BACKUP)) fs.rmSync(MODS_BACKUP, { recursive: true, force: true })
       if (fs.existsSync(MODS_DIR)) fs.renameSync(MODS_DIR, MODS_BACKUP)
       fs.renameSync(MODS_STAGING, MODS_DIR)
 
-      // Save base modpack filenames
       fs.writeFileSync(path.join(SERVER_DIR, '.modpack-files.json'), JSON.stringify(baseFilenames, null, 2))
 
       fs.unlinkSync(mrpackPath)
@@ -681,10 +665,13 @@ async function install() {
       logError(`\n[Installer] HIBA a modpack telepítésekor: ${err.message}`)
       logInfo('[Installer] Visszaállítás...')
       if (fs.existsSync(MODS_STAGING)) fs.rmSync(MODS_STAGING, { recursive: true, force: true })
-      // If we failed before swapping, MODS_DIR is still there and untouched.
-      // If we failed AFTER swapping (unlikely here but still), we'd need more logic.
       throw err
     }
+  } else if (isFresh) {
+    logInfo(`[Installer] Modpack (${latestPack.version_number}) rendben. (Utolsó ellenőrzés: ${new Date(lastCheck).toLocaleString('hu-HU')})`)
+    return javaPath
+  } else {
+    logInfo(`[Installer] Modpack verzió egyezik, de frissítések ellenőrzése szükséges...`)
   }
 
   // 2. Fabric Server Install
