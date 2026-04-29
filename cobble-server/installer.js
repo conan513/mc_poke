@@ -386,8 +386,6 @@ async function ensureExtraMods() {
     { slug: 'cobblemon-farmers',              loaders: ['fabric'], gameVersions: [MC_VERSION] },
     { slug: 'cobblemon-auto-battle',          loaders: ['fabric'], gameVersions: [MC_VERSION] },
     { slug: 'cobblemon_expeditions',          loaders: ['fabric'], gameVersions: [MC_VERSION] },
-    { slug: 'vulkanmod',                      loaders: ['fabric'], gameVersions: [MC_VERSION] },
-    { slug: 'beryl',                          loaders: ['fabric'], gameVersions: [MC_VERSION] },
     // Függőségek (dependencies)
     { slug: 'cloth-config',                   loaders: ['fabric'], gameVersions: [MC_VERSION] }, // player-locator-plus
     { slug: 'farmers-delight',                loaders: ['fabric'], gameVersions: [MC_VERSION] }, // cobblemon-farmers
