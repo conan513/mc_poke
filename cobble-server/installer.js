@@ -7,6 +7,17 @@ const crypto = require('crypto')
 const { exec, execFile } = require('child_process')
 const AdmZip = require('adm-zip')
 
+const LOG_FILE = path.join(__dirname, 'server-data', 'updater.log')
+function logInfo(...args) {
+  console.log(...args)
+  try { fs.appendFileSync(LOG_FILE, `[${new Date().toISOString()}] ${args.join(' ')}\n`) } catch(e) {}
+}
+function logError(...args) {
+  console.error(...args)
+  try { fs.appendFileSync(LOG_FILE, `[ERROR] [${new Date().toISOString()}] ${args.join(' ')}\n`) } catch(e) {}
+}
+
+
 const MODPACK_PROJECT_ID = 'Jkb29YJU'
 const MC_VERSION = '1.21.1'
 const MODRINTH_VERSIONS_URL = `https://api.modrinth.com/v2/project/${MODPACK_PROJECT_ID}/version?loaders=["fabric"]&game_versions=["${MC_VERSION}"]`
@@ -37,7 +48,7 @@ async function installJava() {
   const javaExe = getJavaExecutable()
 
   if (fs.existsSync(javaExe)) {
-    console.log('[Java] Java 21 már telepítve.')
+    logInfo('[Java] Java 21 már telepítve.')
     return javaExe
   }
 
@@ -48,7 +59,7 @@ async function installJava() {
 
   if (!url) throw new Error(`Nem támogatott platform Java letöltéshez: ${platform} ${arch}`)
 
-  console.log(`[Java] Java 21 letöltése (${platform} ${arch})...`)
+  logInfo(`[Java] Java 21 letöltése (${platform} ${arch})...`)
   const ext = url.endsWith('.zip') ? '.zip' : '.tar.gz'
   const javaDl = path.join(SERVER_DIR, `java21${ext}`)
 
@@ -125,7 +136,7 @@ async function installJava() {
   }
 
   if (process.platform !== 'win32') fs.chmodSync(resolvedJavaExe, 0o755)
-  console.log('[Java] Java 21 telepítése sikeres.')
+  logInfo('[Java] Java 21 telepítése sikeres.')
   return resolvedJavaExe
 }
 
@@ -221,7 +232,7 @@ async function modrinthRequest(path, method = 'GET', body = null) {
       res.on('end', () => {
         try {
           if (res.statusCode >= 400) {
-            console.error(`[Modrinth-API] Error ${res.statusCode} on ${path}: ${data}`)
+            logError(`[Modrinth-API] Error ${res.statusCode} on ${path}: ${data}`)
             return reject(new Error(`Modrinth API hiba: ${res.statusCode}`))
           }
           resolve(JSON.parse(data))
@@ -240,15 +251,15 @@ async function modrinthRequest(path, method = 'GET', body = null) {
  */
 async function updateModsFromModrinth() {
   if (!fs.existsSync(MODS_DIR)) {
-    console.log('[Modrinth] Mods mappa nem létezik, kihagyás.');
+    logInfo('[Modrinth] Mods mappa nem létezik, kihagyás.');
     return;
   }
 
-  console.log('[Modrinth] Modok frissítéseinek ellenőrzése (MC 1.21.1)...');
+  logInfo('[Modrinth] Modok frissítéseinek ellenőrzése (MC 1.21.1)...');
 
   try {
     const files = fs.readdirSync(MODS_DIR).filter(f => f.endsWith('.jar'));
-    console.log(`[Modrinth] ${files.length} .jar fájl találva a mods mappában.`);
+    logInfo(`[Modrinth] ${files.length} .jar fájl találva a mods mappában.`);
     
     const hashes = [];
     const fileToInfo = {};
@@ -265,11 +276,11 @@ async function updateModsFromModrinth() {
     }
 
     if (hashes.length === 0) {
-      console.log('[Modrinth] Nem sikerült hash-elni egyetlen fájlt sem.');
+      logInfo('[Modrinth] Nem sikerült hash-elni egyetlen fájlt sem.');
       return;
     }
 
-    console.log(`[Modrinth] Azonosítás a Modrinth API-val...`);
+    logInfo(`[Modrinth] Azonosítás a Modrinth API-val...`);
     const versionMap = await modrinthRequest('/v2/version_files', 'POST', {
       hashes: hashes,
       algorithm: 'sha1'
@@ -283,7 +294,7 @@ async function updateModsFromModrinth() {
       projectsToCheck.add(v.project_id);
     }
 
-    console.log(`[Modrinth] ${projectsToCheck.size} projekt azonosítva a Modrinth-en.`);
+    logInfo(`[Modrinth] ${projectsToCheck.size} projekt azonosítva a Modrinth-en.`);
 
     let updatedCount = 0;
     for (const projectId of projectsToCheck) {
@@ -294,7 +305,7 @@ async function updateModsFromModrinth() {
         const latest = releases[0] || versions[0];
         
         if (!latest) {
-          console.log(`[Modrinth] Nincs kompatibilis verzió a projekthez: ${projectId}`);
+          logInfo(`[Modrinth] Nincs kompatibilis verzió a projekthez: ${projectId}`);
           continue;
         }
 
@@ -314,7 +325,7 @@ async function updateModsFromModrinth() {
           const oldFileInfo = fileToInfo[oldHash];
 
           if (oldFileInfo) {
-            console.log(`[Modrinth] FRISSÍTÉS: ${oldFileInfo.file} -> ${newestFile.filename} (${latest.version_number})`);
+            logInfo(`[Modrinth] FRISSÍTÉS: ${oldFileInfo.file} -> ${newestFile.filename} (${latest.version_number})`);
             const dest = path.join(MODS_DIR, newestFile.filename);
             
             await downloadFile(newestFile.url, dest, { hash: newestFile.hashes.sha1, algorithm: 'sha1' });
@@ -325,17 +336,17 @@ async function updateModsFromModrinth() {
           }
         }
       } catch (e) {
-        console.error(`[Modrinth-Hiba] Hiba a projekt ellenőrzésekor (${projectId}): ${e.message}`);
+        logError(`[Modrinth-Hiba] Hiba a projekt ellenőrzésekor (${projectId}): ${e.message}`);
       }
     }
 
     if (updatedCount > 0) {
-      console.log(`[Modrinth] Szinkronizáció kész! ${updatedCount} mod frissítve.`);
+      logInfo(`[Modrinth] Szinkronizáció kész! ${updatedCount} mod frissítve.`);
     } else {
-      console.log('[Modrinth] Minden mod naprakész.');
+      logInfo('[Modrinth] Minden mod naprakész.');
     }
   } catch (err) {
-    console.error(`[Modrinth-Hiba] Végzetes hiba az ellenőrzés során: ${err.message}`);
+    logError(`[Modrinth-Hiba] Végzetes hiba az ellenőrzés során: ${err.message}`);
   }
 }
 
@@ -386,7 +397,7 @@ async function ensureExtraMods() {
     { slug: 'glitchcore',                     loaders: ['fabric'], gameVersions: [MC_VERSION] }, // serene-seasons
     { slug: 'forge-config-api-port',          loaders: ['fabric'], gameVersions: [MC_VERSION] }, // seasonhud-fabric
   ];
-  console.log(`[Modrinth] Extra modok ellenőrzése: ${extraMods.map(m => m.slug).join(', ')}...`);
+  logInfo(`[Modrinth] Extra modok ellenőrzése: ${extraMods.map(m => m.slug).join(', ')}...`);
 
   for (const { slug, loaders, gameVersions } of extraMods) {
     try {
@@ -399,11 +410,11 @@ async function ensureExtraMods() {
       const latest = versions.filter(v => v.version_type === 'release')[0] || versions[0];
 
       if (!latest) {
-        console.log(`[Modrinth] Nincs megfelelő verzió: ${slug} (MC ${MC_VERSION})`);
+        logInfo(`[Modrinth] Nincs megfelelő verzió: ${slug} (MC ${MC_VERSION})`);
         continue;
       }
 
-      console.log(`[Modrinth] ${slug} → ${latest.version_number}`);
+      logInfo(`[Modrinth] ${slug} → ${latest.version_number}`);
 
       const file = latest.files.find(f => f.primary) || latest.files[0];
       const dest = path.join(MODS_DIR, file.filename);
@@ -412,13 +423,13 @@ async function ensureExtraMods() {
       const isPresent = existingFiles.some(f => f.toLowerCase().includes(slug.toLowerCase()));
 
       if (!isPresent) {
-        console.log(`[Modrinth] Extra mod letöltése: ${slug} -> ${file.filename}`);
+        logInfo(`[Modrinth] Extra mod letöltése: ${slug} -> ${file.filename}`);
         await downloadFile(file.url, dest, { hash: file.hashes.sha1, algorithm: 'sha1' });
       } else {
-        console.log(`[Modrinth] Extra mod már jelen van: ${slug}`);
+        logInfo(`[Modrinth] Extra mod már jelen van: ${slug}`);
       }
     } catch (e) {
-      console.error(`[Modrinth-Hiba] Extra mod hiba (${slug}): ${e.message}`);
+      logError(`[Modrinth-Hiba] Extra mod hiba (${slug}): ${e.message}`);
     }
   }
 }
@@ -433,7 +444,7 @@ async function cleanupBlacklistedMods() {
     for (const file of files) {
       const lower = file.toLowerCase();
       if (blacklist.some(b => lower.includes(b))) {
-        console.log(`[Installer] Feketelistás mod törlése: ${file}`);
+        logInfo(`[Installer] Feketelistás mod törlése: ${file}`);
         try {
           fs.unlinkSync(path.join(MODS_DIR, file));
         } catch (e) {
@@ -475,7 +486,7 @@ async function getLatestFabric() {
 }
 
 async function verifyIntegrity(state) {
-  console.log('[Installer] Integritás ellenőrzése...')
+  logInfo('[Installer] Integritás ellenőrzése...')
   
   // 1. Java check
   const javaExe = getJavaExecutable()
@@ -501,7 +512,7 @@ async function verifyIntegrity(state) {
 }
 
 async function install() {
-  console.log('[Installer] Indítás...')
+  logInfo('[Installer] Indítás...')
 
   // 0. Java 21
   const javaPath = await installJava()
@@ -509,7 +520,7 @@ async function install() {
   fs.mkdirSync(MODS_DIR, { recursive: true })
 
   // 1. Modpack check & download
-  console.log('[Installer] Keresem a legfrissebb Cobbleverse modpackot...')
+  logInfo('[Installer] Keresem a legfrissebb Cobbleverse modpackot...')
   const versions = await fetchJson(MODRINTH_VERSIONS_URL)
   const latestPack = versions.filter(v => v.version_type === 'release')[0] || versions[0]
   const file = latestPack.files.find(f => f.primary) || latestPack.files[0]
@@ -521,9 +532,9 @@ async function install() {
   const integrityOk = await verifyIntegrity(state)
 
   if (state.modpackId === latestPack.id && integrityOk) {
-    console.log(`[Installer] Modpack (${latestPack.version_number}) és alap fájlok rendben.`)
+    logInfo(`[Installer] Modpack (${latestPack.version_number}) és alap fájlok rendben.`)
   } else {
-    console.log(`[Installer] Új modpack telepítése: ${latestPack.version_number}`)
+    logInfo(`[Installer] Új modpack telepítése: ${latestPack.version_number}`)
     const mrpackPath = path.join(SERVER_DIR, 'modpack.mrpack')
     const MODS_STAGING = path.join(SERVER_DIR, 'mods.new')
     const MODS_BACKUP = path.join(SERVER_DIR, 'mods.old')
@@ -539,7 +550,7 @@ async function install() {
           process.stdout.write(`\r[Installer] Modpack letöltése: ${Math.round(p * 100)}%`)
         }
       })
-      console.log('\n[Installer] Kicsomagolás...')
+      logInfo('\n[Installer] Kicsomagolás...')
 
       const zip = new AdmZip(mrpackPath)
       const index = JSON.parse(zip.readAsText('modrinth.index.json'))
@@ -574,7 +585,7 @@ async function install() {
         return true
       })
       
-      console.log(`[Installer] Szerver modok letöltése (${serverFiles.length} db) a staging mappába...`)
+      logInfo(`[Installer] Szerver modok letöltése (${serverFiles.length} db) a staging mappába...`)
 
       const baseFilenames = []
       let done = 0
@@ -590,7 +601,7 @@ async function install() {
           const downloadUrl = f.downloads?.[0]
           if (downloadUrl) {
             await downloadFile(downloadUrl, dest, { hash: f.hashes.sha1 }).catch(e => {
-               console.error(`\n[Installer] Hiba a mod letöltésekor (${filename}): ${e.message}`)
+               logError(`\n[Installer] Hiba a mod letöltésekor (${filename}): ${e.message}`)
                throw e
             })
           }
@@ -598,10 +609,10 @@ async function install() {
         }))
         process.stdout.write(`\r[Installer] Modok: ${done}/${serverFiles.length}`)
       }
-      console.log()
+      logInfo()
 
       // SUCCESS! Now swap the mods folder.
-      console.log('[Installer] Modok cseréje...')
+      logInfo('[Installer] Modok cseréje...')
       if (fs.existsSync(MODS_BACKUP)) fs.rmSync(MODS_BACKUP, { recursive: true, force: true })
       if (fs.existsSync(MODS_DIR)) fs.renameSync(MODS_DIR, MODS_BACKUP)
       fs.renameSync(MODS_STAGING, MODS_DIR)
@@ -614,11 +625,11 @@ async function install() {
 
       state.modpackId = latestPack.id
       fs.writeFileSync(stateFile, JSON.stringify(state, null, 2))
-      console.log('[Installer] Modpack frissítés sikeres.')
+      logInfo('[Installer] Modpack frissítés sikeres.')
 
     } catch (err) {
-      console.error(`\n[Installer] HIBA a modpack telepítésekor: ${err.message}`)
-      console.log('[Installer] Visszaállítás...')
+      logError(`\n[Installer] HIBA a modpack telepítésekor: ${err.message}`)
+      logInfo('[Installer] Visszaállítás...')
       if (fs.existsSync(MODS_STAGING)) fs.rmSync(MODS_STAGING, { recursive: true, force: true })
       // If we failed before swapping, MODS_DIR is still there and untouched.
       // If we failed AFTER swapping (unlikely here but still), we'd need more logic.
@@ -631,7 +642,7 @@ async function install() {
   const launchJar = path.join(SERVER_DIR, 'fabric-server-launch.jar')
 
   if (state.fabricLoader !== fv.loader || !fs.existsSync(launchJar)) {
-    console.log(`[Installer] Fabric Server ${fv.loader} telepítése...`)
+    logInfo(`[Installer] Fabric Server ${fv.loader} telepítése...`)
     const installerJar = path.join(SERVER_DIR, 'fabric-installer.jar')
     const installerUrl = `https://maven.fabricmc.net/net/fabricmc/fabric-installer/${fv.installer}/fabric-installer-${fv.installer}.jar`
     await downloadFile(installerUrl, installerJar)
@@ -659,14 +670,14 @@ async function install() {
     state.fabricLoader = fv.loader
     fs.writeFileSync(stateFile, JSON.stringify(state, null, 2))
   } else {
-    console.log(`[Installer] Fabric Server (${fv.loader}) már telepítve.`)
+    logInfo(`[Installer] Fabric Server (${fv.loader}) már telepítve.`)
   }
 
   // 3. EULA
   const eulaPath = path.join(SERVER_DIR, 'eula.txt')
   if (!fs.existsSync(eulaPath) || !fs.readFileSync(eulaPath, 'utf8').includes('eula=true')) {
     fs.writeFileSync(eulaPath, 'eula=true\n')
-    console.log('[Installer] EULA automatikusan elfogadva.')
+    logInfo('[Installer] EULA automatikusan elfogadva.')
   }
 
   // 3b. server.properties – online-mode=false (offline mód) biztosítása
@@ -684,20 +695,20 @@ async function install() {
       'motd=CobbleVerse Server',
       'spawn-protection=0',
     ].join('\n') + '\n')
-    console.log('[Installer] server.properties létrehozva (online-mode=false).')
+    logInfo('[Installer] server.properties létrehozva (online-mode=false).')
   } else {
     // A fájl már létezik – meggyőzödünk róla, hogy online-mode=false
     let props = fs.readFileSync(serverPropsPath, 'utf8')
     if (/^online-mode\s*=\s*true/m.test(props)) {
       props = props.replace(/^online-mode\s*=\s*true/m, 'online-mode=false')
       fs.writeFileSync(serverPropsPath, props)
-      console.log('[Installer] server.properties: online-mode=true → false (offline mód bekapcsolva).')
+      logInfo('[Installer] server.properties: online-mode=true → false (offline mód bekapcsolva).')
     } else if (!/^online-mode\s*=/m.test(props)) {
       // Nincs benne online-mode sor egyáltalán – hozzáadjuk
       fs.writeFileSync(serverPropsPath, props.trimEnd() + '\nonline-mode=false\n')
-      console.log('[Installer] server.properties: online-mode=false sor hozzáadva.')
+      logInfo('[Installer] server.properties: online-mode=false sor hozzáadva.')
     } else {
-      console.log('[Installer] server.properties: online-mode már false, nincs teendő.')
+      logInfo('[Installer] server.properties: online-mode már false, nincs teendő.')
     }
   }
 
@@ -707,7 +718,7 @@ async function install() {
     const destFancymenuDir = path.join(SERVER_DIR, 'config', 'fancymenu')
 
     if (fs.existsSync(customFancymenuDir)) {
-      console.log('[Installer] Egyedi FancyMenu konfig másolása a szerver adatai közé (szinkronizáláshoz)...')
+      logInfo('[Installer] Egyedi FancyMenu konfig másolása a szerver adatai közé (szinkronizáláshoz)...')
 
       const copyRecursive = (src, dest) => {
         fs.mkdirSync(dest, { recursive: true })
@@ -725,14 +736,14 @@ async function install() {
       // Régi fájlok teljes törlése másolás előtt
       if (fs.existsSync(destFancymenuDir)) {
         fs.rmSync(destFancymenuDir, { recursive: true, force: true })
-        console.log('[Installer] Korábbi FancyMenu konfig teljesen törölve a tiszta cseréhez.')
+        logInfo('[Installer] Korábbi FancyMenu konfig teljesen törölve a tiszta cseréhez.')
       }
 
       copyRecursive(customFancymenuDir, destFancymenuDir)
-      console.log('[Installer] FancyMenu konfig sikeresen átmásolva.')
+      logInfo('[Installer] FancyMenu konfig sikeresen átmásolva.')
     }
   } catch (err) {
-    console.error(`[Installer] Hiba a FancyMenu konfig másolásakor: ${err.message}`)
+    logError(`[Installer] Hiba a FancyMenu konfig másolásakor: ${err.message}`)
   }
 
   // 5. Extra Mods (Chipped, TerraBlender)
@@ -744,7 +755,7 @@ async function install() {
   // 7. Modrinth Mod Updates
   await updateModsFromModrinth()
 
-  console.log('[Installer] Telepítés sikeres! Minden készen áll.')
+  logInfo('[Installer] Telepítés sikeres! Minden készen áll.')
 
   return javaPath
 }

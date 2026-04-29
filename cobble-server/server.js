@@ -721,21 +721,24 @@ function scheduleNightlyRestart() {
   
   nextRestartTime = next.getTime()
 
-  console.log(`[Scheduler] Következő automatikus újraindítás: ${next.toLocaleString('hu-HU')} (${Math.round(msUntilRestart / 60000)} perc múlva)`)
+  console.log(`[Scheduler] Next automatic restart: ${next.toLocaleString('en-US')} (in ${Math.round(msUntilRestart / 60000)} minutes)`)
 
   // 5 perces figyelmeztetés
   if (msUntilWarning > 0) {
     setTimeout(() => {
-      console.log('[Scheduler] ⚠️  5 perc múlva automatikus újraindítás!')
-      sendCommand('say [Szerver] Automatikus ujrainditas 5 perc mulva! Modok frissitese folyamatban...')
+      const msg = '[Scheduler] ⚠️  Automatic restart in 5 minutes!'
+      console.log(msg)
+      fs.appendFileSync(path.join(DATA_DIR, 'updater.log'), `[${new Date().toISOString()}] ${msg}\n`)
       sendCommand('say [Server] Automatic restart in 5 minutes! Mod updates incoming...')
     }, msUntilWarning)
   }
 
   // Újraindítás időpontja
   setTimeout(async () => {
-    console.log('[Scheduler] 🔄 Éjszakai automatikus újraindítás kezdődik...')
-    sendCommand('say [Szerver] Ujrainditas most! Visszajovunk nehany masodperc mulva.')
+    const msgStart = '[Scheduler] 🔄 Nightly automatic restart beginning...'
+    console.log(msgStart)
+    fs.appendFileSync(path.join(DATA_DIR, 'updater.log'), `[${new Date().toISOString()}] ${msgStart}\n`)
+    sendCommand('say [Server] Restarting now! We will be back in a few seconds.')
 
     // Adjunk 3 mp-et hogy a chat üzenet kimenjen
     await new Promise(r => setTimeout(r, 3000))
@@ -751,14 +754,20 @@ function scheduleNightlyRestart() {
       setTimeout(resolve, 30000) // max 30 mp várakozás
     })
 
-    console.log('[Scheduler] ⬇️  Minecraft leállva, frissítések ellenőrzése...')
+    const msgStop = '[Scheduler] ⬇️  Minecraft stopped, checking for updates...'
+    console.log(msgStop)
+    fs.appendFileSync(path.join(DATA_DIR, 'updater.log'), `[${new Date().toISOString()}] ${msgStop}\n`)
 
     try {
       const javaPath = await installer.install()
       activeJavaPath = javaPath
-      console.log('[Scheduler] ✅ Frissítések kész, Minecraft újraindítása...')
+      const msgDone = '[Scheduler] ✅ Updates complete, restarting Minecraft...'
+      console.log(msgDone)
+      fs.appendFileSync(path.join(DATA_DIR, 'updater.log'), `[${new Date().toISOString()}] ${msgDone}\n`)
     } catch (err) {
-      console.error('[Scheduler] ❌ Hiba a frissítés közben:', err.message)
+      const msgErr = `[Scheduler] ❌ Error during update: ${err.message}`
+      console.error(msgErr)
+      fs.appendFileSync(path.join(DATA_DIR, 'updater.log'), `[${new Date().toISOString()}] ${msgErr}\n`)
     }
 
     startMinecraft()
