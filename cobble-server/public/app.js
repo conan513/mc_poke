@@ -86,6 +86,7 @@ document.querySelectorAll('.nav-item').forEach(el => {
     if (el.dataset.tab === 'status') loadStatus()
     if (el.dataset.tab === 'mods') loadInstalledMods()
     if (el.dataset.tab === 'search') refreshInstalledCache()
+    if (el.dataset.tab === 'configs') loadConfigs()
   })
 })
 
@@ -541,6 +542,100 @@ function closeModal() { $id('mod-detail-modal').classList.add('hidden') }
 $id('modal-close').addEventListener('click', closeModal)
 $id('mod-detail-modal').addEventListener('click', e => { if (e.target === $id('mod-detail-modal')) closeModal() })
 document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal() })
+
+// ── Config Editor ──────────────────────────────────────────────────
+let configsCache = []
+let activeConfigFile = null
+
+async function loadConfigs() {
+  const listEl = $id('config-list')
+  listEl.innerHTML = '<div class="loading-spinner"></div>'
+  try {
+    const data = await fetchApi('/admin/api/configs')
+    configsCache = data.configs || []
+    renderConfigList()
+  } catch (e) {
+    listEl.innerHTML = `<p style="color:red">Hiba: ${e.message}</p>`
+  }
+}
+
+function renderConfigList() {
+  const listEl = $id('config-list')
+  const q = $id('config-search').value.toLowerCase().trim()
+  let filtered = configsCache
+  
+  if (q) {
+    filtered = filtered.filter(f => f.toLowerCase().includes(q))
+  }
+  
+  if (!filtered.length) {
+    listEl.innerHTML = '<p style="color:var(--text-muted);font-size:13px">Nincs találat.</p>'
+    return
+  }
+  
+  listEl.innerHTML = filtered.map(f => `
+    <div class="config-item ${f === activeConfigFile ? 'active' : ''}" onclick="openConfig('${f}')" title="${f}">
+      📄 ${f}
+    </div>
+  `).join('')
+}
+
+$id('config-search').addEventListener('input', renderConfigList)
+
+async function openConfig(filename) {
+  if (activeConfigFile && activeConfigFile !== filename) {
+    // Lehetne dirty state ellenőrzés is, de most egyelőre egyszerűen váltunk
+  }
+  
+  activeConfigFile = filename
+  renderConfigList() // Hogy a kijelölés (active class) frissüljön
+  
+  $id('config-editor-header').classList.remove('hidden')
+  $id('config-textarea').classList.add('hidden')
+  $id('config-placeholder').classList.remove('hidden')
+  $id('config-placeholder').innerHTML = '<div class="loading-spinner"></div> Betöltés...'
+  
+  $id('config-current-file').textContent = filename
+  
+  try {
+    const data = await fetchApi('/admin/api/config/read', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ filename })
+    })
+    
+    $id('config-placeholder').classList.add('hidden')
+    $id('config-textarea').classList.remove('hidden')
+    $id('config-textarea').value = data.content
+    
+  } catch (e) {
+    $id('config-placeholder').innerHTML = `<span style="color:red">Hiba a fájl olvasásakor: ${e.message}</span>`
+  }
+}
+
+$id('btn-config-save').addEventListener('click', async () => {
+  if (!activeConfigFile) return
+  
+  const btn = $id('btn-config-save')
+  btn.disabled = true
+  btn.textContent = 'Mentés...'
+  
+  const content = $id('config-textarea').value
+  
+  try {
+    await fetchApi('/admin/api/config/save', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ filename: activeConfigFile, content })
+    })
+    showToast('Konfiguráció sikeresen elmentve!')
+  } catch (e) {
+    showToast(`Hiba a mentés során: ${e.message}`)
+  } finally {
+    btn.disabled = false
+    btn.textContent = 'Mentés'
+  }
+})
 
 // Init – hitelesítés indítása
 initAuth()

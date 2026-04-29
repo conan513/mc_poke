@@ -48,6 +48,7 @@
       <a href="#" class="nav-item active" data-tab="status">Szerver Állapot</a>
       <a href="#" class="nav-item" data-tab="mods">Telepített Modok</a>
       <a href="#" class="nav-item" data-tab="search">Mod Kereső</a>
+      <a href="#" class="nav-item" data-tab="configs">Konfigurációk</a>
     </nav>
     <div class="sidebar-footer">
       <button id="btn-logout" class="logout-btn">🔓 Kijelentkezés</button>
@@ -145,6 +146,40 @@
       </div>
 
       <div id="search-pagination" class="pagination hidden"></div>
+    </div>
+
+    <!-- Configs Tab -->
+    <div class="tab-content" id="tab-configs">
+      <div class="page-header">
+        <h1>Konfigurációk</h1>
+        <p>A szerver konfigurációs fájljainak közvetlen szerkesztése.</p>
+      </div>
+      
+      <div class="config-split-layout">
+        <!-- Sidebar: list of files -->
+        <div class="config-sidebar">
+          <input type="text" id="config-search" placeholder="Fájl keresése...">
+          <div id="config-list" class="config-list">
+            <div class="loading-spinner"></div>
+          </div>
+        </div>
+        
+        <!-- Editor area -->
+        <div class="config-editor-area">
+          <div id="config-editor-header" class="config-editor-header hidden">
+            <span id="config-current-file">Kiválasztott fájl: nincs</span>
+            <div class="config-actions">
+              <button id="btn-config-save" class="btn-success">Mentés</button>
+            </div>
+          </div>
+          <div id="config-editor-container" class="config-editor-container">
+            <div id="config-placeholder" class="config-placeholder">
+              Kérlek válassz ki egy fájlt a bal oldali listából a szerkesztéshez.
+            </div>
+            <textarea id="config-textarea" class="config-textarea hidden" spellcheck="false" wrap="off"></textarea>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 

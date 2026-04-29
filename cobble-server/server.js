@@ -703,6 +703,89 @@ function handleRequest(req, res) {
     return
   }
 
+  // ── Config Editor APIs ──────────────────────────────────────
+  if (url === '/admin/api/configs' && req.method === 'GET') {
+    const configDir = path.join(DATA_DIR, 'config');
+    const getConfigsRecursive = (dir, baseDir) => {
+      let results = [];
+      try {
+        const list = fs.readdirSync(dir);
+        list.forEach(file => {
+          const fullPath = path.join(dir, file);
+          const stat = fs.statSync(fullPath);
+          if (stat && stat.isDirectory()) {
+            results = results.concat(getConfigsRecursive(fullPath, baseDir));
+          } else {
+            // Csak olvasható/szerkeszthető szöveges kiterjesztések
+            const ext = path.extname(file).toLowerCase();
+            if (['.json', '.json5', '.toml', '.properties', '.txt', '.yaml', '.yml'].includes(ext)) {
+              results.push(path.relative(baseDir, fullPath).replace(/\\/g, '/'));
+            }
+          }
+        });
+      } catch (e) {}
+      return results;
+    };
+    
+    res.writeHead(200, { 'Content-Type': 'application/json' });
+    res.end(JSON.stringify({ configs: getConfigsRecursive(configDir, configDir) }));
+    return;
+  }
+
+  if (url === '/admin/api/config/read' && req.method === 'POST') {
+    let body = '';
+    req.on('data', c => body += c);
+    req.on('end', () => {
+      try {
+        const { filename } = JSON.parse(body);
+        if (!filename) throw new Error('Hiányzó fájlnév.');
+        
+        const configDir = path.resolve(DATA_DIR, 'config');
+        const targetPath = path.resolve(configDir, filename);
+        
+        // Path traversal védelem
+        if (!targetPath.startsWith(configDir)) throw new Error('Érvénytelen fájl útvonal!');
+        if (!fs.existsSync(targetPath)) throw new Error('A fájl nem található!');
+        
+        const content = fs.readFileSync(targetPath, 'utf8');
+        res.writeHead(200, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ content }));
+      } catch (e) {
+        res.writeHead(400, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ error: e.message }));
+      }
+    });
+    return;
+  }
+
+  if (url === '/admin/api/config/save' && req.method === 'POST') {
+    let body = '';
+    req.on('data', c => body += c);
+    req.on('end', () => {
+      try {
+        const { filename, content } = JSON.parse(body);
+        if (!filename || typeof content !== 'string') throw new Error('Hiányzó vagy hibás adatok.');
+        
+        const configDir = path.resolve(DATA_DIR, 'config');
+        const targetPath = path.resolve(configDir, filename);
+        
+        // Path traversal védelem
+        if (!targetPath.startsWith(configDir)) throw new Error('Érvénytelen fájl útvonal!');
+        
+        // Mentjük a fájlt (ha nem létezik, létrehozza, de alapvetően csak meglévőt szerkesztünk)
+        fs.writeFileSync(targetPath, content, 'utf8');
+        console.log(`[Config Editor] Sikeres mentés: ${filename}`);
+        
+        res.writeHead(200, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ success: true }));
+      } catch (e) {
+        res.writeHead(400, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ error: e.message }));
+      }
+    });
+    return;
+  }
+
   if (url === '/admin/api/server/start' && req.method === 'POST') {
     startMinecraft()
     res.writeHead(200, { 'Content-Type': 'application/json' })
