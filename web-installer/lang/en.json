@@ -14,7 +14,7 @@
     "mac_dmg_arm64": "Apple Silicon (.dmg)",
     "mac_zip": "macOS Intel (.zip)",
     "mac_zip_arm64": "Apple Silicon (.zip)",
-    "platform_linux": "Linux (x86_64)",
+    "platform_linux": "Linux",
     "platform_linux_arm": "Linux (ARM64)",
     "platform_mac": "macOS",
     "platform_win": "Windows",
