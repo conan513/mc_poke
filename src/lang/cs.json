@@ -1,77 +1,87 @@
 {
-  "welcome": {
-    "title": "Vítejte v Cobbleverse",
-    "subtitle": "Dokonalý zážitek s Pokémony v Minecraftu",
-    "username_label": "Vyberte si uživatelské jméno:",
-    "username_placeholder": "Uživatelské jméno",
-    "ram_label": "Paměť (RAM):",
-    "install_btn": "INSTALOVAT A HRÁT",
-    "disclaimer": "Kliknutím na instalovat souhlasíte se stažením cca 2 GB dat.",
-    "stats_pokemon": "1025 Pokémon",
-    "stats_regions": "4 Regions",
-    "stats_megas": "93 Mega Evolutions"
-  },
-  "install": {
-    "title": "Instalace",
-    "preparing": "Příprava...",
-    "java": "Stahování Java 21...",
-    "minecraft": "Stahování Minecraftu...",
-    "fabric": "Instalace Fabricu...",
-    "modpack": "Stahování modpacku...",
-    "waiting": "Čekání...",
-    "done": "Vše nainstalováno! Bavte se! 🎮",
-    "error": "Chyba instalace: ",
-    "subtitle": "Please wait while we prepare your game..."
-  },
-  "home": {
-    "player_status": "Offline režim",
-    "play_btn": "SPUSTIT HRU",
-    "launching": "SPOUŠTĚNÍ...",
-    "running": "HRA BĚŽÍ",
-    "version": "Verze",
-    "ram": "RAM",
-    "sync_label": "Vlastní server pro synchronizaci modů (volitelné):",
-    "update_available": "Aktualizace k dispozici!",
-    "download_required": "Vyžadováno stažení",
-    "update_btn": "Aktualizovat",
-    "console_btn": "Konzole",
-    "files_btn": "Soubory",
-    "trainer_placeholder": "Trainer",
-    "ui_online": "Online UI",
-    "ui_no_internet": "No Internet",
-    "ui_server_offline": "Server Offline"
-  },
-  "sync": {
-    "connecting": "Připojování k serveru: ",
-    "deleting": "Mazání starých synchronizovaných souborů...",
-    "downloading": "Stahování: ",
-    "error": "Chyba synchronizace: ",
-    "up_to_date": "Všechny soubory jsou aktuální.",
-    "finished": "Synchronizace dokončena! Staženo: "
-  },
-  "toast": {
-    "username_short": "Uživatelské jméno musí mít alespoň 3 znaky!",
-    "username_chars": "Povoleny jsou pouze písmena, číslice a _!",
-    "install_error": "Chyba instalace: ",
-    "update_error": "Chyba aktualizace: ",
-    "launch_error": "Launch error: "
-  },
-  "skin": {
-    "type_mojang": "Mojang Name",
-    "toast_empty": "⚠️ Please provide a name, link or select a file!",
-    "rotate_hint": "Drag to rotate",
-    "modal_title": "Skin Settings",
-    "browse_btn": "Select file...",
-    "type_url": "Custom URL",
-    "type_file": "Local File",
-    "source_label": "Skin Source",
-    "toast_saved": "✅ Skin saved and uploaded to server!",
-    "toast_upload_error": "⚠️ Skin upload failed (no server connection)",
-    "save_btn": "Save & Apply"
-  },
-  "titlebar": {
-    "minimize": "Minimize",
-    "close": "Close",
-    "lang_title": "Change language"
-  }
+ "welcome": {
+  "title": "Vítejte v Cobbleverse",
+  "subtitle": "Dokonalý zážitek s Pokémony v Minecraftu",
+  "username_label": "Vyberte profil nebo přidejte nový",
+  "username_placeholder": "Jméno nového trenéra...",
+  "ram_label": "Paměť (RAM):",
+  "install_btn": "INSTALOVAT A HRÁT",
+  "disclaimer": "Kliknutím na instalovat souhlasíte se stažením cca 2 GB dat.",
+  "stats_pokemon": "1025 Pokémon",
+  "profile_add_btn": "Přidat profil"
+ },
+ "install": {
+  "title": "Instalace",
+  "preparing": "Příprava...",
+  "java": "Stahování Java 21...",
+  "minecraft": "Stahování Minecraftu...",
+  "fabric": "Instalace Fabricu...",
+  "modpack": "Stahování modpacku...",
+  "waiting": "Čekání...",
+  "done": "Vše nainstalováno! Bavte se! ",
+  "error": "Chyba instalace: ",
+  "subtitle": "Please wait while we prepare your game..."
+ },
+ "home": {
+  "player_status": "Offline režim",
+  "play_btn": "SPUSTIT HRU",
+  "launching": "SPOUŠTĚNÍ...",
+  "running": "HRA BĚŽÍ",
+  "version": "Verze",
+  "ram": "RAM",
+  "sync_label": "Vlastní server pro synchronizaci modů (volitelné):",
+  "update_available": "Aktualizace k dispozici!",
+  "download_required": "Vyžadováno stažení",
+  "update_btn": "Aktualizovat",
+  "console_btn": "Konzole",
+  "files_btn": "Soubory",
+  "trainer_placeholder": "Trainer",
+  "ui_online": "Online UI",
+  "ui_no_internet": "No Internet",
+  "ui_server_offline": "Server Offline",
+  "trainer_placeholder": "Trenér",
+  "change_skin_label": "Změnit skin",
+  "switch_profile": "Přepnout profil"
+ },
+ "sync": {
+  "connecting": "Připojování k serveru: ",
+  "deleting": "Mazání starých synchronizovaných souborů...",
+  "downloading": "Stahování: ",
+  "error": "Chyba synchronizace: ",
+  "up_to_date": "Všechny soubory jsou aktuální.",
+  "finished": "Synchronizace dokončena! Staženo: "
+ },
+ "toast": {
+  "username_short": "Uživatelské jméno musí mít alespoň 3 znaky!",
+  "username_chars": "Povoleny jsou pouze písmena, číslice a _!",
+  "install_error": "Chyba instalace: ",
+  "update_error": "Chyba aktualizace: ",
+  "launch_error": "Chyba spuštění: ",
+  "auth_error": "Chyba autentizace: ",
+  "launch_denied": "Server odmítl spuštění.",
+  "username_required": "Zadejte prosím jméno pro spuštění hry!",
+  "profile_exists": "Tento profil již existuje!",
+  "profile_selected": "Vybráno {}. Kliknutím na Hrát začněte!"
+ },
+ "skin": {
+  "modal_title": "Nastavení skinu",
+  "rotate_hint": "Tažením otočíte",
+  "source_label": "Zdroj skinu",
+  "type_mojang": "Jméno Mojang",
+  "type_url": "Vlastní URL",
+  "type_file": "Lokální soubor",
+  "browse_btn": "Vybrat soubor...",
+  "save_btn": "Uložit a použít",
+  "toast_empty":"Zadejte jméno, odkaz nebo vyberte soubor!",
+  "toast_saved":"Skin uložen a nahrán na server!",
+  "toast_upload_error":"Nahrávání skinu selhalo (žádné připojení k serveru)",
+  "remove_profile": "Odebrat profil",
+  "multiplayer_hint": "V multiplayeru SkinsRestorer automaticky aplikuje skin!",
+  "singleplayer_hint": "V singleplayeru spusťte ve hře: <code>/skin url {}</code>"
+ },
+ "titlebar": {
+  "minimize": "Minimize",
+  "close": "Close",
+  "lang_title": "Change language"
+ }
 }

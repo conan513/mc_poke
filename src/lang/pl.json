@@ -1,77 +1,86 @@
 {
-  "welcome": {
-    "title": "Witaj w Cobblemon Universe",
-    "subtitle": "Najlepsze doświadczenie Pokémon w Minecraft",
-    "username_label": "Wybierz nazwę użytkownika:",
-    "username_placeholder": "Użytkownik",
-    "ram_label": "Pamięć (RAM):",
-    "install_btn": "ZAINSTALUJ I GRAJ",
-    "disclaimer": "Klikając zainstaluj, zgadzasz się na pobranie ~2GB danych.",
-    "stats_pokemon": "1025 Pokémon",
-    "stats_regions": "4 Regions",
-    "stats_megas": "93 Mega Evolutions"
-  },
-  "install": {
-    "title": "Instalacja",
-    "preparing": "Przygotowanie...",
-    "java": "Pobieranie Java 21...",
-    "minecraft": "Pobieranie Minecraft...",
-    "fabric": "Instalowanie Fabric...",
-    "modpack": "Pobieranie Modpacka...",
-    "waiting": "Oczekiwanie...",
-    "done": "Wszystko zainstalowane! Miłej zabawy! 🎮",
-    "error": "Błąd instalacji: ",
-    "subtitle": "Please wait while we prepare your game..."
-  },
-  "home": {
-    "player_status": "Tryb offline",
-    "play_btn": "URUCHOM GRĘ",
-    "launching": "URUCHAMIANIE...",
-    "running": "GRA URUCHOMIONA",
-    "version": "Wersja",
-    "ram": "RAM",
-    "sync_label": "Serwer synchronizacji (opcjonalnie):",
-    "update_available": "Aktualizacja dostępna!",
-    "download_required": "Wymagane pobieranie",
-    "update_btn": "Aktualizuj",
-    "console_btn": "Konsola",
-    "files_btn": "Pliki",
-    "ui_online": "Interfejs Online",
-    "ui_no_internet": "Brak Internetu",
-    "ui_server_offline": "Serwer Offline",
-    "trainer_placeholder": "Trener"
-  },
-  "toast": {
-    "username_short": "Nazwa użytkownika musi mieć co najmniej 3 znaki!",
-    "username_chars": "Dozwolone są tylko litery, cyfry i _!",
-    "install_error": "Błąd instalacji: ",
-    "update_error": "Błąd aktualizacji: ",
-    "launch_error": "Launch error: "
-  },
-  "skin": {
-    "type_mojang": "Mojang Name",
-    "toast_empty": "⚠️ Please provide a name, link or select a file!",
-    "rotate_hint": "Drag to rotate",
-    "modal_title": "Skin Settings",
-    "browse_btn": "Select file...",
-    "type_url": "Custom URL",
-    "type_file": "Local File",
-    "source_label": "Skin Source",
-    "toast_saved": "✅ Skin saved and uploaded to server!",
-    "toast_upload_error": "⚠️ Skin upload failed (no server connection)",
-    "save_btn": "Save & Apply"
-  },
-  "sync": {
-    "error": "Sync error: ",
-    "deleting": "Deleting old synced files...",
-    "downloading": "Downloading: ",
-    "connecting": "Connecting to server: ",
-    "up_to_date": "All files up to date.",
-    "finished": "Sync finished! Downloaded: "
-  },
-  "titlebar": {
-    "minimize": "Minimize",
-    "close": "Close",
-    "lang_title": "Change language"
-  }
+ "welcome": {
+  "title": "Witaj w Cobblemon Universe",
+  "subtitle": "Najlepsze doświadczenie Pokémon w Minecraft",
+  "username_label": "Wybierz profil lub dodaj nowy",
+  "username_placeholder": "Nazwa nowego trenera...",
+  "ram_label": "Pamięć (RAM):",
+  "install_btn": "ZAINSTALUJ I GRAJ",
+  "disclaimer": "Klikając zainstaluj, zgadzasz się na pobranie ~2GB danych.",
+  "stats_pokemon": "1025 Pokémon",
+  "profile_add_btn": "Dodaj profil"
+ },
+ "install": {
+  "title": "Instalacja",
+  "preparing": "Przygotowanie...",
+  "java": "Pobieranie Java 21...",
+  "minecraft": "Pobieranie Minecraft...",
+  "fabric": "Instalowanie Fabric...",
+  "modpack": "Pobieranie Modpacka...",
+  "waiting": "Oczekiwanie...",
+  "done": "Wszystko zainstalowane! Miłej zabawy! ",
+  "error": "Błąd instalacji: ",
+  "subtitle": "Please wait while we prepare your game..."
+ },
+ "home": {
+  "player_status": "Tryb offline",
+  "play_btn": "URUCHOM GRĘ",
+  "launching": "URUCHAMIANIE...",
+  "running": "GRA URUCHOMIONA",
+  "version": "Wersja",
+  "ram": "RAM",
+  "sync_label": "Serwer synchronizacji (opcjonalnie):",
+  "update_available": "Aktualizacja dostępna!",
+  "download_required": "Wymagane pobieranie",
+  "update_btn": "Aktualizuj",
+  "console_btn": "Konsola",
+  "files_btn": "Pliki",
+  "ui_online": "Interfejs Online",
+  "ui_no_internet": "Brak Internetu",
+  "ui_server_offline": "Serwer Offline",
+  "trainer_placeholder": "Trener",
+  "change_skin_label": "Zmień skin",
+  "switch_profile": "Zmień profil"
+ },
+ "toast": {
+  "username_short": "Nazwa użytkownika musi mieć co najmniej 3 znaki!",
+  "username_chars": "Dozwolone są tylko litery, cyfry i _!",
+  "install_error": "Błąd instalacji: ",
+  "update_error": "Błąd aktualizacji: ",
+  "launch_error": "Błąd uruchamiania: ",
+  "auth_error": "Błąd uwierzytelniania: ",
+  "launch_denied": "Serwer odrzucił uruchomienie.",
+  "username_required": "Proszę podać nazwę, aby uruchomić grę!",
+  "profile_exists": "Ten profil już istnieje!",
+  "profile_selected": "Wybrano {}. Kliknij Graj, aby zacząć!"
+ },
+ "skin": {
+  "modal_title": "Ustawienia Skina",
+  "rotate_hint": "Przeciągnij, aby obrócić",
+  "source_label": "Źródło Skina",
+  "type_mojang": "Nazwa Mojang",
+  "type_url": "Własny URL",
+  "type_file": "Plik lokalny",
+  "browse_btn": "Wybierz plik...",
+  "save_btn": "Zapisz i Zastosuj",
+  "toast_empty":"Proszę podać nazwę, link lub wybrać plik!",
+  "toast_saved":"Skin zapisany i przesłany na serwer!",
+  "toast_upload_error":"Nie udało się przesłać skina (brak połączenia z serwerem)",
+  "remove_profile": "Usuń profil",
+  "multiplayer_hint": "W trybie wieloosobowym SkinsRestorer automatycznie nakłada skin!",
+  "singleplayer_hint": "W trybie jednoosobowym wpisz w grze: <code>/skin url {}</code>"
+ },
+ "sync": {
+  "error": "Sync error: ",
+  "deleting": "Deleting old synced files...",
+  "downloading": "Downloading: ",
+  "connecting": "Connecting to server: ",
+  "up_to_date": "All files up to date.",
+  "finished": "Sync finished! Downloaded: "
+ },
+ "titlebar": {
+  "minimize": "Minimize",
+  "close": "Close",
+  "lang_title": "Change language"
+ }
 }

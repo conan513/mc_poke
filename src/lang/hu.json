@@ -1,77 +1,90 @@
 {
-  "welcome": {
-    "title": "Üdvözlünk a Cobblemon Universe-ben",
-    "subtitle": "A végső Pokémon élmény Minecraftban",
-    "username_label": "Válassz egy felhasználónevet:",
-    "username_placeholder": "Felhasználónév",
-    "ram_label": "Memória (RAM):",
-    "install_btn": "TELEPÍTÉS ÉS JÁTÉK",
-    "disclaimer": "A telepítésre kattintva elfogadod kb. 2GB adat letöltését.",
-    "stats_pokemon": "1025 Pokémon",
-    "stats_regions": "4 Régió",
-    "stats_megas": "93 Mega Evolúció"
-  },
-  "install": {
-    "title": "Telepítés",
-    "subtitle": "Kérjük várj, amíg előkészítjük a játékot...",
-    "preparing": "Előkészítés...",
-    "java": "Java 21 letöltése...",
-    "minecraft": "Minecraft letöltése...",
-    "fabric": "Fabric telepítése...",
-    "modpack": "Modpack letöltése...",
-    "waiting": "Várakozás...",
-    "done": "Minden telepítve! Jó játékot!",
-    "error": "Telepítési hiba: "
-  },
-  "home": {
-    "player_status": "Offline mód",
-    "play_btn": "JÁTÉK INDÍTÁSA",
-    "launching": "INDÍTÁS...",
-    "running": "JÁTÉK FUT",
-    "version": "Verzió",
-    "ram": "RAM",
-    "sync_label": "Saját Mod Sync Szerver (opcionális):",
-    "update_available": "Frissítés elérhető!",
-    "download_required": "Letöltés szükséges",
-    "update_btn": "Frissítés",
-    "console_btn": "Konzol",
-    "files_btn": "Fájlok",
-    "trainer_placeholder": "Edző",
-    "ui_online": "Online Felület",
-    "ui_no_internet": "Nincs Internet",
-    "ui_server_offline": "Szerver Offline"
-  },
-  "sync": {
-    "connecting": "Kapcsolódás a szerverhez: ",
-    "deleting": "Régi fájlok törlése...",
-    "downloading": "Letöltés: ",
-    "error": "Szinkron hiba: ",
-    "up_to_date": "Minden fájl naprakész.",
-    "finished": "Szinkron kész! Letöltve: "
-  },
-  "toast": {
-    "username_short": "Adj meg legalább 3 karakteres felhasználónevet!",
-    "username_chars": "Csak betűk, számok és _ engedélyezett!",
-    "install_error": "Telepítési hiba: ",
-    "update_error": "Frissítési hiba: ",
-    "launch_error": "Indítási hiba: "
-  },
-  "titlebar": {
-    "lang_title": "Nyelv váltása",
-    "minimize": "Minimalizálás",
-    "close": "Bezárás"
-  },
-  "skin": {
-    "modal_title": "Skin Beállítása",
-    "rotate_hint": "Húzza a forgatáshoz",
-    "source_label": "Skin Forrása",
-    "type_mojang": "Mojang Név",
-    "type_url": "Egyedi URL",
-    "type_file": "Helyi Fájl",
-    "browse_btn": "Fájl kiválasztása...",
-    "save_btn": "Mentés és Alkalmazás",
-    "toast_empty": "Kérlek adj meg egy nevet, linket vagy válassz fájlt!",
-    "toast_saved": "Skin elmentve és feltöltve a szerverre!",
-    "toast_upload_error": "Skin feltöltés sikertelen (nincs szerver kapcsolat)"
-  }
+ "welcome": {
+  "title": "Üdvözlünk a Cobblemon Universe-ben",
+  "subtitle": "A végső Pokémon élmény Minecraftban",
+  "username_label": "Válassz profilt vagy adj hozzá újat",
+  "username_placeholder": "Új edző neve...",
+  "ram_label": "Memória (RAM):",
+  "install_btn": "TELEPÍTÉS ÉS JÁTÉK",
+  "disclaimer": "A telepítésre kattintva elfogadod kb. 2GB adat letöltését.",
+  "stats_pokemon": "1025 Pokémon",
+  "stats_regions": "4 Régió",
+  "stats_megas": "93 Mega Evolúció",
+  "stats_raids": "Raid Dennek",
+  "profile_add_btn": "Profil hozzáadása",
+  "copyright": "Copyright © 2026 LUMYVERSE & Conan (Cobblemon Universe)"
+ },
+ "install": {
+  "title": "Telepítés",
+  "subtitle": "Kérjük várj, amíg előkészítjük a játékot...",
+  "preparing": "Előkészítés...",
+  "java": "Java 21 letöltése...",
+  "minecraft": "Minecraft letöltése...",
+  "fabric": "Fabric telepítése...",
+  "modpack": "Modpack letöltése...",
+  "waiting": "Várakozás...",
+  "done": "Minden telepítve! Jó játékot!",
+  "error": "Telepítési hiba: "
+ },
+ "home": {
+  "player_status": "Offline mód",
+  "play_btn": "JÁTÉK INDÍTÁSA",
+  "launching": "INDÍTÁS...",
+  "running": "JÁTÉK FUT",
+  "version": "Verzió",
+  "ram": "RAM",
+  "sync_label": "Saját Mod Sync Szerver (opcionális):",
+  "update_available": "Frissítés elérhető!",
+  "download_required": "Letöltés szükséges",
+  "update_btn": "Frissítés",
+  "console_btn": "Konzol",
+  "files_btn": "Fájlok",
+  "trainer_placeholder": "Edző",
+  "ui_online": "Online Felület",
+  "ui_no_internet": "Nincs Internet",
+  "ui_server_offline": "Szerver Offline",
+  "change_skin_label": "Skin módosítása",
+  "switch_profile": "Profilváltás"
+ },
+ "sync": {
+  "connecting": "Kapcsolódás a szerverhez: ",
+  "deleting": "Régi fájlok törlése...",
+  "downloading": "Letöltés: ",
+  "error": "Szinkron hiba: ",
+  "up_to_date": "Minden fájl naprakész.",
+  "finished": "Szinkron kész! Letöltve: "
+ },
+ "toast": {
+  "username_short": "Adj meg legalább 3 karakteres felhasználónevet!",
+  "username_chars": "Csak betűk, számok és _ engedélyezett!",
+  "install_error": "Telepítési hiba: ",
+  "update_error": "Frissítési hiba: ",
+  "launch_error": "Indítási hiba: ",
+  "auth_error": "Hitelesítési hiba: ",
+  "launch_denied": "Szerver elutasította az indítást.",
+  "username_required": "Kérlek adj meg egy nevet a játék elindításához!",
+  "profile_exists": "Ez a profil már létezik!",
+  "profile_selected": "{} kiválasztva. Kattints a játékra!"
+ },
+ "titlebar": {
+  "lang_title": "Nyelv váltása",
+  "minimize": "Minimalizálás",
+  "close": "Bezárás"
+ },
+ "skin": {
+  "modal_title": "Skin Beállítása",
+  "rotate_hint": "Húzza a forgatáshoz",
+  "source_label": "Skin Forrása",
+  "type_mojang": "Mojang Név",
+  "type_url": "Egyedi URL",
+  "type_file": "Helyi Fájl",
+  "browse_btn": "Fájl kiválasztása...",
+  "save_btn": "Mentés és Alkalmazás",
+  "toast_empty": "Kérlek adj meg egy nevet, linket vagy válassz fájlt!",
+  "toast_saved": "Skin elmentve és feltöltve a szerverre!",
+  "toast_upload_error": "Skin feltöltés sikertelen (nincs szerver kapcsolat)",
+  "remove_profile": "Profil törlése",
+  "multiplayer_hint": "Multiplayer-ben a SkinsRestorer automatikusan alkalmazza a skint!",
+  "singleplayer_hint": "Singleplayer-ben in-game futtasd: <code>/skin url {}</code>"
+ }
 }

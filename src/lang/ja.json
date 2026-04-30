@@ -1,77 +1,87 @@
 {
-  "welcome": {
-    "title": "Cobbleverse へようこそ",
-    "subtitle": "Minecraft で究極のポケモン体験を",
-    "username_label": "ユーザー名を選択:",
-    "username_placeholder": "ユーザー名",
-    "ram_label": "メモリ (RAM):",
-    "install_btn": "インストールしてプレイ",
-    "disclaimer": "インストールをクリックすると、約 2GB のデータのダウンロードに同意したことになります。",
-    "stats_pokemon": "1025 Pokémon",
-    "stats_regions": "4 Regions",
-    "stats_megas": "93 Mega Evolutions"
-  },
-  "install": {
-    "title": "インストール",
-    "preparing": "準備中...",
-    "java": "Java 21 をダウンロード中...",
-    "minecraft": "Minecraft をダウンロード中...",
-    "fabric": "Fabric をインストール中...",
-    "modpack": "Modpack をダウンロード中...",
-    "waiting": "待機中...",
-    "done": "すべてインストールされました！楽しんでください！🎮",
-    "error": "インストールエラー: ",
-    "subtitle": "Please wait while we prepare your game..."
-  },
-  "home": {
-    "player_status": "オフラインモード",
-    "play_btn": "ゲームを起動",
-    "launching": "起動中...",
-    "running": "実行中",
-    "version": "バージョン",
-    "ram": "RAM",
-    "sync_label": "カスタム Mod 同期サーバー (任意):",
-    "update_available": "アップデートがあります！",
-    "download_required": "ダウンロードが必要です",
-    "update_btn": "更新",
-    "console_btn": "コンソール",
-    "files_btn": "ファイル",
-    "trainer_placeholder": "Trainer",
-    "ui_online": "Online UI",
-    "ui_no_internet": "No Internet",
-    "ui_server_offline": "Server Offline"
-  },
-  "sync": {
-    "connecting": "サーバーに接続中: ",
-    "deleting": "古い同期ファイルを削除中...",
-    "downloading": "ダウンロード中: ",
-    "error": "同期エラー: ",
-    "up_to_date": "すべてのファイルが最新です。",
-    "finished": "同期完了！ダウンロード数: "
-  },
-  "toast": {
-    "username_short": "ユーザー名は3文字以上である必要があります！",
-    "username_chars": "英数字とアンダースコア (_) のみ使用できます！",
-    "install_error": "インストールエラー: ",
-    "update_error": "アップデートエラー: ",
-    "launch_error": "Launch error: "
-  },
-  "skin": {
-    "type_mojang": "Mojang Name",
-    "toast_empty": "⚠️ Please provide a name, link or select a file!",
-    "rotate_hint": "Drag to rotate",
-    "modal_title": "Skin Settings",
-    "browse_btn": "Select file...",
-    "type_url": "Custom URL",
-    "type_file": "Local File",
-    "source_label": "Skin Source",
-    "toast_saved": "✅ Skin saved and uploaded to server!",
-    "toast_upload_error": "⚠️ Skin upload failed (no server connection)",
-    "save_btn": "Save & Apply"
-  },
-  "titlebar": {
-    "minimize": "Minimize",
-    "close": "Close",
-    "lang_title": "Change language"
-  }
+ "welcome": {
+  "title": "Cobbleverse へようこそ",
+  "subtitle": "Minecraft で究極のポケモン体験を",
+  "username_label": "プロフィールを選択または新規追加",
+  "username_placeholder": "新しいトレーナー名...",
+  "ram_label": "メモリ (RAM):",
+  "install_btn": "インストールしてプレイ",
+  "disclaimer": "インストールをクリックすると、約 2GB のデータのダウンロードに同意したことになります。",
+  "stats_pokemon": "1025 Pokémon",
+  "profile_add_btn": "プロフィールを追加"
+ },
+ "install": {
+  "title": "インストール",
+  "preparing": "準備中...",
+  "java": "Java 21 をダウンロード中...",
+  "minecraft": "Minecraft をダウンロード中...",
+  "fabric": "Fabric をインストール中...",
+  "modpack": "Modpack をダウンロード中...",
+  "waiting": "待機中...",
+  "done": "すべてインストールされました！楽しんでください！",
+  "error": "インストールエラー: ",
+  "subtitle": "Please wait while we prepare your game..."
+ },
+ "home": {
+  "player_status": "オフラインモード",
+  "play_btn": "ゲームを起動",
+  "launching": "起動中...",
+  "running": "実行中",
+  "version": "バージョン",
+  "ram": "RAM",
+  "sync_label": "カスタム Mod 同期サーバー (任意):",
+  "update_available": "アップデートがあります！",
+  "download_required": "ダウンロードが必要です",
+  "update_btn": "更新",
+  "console_btn": "コンソール",
+  "files_btn": "ファイル",
+  "trainer_placeholder": "Trainer",
+  "ui_online": "Online UI",
+  "ui_no_internet": "No Internet",
+  "ui_server_offline": "Server Offline",
+  "trainer_placeholder": "トレーナー",
+  "change_skin_label": "スキンを変更",
+  "switch_profile": "プロフィールを切り替え"
+ },
+ "sync": {
+  "connecting": "サーバーに接続中: ",
+  "deleting": "古い同期ファイルを削除中...",
+  "downloading": "ダウンロード中: ",
+  "error": "同期エラー: ",
+  "up_to_date": "すべてのファイルが最新です。",
+  "finished": "同期完了！ダウンロード数: "
+ },
+ "toast": {
+  "username_short": "ユーザー名は3文字以上である必要があります！",
+  "username_chars": "英数字とアンダースコア (_) のみ使用できます！",
+  "install_error": "インストールエラー: ",
+  "update_error": "アップデートエラー: ",
+  "launch_error": "起動エラー: ",
+  "auth_error": "認証エラー: ",
+  "launch_denied": "サーバーが起動を拒否しました。",
+  "username_required": "ゲームを開始するには名前を入力してください！",
+  "profile_exists": "このプロフィールは既に存在します！",
+  "profile_selected": "{} が選択されました。「ゲームを起動」をクリックして開始！"
+ },
+ "skin": {
+  "modal_title": "スキン設定",
+  "rotate_hint": "ドラッグして回転",
+  "source_label": "スキンのソース",
+  "type_mojang": "Mojang 名",
+  "type_url": "カスタム URL",
+  "type_file": "ローカルファイル",
+  "browse_btn": "ファイルを選択...",
+  "save_btn": "保存して適用",
+  "toast_empty":"名前、リンクを入力するか、ファイルを選択してください！",
+  "toast_saved":"スキンが保存され、サーバーにアップロードされました！",
+  "toast_upload_error":"スキンのアップロードに失敗しました (サーバー接続なし)",
+  "remove_profile": "プロフィールを削除",
+  "multiplayer_hint": "マルチプレイでは、SkinsRestorer が自動的にスキンを適用します！",
+  "singleplayer_hint": "シングルプレイでは、ゲーム内で実行してください: <code>/skin url {}</code>"
+ },
+ "titlebar": {
+  "minimize": "Minimize",
+  "close": "Close",
+  "lang_title": "Change language"
+ }
 }

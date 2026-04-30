@@ -1,77 +1,86 @@
 {
-  "welcome": {
-    "title": "Добро пожаловать в Cobblemon Universe",
-    "subtitle": "Лучшее приключение Покемонов в Minecraft",
-    "username_label": "Выберите имя пользователя:",
-    "username_placeholder": "Имя",
-    "ram_label": "Память (RAM):",
-    "install_btn": "УСТАНОВИТЬ И ИГРАТЬ",
-    "disclaimer": "Нажимая установить, вы соглашаетесь на загрузку ~2 ГБ данных.",
-    "stats_regions": "4 Regions",
-    "stats_megas": "93 Mega Evolutions",
-    "stats_pokemon": "1025 Pokémon"
-  },
-  "install": {
-    "title": "Установка",
-    "preparing": "Подготовка...",
-    "java": "Загрузка Java 21...",
-    "minecraft": "Загрузка Minecraft...",
-    "fabric": "Установка Fabric...",
-    "modpack": "Загрузка сборки...",
-    "waiting": "Ожидание...",
-    "done": "Все установлено! Приятной игры! 🎮",
-    "error": "Ошибка установки: ",
-    "subtitle": "Please wait while we prepare your game..."
-  },
-  "home": {
-    "player_status": "Оффлайн режим",
-    "play_btn": "ЗАПУСТИТЬ ИГРУ",
-    "launching": "ЗАПУСК...",
-    "running": "ИГРА ЗАПУЩЕНА",
-    "version": "Версия",
-    "ram": "RAM",
-    "sync_label": "Сервер синхронизации (опционально):",
-    "update_available": "Доступно обновление!",
-    "download_required": "Требуется загрузка",
-    "update_btn": "Обновить",
-    "console_btn": "Консоль",
-    "files_btn": "Файлы",
-    "ui_online": "Онлайн Интерфейс",
-    "ui_no_internet": "Нет Интернета",
-    "ui_server_offline": "Сервер Оффлайн",
-    "trainer_placeholder": "Тренер"
-  },
-  "toast": {
-    "username_short": "Имя пользователя должно содержать не менее 3 символов!",
-    "username_chars": "Разрешены только буквы, цифры и _!",
-    "install_error": "Ошибка установки: ",
-    "update_error": "Ошибка обновления: ",
-    "launch_error": "Ошибка запуска: "
-  },
-  "titlebar": {
-    "lang_title": "Сменить язык",
-    "minimize": "Свернуть",
-    "close": "Закрыть"
-  },
-  "skin": {
-    "modal_title": "Настройки скина",
-    "rotate_hint": "Перетащите, чтобы повернуть",
-    "source_label": "Источник скина",
-    "type_mojang": "Имя Mojang",
-    "type_url": "Своя ссылка",
-    "type_file": "Локальный файл",
-    "browse_btn": "Выбрать файл...",
-    "save_btn": "Сохранить и применить",
-    "toast_empty": "⚠️ Пожалуйста, введите имя, ссылку или выберите файл!",
-    "toast_saved": "✅ Скин сохранен и загружен на сервер!",
-    "toast_upload_error": "⚠️ Не удалось загрузить скин (нет соединения с сервером)"
-  },
-  "sync": {
-    "error": "Sync error: ",
-    "connecting": "Connecting to server: ",
-    "up_to_date": "All files up to date.",
-    "finished": "Sync finished! Downloaded: ",
-    "deleting": "Deleting old synced files...",
-    "downloading": "Downloading: "
-  }
+ "welcome": {
+  "title": "Добро пожаловать в Cobblemon Universe",
+  "subtitle": "Лучшее приключение Покемонов в Minecraft",
+  "username_label": "Выберите профиль или добавьте новый",
+  "username_placeholder": "Имя нового тренера...",
+  "ram_label": "Память (RAM):",
+  "install_btn": "УСТАНОВИТЬ И ИГРАТЬ",
+  "disclaimer": "Нажимая установить, вы соглашаетесь на загрузку ~2 ГБ данных.",
+  "stats_pokemon": "1025 Pokémon",
+  "profile_add_btn": "Добавить профиль"
+ },
+ "install": {
+  "title": "Установка",
+  "preparing": "Подготовка...",
+  "java": "Загрузка Java 21...",
+  "minecraft": "Загрузка Minecraft...",
+  "fabric": "Установка Fabric...",
+  "modpack": "Загрузка сборки...",
+  "waiting": "Ожидание...",
+  "done": "Все установлено! Приятной игры! ",
+  "error": "Ошибка установки: ",
+  "subtitle": "Please wait while we prepare your game..."
+ },
+ "home": {
+  "player_status": "Оффлайн режим",
+  "play_btn": "ЗАПУСТИТЬ ИГРУ",
+  "launching": "ЗАПУСК...",
+  "running": "ИГРА ЗАПУЩЕНА",
+  "version": "Версия",
+  "ram": "RAM",
+  "sync_label": "Сервер синхронизации (опционально):",
+  "update_available": "Доступно обновление!",
+  "download_required": "Требуется загрузка",
+  "update_btn": "Обновить",
+  "console_btn": "Консоль",
+  "files_btn": "Файлы",
+  "ui_online": "Онлайн Интерфейс",
+  "ui_no_internet": "Нет Интернета",
+  "ui_server_offline": "Сервер Оффлайн",
+  "trainer_placeholder": "Тренер",
+  "change_skin_label": "Сменить скин",
+  "switch_profile": "Сменить профиль"
+ },
+ "toast": {
+  "username_short": "Имя пользователя должно содержать не менее 3 символов!",
+  "username_chars": "Разрешены только буквы, цифры и _!",
+  "install_error": "Ошибка установки: ",
+  "update_error": "Ошибка обновления: ",
+  "launch_error": "Ошибка запуска: ",
+  "auth_error": "Ошибка аутентификации: ",
+  "launch_denied": "Сервер отклонил запуск.",
+  "username_required": "Пожалуйста, введите имя для запуска игры!",
+  "profile_exists": "Этот профиль уже существует!",
+  "profile_selected": "Выбран {}. Нажмите Играть, чтобы начать!"
+ },
+ "titlebar": {
+  "lang_title": "Сменить язык",
+  "minimize": "Свернуть",
+  "close": "Закрыть"
+ },
+ "skin": {
+  "modal_title": "Настройки скина",
+  "rotate_hint": "Перетащите, чтобы повернуть",
+  "source_label": "Источник скина",
+  "type_mojang": "Имя Mojang",
+  "type_url": "Своя ссылка",
+  "type_file": "Локальный файл",
+  "browse_btn": "Выбрать файл...",
+  "save_btn": "Сохранить и применить",
+  "toast_empty":"Пожалуйста, введите имя, ссылку или выберите файл!",
+  "toast_saved":"Скин сохранен и загружен на сервер!",
+  "toast_upload_error":"Не удалось загрузить скин (нет соединения с сервером)",
+  "remove_profile": "Удалить профиль",
+  "multiplayer_hint": "В мультиплеере SkinsRestorer автоматически применяет скин!",
+  "singleplayer_hint": "В одиночной игре введите в игре: <code>/skin url {}</code>"
+ },
+ "sync": {
+  "error": "Sync error: ",
+  "connecting": "Connecting to server: ",
+  "up_to_date": "All files up to date.",
+  "finished": "Sync finished! Downloaded: ",
+  "deleting": "Deleting old synced files...",
+  "downloading": "Downloading: "
+ }
 }

@@ -1,77 +1,87 @@
 {
-  "welcome": {
-    "title": "Välkommen till Cobbleverse",
-    "subtitle": "Den ultimata Pokémon-upplevelsen i Minecraft",
-    "username_label": "Välj ett användarnamn:",
-    "username_placeholder": "Användarnamn",
-    "ram_label": "Minne (RAM):",
-    "install_btn": "INSTALLERA & SPELA",
-    "disclaimer": "Genom att klicka på installera godkänner du nedladdning av ca 2 GB data.",
-    "stats_pokemon": "1025 Pokémon",
-    "stats_regions": "4 Regions",
-    "stats_megas": "93 Mega Evolutions"
-  },
-  "install": {
-    "title": "Installation",
-    "preparing": "Förbereder...",
-    "java": "Laddar ner Java 21...",
-    "minecraft": "Laddar ner Minecraft...",
-    "fabric": "Installerar Fabric...",
-    "modpack": "Laddar ner modpaket...",
-    "waiting": "Väntar...",
-    "done": "Allt är installerat! Ha så kul! 🎮",
-    "error": "Installationsfel: ",
-    "subtitle": "Please wait while we prepare your game..."
-  },
-  "home": {
-    "player_status": "Offline-läge",
-    "play_btn": "STARTA SPELET",
-    "launching": "STARTAR...",
-    "running": "SPELET KÖRS",
-    "version": "Version",
-    "ram": "RAM",
-    "sync_label": "Anpassad Mod Sync Server (valfritt):",
-    "update_available": "Uppdatering tillgänglig!",
-    "download_required": "Nedladdning krävs",
-    "update_btn": "Uppdatera",
-    "console_btn": "Konsol",
-    "files_btn": "Filer",
-    "trainer_placeholder": "Trainer",
-    "ui_online": "Online UI",
-    "ui_no_internet": "No Internet",
-    "ui_server_offline": "Server Offline"
-  },
-  "sync": {
-    "connecting": "Ansluter till server: ",
-    "deleting": "Tar bort gamla synkroniserade filer...",
-    "downloading": "Laddar ner: ",
-    "error": "Synkroniseringsfel: ",
-    "up_to_date": "Alla filer är uppdaterade.",
-    "finished": "Synkronisering klar! Laddade ner: "
-  },
-  "toast": {
-    "username_short": "Användarnamnet måste vara minst 3 tecken långt!",
-    "username_chars": "Endast bokstäver, siffror och _ är tillåtna!",
-    "install_error": "Installationsfel: ",
-    "update_error": "Uppdateringsfel: ",
-    "launch_error": "Launch error: "
-  },
-  "skin": {
-    "type_mojang": "Mojang Name",
-    "toast_empty": "⚠️ Please provide a name, link or select a file!",
-    "rotate_hint": "Drag to rotate",
-    "modal_title": "Skin Settings",
-    "browse_btn": "Select file...",
-    "type_url": "Custom URL",
-    "type_file": "Local File",
-    "source_label": "Skin Source",
-    "toast_saved": "✅ Skin saved and uploaded to server!",
-    "toast_upload_error": "⚠️ Skin upload failed (no server connection)",
-    "save_btn": "Save & Apply"
-  },
-  "titlebar": {
-    "minimize": "Minimize",
-    "close": "Close",
-    "lang_title": "Change language"
-  }
+ "welcome": {
+  "title": "Välkommen till Cobbleverse",
+  "subtitle": "Den ultimata Pokémon-upplevelsen i Minecraft",
+  "username_label": "Välj en profil eller lägg till en ny",
+  "username_placeholder": "Nytt tränarnamn...",
+  "ram_label": "Minne (RAM):",
+  "install_btn": "INSTALLERA & SPELA",
+  "disclaimer": "Genom att klicka på installera godkänner du nedladdning av ca 2 GB data.",
+  "stats_pokemon": "1025 Pokémon",
+  "profile_add_btn": "Lägg till profil"
+ },
+ "install": {
+  "title": "Installation",
+  "preparing": "Förbereder...",
+  "java": "Laddar ner Java 21...",
+  "minecraft": "Laddar ner Minecraft...",
+  "fabric": "Installerar Fabric...",
+  "modpack": "Laddar ner modpaket...",
+  "waiting": "Väntar...",
+  "done": "Allt är installerat! Ha så kul! ",
+  "error": "Installationsfel: ",
+  "subtitle": "Please wait while we prepare your game..."
+ },
+ "home": {
+  "player_status": "Offline-läge",
+  "play_btn": "STARTA SPELET",
+  "launching": "STARTAR...",
+  "running": "SPELET KÖRS",
+  "version": "Version",
+  "ram": "RAM",
+  "sync_label": "Anpassad Mod Sync Server (valfritt):",
+  "update_available": "Uppdatering tillgänglig!",
+  "download_required": "Nedladdning krävs",
+  "update_btn": "Uppdatera",
+  "console_btn": "Konsol",
+  "files_btn": "Filer",
+  "trainer_placeholder": "Trainer",
+  "ui_online": "Online UI",
+  "ui_no_internet": "No Internet",
+  "ui_server_offline": "Server Offline",
+  "trainer_placeholder": "Tränare",
+  "change_skin_label": "Ändra skin",
+  "switch_profile": "Byt profil"
+ },
+ "sync": {
+  "connecting": "Ansluter till server: ",
+  "deleting": "Tar bort gamla synkroniserade filer...",
+  "downloading": "Laddar ner: ",
+  "error": "Synkroniseringsfel: ",
+  "up_to_date": "Alla filer är uppdaterade.",
+  "finished": "Synkronisering klar! Laddade ner: "
+ },
+ "toast": {
+  "username_short": "Användarnamnet måste vara minst 3 tecken långt!",
+  "username_chars": "Endast bokstäver, siffror och _ är tillåtna!",
+  "install_error": "Installationsfel: ",
+  "update_error": "Uppdateringsfel: ",
+  "launch_error": "Startfel: ",
+  "auth_error": "Autentiseringsfel: ",
+  "launch_denied": "Servern nekade start.",
+  "username_required": "Ange ett namn för att starta spelet!",
+  "profile_exists": "Denna profil finns redan!",
+  "profile_selected": "{} vald. Klicka på Spela för att börja!"
+ },
+ "skin": {
+  "modal_title": "Skin-inställningar",
+  "rotate_hint": "Dra för att rotera",
+  "source_label": "Skin-källa",
+  "type_mojang": "Mojang-namn",
+  "type_url": "Anpassad URL",
+  "type_file": "Lokal fil",
+  "browse_btn": "Välj fil...",
+  "save_btn": "Spara och tillämpa",
+  "toast_empty":"Ange ett namn, länk eller välj en fil!",
+  "toast_saved":"Skin sparat och uppladdat till servern!",
+  "toast_upload_error":"Det gick inte att ladda upp skinnet (ingen serveranslutning)",
+  "remove_profile": "Ta bort profil",
+  "multiplayer_hint": "I multiplayer tillämpas skinnet automatiskt av SkinsRestorer!",
+  "singleplayer_hint": "I singleplayer, kör i spelet: <code>/skin url {}</code>"
+ },
+ "titlebar": {
+  "minimize": "Minimize",
+  "close": "Close",
+  "lang_title": "Change language"
+ }
 }

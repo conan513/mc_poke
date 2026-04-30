@@ -3,6 +3,7 @@ const $id = (id) => document.getElementById(id)
 // ── State ────────────────────────────────────────────────────
 let selectedRam = 4096
 let username = ''
+let profiles = []
 let isGameRunning = false
 let currentLang = 'en'
 let translations = {}
@@ -268,6 +269,105 @@ function goToHome() {
   runUpdateCheck()
 }
 
+// ── Profile Management ────────────────────────────────────────
+function saveProfiles() {
+  localStorage.setItem('cobble_profiles', JSON.stringify(profiles))
+}
+
+function renderProfiles() {
+  const list = $id('profile-list')
+  if (!list) return
+  list.innerHTML = ''
+
+  if (profiles.length === 0) {
+    list.style.display = 'none'
+    return
+  }
+  list.style.display = 'flex'
+
+  profiles.forEach(p => {
+    const item = document.createElement('div')
+    item.className = `profile-item ${username === p.name ? 'active' : ''}`
+    
+    // Check if we have a cached skin URL or just use first letter
+    const avatarStyle = p.skinUrl ? `background-image: url(${p.skinUrl})` : ''
+    
+    item.innerHTML = `
+      <div class="p-avatar" style="${avatarStyle}">${p.skinUrl ? '' : p.name.charAt(0).toUpperCase()}</div>
+      <div class="p-name">${p.name}</div>
+      <div class="p-name">${p.name}</div>
+      <div class="p-remove" data-i18n-title="skin.remove_profile" title="Profil törlése">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="width: 14px; height: 14px;"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+      </div>
+    `
+    
+    item.addEventListener('click', (e) => {
+      if (e.target.closest('.p-remove')) {
+        profiles = profiles.filter(pr => pr.name !== p.name)
+        if (username === p.name) username = ''
+        saveProfiles()
+        renderProfiles()
+        return
+      }
+      selectProfile(p.name)
+    })
+    
+    list.appendChild(item)
+  })
+  
+  updateUI()
+}
+
+async function selectProfile(name) {
+  username = name
+  localStorage.setItem('cobble_username', name)
+  
+  // Automatikus skin frissítés a szerverről
+  await syncSkinFromServer(name)
+  
+  // Ugrás a főképernyőre (ha már telepítve van)
+  const status = await window.cobble.checkInstalled()
+  if (status.allDone) {
+    window._lastInstallStatus = status
+    goToHome()
+    applyAvatar()
+  } else {
+    showToast(t('toast.profile_selected').replace('{}', name))
+    renderProfiles()
+    updateUI()
+  }
+}
+
+async function syncSkinFromServer(name) {
+  const serverUrl = $id('input-server-url').value.trim()
+  if (!serverUrl) return
+
+  const skinUrl = `${serverUrl.replace(/\/+$/, '')}/skins/${name}.png`
+  try {
+    // Check if skin exists (HEAD request)
+    const res = await fetch(skinUrl, { method: 'HEAD', cache: 'no-store' })
+    if (res.ok) {
+      console.log(`[Skin] Szerver oldali skin megtalálva: ${name}`)
+      currentSkinType = 'url'
+      currentSkinVal = skinUrl
+      
+      // Update profile cache
+      const p = profiles.find(pr => pr.name === name)
+      if (p) p.skinUrl = skinUrl
+      saveProfiles()
+    } else {
+      console.log(`[Skin] Nincs egyedi skin a szerveren: ${name}`)
+      // Fallback to Mojang or Steve if no server skin
+      if (currentSkinType === 'url' && currentSkinVal.includes('/skins/')) {
+        currentSkinType = 'mojang'
+        currentSkinVal = name
+      }
+    }
+  } catch (e) {
+    console.warn('[Skin] Hiba a skin ellenőrzésekor:', e.message)
+  }
+}
+
 // ── Update check (background) ─────────────────────────────────
 async function runUpdateCheck() {
   const banner = $id('update-banner')
@@ -349,11 +449,11 @@ $id('btn-play').addEventListener('click', async () => {
     
     if (!verifyRes.ok) {
       const errData = await verifyRes.json()
-      throw new Error(errData.error || 'Szerver elutasította az indítást.')
+      throw new Error(errData.error || t('toast.launch_denied'))
     }
     console.log('[Verification] Sikeres szerver oldali igazolás.')
   } catch (e) {
-    showToast('❌ Hitelesítési hiba: ' + e.message)
+    showToast('❌ ' + t('toast.auth_error') + e.message)
     btn.disabled = false
     btn.querySelector('span:last-child').textContent = t('home.play_btn')
     return
@@ -401,6 +501,32 @@ $id('link-discord').addEventListener('click', () => {
 })
 $id('link-folder').addEventListener('click', () => {
   window.cobble.openGameFolder()
+})
+
+$id('btn-switch-profile').addEventListener('click', () => {
+  showScreen('welcome')
+})
+
+$id('btn-add-profile').addEventListener('click', () => {
+  const name = $id('input-username').value.trim()
+  if (!name || name.length < 3) {
+    showToast(t('toast.username_short'))
+    return
+  }
+  if (!/^[a-zA-Z0-9_]+$/.test(name)) {
+    showToast(t('toast.username_chars'))
+    return
+  }
+  if (profiles.find(p => p.name === name)) {
+    showToast(t('toast.profile_exists'))
+    return
+  }
+  
+  profiles.push({ name, skinUrl: null })
+  saveProfiles()
+  $id('input-username').value = ''
+  renderProfiles()
+  selectProfile(name)
 })
 
 // ── Particle Animation ─────────────────────────────────────────
@@ -459,10 +585,20 @@ animateParticles()
 ;(async () => {
   await loadLanguage()
   
+  // Profiles init
+  try {
+    profiles = JSON.parse(localStorage.getItem('cobble_profiles') || '[]')
+    renderProfiles()
+  } catch(e) {}
+
   // Try to restore saved username and server url
   try {
     const saved = localStorage.getItem('cobble_username')
-    if (saved) $id('input-username').value = saved
+    if (saved) {
+      username = saved
+      // Sync skin for initial user
+      setTimeout(() => syncSkinFromServer(username), 500)
+    }
 
     const savedUrl = localStorage.getItem('cobble_server_url')
     if (savedUrl) {
@@ -579,7 +715,7 @@ animateParticles()
         $id('btn-install').click()
       }
     } else {
-      showToast('Kérlek add meg a felhasználóneved a játék elindításához!')
+      showToast(t('toast.username_required'))
     }
   })
 })()
@@ -681,21 +817,32 @@ function updateSkinPreview() {
 
 function applyAvatar() {
   const avatar = $id('player-avatar')
+  if (!avatar) return
+  
   const val = currentSkinVal || username || 'Steve'
 
   if (currentSkinType === 'mojang') {
     // Use head avatar from mc-heads.net
     avatar.style.backgroundImage = `url(https://mc-heads.net/avatar/${val || 'Steve'})`
     avatar.style.backgroundSize = 'cover'
+    avatar.style.backgroundPosition = 'center'
+    avatar.style.imageRendering = 'auto'
     avatar.textContent = ''
-  } else if (currentSkinType === 'url') {
-    // For URL skins, fall back to first letter (we can't easily crop the face)
-    avatar.style.backgroundImage = ''
-    avatar.textContent = username ? username.charAt(0).toUpperCase() : '?'
   } else {
-    // File upload: use the first letter as avatar
-    avatar.style.backgroundImage = ''
-    avatar.textContent = username ? username.charAt(0).toUpperCase() : '?'
+    // Custom URL or File: Try to show the head part of the skin PNG (8,8 to 16,16)
+    // For a 64x64 skin, the head is at 8,8 and is 8x8 pixels.
+    // To show only that, we zoom in 8x (800%) and position it.
+    avatar.style.backgroundImage = `url(${currentSkinVal})`
+    avatar.style.backgroundSize = '800%' // 64 / 8 = 8x zoom
+    avatar.style.backgroundPosition = '14.28% 14.28%' // Position at 8,8
+    avatar.style.imageRendering = 'pixelated'
+    avatar.textContent = ''
+    
+    // Fallback if no skin val
+    if (!currentSkinVal) {
+      avatar.style.backgroundImage = ''
+      avatar.textContent = username ? username.charAt(0).toUpperCase() : '?'
+    }
   }
 }
 
@@ -828,16 +975,17 @@ async function uploadSkinToServer() {
       // Update SP hint with the actual skin URL returned by server
       const hintText = $id('skin-sp-hint-text')
       if (hintText && res.url) {
-        hintText.innerHTML = `SP in-game parancs: <code>/skin url ${res.url}</code>`
+        hintText.innerHTML = t('skin.singleplayer_hint').replace('{}', `<code>${res.url}</code>`)
         const hint = $id('skin-sp-hint')
         if (hint) hint.style.display = 'flex'
       }
     } else {
       console.warn('[Skins] Szerver hiba:', res.error)
+      showToast('❌ ' + (res.error || t('toast.error')))
     }
   } catch (e) {
     console.warn('[Skins] Nem sikerült feltölteni a skint:', e.message)
-    showToast('⚠️ Skin feltöltés sikertelen (nincs szerver kapcsolat)')
+    showToast('⚠️ ' + t('skin.toast_upload_error'))
   }
 }
 

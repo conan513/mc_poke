@@ -1,77 +1,87 @@
 {
-  "welcome": {
-    "title": "Tervetuloa Cobbleverseen",
-    "subtitle": "Lopullinen Pokémon-kokemus Minecraftissa",
-    "username_label": "Valitse käyttäjänimi:",
-    "username_placeholder": "Käyttäjänimi",
-    "ram_label": "Muisti (RAM):",
-    "install_btn": "ASENNA JA PELAA",
-    "disclaimer": "Napsauttamalla asenna hyväksyt n. 2 Gt:n datan lataamisen.",
-    "stats_pokemon": "1025 Pokémon",
-    "stats_regions": "4 Regions",
-    "stats_megas": "93 Mega Evolutions"
-  },
-  "install": {
-    "title": "Asennus",
-    "preparing": "Valmistellaan...",
-    "java": "Ladataan Java 21...",
-    "minecraft": "Ladataan Minecraft...",
-    "fabric": "Asennetaan Fabric...",
-    "modpack": "Ladataan modipakettia...",
-    "waiting": "Odotetaan...",
-    "done": "Kaikki asennettu! Hauskaa peliä! 🎮",
-    "error": "Asennusvirhe: ",
-    "subtitle": "Please wait while we prepare your game..."
-  },
-  "home": {
-    "player_status": "Offline-tila",
-    "play_btn": "KÄYNNISTÄ PELI",
-    "launching": "KÄYNNISTETÄÄN...",
-    "running": "PELI KÄYNNISSÄ",
-    "version": "Versio",
-    "ram": "RAM",
-    "sync_label": "Mukautettu Mod Sync -palvelin (valinnainen):",
-    "update_available": "Päivitys saatavilla!",
-    "download_required": "Lataus vaaditaan",
-    "update_btn": "Päivitä",
-    "console_btn": "Konsoli",
-    "files_btn": "Tiedostot",
-    "trainer_placeholder": "Trainer",
-    "ui_online": "Online UI",
-    "ui_no_internet": "No Internet",
-    "ui_server_offline": "Server Offline"
-  },
-  "sync": {
-    "connecting": "Yhdistetään palvelimeen: ",
-    "deleting": "Poistetaan vanhoja synkronoituja tiedostoja...",
-    "downloading": "Ladataan: ",
-    "error": "Synkronointivirhe: ",
-    "up_to_date": "Kaikki tiedostot ovat ajan tasalla.",
-    "finished": "Synkronointi valmis! Ladattu: "
-  },
-  "toast": {
-    "username_short": "Käyttäjänimen on oltava vähintään 3 merkkiä pitkä!",
-    "username_chars": "Vain kirjaimet, numerot ja _ ovat sallittuja!",
-    "install_error": "Asennusvirhe: ",
-    "update_error": "Päivitysvirhe: ",
-    "launch_error": "Launch error: "
-  },
-  "skin": {
-    "type_mojang": "Mojang Name",
-    "toast_empty": "⚠️ Please provide a name, link or select a file!",
-    "rotate_hint": "Drag to rotate",
-    "modal_title": "Skin Settings",
-    "browse_btn": "Select file...",
-    "type_url": "Custom URL",
-    "type_file": "Local File",
-    "source_label": "Skin Source",
-    "toast_saved": "✅ Skin saved and uploaded to server!",
-    "toast_upload_error": "⚠️ Skin upload failed (no server connection)",
-    "save_btn": "Save & Apply"
-  },
-  "titlebar": {
-    "minimize": "Minimize",
-    "close": "Close",
-    "lang_title": "Change language"
-  }
+ "welcome": {
+  "title": "Tervetuloa Cobbleverseen",
+  "subtitle": "Lopullinen Pokémon-kokemus Minecraftissa",
+  "username_label": "Valitse profiili tai lisää uusi",
+  "username_placeholder": "Uusi kouluttajan nimi...",
+  "ram_label": "Muisti (RAM):",
+  "install_btn": "ASENNA JA PELAA",
+  "disclaimer": "Napsauttamalla asenna hyväksyt n. 2 Gt:n datan lataamisen.",
+  "stats_pokemon": "1025 Pokémon",
+  "profile_add_btn": "Lisää profiili"
+ },
+ "install": {
+  "title": "Asennus",
+  "preparing": "Valmistellaan...",
+  "java": "Ladataan Java 21...",
+  "minecraft": "Ladataan Minecraft...",
+  "fabric": "Asennetaan Fabric...",
+  "modpack": "Ladataan modipakettia...",
+  "waiting": "Odotetaan...",
+  "done": "Kaikki asennettu! Hauskaa peliä! ",
+  "error": "Asennusvirhe: ",
+  "subtitle": "Please wait while we prepare your game..."
+ },
+ "home": {
+  "player_status": "Offline-tila",
+  "play_btn": "KÄYNNISTÄ PELI",
+  "launching": "KÄYNNISTETÄÄN...",
+  "running": "PELI KÄYNNISSÄ",
+  "version": "Versio",
+  "ram": "RAM",
+  "sync_label": "Mukautettu Mod Sync -palvelin (valinnainen):",
+  "update_available": "Päivitys saatavilla!",
+  "download_required": "Lataus vaaditaan",
+  "update_btn": "Päivitä",
+  "console_btn": "Konsoli",
+  "files_btn": "Tiedostot",
+  "trainer_placeholder": "Trainer",
+  "ui_online": "Online UI",
+  "ui_no_internet": "No Internet",
+  "ui_server_offline": "Server Offline",
+  "trainer_placeholder": "Kouluttaja",
+  "change_skin_label": "Vaihda skini",
+  "switch_profile": "Vaihda profiilia"
+ },
+ "sync": {
+  "connecting": "Yhdistetään palvelimeen: ",
+  "deleting": "Poistetaan vanhoja synkronoituja tiedostoja...",
+  "downloading": "Ladataan: ",
+  "error": "Synkronointivirhe: ",
+  "up_to_date": "Kaikki tiedostot ovat ajan tasalla.",
+  "finished": "Synkronointi valmis! Ladattu: "
+ },
+ "toast": {
+  "username_short": "Käyttäjänimen on oltava vähintään 3 merkkiä pitkä!",
+  "username_chars": "Vain kirjaimet, numerot ja _ ovat sallittuja!",
+  "install_error": "Asennusvirhe: ",
+  "update_error": "Päivitysvirhe: ",
+  "launch_error": "Käynnistysvirhe: ",
+  "auth_error": "Tunnistautumisvirhe: ",
+  "launch_denied": "Palvelin hylkäsi käynnistyksen.",
+  "username_required": "Anna nimi pelin käynnistämiseksi!",
+  "profile_exists": "Tämä profiili on jo olemassa!",
+  "profile_selected": "{} valittu. Aloita napsauttamalla Pelaa!"
+ },
+ "skin": {
+  "modal_title": "Skin-asetukset",
+  "rotate_hint": "Vedä kääntääksesi",
+  "source_label": "Skinin lähde",
+  "type_mojang": "Mojang-nimi",
+  "type_url": "Mukautettu URL",
+  "type_file": "Paikallinen tiedosto",
+  "browse_btn": "Valitse tiedosto...",
+  "save_btn": "Tallenna ja käytä",
+  "toast_empty":"Anna nimi, linkki tai valitse tiedosto!",
+  "toast_saved":"Skin tallennettu ja ladattu palvelimelle!",
+  "toast_upload_error":"Skinin lataus epäonnistui (ei palvelinyhteyttä)",
+  "remove_profile": "Poista profiili",
+  "multiplayer_hint": "Moninpelissä SkinsRestorer asettaa skinin automaattisesti!",
+  "singleplayer_hint": "Yksinpelissä suorita pelissä: <code>/skin url {}</code>"
+ },
+ "titlebar": {
+  "minimize": "Minimize",
+  "close": "Close",
+  "lang_title": "Change language"
+ }
 }
