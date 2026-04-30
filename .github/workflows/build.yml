@@ -10,6 +10,9 @@ on:
     branches:
       - main
 
+permissions:
+  contents: write
+
 jobs:
   build:
     runs-on: ${{ matrix.os }}
@@ -43,12 +46,18 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
+          # Only publish on main branch push or tags
+          PUBLISH_FLAG=""
+          if [[ "${{ github.event_name }}" == "push" && ("${{ github.ref }}" == "refs/heads/main" || "${{ github.ref }}" == refs/tags/v*) ]]; then
+            PUBLISH_FLAG="--publish always"
+          fi
+
           if [ "${{ matrix.os }}" = "windows-latest" ]; then
-            npm run dist:win
+            npm run dist:win -- $PUBLISH_FLAG
           elif [ "${{ matrix.os }}" = "macos-latest" ]; then
-            npm run dist:mac
+            npm run dist:mac -- $PUBLISH_FLAG
           else
-            npm run dist:linux
+            npm run dist:linux -- $PUBLISH_FLAG
           fi
         shell: bash
 
