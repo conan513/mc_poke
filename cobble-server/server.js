@@ -20,7 +20,7 @@ const path = require('path')
 const crypto = require('crypto')
 const os = require('os')
 const { spawn, execFile } = require('child_process')
-const installer = require('./installer')
+const { install, downloadFile, rollback, commitUpdate, logInfo, logError } = require('./installer')
 const https = require('https')
 const EventEmitter = require('events')
 const serverEvents = new EventEmitter()
@@ -387,7 +387,7 @@ function handleRequest(req, res) {
 
         if (isUrl) {
           // Download the skin PNG from the provided URL
-          installer.downloadFile(skinData, savePath).then(onSaved).catch(e => {
+          downloadFile(skinData, savePath).then(onSaved).catch(e => {
             res.writeHead(500)
             res.end(JSON.stringify({ error: e.message }))
           })
@@ -820,7 +820,7 @@ function handleRequest(req, res) {
 
             const dest = path.join(MODS_DIR, file.filename)
 
-            installer.downloadFile(file.url, dest, { hash: file.hashes?.sha1 }).then(() => {
+            downloadFile(file.url, dest, { hash: file.hashes?.sha1 }).then(() => {
               // Ha frissítés volt, töröljük a régit
               if (oldFilename && oldFilename !== file.filename && !oldFilename.includes('..')) {
                 const oldPath = path.join(MODS_DIR, oldFilename)
@@ -1005,8 +1005,7 @@ function scheduleNightlyRestart() {
   if (msUntilWarning > 0) {
     setTimeout(() => {
       const msg = '[Scheduler] ⚠️  Automatic restart in 5 minutes!'
-      console.log(msg)
-      fs.appendFileSync(path.join(DATA_DIR, 'updater.log'), `[${new Date().toISOString()}] ${msg}\n`)
+      logInfo(msg)
       sendCommand('say [Server] Automatic restart in 5 minutes! Mod updates incoming...')
     }, msUntilWarning)
   }
@@ -1014,8 +1013,7 @@ function scheduleNightlyRestart() {
   // Újraindítás időpontja
   setTimeout(async () => {
     const msgStart = '[Scheduler] 🔄 Nightly automatic restart beginning...'
-    console.log(msgStart)
-    fs.appendFileSync(path.join(DATA_DIR, 'updater.log'), `[${new Date().toISOString()}] ${msgStart}\n`)
+    logInfo(msgStart)
     sendCommand('say [Server] Restarting now! We will be back in a few seconds.')
 
     // Adjunk 3 mp-et hogy a chat üzenet kimenjen
@@ -1033,24 +1031,21 @@ function scheduleNightlyRestart() {
     })
 
     const msgStop = '[Scheduler] ⬇️  Minecraft stopped, checking for updates...'
-    console.log(msgStop)
-    fs.appendFileSync(path.join(DATA_DIR, 'updater.log'), `[${new Date().toISOString()}] ${msgStop}\n`)
+    logInfo(msgStop)
 
     const skipUpdate = fs.existsSync(UPDATE_FAILED_FLAG)
 
     try {
       if (skipUpdate) {
         const msgSkip = '[Scheduler] ⚠️ Skipping update attempt because previous update failed. Restarting only.'
-        console.log(msgSkip)
-        fs.appendFileSync(path.join(DATA_DIR, 'updater.log'), `[${new Date().toISOString()}] ${msgSkip}\n`)
+        logInfo(msgSkip)
         fs.unlinkSync(UPDATE_FAILED_FLAG) // Clear the flag so we try again next time
       } else {
-        const javaPath = await installer.install()
+        const javaPath = await install()
         activeJavaPath = javaPath
         invalidateManifest()
         const msgDone = '[Scheduler] ✅ Update packages applied, checking server health...'
-        console.log(msgDone)
-        fs.appendFileSync(path.join(DATA_DIR, 'updater.log'), `[${new Date().toISOString()}] ${msgDone}\n`)
+        logInfo(msgDone)
       }
 
       startMinecraft()
@@ -1058,12 +1053,11 @@ function scheduleNightlyRestart() {
       if (!skipUpdate) {
         await waitForServerReady(300000) // 5 perc watchdog
         logInfo('[Scheduler] ✅ Server is healthy, committing update.')
-        installer.commitUpdate()
+        commitUpdate()
       }
     } catch (err) {
       const msgErr = `[Scheduler] ❌ Update or startup failed: ${err.message}`
-      console.error(msgErr)
-      fs.appendFileSync(path.join(DATA_DIR, 'updater.log'), `[${new Date().toISOString()}] ${msgErr}\n`)
+      logError(msgErr)
 
       if (!skipUpdate) {
         logInfo('[Scheduler] 🔄 Initiating rollback...')
@@ -1071,7 +1065,7 @@ function scheduleNightlyRestart() {
         await new Promise(r => setTimeout(r, 5000))
         if (mcProcess) mcProcess.kill('SIGKILL') // Force kill if stuck
         
-        installer.rollback()
+        rollback()
         fs.writeFileSync(UPDATE_FAILED_FLAG, 'true')
         
         logInfo('[Scheduler] 🔄 Restarting with previous working version...')
@@ -1092,7 +1086,7 @@ function scheduleNightlyRestart() {
 async function start() {
   try {
     // 1. Install / Update Modpack and Fabric Server
-    const javaPath = await installer.install()
+    const javaPath = await install()
     invalidateManifest()
 
     // 2. Start HTTP Sync Server
@@ -1126,7 +1120,7 @@ async function start() {
     // Initial start health check (optional but good)
     waitForServerReady(300000).then(() => {
       logInfo('[Main] Server started successfully.')
-      installer.commitUpdate() // In case it was an update that needed committing
+      commitUpdate() // In case it was an update that needed committing
     }).catch(err => {
       logError(`[Main] Server startup warning: ${err.message}`)
     })

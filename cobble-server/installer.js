@@ -896,4 +896,4 @@ async function install() {
   return javaPath
 }
 
-module.exports = { install, downloadFile, rollback, commitUpdate }
+module.exports = { install, downloadFile, rollback, commitUpdate, logInfo, logError }
