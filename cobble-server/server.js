@@ -14,18 +14,18 @@
  * ─────────────────────────────────────────────────────────────
  */
 
-const http    = require('http')
-const fs      = require('fs')
-const path    = require('path')
-const crypto  = require('crypto')
-const os      = require('os')
+const http = require('http')
+const fs = require('fs')
+const path = require('path')
+const crypto = require('crypto')
+const os = require('os')
 const { spawn, execFile } = require('child_process')
 const installer = require('./installer')
-const https   = require('https')
+const https = require('https')
 
-const PORT       = parseInt(process.env.PORT || '8080', 10)
-const DATA_DIR   = path.join(__dirname, 'server-data')
-const SKINS_DIR  = path.join(DATA_DIR, 'skins')
+const PORT = parseInt(process.env.PORT || '8080', 10)
+const DATA_DIR = path.join(__dirname, 'server-data')
+const SKINS_DIR = path.join(DATA_DIR, 'skins')
 const SYNC_FOLDERS = ['mods', 'datapacks', 'config', 'resourcepacks', 'shaderpacks']
 
 // Map of folder names to their full paths
@@ -48,6 +48,8 @@ let nextRestartTime = null
 
 // Játékosok nyomon követése
 const onlinePlayers = new Set()
+const verifiedLaunchers = new Map() // username -> { ip, expiry }
+const LAUNCHER_SECRET = 'cobble-super-secret-key-2024' // Csak a launcher és a szerver tudja
 
 // Ensure sync directories exist
 SYNC_FOLDERS.forEach(f => {
@@ -109,19 +111,34 @@ function startMinecraft() {
     stdio: ['pipe', 'pipe', 'inherit'] // stdout 'pipe', hogy tudjuk olvasni a játékos csatlakozásokat
   })
   mcStatus = 'running'
-  
+
   mcProcess.stdout.on('data', (data) => {
     process.stdout.write(data) // Továbbítjuk a konzolra
-    
+
     const lines = data.toString().split('\n')
     for (const line of lines) {
+      // Whitelist bekapcsolása amikor a szerver kész
+      if (line.includes('Done (') && line.includes('s)! For help, type "help"')) {
+        console.log('[Minecraft] Szerver kész, whitelist bekapcsolása...')
+        sendCommand('whitelist on')
+      }
+
       // "Herobrine joined the game"
       const joinMatch = line.match(/:\s+([a-zA-Z0-9_]{3,16})\s+joined the game/)
-      if (joinMatch) onlinePlayers.add(joinMatch[1])
-      
+      if (joinMatch) {
+        onlinePlayers.add(joinMatch[1])
+        // Ha bent van, levehetjük a whitelistről? Nem, jobb ha rajta marad amíg online.
+      }
+
       // "Herobrine left the game"
       const leaveMatch = line.match(/:\s+([a-zA-Z0-9_]{3,16})\s+left the game/)
-      if (leaveMatch) onlinePlayers.delete(leaveMatch[1])
+      if (leaveMatch) {
+        const user = leaveMatch[1]
+        onlinePlayers.delete(user)
+        console.log(`[Minecraft] ${user} kilépett, eltávolítás a whitelistről.`)
+        sendCommand(`whitelist remove ${user}`)
+        verifiedLaunchers.delete(user)
+      }
     }
   })
 
@@ -183,7 +200,7 @@ function buildManifest() {
 
   const mapFiles = (files, dir) => files.map(relPath => {
     const filePath = path.join(dir, relPath)
-    const buf  = fs.readFileSync(filePath)
+    const buf = fs.readFileSync(filePath)
     const hash = crypto.createHash('sha256').update(buf).digest('hex')
     return { filename: relPath, hash, size: buf.length }
   })
@@ -435,9 +452,9 @@ function handleRequest(req, res) {
     const filePath = path.join(DIST_DIR, relPath)
     if (!relPath.includes('..') && fs.existsSync(filePath) && fs.statSync(filePath).isFile()) {
       const ext = path.extname(relPath)
-      const mimeTypes = { 
+      const mimeTypes = {
         '.html': 'text/html',
-        '.css': 'text/css', 
+        '.css': 'text/css',
         '.js': 'application/javascript',
         '.png': 'image/png',
         '.jpg': 'image/jpeg',
@@ -450,7 +467,7 @@ function handleRequest(req, res) {
       }
       // Add aggressive caching for images and fonts
       const isAsset = ['.png', '.jpg', '.jpeg', '.svg', '.woff', '.woff2', '.ttf'].includes(ext)
-      res.writeHead(200, { 
+      res.writeHead(200, {
         'Content-Type': mimeTypes[ext] || 'application/octet-stream',
         'Cache-Control': isAsset ? 'public, max-age=31536000, immutable' : 'no-cache'
       })
@@ -462,7 +479,7 @@ function handleRequest(req, res) {
   // ── Root / Landing Page ───────────────────────────────────
   if (url === '/' || url === '' || url === '/index.html') {
     const accept = req.headers['accept'] || ''
-    
+
     // Ha böngésző kéri (HTML), adjuk a Web Installert
     if (accept.includes('text/html')) {
       const filePath = path.join(WEB_INSTALLER_DIR, 'index.html')
@@ -502,10 +519,51 @@ function handleRequest(req, res) {
     return
   }
 
+  // ── Launcher Verification API ─────────────────────────────
+  if (url === '/api/launcher/verify' && req.method === 'POST') {
+    let body = ''
+    req.on('data', c => body += c)
+    req.on('end', () => {
+      try {
+        const { username, secret } = JSON.parse(body)
+        if (secret !== LAUNCHER_SECRET) {
+          console.warn(`[Verification] Hibás titkos kód: ${username}`)
+          res.writeHead(403)
+          return res.end(JSON.stringify({ error: 'Érvénytelen launcher kód.' }))
+        }
+
+        const ip = req.socket.remoteAddress
+        console.log(`[Verification] Sikeres igazolás: ${username} (IP: ${ip})`)
+
+        // Hozzáadás a whitelisthez
+        sendCommand(`whitelist add ${username}`)
+
+        // Eltároljuk az igazolást (60 mp-ig érvényes a belépéshez)
+        verifiedLaunchers.set(username, { ip, expiry: Date.now() + 60000 })
+
+        // Időzítő: ha 60 mp után sincs online, vegyük le (ha csak "próbálkozott")
+        setTimeout(() => {
+          if (!onlinePlayers.has(username)) {
+            console.log(`[Verification] ${username} nem lépett be időben, whitelist remove.`)
+            sendCommand(`whitelist remove ${username}`)
+            verifiedLaunchers.delete(username)
+          }
+        }, 60000)
+
+        res.writeHead(200, { 'Content-Type': 'application/json' })
+        res.end(JSON.stringify({ success: true }))
+      } catch (e) {
+        res.writeHead(400)
+        res.end(JSON.stringify({ error: e.message }))
+      }
+    })
+    return
+  }
+
   // ── Serve Web Installer assets (app.js, style.css, images, releases) ──
   const allowedExtensions = ['.js', '.css', '.png', '.jpg', '.jpeg', '.exe', '.AppImage', '.deb', '.zip', '.dmg', '.json', '.ico']
   const requestedFile = url.startsWith('/') ? url.slice(1) : url
-  
+
   // Basic security: prevent directory traversal
   if (requestedFile.includes('..')) return
 
@@ -513,8 +571,8 @@ function handleRequest(req, res) {
   const ext = path.extname(requestedFile)
 
   if (allowedExtensions.includes(ext) && fs.existsSync(filePath)) {
-    const mimeTypes = { 
-      '.css': 'text/css', 
+    const mimeTypes = {
+      '.css': 'text/css',
       '.js': 'application/javascript',
       '.png': 'image/png',
       '.jpg': 'image/jpeg',
@@ -526,7 +584,7 @@ function handleRequest(req, res) {
       '.zip': 'application/zip',
       '.dmg': 'application/x-apple-diskimage'
     }
-    res.writeHead(200, { 
+    res.writeHead(200, {
       'Content-Type': mimeTypes[ext] || 'application/octet-stream',
       'Cache-Control': 'public, max-age=86400'
     })
@@ -592,19 +650,19 @@ function handleRequest(req, res) {
     let baseFiles = []
     try {
       baseFiles = JSON.parse(fs.readFileSync(path.join(DATA_DIR, '.modpack-files.json'), 'utf8'))
-    } catch (e) {}
-    
+    } catch (e) { }
+
     const allMods = manifest.mods.map(m => ({
       ...m,
       isBase: baseFiles.includes(m.filename)
     }))
-    
+
     // Előre a saját modokat, utána a modpack modokat
     allMods.sort((a, b) => {
       if (a.isBase === b.isBase) return a.filename.localeCompare(b.filename)
       return a.isBase ? 1 : -1
     })
-    
+
     res.writeHead(200, { 'Content-Type': 'application/json' })
     res.end(JSON.stringify({ mods: allMods }))
     return
@@ -682,7 +740,7 @@ function handleRequest(req, res) {
         projectsArr.forEach(p => { projects[p.id] = { title: p.title, icon_url: p.icon_url } })
 
         // 3. Check updates (custom mods only, passed in from frontend filter)
-        const updates = await modrinthPost('/v2/version_files/update', { hashes, algorithm: 'sha1', loaders: ['fabric'], game_versions: ['1.21.1'] }).catch(() => {})
+        const updates = await modrinthPost('/v2/version_files/update', { hashes, algorithm: 'sha1', loaders: ['fabric'], game_versions: ['1.21.1'] }).catch(() => { })
 
         res.writeHead(200, { 'Content-Type': 'application/json' })
         res.end(JSON.stringify({ versions, projects, updates: updates || {} }))
@@ -702,7 +760,7 @@ function handleRequest(req, res) {
       try {
         const { projectId, oldFilename } = JSON.parse(body)
         const apiUrl = `https://api.modrinth.com/v2/project/${projectId}/version?loaders=["fabric"]&game_versions=["1.21.1"]`
-        
+
         https.get(apiUrl, { headers: { 'User-Agent': 'CobbleServer/1.0' } }, apiRes => {
           let data = ''
           apiRes.on('data', c => data += c)
@@ -715,9 +773,9 @@ function handleRequest(req, res) {
             }
             const latest = versions.filter(v => v.version_type === 'release')[0] || versions[0]
             const file = latest.files.find(f => f.primary) || latest.files[0]
-            
+
             const dest = path.join(MODS_DIR, file.filename)
-            
+
             installer.downloadFile(file.url, dest, { hash: file.hashes?.sha1 }).then(() => {
               // Ha frissítés volt, töröljük a régit
               if (oldFilename && oldFilename !== file.filename && !oldFilename.includes('..')) {
@@ -764,10 +822,10 @@ function handleRequest(req, res) {
             }
           }
         });
-      } catch (e) {}
+      } catch (e) { }
       return results;
     };
-    
+
     res.writeHead(200, { 'Content-Type': 'application/json' });
     res.end(JSON.stringify({ configs: getConfigsRecursive(configDir, configDir) }));
     return;
@@ -780,14 +838,14 @@ function handleRequest(req, res) {
       try {
         const { filename } = JSON.parse(body);
         if (!filename) throw new Error('Hiányzó fájlnév.');
-        
+
         const configDir = path.resolve(DATA_DIR, 'config');
         const targetPath = path.resolve(configDir, filename);
-        
+
         // Path traversal védelem
         if (!targetPath.startsWith(configDir)) throw new Error('Érvénytelen fájl útvonal!');
         if (!fs.existsSync(targetPath)) throw new Error('A fájl nem található!');
-        
+
         const content = fs.readFileSync(targetPath, 'utf8');
         res.writeHead(200, { 'Content-Type': 'application/json' });
         res.end(JSON.stringify({ content }));
@@ -806,20 +864,20 @@ function handleRequest(req, res) {
       try {
         const { filename, content } = JSON.parse(body);
         if (!filename || typeof content !== 'string') throw new Error('Hiányzó vagy hibás adatok.');
-        
+
         const configDir = path.resolve(DATA_DIR, 'config');
         const targetPath = path.resolve(configDir, filename);
-        
+
         // Path traversal védelem
         if (!targetPath.startsWith(configDir)) throw new Error('Érvénytelen fájl útvonal!');
-        
+
         // Mentjük a fájlt (ha nem létezik, létrehozza, de alapvetően csak meglévőt szerkesztünk)
         fs.writeFileSync(targetPath, content, 'utf8');
         console.log(`[Config Editor] Sikeres mentés: ${filename}`);
-        
+
         // Megpróbáljuk újratölteni a szervert
         sendCommand('reload');
-        
+
         res.writeHead(200, { 'Content-Type': 'application/json' });
         res.end(JSON.stringify({ success: true, reloaded: true }));
       } catch (e) {
@@ -894,7 +952,7 @@ function scheduleNightlyRestart() {
 
   const msUntilRestart = next - now
   const msUntilWarning = msUntilRestart - 5 * 60 * 1000 // 5 perccel korábban figyelmeztet
-  
+
   nextRestartTime = next.getTime()
 
   console.log(`[Scheduler] Next automatic restart: ${next.toLocaleString('en-US')} (in ${Math.round(msUntilRestart / 60000)} minutes)`)
@@ -961,7 +1019,7 @@ async function start() {
     // 1. Install / Update Modpack and Fabric Server
     const javaPath = await installer.install()
     invalidateManifest()
-    
+
     // 2. Start HTTP Sync Server
     const server = http.createServer(handleRequest)
     server.listen(PORT, '0.0.0.0', () => {

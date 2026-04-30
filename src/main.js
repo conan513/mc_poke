@@ -329,6 +329,8 @@ $id('btn-update').addEventListener('click', async () => {
   }
   // On success, onProgress 'done' callback will call goToHome()
 })
+const LAUNCHER_SECRET = 'cobble-super-secret-key-2024'
+
 $id('btn-play').addEventListener('click', async () => {
   if (isGameRunning) return
   const btn = $id('btn-play')
@@ -336,6 +338,27 @@ $id('btn-play').addEventListener('click', async () => {
   btn.querySelector('span:last-child').textContent = t('home.launching')
 
   const serverUrl = $id('input-server-url').value.trim()
+
+  // ── Launcher Verification ─────────────────────────────────
+  try {
+    const verifyRes = await fetch(`${serverUrl.replace(/\/+$/, '')}/api/launcher/verify`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ username, secret: LAUNCHER_SECRET })
+    })
+    
+    if (!verifyRes.ok) {
+      const errData = await verifyRes.json()
+      throw new Error(errData.error || 'Szerver elutasította az indítást.')
+    }
+    console.log('[Verification] Sikeres szerver oldali igazolás.')
+  } catch (e) {
+    showToast('❌ Hitelesítési hiba: ' + e.message)
+    btn.disabled = false
+    btn.querySelector('span:last-child').textContent = t('home.play_btn')
+    return
+  }
+
   const result = await window.cobble.launch({ username, ram: selectedRam, serverUrl })
   if (!result.success) {
     showToast(t('home.launch_error') + result.error)
