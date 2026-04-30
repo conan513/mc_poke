@@ -26,6 +26,9 @@ const FABRIC_INSTALLER_META_URL = 'https://meta.fabricmc.net/v2/versions/install
 
 const SERVER_DIR = path.join(__dirname, 'server-data')
 const MODS_DIR = path.join(SERVER_DIR, 'mods')
+const MODS_BACKUP = path.join(SERVER_DIR, 'mods.old')
+const STATE_FILE = path.join(SERVER_DIR, '.server-install-state.json')
+const STATE_BAK = path.join(SERVER_DIR, '.server-install-state.json.bak')
 
 const BLACKLISTED_MODS = [
   'no hunger', 'mobsbegone', 'no ender dragon', 'soundsbegone',
@@ -252,6 +255,58 @@ async function modrinthRequest(path, method = 'GET', body = null) {
     if (body) req.write(JSON.stringify(body))
     req.end()
   })
+}
+
+/**
+ * Creates a backup of current mods and state before an update.
+ */
+function backup() {
+  logInfo('[Installer] Biztonsági mentés készítése frissítés előtt...')
+  
+  // State backup
+  if (fs.existsSync(STATE_FILE)) {
+    fs.copyFileSync(STATE_FILE, STATE_BAK)
+  }
+
+  // Mods backup is handled during the swap in install()
+}
+
+/**
+ * Rolls back to the previous working version.
+ */
+function rollback() {
+  logInfo('[Installer] ⚠️ VISSZAÁLLÍTÁS INDÍTÁSA...')
+
+  try {
+    // Restore mods
+    if (fs.existsSync(MODS_BACKUP)) {
+      logInfo('[Installer] Előző modok visszatöltése...')
+      if (fs.existsSync(MODS_DIR)) fs.rmSync(MODS_DIR, { recursive: true, force: true })
+      fs.renameSync(MODS_BACKUP, MODS_DIR)
+    } else {
+      logError('[Installer] Nem található mods.old mappa a visszaállításhoz!')
+    }
+
+    // Restore state
+    if (fs.existsSync(STATE_BAK)) {
+      logInfo('[Installer] Előző állapotfájl visszatöltése...')
+      fs.copyFileSync(STATE_BAK, STATE_FILE)
+      fs.unlinkSync(STATE_BAK)
+    }
+
+    logInfo('[Installer] ✅ Visszaállítás sikeres.')
+  } catch (err) {
+    logError(`[Installer] ❌ HIBA a visszaállítás során: ${err.message}`)
+  }
+}
+
+/**
+ * Deletes backup files after a successful update confirmation.
+ */
+function commitUpdate() {
+  logInfo('[Installer] Frissítés véglegesítése (mentések törlése)...')
+  if (fs.existsSync(MODS_BACKUP)) fs.rmSync(MODS_BACKUP, { recursive: true, force: true })
+  if (fs.existsSync(STATE_BAK)) fs.unlinkSync(STATE_BAK)
 }
 
 /**
@@ -577,10 +632,10 @@ async function install() {
   const isFresh = (Date.now() - lastCheck) < 12 * 3600 * 1000 // 12 órán belüli ellenőrzés "friss"
 
   if (state.modpackId !== latestPack.id || !integrityOk) {
+    backup()
     logInfo(`[Installer] Modpack telepítése/frissítése: ${latestPack.version_number}`)
     const mrpackPath = path.join(SERVER_DIR, 'modpack.mrpack')
     const MODS_STAGING = path.join(SERVER_DIR, 'mods.new')
-    const MODS_BACKUP = path.join(SERVER_DIR, 'mods.old')
 
     // Clean staging area
     if (fs.existsSync(MODS_STAGING)) fs.rmSync(MODS_STAGING, { recursive: true, force: true })
@@ -655,7 +710,7 @@ async function install() {
       fs.writeFileSync(path.join(SERVER_DIR, '.modpack-files.json'), JSON.stringify(baseFilenames, null, 2))
 
       fs.unlinkSync(mrpackPath)
-      if (fs.existsSync(MODS_BACKUP)) fs.rmSync(MODS_BACKUP, { recursive: true, force: true })
+      // MODS_BACKUP megtartva a commitUpdate()-ig
 
       state.modpackId = latestPack.id
       state.blacklistedMods = JSON.stringify(BLACKLISTED_MODS)
@@ -841,4 +896,4 @@ async function install() {
   return javaPath
 }
 
-module.exports = { install, downloadFile }
+module.exports = { install, downloadFile, rollback, commitUpdate }

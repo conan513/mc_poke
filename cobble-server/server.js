@@ -22,6 +22,8 @@ const os = require('os')
 const { spawn, execFile } = require('child_process')
 const installer = require('./installer')
 const https = require('https')
+const EventEmitter = require('events')
+const serverEvents = new EventEmitter()
 
 const PORT = parseInt(process.env.PORT || '8080', 10)
 const DATA_DIR = path.join(__dirname, 'server-data')
@@ -45,6 +47,8 @@ let mcProcess = null
 let mcStatus = 'stopped'
 let activeJavaPath = null
 let nextRestartTime = null
+let isServerReady = false
+const UPDATE_FAILED_FLAG = path.join(DATA_DIR, '.update-failed')
 
 // Játékosok nyomon követése
 const onlinePlayers = new Set()
@@ -111,6 +115,7 @@ function startMinecraft() {
     stdio: ['pipe', 'pipe', 'inherit'] // stdout 'pipe', hogy tudjuk olvasni a játékos csatlakozásokat
   })
   mcStatus = 'running'
+  isServerReady = false
 
   mcProcess.stdout.on('data', (data) => {
     process.stdout.write(data) // Továbbítjuk a konzolra
@@ -120,6 +125,8 @@ function startMinecraft() {
       // Whitelist bekapcsolása amikor a szerver kész
       if (line.includes('Done (') && line.includes('s)! For help, type "help"')) {
         console.log('[Minecraft] Szerver kész, whitelist bekapcsolása...')
+        isServerReady = true
+        serverEvents.emit('ready')
         sendCommand('whitelist on')
       }
 
@@ -145,8 +152,45 @@ function startMinecraft() {
   mcProcess.on('close', (code) => {
     console.log(`[Minecraft] Szerver leállt (kód: ${code}).`)
     mcStatus = 'stopped'
+    isServerReady = false
     mcProcess = null
     onlinePlayers.clear()
+    serverEvents.emit('stopped', code)
+  })
+}
+
+/**
+ * Wait for the server to log the "Done" message.
+ */
+function waitForServerReady(timeoutMs = 300000) {
+  return new Promise((resolve, reject) => {
+    const timer = setTimeout(() => {
+      serverEvents.removeListener('ready', onReady)
+      serverEvents.removeListener('stopped', onStopped)
+      reject(new Error(`Szerver indítási időtúllépés (${Math.round(timeoutMs/1000)} mp). Valószínűleg beragadt.`))
+    }, timeoutMs)
+
+    const onReady = () => {
+      clearTimeout(timer)
+      serverEvents.removeListener('stopped', onStopped)
+      resolve()
+    }
+
+    const onStopped = (code) => {
+      clearTimeout(timer)
+      serverEvents.removeListener('ready', onReady)
+      reject(new Error(`Szerver váratlanul leállt az indítás során (kód: ${code}).`))
+    }
+
+    serverEvents.once('ready', onReady)
+    serverEvents.once('stopped', onStopped)
+
+    if (isServerReady) {
+      clearTimeout(timer)
+      serverEvents.removeListener('ready', onReady)
+      serverEvents.removeListener('stopped', onStopped)
+      resolve()
+    }
   })
 }
 
@@ -992,20 +1036,51 @@ function scheduleNightlyRestart() {
     console.log(msgStop)
     fs.appendFileSync(path.join(DATA_DIR, 'updater.log'), `[${new Date().toISOString()}] ${msgStop}\n`)
 
+    const skipUpdate = fs.existsSync(UPDATE_FAILED_FLAG)
+
     try {
-      const javaPath = await installer.install()
-      activeJavaPath = javaPath
-      invalidateManifest()
-      const msgDone = '[Scheduler] ✅ Updates complete, restarting Minecraft...'
-      console.log(msgDone)
-      fs.appendFileSync(path.join(DATA_DIR, 'updater.log'), `[${new Date().toISOString()}] ${msgDone}\n`)
+      if (skipUpdate) {
+        const msgSkip = '[Scheduler] ⚠️ Skipping update attempt because previous update failed. Restarting only.'
+        console.log(msgSkip)
+        fs.appendFileSync(path.join(DATA_DIR, 'updater.log'), `[${new Date().toISOString()}] ${msgSkip}\n`)
+        fs.unlinkSync(UPDATE_FAILED_FLAG) // Clear the flag so we try again next time
+      } else {
+        const javaPath = await installer.install()
+        activeJavaPath = javaPath
+        invalidateManifest()
+        const msgDone = '[Scheduler] ✅ Update packages applied, checking server health...'
+        console.log(msgDone)
+        fs.appendFileSync(path.join(DATA_DIR, 'updater.log'), `[${new Date().toISOString()}] ${msgDone}\n`)
+      }
+
+      startMinecraft()
+
+      if (!skipUpdate) {
+        await waitForServerReady(300000) // 5 perc watchdog
+        logInfo('[Scheduler] ✅ Server is healthy, committing update.')
+        installer.commitUpdate()
+      }
     } catch (err) {
-      const msgErr = `[Scheduler] ❌ Error during update: ${err.message}`
+      const msgErr = `[Scheduler] ❌ Update or startup failed: ${err.message}`
       console.error(msgErr)
       fs.appendFileSync(path.join(DATA_DIR, 'updater.log'), `[${new Date().toISOString()}] ${msgErr}\n`)
-    }
 
-    startMinecraft()
+      if (!skipUpdate) {
+        logInfo('[Scheduler] 🔄 Initiating rollback...')
+        stopMinecraft()
+        await new Promise(r => setTimeout(r, 5000))
+        if (mcProcess) mcProcess.kill('SIGKILL') // Force kill if stuck
+        
+        installer.rollback()
+        fs.writeFileSync(UPDATE_FAILED_FLAG, 'true')
+        
+        logInfo('[Scheduler] 🔄 Restarting with previous working version...')
+        startMinecraft()
+      } else {
+        // If it failed even with skipUpdate (normal restart failed), just log it
+        logError('[Scheduler] ❌ Fatal: Server failed to start even without update!')
+      }
+    }
 
     // Következő éjszakára ütemezés
     scheduleNightlyRestart()
@@ -1047,6 +1122,14 @@ async function start() {
     // 3. Start Minecraft Server
     activeJavaPath = javaPath
     startMinecraft()
+    
+    // Initial start health check (optional but good)
+    waitForServerReady(300000).then(() => {
+      logInfo('[Main] Server started successfully.')
+      installer.commitUpdate() // In case it was an update that needed committing
+    }).catch(err => {
+      logError(`[Main] Server startup warning: ${err.message}`)
+    })
 
     // 4. Hajnali 3:00-ás automatikus újraindítás ütemezése
     scheduleNightlyRestart()
