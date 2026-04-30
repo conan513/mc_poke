@@ -521,6 +521,27 @@ function handleRequest(req, res) {
     return true
   }
 
+  // ── Lang files – highest priority, with source fallback ──────
+  // Handles: /app/lang/xx.json  AND  /lang/xx.json
+  // Tries dist/lang/ first, then falls back to src/public/lang/ in the repo.
+  if (url.startsWith('/app/lang/') || url.startsWith('/lang/')) {
+    const langFile = path.basename(url) // e.g. 'en.json'
+    const candidates = [
+      path.join(DIST_DIR, 'lang', langFile),
+      path.join(__dirname, '..', 'src', 'public', 'lang', langFile),
+    ]
+    for (const filePath of candidates) {
+      if (fs.existsSync(filePath)) {
+        res.writeHead(200, { 'Content-Type': 'application/json', 'Cache-Control': 'no-cache' })
+        fs.createReadStream(filePath).pipe(res)
+        return
+      }
+    }
+    res.writeHead(404, { 'Content-Type': 'application/json' })
+    res.end(JSON.stringify({ error: 'Lang file not found: ' + langFile }))
+    return
+  }
+
   // Handle assets for /app/* (e.g. /app/assets/index.css or /app/index.css)
   if (url.startsWith('/app/')) {
     const relPath = url.slice(5) // remove /app/
@@ -530,12 +551,6 @@ function handleRequest(req, res) {
   // Backwards-compat: old builds reference /assets/* directly (relative to /app without trailing slash)
   if (url.startsWith('/assets/')) {
     const relPath = url.slice(1) // keep 'assets/...'
-    if (serveDistFile(relPath, res)) return
-  }
-
-  // Also serve lang files requested from root /lang/* (old behaviour)
-  if (url.startsWith('/lang/')) {
-    const relPath = url.slice(1)
     if (serveDistFile(relPath, res)) return
   }
 
