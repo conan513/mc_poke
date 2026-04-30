@@ -143,7 +143,7 @@
       "requestedExecutionLevel": "asInvoker"
     },
     "nsis": {
-      "artifactName": "${productName}-Setup.${ext}",
+      "artifactName": "${productName}-Setup-${arch}.${ext}",
       "oneClick": false,
       "allowToChangeInstallationDirectory": true,
       "installerIcon": "build-assets/icon.ico",
@@ -154,7 +154,7 @@
       "shortcutName": "CobbleLauncher"
     },
     "portable": {
-      "artifactName": "${productName}.${ext}"
+      "artifactName": "${productName}-${arch}.${ext}"
     },
     "mac": {
       "artifactName": "${productName}-${arch}.${ext}",
