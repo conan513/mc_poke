@@ -1,21 +1,22 @@
 document.addEventListener('DOMContentLoaded', () => {
   // Config
+  const GH = 'https://github.com/conan513/mc_poke/releases/download/v1'
   const DOWNLOADS = {
-    win: './releases/Cobblemon-Universe-Setup-x64.exe',
-    winArm64: './releases/Cobblemon-Universe-Setup-arm64.exe',
-    winPortable: './releases/Cobblemon-Universe-x64.exe',
-    winPortableArm64: './releases/Cobblemon-Universe-arm64.exe',
-    linuxApp: './releases/Cobblemon-Universe-x86_64.AppImage',
-    linuxAppArm64: './releases/Cobblemon-Universe-arm64.AppImage',
-    linuxDeb: './releases/Cobblemon-Universe-x86_64.deb',
-    linuxRpm: './releases/Cobblemon-Universe-x86_64.rpm',
-    linuxTar: './releases/Cobblemon-Universe-x86_64.tar.gz',
-    linuxTarArm64: './releases/Cobblemon-Universe-arm64.tar.gz',
-    linuxPacman: './releases/Cobblemon-Universe-x86_64.pacman',
-    macDmg: './releases/Cobblemon-Universe-x64.dmg',
-    macDmgArm64: './releases/Cobblemon-Universe-arm64.dmg',
-    macZip: './releases/Cobblemon-Universe-x64.zip',
-    macZipArm64: './releases/Cobblemon-Universe-arm64.zip'
+    win:                `${GH}/Cobblemon-Universe-Setup-x64.exe`,
+    winArm64:           `${GH}/Cobblemon-Universe-Setup-arm64.exe`,
+    winPortable:        `${GH}/Cobblemon-Universe-x64.exe`,
+    winPortableArm64:   `${GH}/Cobblemon-Universe-arm64.exe`,
+    linuxApp:           `${GH}/Cobblemon-Universe-x86_64.AppImage`,
+    linuxAppArm64:      `${GH}/Cobblemon-Universe-arm64.AppImage`,
+    linuxDeb:           `${GH}/Cobblemon-Universe-amd64.deb`,
+    linuxRpm:           `${GH}/Cobblemon-Universe-x86_64.rpm`,
+    linuxTar:           `${GH}/Cobblemon-Universe-x64.tar.gz`,
+    linuxTarArm64:      `${GH}/Cobblemon-Universe-arm64.tar.gz`,
+    linuxPacman:        `${GH}/Cobblemon-Universe-x64.pacman`,
+    macDmg:             `${GH}/Cobblemon-Universe-x64.dmg`,
+    macDmgArm64:        `${GH}/Cobblemon-Universe-arm64.dmg`,
+    macZip:             `${GH}/Cobblemon-Universe-x64.zip`,
+    macZipArm64:        `${GH}/Cobblemon-Universe-arm64.zip`,
   };
 
   let currentLang = 'hu';
