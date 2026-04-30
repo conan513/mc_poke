@@ -485,7 +485,14 @@ function handleRequest(req, res) {
   }
 
   // ── Serve Launcher App (at /app) ───────────────────────────
-  if (url === '/app' || url === '/app/' || url === '/app/index.html') {
+  // Redirect /app → /app/ so that relative asset paths resolve correctly
+  if (url === '/app') {
+    res.writeHead(301, { 'Location': '/app/' })
+    res.end()
+    return
+  }
+
+  if (url === '/app/' || url === '/app/index.html') {
     const filePath = path.join(DIST_DIR, 'index.html')
     if (fs.existsSync(filePath)) {
       res.writeHead(200, { 'Content-Type': 'text/html' })
@@ -494,34 +501,42 @@ function handleRequest(req, res) {
     }
   }
 
-  // Handle assets for /app (e.g. /app/assets/...)
+  // Helper: serve a file from DIST_DIR by relative path
+  function serveDistFile(relPath, res) {
+    const filePath = path.join(DIST_DIR, relPath)
+    if (relPath.includes('..') || !fs.existsSync(filePath) || !fs.statSync(filePath).isFile()) return false
+    const ext = path.extname(relPath)
+    const mimeTypes = {
+      '.html': 'text/html', '.css': 'text/css', '.js': 'application/javascript',
+      '.png': 'image/png', '.jpg': 'image/jpeg', '.svg': 'image/svg+xml',
+      '.json': 'application/json', '.ico': 'image/x-icon',
+      '.woff': 'font/woff', '.woff2': 'font/woff2', '.ttf': 'font/ttf'
+    }
+    const isAsset = ['.png', '.jpg', '.jpeg', '.svg', '.woff', '.woff2', '.ttf'].includes(ext)
+    res.writeHead(200, {
+      'Content-Type': mimeTypes[ext] || 'application/octet-stream',
+      'Cache-Control': isAsset ? 'public, max-age=31536000, immutable' : 'no-cache'
+    })
+    fs.createReadStream(filePath).pipe(res)
+    return true
+  }
+
+  // Handle assets for /app/* (e.g. /app/assets/index.css or /app/index.css)
   if (url.startsWith('/app/')) {
     const relPath = url.slice(5) // remove /app/
-    const filePath = path.join(DIST_DIR, relPath)
-    if (!relPath.includes('..') && fs.existsSync(filePath) && fs.statSync(filePath).isFile()) {
-      const ext = path.extname(relPath)
-      const mimeTypes = {
-        '.html': 'text/html',
-        '.css': 'text/css',
-        '.js': 'application/javascript',
-        '.png': 'image/png',
-        '.jpg': 'image/jpeg',
-        '.svg': 'image/svg+xml',
-        '.json': 'application/json',
-        '.ico': 'image/x-icon',
-        '.woff': 'font/woff',
-        '.woff2': 'font/woff2',
-        '.ttf': 'font/ttf'
-      }
-      // Add aggressive caching for images and fonts
-      const isAsset = ['.png', '.jpg', '.jpeg', '.svg', '.woff', '.woff2', '.ttf'].includes(ext)
-      res.writeHead(200, {
-        'Content-Type': mimeTypes[ext] || 'application/octet-stream',
-        'Cache-Control': isAsset ? 'public, max-age=31536000, immutable' : 'no-cache'
-      })
-      fs.createReadStream(filePath).pipe(res)
-      return
-    }
+    if (serveDistFile(relPath, res)) return
+  }
+
+  // Backwards-compat: old builds reference /assets/* directly (relative to /app without trailing slash)
+  if (url.startsWith('/assets/')) {
+    const relPath = url.slice(1) // keep 'assets/...'
+    if (serveDistFile(relPath, res)) return
+  }
+
+  // Also serve lang files requested from root /lang/* (old behaviour)
+  if (url.startsWith('/lang/')) {
+    const relPath = url.slice(1)
+    if (serveDistFile(relPath, res)) return
   }
 
   // ── Root / Landing Page ───────────────────────────────────
