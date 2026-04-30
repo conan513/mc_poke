@@ -1,8 +1,44 @@
 const { app, BrowserWindow, ipcMain, shell } = require('electron')
 const path = require('path')
 const fs = require('fs')
+const http = require('http')
 const launcher = require('./launcher')
 const { setupAutoUpdater } = require('./auto-updater')
+
+// ── Local fallback server ─────────────────────────────────────
+const LOCAL_PORT = 8079
+const DIST_DIR = path.join(__dirname, '../dist')
+let localServer = null
+
+function startLocalServer() {
+  if (localServer) return Promise.resolve()
+  return new Promise((resolve) => {
+    localServer = http.createServer((req, res) => {
+      // Strip /app prefix so paths match dist structure
+      let urlPath = req.url.split('?')[0]
+      if (urlPath === '/app' || urlPath === '/app/') urlPath = '/app/index.html'
+      if (urlPath.startsWith('/app/')) urlPath = urlPath.slice(4) // → /index.html, /index.css etc.
+      const filePath = path.join(DIST_DIR, urlPath)
+      const ext = path.extname(filePath)
+      const mimeTypes = {
+        '.html': 'text/html', '.css': 'text/css', '.js': 'application/javascript',
+        '.png': 'image/png', '.jpg': 'image/jpeg', '.svg': 'image/svg+xml',
+        '.json': 'application/json', '.ico': 'image/x-icon',
+        '.woff': 'font/woff', '.woff2': 'font/woff2',
+      }
+      if (fs.existsSync(filePath) && fs.statSync(filePath).isFile()) {
+        res.writeHead(200, { 'Content-Type': mimeTypes[ext] || 'application/octet-stream' })
+        fs.createReadStream(filePath).pipe(res)
+      } else {
+        res.writeHead(404); res.end('Not found')
+      }
+    })
+    localServer.listen(LOCAL_PORT, '127.0.0.1', () => {
+      console.log(`[LocalServer] Serving dist on http://127.0.0.1:${LOCAL_PORT}`)
+      resolve()
+    })
+  })
+}
 
 const isDev = process.env.NODE_ENV === 'development' || !app.isPackaged
 
@@ -91,23 +127,26 @@ function createWindow() {
   })
 
   const remoteUrl = 'http://94.72.100.43:8080/app'
-  const localFile = path.join(__dirname, '../dist/index.html')
+  const localUrl = `http://127.0.0.1:${LOCAL_PORT}/app/`
+
+  async function loadLocalFallback() {
+    console.log('[Electron] Loading local fallback server...')
+    await startLocalServer()
+    mainWindow.loadURL(localUrl)
+  }
 
   if (isDev) {
     mainWindow.loadURL('http://localhost:5173')
     // mainWindow.webContents.openDevTools()
   } else {
-    mainWindow.loadURL(remoteUrl).catch(() => {
-      console.log('[Electron] Remote UI load failed, falling back to local file.')
-      mainWindow.loadFile(localFile)
-    })
+    mainWindow.loadURL(remoteUrl).catch(() => loadLocalFallback())
   }
 
   // Handle load failures (e.g. server down or no internet)
   mainWindow.webContents.on('did-fail-load', (event, errorCode, errorDescription, validatedURL) => {
-    if (validatedURL === remoteUrl) {
+    if (validatedURL === remoteUrl || validatedURL === remoteUrl + '/') {
       console.warn(`[Electron] Failed to load remote UI: ${errorDescription} (${errorCode})`)
-      mainWindow.loadFile(localFile)
+      loadLocalFallback()
     }
   })
 
