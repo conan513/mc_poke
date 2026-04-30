@@ -167,18 +167,21 @@ function waitForServerReady(timeoutMs = 300000) {
     const timer = setTimeout(() => {
       serverEvents.removeListener('ready', onReady)
       serverEvents.removeListener('stopped', onStopped)
+      console.log('[Watchdog] Időtúllépés az indítás során.')
       reject(new Error(`Szerver indítási időtúllépés (${Math.round(timeoutMs/1000)} mp). Valószínűleg beragadt.`))
     }, timeoutMs)
 
     const onReady = () => {
       clearTimeout(timer)
       serverEvents.removeListener('stopped', onStopped)
+      console.log('[Watchdog] Szerver kész jelzés érkezett.')
       resolve()
     }
 
     const onStopped = (code) => {
       clearTimeout(timer)
       serverEvents.removeListener('ready', onReady)
+      console.log(`[Watchdog] Szerver leállás jelzés érkezett (kód: ${code}).`)
       reject(new Error(`Szerver váratlanul leállt az indítás során (kód: ${code}).`))
     }
 
@@ -189,6 +192,7 @@ function waitForServerReady(timeoutMs = 300000) {
       clearTimeout(timer)
       serverEvents.removeListener('ready', onReady)
       serverEvents.removeListener('stopped', onStopped)
+      console.log('[Watchdog] Szerver már korábban kész volt.')
       resolve()
     }
   })
@@ -1130,10 +1134,13 @@ async function start() {
 
     // Graceful shutdown
     process.on('SIGINT', () => {
-      console.log('\n[Szerver] Leállítás kérése...')
+      console.log('\n[Szerver] SIGINT (Ctrl+C) jelzés érkezett. Leállítás...')
       stopMinecraft()
       server.close()
-      setTimeout(() => process.exit(0), 1000)
+      setTimeout(() => {
+        console.log('[Szerver] Folyamat kilépése.')
+        process.exit(0)
+      }, 1000)
     })
 
   } catch (err) {
