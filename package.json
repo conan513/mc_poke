@@ -39,6 +39,11 @@
     "copyright": "Copyright © 2026 LUMYVERSE & Conan (Cobblemon Universe)",
     "publish": [
       {
+        "provider": "github",
+        "owner": "conan513",
+        "repo": "mc_poke"
+      },
+      {
         "provider": "generic",
         "url": "http://94.72.100.43:8080/releases/"
       }
