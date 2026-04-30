@@ -1,9 +1,9 @@
 document.addEventListener('DOMContentLoaded', () => {
   // Config
   const DOWNLOADS = {
-    win: './releases/Cobblemon-Universe-Setup.exe',
-    winArm64: './releases/Cobblemon-Universe-arm64-Setup.exe',
-    winPortable: './releases/Cobblemon-Universe.exe',
+    win: './releases/Cobblemon-Universe-Setup-x64.exe',
+    winArm64: './releases/Cobblemon-Universe-Setup-arm64.exe',
+    winPortable: './releases/Cobblemon-Universe-x64.exe',
     winPortableArm64: './releases/Cobblemon-Universe-arm64.exe',
     linuxApp: './releases/Cobblemon-Universe-x86_64.AppImage',
     linuxAppArm64: './releases/Cobblemon-Universe-arm64.AppImage',
