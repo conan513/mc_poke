@@ -21,7 +21,9 @@
     "text": "Looking for another platform?",
     "title": "All Downloads",
     "win": "Installer (.exe)",
-    "win_portable": "Portable (.exe)"
+    "win_arm64": "ARM Installer (.exe)",
+    "win_portable": "Portable (.exe)",
+    "win_portable_arm64": "ARM Portable (.exe)"
   },
   "features": {
     "f1_desc": "All Pokémon from every generation are available, including Legendaries and Mythicals. No 'fakemons', just the classics.",

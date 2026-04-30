@@ -2,7 +2,9 @@ document.addEventListener('DOMContentLoaded', () => {
   // Config
   const DOWNLOADS = {
     win: './releases/Cobblemon-Universe-Setup.exe',
+    winArm64: './releases/Cobblemon-Universe-arm64-Setup.exe',
     winPortable: './releases/Cobblemon-Universe.exe',
+    winPortableArm64: './releases/Cobblemon-Universe-arm64.exe',
     linuxApp: './releases/Cobblemon-Universe-x86_64.AppImage',
     linuxAppArm64: './releases/Cobblemon-Universe-arm64.AppImage',
     linuxDeb: './releases/Cobblemon-Universe-x86_64.deb',
@@ -83,18 +85,35 @@ document.addEventListener('DOMContentLoaded', () => {
   function detectOS() {
     const ua = navigator.userAgent.toLowerCase();
     let os = 'Unknown';
+    let isArm = ua.includes('arm') || ua.includes('aarch64');
 
     if (ua.includes('win')) {
       os = 'Windows';
-      currentDownloadUrl = DOWNLOADS.win;
+      // Detect ARM Windows (Snapdragon X Elite etc)
+      if (ua.includes('arm64') || ua.includes('arm;')) {
+        os = 'Windows ARM';
+        currentDownloadUrl = DOWNLOADS.winArm64;
+      } else {
+        currentDownloadUrl = DOWNLOADS.win;
+      }
     } else if (ua.includes('mac')) {
       os = 'macOS';
-      currentDownloadUrl = '#';
-      if (btnDownload) btnDownload.style.opacity = "0.5";
-      if (btnDownload) btnDownload.style.pointerEvents = "none";
+      // Detect Apple Silicon
+      if (ua.includes('mac os x') && (ua.includes('arm64') || navigator.maxTouchPoints > 0)) {
+        os = 'macOS (Apple Silicon)';
+        currentDownloadUrl = DOWNLOADS.macDmgArm64;
+      } else {
+        os = 'macOS (Intel)';
+        currentDownloadUrl = DOWNLOADS.macDmg;
+      }
     } else if (ua.includes('linux')) {
       os = 'Linux';
-      currentDownloadUrl = DOWNLOADS.linuxApp;
+      if (isArm) {
+        os = 'Linux ARM';
+        currentDownloadUrl = DOWNLOADS.linuxAppArm64;
+      } else {
+        currentDownloadUrl = DOWNLOADS.linuxApp;
+      }
     }
 
     // Update download button text and link
@@ -110,7 +129,9 @@ document.addEventListener('DOMContentLoaded', () => {
   // Setup alt links
   const altMap = {
     'alt-win': DOWNLOADS.win,
+    'alt-win-arm64': DOWNLOADS.winArm64,
     'alt-win-portable': DOWNLOADS.winPortable,
+    'alt-win-portable-arm64': DOWNLOADS.winPortableArm64,
     'alt-linux-app': DOWNLOADS.linuxApp,
     'alt-linux-app-arm64': DOWNLOADS.linuxAppArm64,
     'alt-linux-deb': DOWNLOADS.linuxDeb,

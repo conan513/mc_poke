@@ -21,7 +21,9 @@
     "text": "Másik platformra keresel letöltést?",
     "title": "Összes letöltés",
     "win": "Telepítő (.exe)",
-    "win_portable": "Portable (.exe)"
+    "win_arm64": "ARM Telepítő (.exe)",
+    "win_portable": "Portable (.exe)",
+    "win_portable_arm64": "ARM Portable (.exe)"
   },
   "features": {
     "f1_desc": "Minden generáció összes Pokémonja elérhető, beleértve a Legendásokat és a Mythical lényeket is. Nincsenek 'fakemonok', csak a klasszikusok.",
