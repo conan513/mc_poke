@@ -817,8 +817,11 @@ function handleRequest(req, res) {
         fs.writeFileSync(targetPath, content, 'utf8');
         console.log(`[Config Editor] Sikeres mentés: ${filename}`);
         
+        // Megpróbáljuk újratölteni a szervert
+        sendCommand('reload');
+        
         res.writeHead(200, { 'Content-Type': 'application/json' });
-        res.end(JSON.stringify({ success: true }));
+        res.end(JSON.stringify({ success: true, reloaded: true }));
       } catch (e) {
         res.writeHead(400, { 'Content-Type': 'application/json' });
         res.end(JSON.stringify({ error: e.message }));
