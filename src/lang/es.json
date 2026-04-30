@@ -6,7 +6,10 @@
     "username_placeholder": "Usuario",
     "ram_label": "Memoria (RAM):",
     "install_btn": "INSTALAR Y JUGAR",
-    "disclaimer": "Al hacer clic en instalar, aceptas descargar ~2GB de datos."
+    "disclaimer": "Al hacer clic en instalar, aceptas descargar ~2GB de datos.",
+    "stats_regions": "4 Regions",
+    "stats_megas": "93 Mega Evolutions",
+    "stats_pokemon": "1025 Pokémon"
   },
   "install": {
     "title": "Instalación",
@@ -17,7 +20,8 @@
     "modpack": "Descargando Modpack...",
     "waiting": "Esperando...",
     "done": "¡Todo instalado! ¡Diviértete! 🎮",
-    "error": "Error de instalación: "
+    "error": "Error de instalación: ",
+    "subtitle": "Please wait while we prepare your game..."
   },
   "home": {
     "player_status": "Modo offline",
@@ -31,7 +35,11 @@
     "download_required": "Descarga requerida",
     "update_btn": "Actualizar",
     "console_btn": "Consola",
-    "files_btn": "Archivos"
+    "files_btn": "Archivos",
+    "ui_online": "Interfaz en línea",
+    "ui_server_offline": "Server Offline",
+    "trainer_placeholder": "Trainer",
+    "ui_no_internet": "No Internet"
   },
   "toast": {
     "username_short": "¡El usuario debe tener al menos 3 caracteres!",
@@ -57,5 +65,13 @@
     "toast_empty": "⚠️ ¡Por favor, proporciona un nombre, enlace o selecciona un archivo!",
     "toast_saved": "✅ ¡Skin guardada y subida al servidor!",
     "toast_upload_error": "⚠️ Error al subir la skin (sin conexión al servidor)"
+  },
+  "sync": {
+    "error": "Sync error: ",
+    "connecting": "Connecting to server: ",
+    "up_to_date": "All files up to date.",
+    "finished": "Sync finished! Downloaded: ",
+    "deleting": "Deleting old synced files...",
+    "downloading": "Downloading: "
   }
 }

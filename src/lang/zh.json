@@ -36,7 +36,10 @@
     "update_btn": "更新",
     "console_btn": "控制台",
     "files_btn": "文件",
-    "trainer_placeholder": "训练家"
+    "trainer_placeholder": "训练家",
+    "ui_server_offline": "Server Offline",
+    "ui_online": "Online UI",
+    "ui_no_internet": "No Internet"
   },
   "toast": {
     "username_short": "用户名至少需要 3 个字符！",
@@ -62,5 +65,13 @@
     "toast_empty": "⚠️ 请提供名字、链接或选择文件！",
     "toast_saved": "✅ 皮肤已保存并上传到服务器！",
     "toast_upload_error": "⚠️ 皮肤上传失败（无法连接服务器）"
+  },
+  "sync": {
+    "error": "Sync error: ",
+    "connecting": "Connecting to server: ",
+    "up_to_date": "All files up to date.",
+    "finished": "Sync finished! Downloaded: ",
+    "deleting": "Deleting old synced files...",
+    "downloading": "Downloading: "
   }
 }

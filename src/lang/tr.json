@@ -6,7 +6,10 @@
     "username_placeholder": "Kullanıcı adı",
     "ram_label": "Bellek (RAM):",
     "install_btn": "YÜKLE & OYNA",
-    "disclaimer": "Yükle'ye tıklayarak ~2GB veri indirmeyi kabul etmiş olursunuz."
+    "disclaimer": "Yükle'ye tıklayarak ~2GB veri indirmeyi kabul etmiş olursunuz.",
+    "stats_pokemon": "1025 Pokémon",
+    "stats_regions": "4 Regions",
+    "stats_megas": "93 Mega Evolutions"
   },
   "install": {
     "title": "Kurulum",
@@ -17,7 +20,8 @@
     "modpack": "Mod paketi indiriliyor...",
     "waiting": "Bekleniyor...",
     "done": "Her şey yüklendi! İyi eğlenceler! 🎮",
-    "error": "Kurulum hatası: "
+    "error": "Kurulum hatası: ",
+    "subtitle": "Please wait while we prepare your game..."
   },
   "home": {
     "player_status": "Çevrimdışı mod",
@@ -31,12 +35,43 @@
     "download_required": "İndirme gerekiyor",
     "update_btn": "Güncelle",
     "console_btn": "Konsol",
-    "files_btn": "Dosyalar"
+    "files_btn": "Dosyalar",
+    "trainer_placeholder": "Trainer",
+    "ui_online": "Online UI",
+    "ui_no_internet": "No Internet",
+    "ui_server_offline": "Server Offline"
   },
   "toast": {
     "username_short": "Kullanıcı adı en az 3 karakter olmalıdır!",
     "username_chars": "Sadece harf, rakam ve _ karakterlerine izin verilir!",
     "install_error": "Kurulum hatası: ",
-    "update_error": "Güncelleme hatası: "
+    "update_error": "Güncelleme hatası: ",
+    "launch_error": "Launch error: "
+  },
+  "skin": {
+    "type_mojang": "Mojang Name",
+    "toast_empty": "⚠️ Please provide a name, link or select a file!",
+    "rotate_hint": "Drag to rotate",
+    "modal_title": "Skin Settings",
+    "browse_btn": "Select file...",
+    "type_url": "Custom URL",
+    "type_file": "Local File",
+    "source_label": "Skin Source",
+    "toast_saved": "✅ Skin saved and uploaded to server!",
+    "toast_upload_error": "⚠️ Skin upload failed (no server connection)",
+    "save_btn": "Save & Apply"
+  },
+  "sync": {
+    "error": "Sync error: ",
+    "deleting": "Deleting old synced files...",
+    "downloading": "Downloading: ",
+    "connecting": "Connecting to server: ",
+    "up_to_date": "All files up to date.",
+    "finished": "Sync finished! Downloaded: "
+  },
+  "titlebar": {
+    "minimize": "Minimize",
+    "close": "Close",
+    "lang_title": "Change language"
   }
 }

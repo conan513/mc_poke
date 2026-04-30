@@ -36,7 +36,10 @@
     "update_btn": "Оновити",
     "console_btn": "Консоль",
     "files_btn": "Файли",
-    "trainer_placeholder": "Тренер"
+    "trainer_placeholder": "Тренер",
+    "ui_server_offline": "Server Offline",
+    "ui_online": "Online UI",
+    "ui_no_internet": "No Internet"
   },
   "toast": {
     "username_short": "Ім'я користувача має містити принаймні 3 символи!",
@@ -62,5 +65,13 @@
     "toast_empty": "⚠️ Будь ласка, вкажіть ім'я, посилання або оберіть файл!",
     "toast_saved": "✅ Скін збережено та завантажено на сервер!",
     "toast_upload_error": "⚠️ Не вдалося завантажити скін (немає зв'язку з сервером)"
+  },
+  "sync": {
+    "error": "Sync error: ",
+    "connecting": "Connecting to server: ",
+    "up_to_date": "All files up to date.",
+    "finished": "Sync finished! Downloaded: ",
+    "deleting": "Deleting old synced files...",
+    "downloading": "Downloading: "
   }
 }

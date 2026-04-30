@@ -6,7 +6,10 @@
     "username_placeholder": "Utilizator",
     "ram_label": "Memorie (RAM):",
     "install_btn": "INSTALEAZĂ ȘI JOACĂ",
-    "disclaimer": "Apăsând pe instalează, ești de acord să descarci ~2GB de date."
+    "disclaimer": "Apăsând pe instalează, ești de acord să descarci ~2GB de date.",
+    "stats_pokemon": "1025 Pokémon",
+    "stats_regions": "4 Regions",
+    "stats_megas": "93 Mega Evolutions"
   },
   "install": {
     "title": "Instalare",
@@ -17,7 +20,8 @@
     "modpack": "Se descarcă Modpack-ul...",
     "waiting": "Așteptare...",
     "done": "Totul a fost instalat! Distracție plăcută! 🎮",
-    "error": "Eroare de instalare: "
+    "error": "Eroare de instalare: ",
+    "subtitle": "Please wait while we prepare your game..."
   },
   "home": {
     "player_status": "Mod offline",
@@ -31,12 +35,43 @@
     "download_required": "Descărcare necesară",
     "update_btn": "Actualizează",
     "console_btn": "Consolă",
-    "files_btn": "Fișiere"
+    "files_btn": "Fișiere",
+    "trainer_placeholder": "Antrenor",
+    "ui_online": "Interfață Online",
+    "ui_no_internet": "Fără Internet",
+    "ui_server_offline": "Server Offline"
   },
   "toast": {
     "username_short": "Numele de utilizator trebuie să aibă cel puțin 3 caractere!",
     "username_chars": "Doar litere, cifre și _ sunt permise!",
     "install_error": "Eroare de instalare: ",
-    "update_error": "Eroare de actualizare: "
+    "update_error": "Eroare de actualizare: ",
+    "launch_error": "Launch error: "
+  },
+  "skin": {
+    "type_mojang": "Mojang Name",
+    "toast_empty": "⚠️ Please provide a name, link or select a file!",
+    "rotate_hint": "Drag to rotate",
+    "modal_title": "Skin Settings",
+    "browse_btn": "Select file...",
+    "type_url": "Custom URL",
+    "type_file": "Local File",
+    "source_label": "Skin Source",
+    "toast_saved": "✅ Skin saved and uploaded to server!",
+    "toast_upload_error": "⚠️ Skin upload failed (no server connection)",
+    "save_btn": "Save & Apply"
+  },
+  "sync": {
+    "error": "Sync error: ",
+    "deleting": "Deleting old synced files...",
+    "downloading": "Downloading: ",
+    "connecting": "Connecting to server: ",
+    "up_to_date": "All files up to date.",
+    "finished": "Sync finished! Downloaded: "
+  },
+  "titlebar": {
+    "minimize": "Minimize",
+    "close": "Close",
+    "lang_title": "Change language"
   }
 }

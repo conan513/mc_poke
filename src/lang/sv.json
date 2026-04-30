@@ -6,7 +6,10 @@
     "username_placeholder": "Användarnamn",
     "ram_label": "Minne (RAM):",
     "install_btn": "INSTALLERA & SPELA",
-    "disclaimer": "Genom att klicka på installera godkänner du nedladdning av ca 2 GB data."
+    "disclaimer": "Genom att klicka på installera godkänner du nedladdning av ca 2 GB data.",
+    "stats_pokemon": "1025 Pokémon",
+    "stats_regions": "4 Regions",
+    "stats_megas": "93 Mega Evolutions"
   },
   "install": {
     "title": "Installation",
@@ -17,7 +20,8 @@
     "modpack": "Laddar ner modpaket...",
     "waiting": "Väntar...",
     "done": "Allt är installerat! Ha så kul! 🎮",
-    "error": "Installationsfel: "
+    "error": "Installationsfel: ",
+    "subtitle": "Please wait while we prepare your game..."
   },
   "home": {
     "player_status": "Offline-läge",
@@ -31,7 +35,11 @@
     "download_required": "Nedladdning krävs",
     "update_btn": "Uppdatera",
     "console_btn": "Konsol",
-    "files_btn": "Filer"
+    "files_btn": "Filer",
+    "trainer_placeholder": "Trainer",
+    "ui_online": "Online UI",
+    "ui_no_internet": "No Internet",
+    "ui_server_offline": "Server Offline"
   },
   "sync": {
     "connecting": "Ansluter till server: ",
@@ -45,6 +53,25 @@
     "username_short": "Användarnamnet måste vara minst 3 tecken långt!",
     "username_chars": "Endast bokstäver, siffror och _ är tillåtna!",
     "install_error": "Installationsfel: ",
-    "update_error": "Uppdateringsfel: "
+    "update_error": "Uppdateringsfel: ",
+    "launch_error": "Launch error: "
+  },
+  "skin": {
+    "type_mojang": "Mojang Name",
+    "toast_empty": "⚠️ Please provide a name, link or select a file!",
+    "rotate_hint": "Drag to rotate",
+    "modal_title": "Skin Settings",
+    "browse_btn": "Select file...",
+    "type_url": "Custom URL",
+    "type_file": "Local File",
+    "source_label": "Skin Source",
+    "toast_saved": "✅ Skin saved and uploaded to server!",
+    "toast_upload_error": "⚠️ Skin upload failed (no server connection)",
+    "save_btn": "Save & Apply"
+  },
+  "titlebar": {
+    "minimize": "Minimize",
+    "close": "Close",
+    "lang_title": "Change language"
   }
 }

@@ -36,7 +36,10 @@
     "update_btn": "Update",
     "console_btn": "Console",
     "files_btn": "Files",
-    "trainer_placeholder": "Trainer"
+    "trainer_placeholder": "Trainer",
+    "ui_online": "Online UI",
+    "ui_no_internet": "No Internet",
+    "ui_server_offline": "Server Offline"
   },
   "sync": {
     "connecting": "Connecting to server: ",

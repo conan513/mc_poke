@@ -6,7 +6,10 @@
     "username_placeholder": "사용자 이름",
     "ram_label": "메모리 (RAM):",
     "install_btn": "설치 및 플레이",
-    "disclaimer": "설치를 클릭하면 약 2GB의 데이터 다운로드에 동의하게 됩니다."
+    "disclaimer": "설치를 클릭하면 약 2GB의 데이터 다운로드에 동의하게 됩니다.",
+    "stats_pokemon": "1025 Pokémon",
+    "stats_regions": "4 Regions",
+    "stats_megas": "93 Mega Evolutions"
   },
   "install": {
     "title": "설치",
@@ -17,7 +20,8 @@
     "modpack": "모드팩 다운로드 중...",
     "waiting": "대기 중...",
     "done": "모든 설치가 완료되었습니다! 즐거운 시간 되세요! 🎮",
-    "error": "설치 오류: "
+    "error": "설치 오류: ",
+    "subtitle": "Please wait while we prepare your game..."
   },
   "home": {
     "player_status": "오프라인 모드",
@@ -31,7 +35,11 @@
     "download_required": "다운로드 필요",
     "update_btn": "업데이트",
     "console_btn": "콘솔",
-    "files_btn": "파일"
+    "files_btn": "파일",
+    "trainer_placeholder": "Trainer",
+    "ui_online": "Online UI",
+    "ui_no_internet": "No Internet",
+    "ui_server_offline": "Server Offline"
   },
   "sync": {
     "connecting": "서버 연결 중: ",
@@ -45,6 +53,25 @@
     "username_short": "사용자 이름은 최소 3자 이상이어야 합니다!",
     "username_chars": "영문, 숫자, _만 사용할 수 있습니다!",
     "install_error": "설치 오류: ",
-    "update_error": "업데이트 오류: "
+    "update_error": "업데이트 오류: ",
+    "launch_error": "Launch error: "
+  },
+  "skin": {
+    "type_mojang": "Mojang Name",
+    "toast_empty": "⚠️ Please provide a name, link or select a file!",
+    "rotate_hint": "Drag to rotate",
+    "modal_title": "Skin Settings",
+    "browse_btn": "Select file...",
+    "type_url": "Custom URL",
+    "type_file": "Local File",
+    "source_label": "Skin Source",
+    "toast_saved": "✅ Skin saved and uploaded to server!",
+    "toast_upload_error": "⚠️ Skin upload failed (no server connection)",
+    "save_btn": "Save & Apply"
+  },
+  "titlebar": {
+    "minimize": "Minimize",
+    "close": "Close",
+    "lang_title": "Change language"
   }
 }

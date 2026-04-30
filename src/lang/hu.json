@@ -36,7 +36,10 @@
     "update_btn": "Frissítés",
     "console_btn": "Konzol",
     "files_btn": "Fájlok",
-    "trainer_placeholder": "Edző"
+    "trainer_placeholder": "Edző",
+    "ui_online": "Online Felület",
+    "ui_no_internet": "Nincs Internet",
+    "ui_server_offline": "Szerver Offline"
   },
   "sync": {
     "connecting": "Kapcsolódás a szerverhez: ",

@@ -6,7 +6,10 @@
     "username_placeholder": "Käyttäjänimi",
     "ram_label": "Muisti (RAM):",
     "install_btn": "ASENNA JA PELAA",
-    "disclaimer": "Napsauttamalla asenna hyväksyt n. 2 Gt:n datan lataamisen."
+    "disclaimer": "Napsauttamalla asenna hyväksyt n. 2 Gt:n datan lataamisen.",
+    "stats_pokemon": "1025 Pokémon",
+    "stats_regions": "4 Regions",
+    "stats_megas": "93 Mega Evolutions"
   },
   "install": {
     "title": "Asennus",
@@ -17,7 +20,8 @@
     "modpack": "Ladataan modipakettia...",
     "waiting": "Odotetaan...",
     "done": "Kaikki asennettu! Hauskaa peliä! 🎮",
-    "error": "Asennusvirhe: "
+    "error": "Asennusvirhe: ",
+    "subtitle": "Please wait while we prepare your game..."
   },
   "home": {
     "player_status": "Offline-tila",
@@ -31,7 +35,11 @@
     "download_required": "Lataus vaaditaan",
     "update_btn": "Päivitä",
     "console_btn": "Konsoli",
-    "files_btn": "Tiedostot"
+    "files_btn": "Tiedostot",
+    "trainer_placeholder": "Trainer",
+    "ui_online": "Online UI",
+    "ui_no_internet": "No Internet",
+    "ui_server_offline": "Server Offline"
   },
   "sync": {
     "connecting": "Yhdistetään palvelimeen: ",
@@ -45,6 +53,25 @@
     "username_short": "Käyttäjänimen on oltava vähintään 3 merkkiä pitkä!",
     "username_chars": "Vain kirjaimet, numerot ja _ ovat sallittuja!",
     "install_error": "Asennusvirhe: ",
-    "update_error": "Päivitysvirhe: "
+    "update_error": "Päivitysvirhe: ",
+    "launch_error": "Launch error: "
+  },
+  "skin": {
+    "type_mojang": "Mojang Name",
+    "toast_empty": "⚠️ Please provide a name, link or select a file!",
+    "rotate_hint": "Drag to rotate",
+    "modal_title": "Skin Settings",
+    "browse_btn": "Select file...",
+    "type_url": "Custom URL",
+    "type_file": "Local File",
+    "source_label": "Skin Source",
+    "toast_saved": "✅ Skin saved and uploaded to server!",
+    "toast_upload_error": "⚠️ Skin upload failed (no server connection)",
+    "save_btn": "Save & Apply"
+  },
+  "titlebar": {
+    "minimize": "Minimize",
+    "close": "Close",
+    "lang_title": "Change language"
   }
 }

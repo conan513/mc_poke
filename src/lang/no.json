@@ -6,7 +6,10 @@
     "username_placeholder": "Brukernavn",
     "ram_label": "Minne (RAM):",
     "install_btn": "INSTALLER & SPILL",
-    "disclaimer": "Ved å klikke på installer godtar du nedlasting av ca. 2 GB data."
+    "disclaimer": "Ved å klikke på installer godtar du nedlasting av ca. 2 GB data.",
+    "stats_pokemon": "1025 Pokémon",
+    "stats_regions": "4 Regions",
+    "stats_megas": "93 Mega Evolutions"
   },
   "install": {
     "title": "Installasjon",
@@ -17,7 +20,8 @@
     "modpack": "Laster ned modpakke...",
     "waiting": "Venter...",
     "done": "Alt er installert! Ha det gøy! 🎮",
-    "error": "Installasjonsfeil: "
+    "error": "Installasjonsfeil: ",
+    "subtitle": "Please wait while we prepare your game..."
   },
   "home": {
     "player_status": "Frakoblet modus",
@@ -31,7 +35,11 @@
     "download_required": "Nedlasting kreves",
     "update_btn": "Oppdater",
     "console_btn": "Konsoll",
-    "files_btn": "Filer"
+    "files_btn": "Filer",
+    "trainer_placeholder": "Trainer",
+    "ui_online": "Online UI",
+    "ui_no_internet": "No Internet",
+    "ui_server_offline": "Server Offline"
   },
   "sync": {
     "connecting": "Kobler til server: ",
@@ -45,6 +53,25 @@
     "username_short": "Brukernavnet må være minst 3 tegn langt!",
     "username_chars": "Bare bokstaver, tall og _ er tillatt!",
     "install_error": "Installasjonsfeil: ",
-    "update_error": "Oppdateringsfeil: "
+    "update_error": "Oppdateringsfeil: ",
+    "launch_error": "Launch error: "
+  },
+  "skin": {
+    "type_mojang": "Mojang Name",
+    "toast_empty": "⚠️ Please provide a name, link or select a file!",
+    "rotate_hint": "Drag to rotate",
+    "modal_title": "Skin Settings",
+    "browse_btn": "Select file...",
+    "type_url": "Custom URL",
+    "type_file": "Local File",
+    "source_label": "Skin Source",
+    "toast_saved": "✅ Skin saved and uploaded to server!",
+    "toast_upload_error": "⚠️ Skin upload failed (no server connection)",
+    "save_btn": "Save & Apply"
+  },
+  "titlebar": {
+    "minimize": "Minimize",
+    "close": "Close",
+    "lang_title": "Change language"
   }
 }

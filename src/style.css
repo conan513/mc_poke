@@ -96,6 +96,51 @@ body::before {
 .pokeball-icon { font-size: 16px; }
 .titlebar-title { color: var(--accent-blue); }
 
+.ui-status-indicator {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(255, 255, 255, 0.05);
+  padding: 4px 10px;
+  border-radius: 12px;
+  margin-left: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.status-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--accent-green);
+  box-shadow: 0 0 6px var(--accent-green);
+}
+
+.status-text {
+  font-size: 10px;
+  font-weight: 600;
+  color: var(--text-second);
+  letter-spacing: 0.3px;
+  text-transform: uppercase;
+}
+
+/* Offline / No Internet state */
+.ui-status-indicator.no-net .status-dot {
+  background: var(--accent-red);
+  box-shadow: 0 0 8px var(--accent-red);
+}
+.ui-status-indicator.no-net .status-text {
+  color: var(--accent-red);
+}
+
+/* Server unreachable state */
+.ui-status-indicator.server-down .status-dot {
+  background: var(--accent-gold);
+  box-shadow: 0 0 8px var(--accent-gold);
+}
+.ui-status-indicator.server-down .status-text {
+  color: var(--accent-gold);
+}
+
 .titlebar-controls {
   display: flex;
   gap: 4px;

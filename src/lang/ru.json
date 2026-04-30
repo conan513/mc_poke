@@ -6,7 +6,10 @@
     "username_placeholder": "Имя",
     "ram_label": "Память (RAM):",
     "install_btn": "УСТАНОВИТЬ И ИГРАТЬ",
-    "disclaimer": "Нажимая установить, вы соглашаетесь на загрузку ~2 ГБ данных."
+    "disclaimer": "Нажимая установить, вы соглашаетесь на загрузку ~2 ГБ данных.",
+    "stats_regions": "4 Regions",
+    "stats_megas": "93 Mega Evolutions",
+    "stats_pokemon": "1025 Pokémon"
   },
   "install": {
     "title": "Установка",
@@ -17,7 +20,8 @@
     "modpack": "Загрузка сборки...",
     "waiting": "Ожидание...",
     "done": "Все установлено! Приятной игры! 🎮",
-    "error": "Ошибка установки: "
+    "error": "Ошибка установки: ",
+    "subtitle": "Please wait while we prepare your game..."
   },
   "home": {
     "player_status": "Оффлайн режим",
@@ -31,7 +35,11 @@
     "download_required": "Требуется загрузка",
     "update_btn": "Обновить",
     "console_btn": "Консоль",
-    "files_btn": "Файлы"
+    "files_btn": "Файлы",
+    "ui_online": "Онлайн Интерфейс",
+    "ui_no_internet": "Нет Интернета",
+    "ui_server_offline": "Сервер Оффлайн",
+    "trainer_placeholder": "Тренер"
   },
   "toast": {
     "username_short": "Имя пользователя должно содержать не менее 3 символов!",
@@ -57,5 +65,13 @@
     "toast_empty": "⚠️ Пожалуйста, введите имя, ссылку или выберите файл!",
     "toast_saved": "✅ Скин сохранен и загружен на сервер!",
     "toast_upload_error": "⚠️ Не удалось загрузить скин (нет соединения с сервером)"
+  },
+  "sync": {
+    "error": "Sync error: ",
+    "connecting": "Connecting to server: ",
+    "up_to_date": "All files up to date.",
+    "finished": "Sync finished! Downloaded: ",
+    "deleting": "Deleting old synced files...",
+    "downloading": "Downloading: "
   }
 }

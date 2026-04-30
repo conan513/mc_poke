@@ -6,6 +6,7 @@ let username = ''
 let isGameRunning = false
 let currentLang = 'en'
 let translations = {}
+let isOnlineUI = true
 
 // ── Translation Engine ───────────────────────────────────────
 async function loadLanguage() {
@@ -477,6 +478,72 @@ animateParticles()
   })
 
   showScreen('welcome')
+  
+  // Update UI Status (Online/Offline)
+  async function checkConnection() {
+    const statusContainer = $id('ui-status')
+    if (!statusContainer) return
+
+    const textEl = statusContainer.querySelector('.status-text')
+    const isLocalFile = window.location.protocol === 'file:'
+    
+    // First step: Check internet connection via navigator.onLine
+    let hasInternet = navigator.onLine
+    let serverReachable = false
+
+    // Update UI helper
+    const setStatus = (mode, key) => {
+      statusContainer.classList.remove('no-net', 'server-down')
+      if (mode) statusContainer.classList.add(mode)
+      textEl.setAttribute('data-i18n', key)
+      updateUI()
+      // Force repaint
+      statusContainer.style.display = 'none'
+      statusContainer.offsetHeight
+      statusContainer.style.display = 'flex'
+    }
+
+    if (!hasInternet) {
+      isOnlineUI = false
+      setStatus('no-net', 'home.ui_no_internet')
+      return
+    }
+
+    if (isLocalFile) {
+      isOnlineUI = false
+      setStatus('server-down', 'home.ui_server_offline')
+      return
+    }
+
+    // Second step: Check server availability via fetch
+    const controller = new AbortController()
+    const timeoutId = setTimeout(() => controller.abort(), 2000)
+
+    try {
+      await fetch('http://94.72.100.43:8080/api/status', { 
+        mode: 'no-cors', 
+        cache: 'no-store',
+        signal: controller.signal 
+      })
+      isOnlineUI = true
+      setStatus(null, 'home.ui_online')
+    } catch (e) {
+      isOnlineUI = false
+      setStatus('server-down', 'home.ui_server_offline')
+    } finally {
+      clearTimeout(timeoutId)
+    }
+  }
+
+  // Initial check
+  checkConnection()
+
+  // Real-time listeners
+  window.addEventListener('online', checkConnection)
+  window.addEventListener('offline', checkConnection)
+  
+  // Periodic check (every 30s)
+  setInterval(checkConnection, 30000)
 
   // Auto-launch handling from cobble:// protocol
   window.cobble.onProtocolLaunch(() => {
