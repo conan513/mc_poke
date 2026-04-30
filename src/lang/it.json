@@ -8,7 +8,8 @@
   "install_btn": "INSTALLA E GIOCA",
   "disclaimer": "Cliccando su installa, accetti di scaricare ~2GB di dati.",
   "stats_pokemon": "1025 Pokémon",
-  "profile_add_btn": "Aggiungi profilo"
+  "profile_add_btn": "Aggiungi profilo",
+  "offline_hint": "Modalità offline – nessun account Microsoft richiesto"
  },
  "install": {
   "title": "Installazione",
@@ -63,9 +64,9 @@
   "type_file": "File locale",
   "browse_btn": "Seleziona file...",
   "save_btn": "Salva e Applica",
-  "toast_empty":"Per favore, fornisci un nome, un link o seleziona un file!",
-  "toast_saved":"Skin salvata e caricata sul server!",
-  "toast_upload_error":"Caricamento skin fallito (nessuna connessione al server)",
+  "toast_empty": "Per favore, fornisci un nome, un link o seleziona un file!",
+  "toast_saved": "Skin salvata e caricata sul server!",
+  "toast_upload_error": "Caricamento skin fallito (nessuna connessione al server)",
   "remove_profile": "Rimuovi profilo",
   "multiplayer_hint": "In multigiocatore, SkinsRestorer applica la skin automaticamente!",
   "singleplayer_hint": "In giocatore singolo, esegui in gioco: <code>/skin url {}</code>"

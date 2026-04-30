@@ -12,7 +12,8 @@
   "stats_megas": "93 Mega Evolúció",
   "stats_raids": "Raid Dennek",
   "profile_add_btn": "Profil hozzáadása",
-  "copyright": "Copyright © 2026 LUMYVERSE & Conan (Cobblemon Universe)"
+  "copyright": "Copyright © 2026 LUMYVERSE & Conan (Cobblemon Universe)",
+  "offline_hint": "Offline mód – nem szükséges Microsoft fiók"
  },
  "install": {
   "title": "Telepítés",

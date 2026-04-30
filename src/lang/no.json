@@ -8,7 +8,8 @@
   "install_btn": "INSTALLER & SPILL",
   "disclaimer": "Ved å klikke på installer godtar du nedlasting av ca. 2 GB data.",
   "stats_pokemon": "1025 Pokémon",
-  "profile_add_btn": "Legg til profil"
+  "profile_add_btn": "Legg til profil",
+  "offline_hint": "Frakoblet modus – ingen Microsoft-konto kreves"
  },
  "install": {
   "title": "Installasjon",
@@ -35,11 +36,10 @@
   "update_btn": "Oppdater",
   "console_btn": "Konsoll",
   "files_btn": "Filer",
-  "trainer_placeholder": "Trainer",
+  "trainer_placeholder": "Trener",
   "ui_online": "Online UI",
   "ui_no_internet": "No Internet",
   "ui_server_offline": "Server Offline",
-  "trainer_placeholder": "Trener",
   "change_skin_label": "Endre skin",
   "switch_profile": "Bytt profil"
  },
@@ -72,9 +72,9 @@
   "type_file": "Lokal fil",
   "browse_btn": "Velg fil...",
   "save_btn": "Lagre og bruk",
-  "toast_empty":"Vennligst oppgi et navn, lenke eller velg en fil!",
-  "toast_saved":"Skin lagret og lastet opp til serveren!",
-  "toast_upload_error":"Opplasting av skin mislyktes (ingen servertilkobling)",
+  "toast_empty": "Vennligst oppgi et navn, lenke eller velg en fil!",
+  "toast_saved": "Skin lagret og lastet opp til serveren!",
+  "toast_upload_error": "Opplasting av skin mislyktes (ingen servertilkobling)",
   "remove_profile": "Fjern profil",
   "multiplayer_hint": "I multiplayer brukes skinnet automatisk av SkinsRestorer!",
   "singleplayer_hint": "I singleplayer, kjør i spillet: <code>/skin url {}</code>"

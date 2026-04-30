@@ -12,7 +12,8 @@
   "stats_raids": "Raid-Höhlen",
   "stats_pokemon": "1025 Pokémon",
   "profile_add_btn": "Profil hinzufügen",
-  "copyright": "Copyright © 2026 LUMYVERSE & Conan (Cobblemon Universe)"
+  "copyright": "Copyright © 2026 LUMYVERSE & Conan (Cobblemon Universe)",
+  "offline_hint": "Offline-Modus – kein Microsoft-Konto erforderlich"
  },
  "install": {
   "title": "Installation",
@@ -72,9 +73,9 @@
   "type_file": "Lokale Datei",
   "browse_btn": "Datei auswählen...",
   "save_btn": "Speichern & Übernehmen",
-  "toast_empty":"Bitte einen Namen, Link oder eine Datei angeben!",
-  "toast_saved":"Skin gespeichert und auf Server hochgeladen!",
-  "toast_upload_error":"Skin-Upload fehlgeschlagen (keine Serververbindung)",
+  "toast_empty": "Bitte einen Namen, Link oder eine Datei angeben!",
+  "toast_saved": "Skin gespeichert und auf Server hochgeladen!",
+  "toast_upload_error": "Skin-Upload fehlgeschlagen (keine Serververbindung)",
   "remove_profile": "Profil entfernen",
   "multiplayer_hint": "Im Multiplayer wird der Skin automatisch von SkinsRestorer angewendet!",
   "singleplayer_hint": "Im Singleplayer im Spiel ausführen: <code>/skin url {}</code>"

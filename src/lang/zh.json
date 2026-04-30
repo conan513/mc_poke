@@ -7,10 +7,11 @@
   "ram_label": "内存 (RAM)：",
   "install_btn": "安装并开始游戏",
   "disclaimer": "点击安装即表示您同意下载约 2GB 的数据。",
-  "stats_pokemon":"1025 宝可梦",
-  "stats_regions":"4 个地区",
-  "stats_megas":"93 种超级进化",
-  "profile_add_btn": "添加档案"
+  "stats_pokemon": "1025 宝可梦",
+  "stats_regions": "4 个地区",
+  "stats_megas": "93 种超级进化",
+  "profile_add_btn": "添加档案",
+  "offline_hint": "离线模式 – 不需要 Microsoft 账户"
  },
  "install": {
   "title": "安装中",
@@ -70,9 +71,9 @@
   "type_file": "本地文件",
   "browse_btn": "选择文件...",
   "save_btn": "保存并应用",
-  "toast_empty":"请提供名字、链接或选择文件！",
-  "toast_saved":"皮肤已保存并上传到服务器！",
-  "toast_upload_error":"皮肤上传失败（无法连接服务器）",
+  "toast_empty": "请提供名字、链接或选择文件！",
+  "toast_saved": "皮肤已保存并上传到服务器！",
+  "toast_upload_error": "皮肤上传失败（无法连接服务器）",
   "remove_profile": "删除档案",
   "multiplayer_hint": "在多人游戏中，SkinsRestorer 会自动应用皮肤！",
   "singleplayer_hint": "在单人游戏中，请在游戏内运行：<code>/skin url {}</code>"

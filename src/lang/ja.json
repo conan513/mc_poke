@@ -8,7 +8,8 @@
   "install_btn": "インストールしてプレイ",
   "disclaimer": "インストールをクリックすると、約 2GB のデータのダウンロードに同意したことになります。",
   "stats_pokemon": "1025 Pokémon",
-  "profile_add_btn": "プロフィールを追加"
+  "profile_add_btn": "プロフィールを追加",
+  "offline_hint": "オフラインモード – Microsoftアカウントは不要です"
  },
  "install": {
   "title": "インストール",
@@ -35,11 +36,10 @@
   "update_btn": "更新",
   "console_btn": "コンソール",
   "files_btn": "ファイル",
-  "trainer_placeholder": "Trainer",
+  "trainer_placeholder": "トレーナー",
   "ui_online": "Online UI",
   "ui_no_internet": "No Internet",
   "ui_server_offline": "Server Offline",
-  "trainer_placeholder": "トレーナー",
   "change_skin_label": "スキンを変更",
   "switch_profile": "プロフィールを切り替え"
  },
@@ -72,9 +72,9 @@
   "type_file": "ローカルファイル",
   "browse_btn": "ファイルを選択...",
   "save_btn": "保存して適用",
-  "toast_empty":"名前、リンクを入力するか、ファイルを選択してください！",
-  "toast_saved":"スキンが保存され、サーバーにアップロードされました！",
-  "toast_upload_error":"スキンのアップロードに失敗しました (サーバー接続なし)",
+  "toast_empty": "名前、リンクを入力するか、ファイルを選択してください！",
+  "toast_saved": "スキンが保存され、サーバーにアップロードされました！",
+  "toast_upload_error": "スキンのアップロードに失敗しました (サーバー接続なし)",
   "remove_profile": "プロフィールを削除",
   "multiplayer_hint": "マルチプレイでは、SkinsRestorer が自動的にスキンを適用します！",
   "singleplayer_hint": "シングルプレイでは、ゲーム内で実行してください: <code>/skin url {}</code>"

@@ -12,7 +12,8 @@
   "stats_megas": "93 Mega Evolutions",
   "stats_raids": "Raid Dens",
   "profile_add_btn": "Add Profile",
-  "copyright": "Copyright © 2026 LUMYVERSE & Conan (Cobblemon Universe)"
+  "copyright": "Copyright © 2026 LUMYVERSE & Conan (Cobblemon Universe)",
+  "offline_hint": "Offline mode – no Microsoft account required"
  },
  "install": {
   "title": "Installing",
@@ -80,9 +81,9 @@
   "type_file": "Local File",
   "browse_btn": "Select file...",
   "save_btn": "Save & Apply",
-  "toast_empty":"Please provide a name, link or select a file!",
-  "toast_saved":"Skin saved and uploaded to server!",
-  "toast_upload_error":"Skin upload failed (no server connection)",
+  "toast_empty": "Please provide a name, link or select a file!",
+  "toast_saved": "Skin saved and uploaded to server!",
+  "toast_upload_error": "Skin upload failed (no server connection)",
   "remove_profile": "Remove Profile",
   "multiplayer_hint": "In Multiplayer, SkinsRestorer automatically applies the skin!",
   "singleplayer_hint": "In Singleplayer, run in-game: <code>/skin url {}</code>"

@@ -12,7 +12,8 @@
   "stats_pokemon": "1025 Pokémon",
   "stats_raids": "Antres de Raid",
   "profile_add_btn": "Ajouter un profil",
-  "copyright": "Copyright © 2026 LUMYVERSE & Conan (Cobblemon Universe)"
+  "copyright": "Copyright © 2026 LUMYVERSE & Conan (Cobblemon Universe)",
+  "offline_hint": "Mode hors ligne – aucun compte Microsoft requis"
  },
  "install": {
   "title": "Installation",
@@ -72,9 +73,9 @@
   "type_file": "Fichier local",
   "browse_btn": "Sélectionner un fichier...",
   "save_btn": "Enregistrer et Appliquer",
-  "toast_empty":"Veuillez fournir un nom, un lien ou sélectionner un fichier !",
-  "toast_saved":"Skin enregistré et téléchargé sur le serveur !",
-  "toast_upload_error":"Échec du téléchargement du skin (pas de connexion au serveur)",
+  "toast_empty": "Veuillez fournir un nom, un lien ou sélectionner un fichier !",
+  "toast_saved": "Skin enregistré et téléchargé sur le serveur !",
+  "toast_upload_error": "Échec du téléchargement du skin (pas de connexion au serveur)",
   "remove_profile": "Supprimer le profil",
   "multiplayer_hint": "En multijoueur, SkinsRestorer applique automatiquement le skin !",
   "singleplayer_hint": "En solo, exécutez en jeu:<code>/skin url {}</code>"

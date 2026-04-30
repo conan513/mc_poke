@@ -8,7 +8,8 @@
   "install_btn": "INSTALOVAT A HRÁT",
   "disclaimer": "Kliknutím na instalovat souhlasíte se stažením cca 2 GB dat.",
   "stats_pokemon": "1025 Pokémon",
-  "profile_add_btn": "Přidat profil"
+  "profile_add_btn": "Přidat profil",
+  "offline_hint": "Offline režim – není vyžadován účet Microsoft"
  },
  "install": {
   "title": "Instalace",
@@ -35,11 +36,10 @@
   "update_btn": "Aktualizovat",
   "console_btn": "Konzole",
   "files_btn": "Soubory",
-  "trainer_placeholder": "Trainer",
+  "trainer_placeholder": "Trenér",
   "ui_online": "Online UI",
   "ui_no_internet": "No Internet",
   "ui_server_offline": "Server Offline",
-  "trainer_placeholder": "Trenér",
   "change_skin_label": "Změnit skin",
   "switch_profile": "Přepnout profil"
  },
@@ -72,9 +72,9 @@
   "type_file": "Lokální soubor",
   "browse_btn": "Vybrat soubor...",
   "save_btn": "Uložit a použít",
-  "toast_empty":"Zadejte jméno, odkaz nebo vyberte soubor!",
-  "toast_saved":"Skin uložen a nahrán na server!",
-  "toast_upload_error":"Nahrávání skinu selhalo (žádné připojení k serveru)",
+  "toast_empty": "Zadejte jméno, odkaz nebo vyberte soubor!",
+  "toast_saved": "Skin uložen a nahrán na server!",
+  "toast_upload_error": "Nahrávání skinu selhalo (žádné připojení k serveru)",
   "remove_profile": "Odebrat profil",
   "multiplayer_hint": "V multiplayeru SkinsRestorer automaticky aplikuje skin!",
   "singleplayer_hint": "V singleplayeru spusťte ve hře: <code>/skin url {}</code>"

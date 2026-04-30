@@ -8,7 +8,8 @@
   "install_btn": "ASENNA JA PELAA",
   "disclaimer": "Napsauttamalla asenna hyväksyt n. 2 Gt:n datan lataamisen.",
   "stats_pokemon": "1025 Pokémon",
-  "profile_add_btn": "Lisää profiili"
+  "profile_add_btn": "Lisää profiili",
+  "offline_hint": "Offline-tila – Microsoft-tiliä ei tarvita"
  },
  "install": {
   "title": "Asennus",
@@ -35,11 +36,10 @@
   "update_btn": "Päivitä",
   "console_btn": "Konsoli",
   "files_btn": "Tiedostot",
-  "trainer_placeholder": "Trainer",
+  "trainer_placeholder": "Kouluttaja",
   "ui_online": "Online UI",
   "ui_no_internet": "No Internet",
   "ui_server_offline": "Server Offline",
-  "trainer_placeholder": "Kouluttaja",
   "change_skin_label": "Vaihda skini",
   "switch_profile": "Vaihda profiilia"
  },
@@ -72,9 +72,9 @@
   "type_file": "Paikallinen tiedosto",
   "browse_btn": "Valitse tiedosto...",
   "save_btn": "Tallenna ja käytä",
-  "toast_empty":"Anna nimi, linkki tai valitse tiedosto!",
-  "toast_saved":"Skin tallennettu ja ladattu palvelimelle!",
-  "toast_upload_error":"Skinin lataus epäonnistui (ei palvelinyhteyttä)",
+  "toast_empty": "Anna nimi, linkki tai valitse tiedosto!",
+  "toast_saved": "Skin tallennettu ja ladattu palvelimelle!",
+  "toast_upload_error": "Skinin lataus epäonnistui (ei palvelinyhteyttä)",
   "remove_profile": "Poista profiili",
   "multiplayer_hint": "Moninpelissä SkinsRestorer asettaa skinin automaattisesti!",
   "singleplayer_hint": "Yksinpelissä suorita pelissä: <code>/skin url {}</code>"

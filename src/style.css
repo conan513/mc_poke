@@ -508,34 +508,42 @@ body::before {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 8px;
+  gap: 10px;
 }
 .avatar-label {
-  font-size: 10px;
-  font-weight: 700;
+  font-size: 9px;
+  font-weight: 800;
   text-transform: uppercase;
-  letter-spacing: 1px;
+  letter-spacing: 1.2px;
   color: var(--accent-blue);
-  opacity: 0.8;
+  opacity: 0.7;
   pointer-events: none;
+  transition: opacity 0.2s;
+}
+.avatar-wrapper:hover + .avatar-label {
+  opacity: 1;
 }
 .player-header {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 12px;
 }
 .btn-mini-switch {
-  background: transparent;
-  border: none;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid var(--border);
   color: var(--text-muted);
   cursor: pointer;
-  padding: 4px;
-  border-radius: 4px;
+  padding: 5px;
+  border-radius: 6px;
   transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 .btn-mini-switch:hover {
   color: var(--accent-blue);
   background: rgba(96,165,250,0.1);
+  border-color: rgba(96,165,250,0.3);
 }
 
 /* Buttons */
@@ -805,35 +813,54 @@ body::before {
 .player-card {
   display: flex;
   align-items: center;
-  gap: 12px;
-  background: var(--bg-card);
+  gap: 18px;
+  background: rgba(255, 255, 255, 0.03);
   border: 1px solid var(--border);
-  border-radius: var(--radius-md);
-  padding: 14px 16px;
+  border-radius: var(--radius-lg);
+  padding: 16px 20px;
+  position: relative;
+  overflow: hidden;
 }
 
 .player-avatar {
-  width: 44px; height: 44px;
+  width: 52px; height: 52px;
   border-radius: 50%;
-  background: linear-gradient(135deg, #3b82f6, #6366f1);
+  background: var(--bg-card2);
+  border: 2px solid var(--border);
   display: flex; align-items: center; justify-content: center;
-  font-size: 20px;
-  font-weight: 700;
-  color: white;
+  font-size: 24px;
+  font-weight: 800;
+  color: var(--accent-blue);
   text-transform: uppercase;
   flex-shrink: 0;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+  transition: all 0.3s;
+  background-size: cover;
+  background-position: center;
+}
+.avatar-wrapper:hover .player-avatar {
+  border-color: var(--accent-blue);
+  box-shadow: 0 0 15px rgba(96, 165, 250, 0.4);
+}
+
+.player-info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
 }
 
 .player-name {
-  font-size: 16px;
-  font-weight: 700;
-  display: block;
+  font-size: 18px;
+  font-weight: 800;
+  letter-spacing: 0.5px;
+  color: var(--text-primary);
+  text-shadow: 0 2px 4px rgba(0,0,0,0.3);
 }
 .player-mode {
   font-size: 12px;
+  font-weight: 500;
   color: var(--text-muted);
-  display: block;
-  margin-top: 2px;
+  letter-spacing: 0.3px;
 }
 
 /* Version info */

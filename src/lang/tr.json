@@ -8,7 +8,8 @@
   "install_btn": "YÜKLE & OYNA",
   "disclaimer": "Yükle'ye tıklayarak ~2GB veri indirmeyi kabul etmiş olursunuz.",
   "stats_pokemon": "1025 Pokémon",
-  "profile_add_btn": "Profil Ekle"
+  "profile_add_btn": "Profil Ekle",
+  "offline_hint": "Çevrimdışı mod – Microsoft hesabı gerekmez"
  },
  "install": {
   "title": "Kurulum",
@@ -35,11 +36,10 @@
   "update_btn": "Güncelle",
   "console_btn": "Konsol",
   "files_btn": "Dosyalar",
-  "trainer_placeholder": "Trainer",
+  "trainer_placeholder": "Eğitmen",
   "ui_online": "Online UI",
   "ui_no_internet": "No Internet",
   "ui_server_offline": "Server Offline",
-  "trainer_placeholder": "Eğitmen",
   "change_skin_label": "Skin'i Değiştir",
   "switch_profile": "Profili Değiştir"
  },
@@ -64,9 +64,9 @@
   "type_file": "Yerel Dosya",
   "browse_btn": "Dosya seç...",
   "save_btn": "Kaydet ve Uygula",
-  "toast_empty":"Lütfen bir ad, bağlantı girin veya bir dosya seçin!",
-  "toast_saved":"Skin kaydedildi ve sunucuya yüklendi!",
-  "toast_upload_error":"Skin yüklenemedi (sunucu bağlantısı yok)",
+  "toast_empty": "Lütfen bir ad, bağlantı girin veya bir dosya seçin!",
+  "toast_saved": "Skin kaydedildi ve sunucuya yüklendi!",
+  "toast_upload_error": "Skin yüklenemedi (sunucu bağlantısı yok)",
   "remove_profile": "Profili Kaldır",
   "multiplayer_hint": "Multiplayer'da, SkinsRestorer skin'i otomatik olarak uygular!",
   "singleplayer_hint": "Singleplayer'da, oyun içinde çalıştırın: <code>/skin url {}</code>"

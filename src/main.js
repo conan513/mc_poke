@@ -158,6 +158,13 @@ $id('btn-install').addEventListener('click', async () => {
     return
   }
 
+  // Automatikus mentés a profilok közé, ha új név
+  if (!profiles.find(p => p.name === username)) {
+    profiles.push({ name: username, skinUrl: null, skinType: 'mojang', skinVal: username })
+    saveProfiles()
+    renderProfiles()
+  }
+
   // Check if already installed
   const status = await window.cobble.checkInstalled()
   window._lastInstallStatus = status
@@ -274,6 +281,10 @@ function saveProfiles() {
   localStorage.setItem('cobble_profiles', JSON.stringify(profiles))
 }
 
+function getProfile(name) {
+  return profiles.find(p => p.name === name)
+}
+
 function renderProfiles() {
   const list = $id('profile-list')
   if (!list) return
@@ -289,12 +300,25 @@ function renderProfiles() {
     const item = document.createElement('div')
     item.className = `profile-item ${username === p.name ? 'active' : ''}`
     
-    // Check if we have a cached skin URL or just use first letter
-    const avatarStyle = p.skinUrl ? `background-image: url(${p.skinUrl})` : ''
+    // Generate avatar style based on profile skin data
+    let avatarStyle = ''
+    let avatarContent = p.name.charAt(0).toUpperCase()
+    
+    if (p.skinType === 'url' && p.skinVal) {
+      avatarStyle = `background-image: url(${p.skinVal}); background-size: 800%; background-position: 14.28% 14.28%; image-rendering: pixelated;`
+      avatarContent = ''
+    } else if (p.skinUrl) {
+      avatarStyle = `background-image: url(${p.skinUrl}); background-size: 800%; background-position: 14.28% 14.28%; image-rendering: pixelated;`
+      avatarContent = ''
+    } else {
+      // Mojang or default
+      const mojangName = p.skinVal || p.name
+      avatarStyle = `background-image: url(https://mc-heads.net/avatar/${mojangName}); background-size: cover;`
+      avatarContent = ''
+    }
     
     item.innerHTML = `
-      <div class="p-avatar" style="${avatarStyle}">${p.skinUrl ? '' : p.name.charAt(0).toUpperCase()}</div>
-      <div class="p-name">${p.name}</div>
+      <div class="p-avatar" style="${avatarStyle}">${avatarContent}</div>
       <div class="p-name">${p.name}</div>
       <div class="p-remove" data-i18n-title="skin.remove_profile" title="Profil törlése">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="width: 14px; height: 14px;"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
@@ -322,6 +346,19 @@ async function selectProfile(name) {
   username = name
   localStorage.setItem('cobble_username', name)
   
+  const p = getProfile(name)
+  if (p) {
+    currentSkinType = p.skinType || 'mojang'
+    currentSkinVal = p.skinVal || name
+    if (p.skinUrl && currentSkinType === 'url') {
+      currentSkinVal = p.skinUrl
+    }
+  } else {
+    // Default for new profiles
+    currentSkinType = 'mojang'
+    currentSkinVal = name
+  }
+
   // Automatikus skin frissítés a szerverről
   await syncSkinFromServer(name)
   
@@ -335,6 +372,7 @@ async function selectProfile(name) {
     showToast(t('toast.profile_selected').replace('{}', name))
     renderProfiles()
     updateUI()
+    applyAvatar()
   }
 }
 
@@ -349,15 +387,16 @@ async function syncSkinFromServer(name) {
     if (res.ok) {
       console.log(`[Skin] Szerver oldali skin megtalálva: ${name}`)
       currentSkinType = 'url'
-      currentSkinVal = skinUrl
+      // Add cache buster to force refresh
+      currentSkinVal = skinUrl.includes('?') ? `${skinUrl}&t=${Date.now()}` : `${skinUrl}?t=${Date.now()}`
       
       // Update profile cache
       const p = profiles.find(pr => pr.name === name)
-      if (p) p.skinUrl = skinUrl
+      if (p) p.skinUrl = currentSkinVal
       saveProfiles()
     } else {
       console.log(`[Skin] Nincs egyedi skin a szerveren: ${name}`)
-      // Fallback to Mojang or Steve if no server skin
+      // If we don't have a server skin and current was a server URL, reset to mojang
       if (currentSkinType === 'url' && currentSkinVal.includes('/skins/')) {
         currentSkinType = 'mojang'
         currentSkinVal = name
@@ -522,7 +561,7 @@ $id('btn-add-profile').addEventListener('click', () => {
     return
   }
   
-  profiles.push({ name, skinUrl: null })
+  profiles.push({ name, skinUrl: null, skinType: 'mojang', skinVal: name })
   saveProfiles()
   $id('input-username').value = ''
   renderProfiles()
@@ -621,7 +660,31 @@ animateParticles()
 
   // Save on input change
   $id('input-username').addEventListener('input', (e) => {
-    try { localStorage.setItem('cobble_username', e.target.value.trim()) } catch(e2) {}
+    const name = e.target.value.trim()
+    username = name
+    try { localStorage.setItem('cobble_username', name) } catch(e2) {}
+    
+    // Frissítsük az avatart gépelés közben is, hogy látszódjon a névhez tartozó skin
+    if (name.length >= 3) {
+      currentSkinType = 'mojang'
+      currentSkinVal = name
+      applyAvatar()
+    }
+  })
+  
+  // Add on Enter key
+  $id('input-username').addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') {
+      const name = e.target.value.trim()
+      if (name.length >= 3 && /^[a-zA-Z0-9_]+$/.test(name)) {
+        if (!profiles.find(p => p.name === name)) {
+          profiles.push({ name, skinUrl: null })
+          saveProfiles()
+          renderProfiles()
+        }
+        $id('btn-install').click() 
+      }
+    }
   })
   $id('input-server-url').addEventListener('input', (e) => {
     const url = e.target.value.trim()
@@ -830,9 +893,13 @@ function applyAvatar() {
     avatar.textContent = ''
   } else {
     // Custom URL or File: Try to show the head part of the skin PNG (8,8 to 16,16)
-    // For a 64x64 skin, the head is at 8,8 and is 8x8 pixels.
-    // To show only that, we zoom in 8x (800%) and position it.
-    avatar.style.backgroundImage = `url(${currentSkinVal})`
+    // Add cache buster if it's a URL
+    let skinUrl = currentSkinVal
+    if (skinUrl && skinUrl.startsWith('http')) {
+      skinUrl = skinUrl.includes('?') ? `${skinUrl}&t=${Date.now()}` : `${skinUrl}?t=${Date.now()}`
+    }
+    
+    avatar.style.backgroundImage = `url(${skinUrl})`
     avatar.style.backgroundSize = '800%' // 64 / 8 = 8x zoom
     avatar.style.backgroundPosition = '14.28% 14.28%' // Position at 8,8
     avatar.style.imageRendering = 'pixelated'
@@ -853,12 +920,24 @@ $id('btn-change-skin').addEventListener('click', () => {
   modal.classList.remove('hidden')
   setTimeout(() => modal.classList.add('active'), 10)
 
-  // Load current values into modal input
-  if (currentSkinType !== 'file') {
-    $id('input-skin-val').value = currentSkinVal
+  // Update modal UI to match current state
+  document.querySelectorAll('[data-skin-type]').forEach(btn => {
+    btn.classList.toggle('active', btn.dataset.skinType === currentSkinType)
+  })
+
+  if (currentSkinType === 'file') {
+    $id('skin-input-container').classList.add('hidden')
+    $id('btn-browse-skin').classList.remove('hidden')
+  } else {
+    $id('skin-input-container').classList.remove('hidden')
+    $id('btn-browse-skin').classList.add('hidden')
+    $id('input-skin-val').value = currentSkinVal || ''
+    $id('input-skin-val').placeholder = currentSkinType === 'mojang'
+      ? 'pl. AshKetchum'
+      : 'https://.../skin.png'
   }
 
-  // Initialize 3D viewer (needs to be after modal is visible for correct canvas size)
+  // Initialize 3D viewer
   setTimeout(() => {
     initSkinViewer()
     updateSkinViewer()
@@ -929,6 +1008,13 @@ $id('btn-save-skin').addEventListener('click', async () => {
   }
 
   try {
+    const p = getProfile(username)
+    if (p) {
+      p.skinType = currentSkinType
+      p.skinVal = currentSkinVal
+      saveProfiles()
+      renderProfiles()
+    }
     localStorage.setItem('cobble_skin_type', currentSkinType)
     localStorage.setItem('cobble_skin_val', currentSkinVal)
   } catch (e) {}
@@ -972,6 +1058,16 @@ async function uploadSkinToServer() {
     const res = await response.json()
     if (res.success) {
       console.log('[Skins] Skin sikeresen feltöltve:', res.url)
+      
+      // Update profile cache with the new URL from server
+      const p = getProfile(username)
+      if (p) {
+        // Add cache buster to the URL to force refresh
+        p.skinUrl = res.url.includes('?') ? `${res.url}&t=${Date.now()}` : `${res.url}?t=${Date.now()}`
+        saveProfiles()
+        renderProfiles()
+      }
+      
       // Update SP hint with the actual skin URL returned by server
       const hintText = $id('skin-sp-hint-text')
       if (hintText && res.url) {

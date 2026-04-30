@@ -8,7 +8,8 @@
   "install_btn": "INSTALEAZĂ ȘI JOACĂ",
   "disclaimer": "Apăsând pe instalează, ești de acord să descarci ~2GB de date.",
   "stats_pokemon": "1025 Pokémon",
-  "profile_add_btn": "Adaugă profil"
+  "profile_add_btn": "Adaugă profil",
+  "offline_hint": "Mod offline – nu este necesar un cont Microsoft"
  },
  "install": {
   "title": "Instalare",
@@ -63,9 +64,9 @@
   "type_file": "Fișier local",
   "browse_btn": "Selectează fișier...",
   "save_btn": "Salvează și Aplică",
-  "toast_empty":"Te rugăm să introduci un nume, un link sau să selectezi un fișier!",
-  "toast_saved":"Skin salvat și încărcat pe server!",
-  "toast_upload_error":"Încărcarea skin-ului a eșuat (lipsă conexiune la server)",
+  "toast_empty": "Te rugăm să introduci un nume, un link sau să selectezi un fișier!",
+  "toast_saved": "Skin salvat și încărcat pe server!",
+  "toast_upload_error": "Încărcarea skin-ului a eșuat (lipsă conexiune la server)",
   "remove_profile": "Șterge profilul",
   "multiplayer_hint": "În multiplayer, SkinsRestorer aplică automat skin-ul!",
   "singleplayer_hint": "În singleplayer, rulează în joc: <code>/skin url {}</code>"

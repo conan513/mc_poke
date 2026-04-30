@@ -8,7 +8,8 @@
   "install_btn": "INSTALLEREN & SPELEN",
   "disclaimer": "Door op installeren te klikken, ga je akkoord met het downloaden van ~2GB aan data.",
   "stats_pokemon": "1025 Pokémon",
-  "profile_add_btn": "Profiel toevoegen"
+  "profile_add_btn": "Profiel toevoegen",
+  "offline_hint": "Offline modus – geen Microsoft-account vereist"
  },
  "install": {
   "title": "Installatie",
@@ -63,9 +64,9 @@
   "type_file": "Lokaal Bestand",
   "browse_btn": "Selecteer bestand...",
   "save_btn": "Opslaan & Toepassen",
-  "toast_empty":"Geef een naam, link op of selecteer een bestand!",
-  "toast_saved":"Skin opgeslagen en geüpload naar server!",
-  "toast_upload_error":"Skin upload mislukt (geen serververbinding)",
+  "toast_empty": "Geef een naam, link op of selecteer een bestand!",
+  "toast_saved": "Skin opgeslagen en geüpload naar server!",
+  "toast_upload_error": "Skin upload mislukt (geen serververbinding)",
   "remove_profile": "Profiel verwijderen",
   "multiplayer_hint": "In Multiplayer past SkinsRestorer automatisch de skin toe!",
   "singleplayer_hint": "In Singleplayer, voer in-game uit: <code>/skin url {}</code>"

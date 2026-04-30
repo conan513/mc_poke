@@ -8,7 +8,8 @@
   "install_btn": "INSTALLERA & SPELA",
   "disclaimer": "Genom att klicka på installera godkänner du nedladdning av ca 2 GB data.",
   "stats_pokemon": "1025 Pokémon",
-  "profile_add_btn": "Lägg till profil"
+  "profile_add_btn": "Lägg till profil",
+  "offline_hint": "Offlineläge – inget Microsoft-konto krävs"
  },
  "install": {
   "title": "Installation",
@@ -35,11 +36,10 @@
   "update_btn": "Uppdatera",
   "console_btn": "Konsol",
   "files_btn": "Filer",
-  "trainer_placeholder": "Trainer",
+  "trainer_placeholder": "Tränare",
   "ui_online": "Online UI",
   "ui_no_internet": "No Internet",
   "ui_server_offline": "Server Offline",
-  "trainer_placeholder": "Tränare",
   "change_skin_label": "Ändra skin",
   "switch_profile": "Byt profil"
  },
@@ -72,9 +72,9 @@
   "type_file": "Lokal fil",
   "browse_btn": "Välj fil...",
   "save_btn": "Spara och tillämpa",
-  "toast_empty":"Ange ett namn, länk eller välj en fil!",
-  "toast_saved":"Skin sparat och uppladdat till servern!",
-  "toast_upload_error":"Det gick inte att ladda upp skinnet (ingen serveranslutning)",
+  "toast_empty": "Ange ett namn, länk eller välj en fil!",
+  "toast_saved": "Skin sparat och uppladdat till servern!",
+  "toast_upload_error": "Det gick inte att ladda upp skinnet (ingen serveranslutning)",
   "remove_profile": "Ta bort profil",
   "multiplayer_hint": "I multiplayer tillämpas skinnet automatiskt av SkinsRestorer!",
   "singleplayer_hint": "I singleplayer, kör i spelet: <code>/skin url {}</code>"
