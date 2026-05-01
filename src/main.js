@@ -1064,12 +1064,13 @@ animateParticles()
     if (needsSave) saveProfiles()
     renderProfiles()
 
-    // Trigger intro if no profiles exist
-    if (profiles.length === 0) {
-      startIntro()
-    } else {
-      showScreen('welcome')
-    }
+    // Trigger intro ALWAYS for testing (revert after check)
+    startIntro()
+    // if (profiles.length === 0) {
+    //   startIntro()
+    // } else {
+    //   showScreen('welcome')
+    // }
   } catch(e) {
     showScreen('welcome')
   }
