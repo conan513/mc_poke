@@ -137,5 +137,21 @@
   "cat_pokedex": "Pokédex",
   "cat_shiny": "Shiny Pokémon",
   "col_value": "Érték"
+ },
+ "intro": {
+  "lang_desc": "Üdvözöllek! Ez a Pokémonok világa! Mielőtt elkezdenénk... ez a te anyanyelved?",
+  "confirm_btn": "Igen, mehetünk!",
+  "change_btn": "Nyelv módosítása",
+  "next": "Tovább",
+  "start_btn": "Kezdjük el!",
+  "pitch_1_desc": "Ezt a világot Pokémonnak nevezett lények lakják! Van, akinek a Pokémon háziállat... Mások harcra használják őket.",
+  "pitch_2_desc": "Jómagam... én hivatásszerűen tanulmányozom a Pokémonokat. És itt, a Cobblemon Universe-ben, mindenkit kaland vár!",
+  "pitch_3_desc": "Készen állsz megírni a saját történetedet? Az álmok és kalandok világa vár a Pokémonokkal! Vágjunk bele!",
+  "choice_desc": "Most pedig mondd csak... új edző vagy, aki most vág bele, vagy egy visszatérő Pokémon Mester?",
+  "new_player_title": "Új Edző",
+  "new_player_desc": "Új fiók regisztrálása",
+  "returning_player_title": "Visszatérő Mester",
+  "returning_player_desc": "Belépés meglévő fiókkal",
+  "skip": "Átugrás"
  }
 }

@@ -1,13 +1,96 @@
 const $id = (id) => document.getElementById(id)
 
 // ── State ────────────────────────────────────────────────────
-let selectedRam = 4096
-let username = ''
-let profiles = []
+let selectedRam = localStorage.getItem('cobble_ram') || '4096'
+let username = localStorage.getItem('cobble_username') || ''
+let profiles = JSON.parse(localStorage.getItem('cobble_profiles') || '[]')
 let isGameRunning = false
 let currentLang = 'en'
 let translations = {}
 let isOnlineUI = true
+
+// ── Intro Logic ──────────────────────────────────────────────
+async function startIntro() {
+  const overlay = $id('intro-overlay')
+  overlay.classList.remove('hidden')
+  
+  const browserLang = navigator.language.split('-')[0]
+  const langNames = { 'hu': 'Magyar', 'en': 'English', 'de': 'Deutsch', 'fr': 'Français' }
+  $id('detected-lang-name').textContent = langNames[browserLang] || 'English'
+
+  $id('btn-intro-confirm-lang').onclick = () => switchPhase2()
+  $id('btn-intro-change-lang').onclick = () => {
+    $id('lang-btn-launcher').click()
+  }
+
+  function switchPhase2() {
+    $id('intro-lang-phase').classList.add('hidden')
+    $id('intro-anim-phase').classList.remove('hidden')
+    const music = $id('intro-music')
+    music.volume = 0.5
+    music.play().catch(() => {})
+    runIntroAnimation()
+  }
+
+  async function runIntroAnimation() {
+    const pkmns = ['pikachu', 'charizard', 'rayquaza', 'greninja', 'lucario', 'gengar', 'mewtwo', 'arceus']
+    const container = $id('intro-pokemon-floaters')
+    const spawnPkmn = () => {
+      if ($id('intro-overlay').classList.contains('hidden')) return
+      const p = pkmns[Math.floor(Math.random() * pkmns.length)]
+      const img = document.createElement('img')
+      img.src = `https://play.pokemonshowdown.com/sprites/ani/${p}.gif`
+      img.className = 'floating-pkmn'
+      img.style.top = Math.random() * 80 + 'vh'
+      img.style.animationDuration = (Math.random() * 5 + 10) + 's'
+      container.appendChild(img)
+      setTimeout(() => img.remove(), 15000)
+      setTimeout(spawnPkmn, Math.random() * 2000 + 1000)
+    }
+    spawnPkmn()
+
+    // Pitch Sequence
+    let currentPitch = 1
+    const totalPitches = 3
+    
+    $id('btn-next-pitch').onclick = () => {
+      if (currentPitch < totalPitches) {
+        $id(`pitch-${currentPitch}`).classList.remove('active')
+        currentPitch++
+        $id(`pitch-${currentPitch}`).classList.add('active')
+        if (currentPitch === totalPitches) {
+          $id('btn-next-pitch').textContent = t('intro.start_btn')
+        }
+      } else {
+        showChoicePhase()
+      }
+    }
+  }
+
+  function showChoicePhase() {
+    $id('intro-anim-phase').classList.add('hidden')
+    $id('intro-choice-phase').classList.remove('hidden')
+    
+    $id('btn-choice-new').onclick = () => {
+      endIntro()
+      $id('tab-account').click()
+      $id('link-to-register').click()
+    }
+    
+    $id('btn-choice-returning').onclick = () => {
+      endIntro()
+      $id('tab-account').click()
+      $id('link-to-login').click()
+    }
+  }
+
+  function endIntro() {
+    $id('intro-music').pause()
+    overlay.classList.add('hidden')
+    showScreen('welcome')
+  }
+
+function sleep(ms) { return new Promise(resolve => setTimeout(resolve, ms)) }
 
 // ── Translation Engine ───────────────────────────────────────
 async function loadLanguage() {
@@ -979,7 +1062,16 @@ animateParticles()
     })
     if (needsSave) saveProfiles()
     renderProfiles()
-  } catch(e) {}
+
+    // Trigger intro if no profiles exist
+    if (profiles.length === 0) {
+      startIntro()
+    } else {
+      showScreen('welcome')
+    }
+  } catch(e) {
+    showScreen('welcome')
+  }
 
   // Try to restore saved username and server url
   try {

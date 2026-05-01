@@ -137,5 +137,21 @@
   "cat_pokedex": "Pokédex",
   "cat_shiny": "Shiny Pokémon",
   "col_value": "Value"
+ },
+ "intro": {
+  "lang_desc": "Hello there! Welcome to the world of Pokemon! Before we begin, is this your preferred language?",
+  "confirm_btn": "Yes, let's go!",
+  "change_btn": "Change language",
+  "next": "Next",
+  "start_btn": "Let's Start!",
+  "pitch_1_desc": "This world is inhabited by creatures called Pokemon! For some, Pokemon are pets. Others use them for fights.",
+  "pitch_2_desc": "Myself... I study Pokemon as a profession. And here, in Cobblemon Universe, adventure awaits everyone!",
+  "pitch_3_desc": "Are you ready to write your own story? A world of dreams and adventures with Pokemon awaits! Let's go!",
+  "choice_desc": "Now tell me, are you a new trainer just starting out, or a returning Pokemon Master?",
+  "new_player_title": "New Trainer",
+  "new_player_desc": "Register a new account",
+  "returning_player_title": "Returning Master",
+  "returning_player_desc": "Login with existing account",
+  "skip": "Skip"
  }
 }

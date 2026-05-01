@@ -11,6 +11,77 @@
   <script src="https://unpkg.com/skinview3d@3.0.0-alpha.1/bundles/skinview3d.bundle.js"></script>
 </head>
 <body>
+  <!-- INTRO OVERLAY -->
+  <div id="intro-overlay" class="hidden">
+    <!-- Professor Image (Global to Intro) -->
+    <div class="intro-professor-container">
+      <img src="./img/professor.png" id="intro-professor-img" alt="Professor">
+    </div>
+
+    <!-- Phase 1: Language Check -->
+    <div id="intro-lang-phase" class="intro-phase">
+      <div class="intro-dialogue-box">
+        <p data-i18n="intro.lang_desc">Hello there! Welcome to the world of Pokemon! Before we begin, is this your preferred language?</p>
+        <div class="detected-lang-box">
+          <span id="detected-lang-name">Magyar</span>
+        </div>
+        <div class="intro-lang-buttons">
+          <button id="btn-intro-confirm-lang" class="btn-primary" data-i18n="intro.confirm_btn">Yes, let's go!</button>
+          <button id="btn-intro-change-lang" class="btn-secondary" data-i18n="intro.change_btn">Change language</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Phase 2: Animated Intro / Pitch (The Pokemon World) -->
+    <div id="intro-anim-phase" class="intro-phase hidden">
+      <div class="intro-content">
+        <div class="intro-pokemon-container" id="intro-pokemon-floaters"></div>
+        
+        <div id="intro-pitch-container" class="intro-pitch-container">
+          <div class="pitch-card active" id="pitch-1">
+            <p data-i18n="intro.pitch_1_desc">This world is inhabited by creatures called Pokemon! For some, Pokemon are pets. Others use them for fights.</p>
+          </div>
+          <div class="pitch-card" id="pitch-2">
+            <p data-i18n="intro.pitch_2_desc">Myself... I study Pokemon as a profession. And here, in Cobblemon Universe, adventure awaits everyone!</p>
+          </div>
+          <div class="pitch-card" id="pitch-3">
+            <p data-i18n="intro.pitch_3_desc">Are you ready to write your own story? A world of dreams and adventures with Pokemon awaits!</p>
+          </div>
+        </div>
+
+        <button id="btn-next-pitch" class="btn-primary" data-i18n="intro.next">Next</button>
+      </div>
+    </div>
+
+    <!-- Phase 3: The Choice -->
+    <div id="intro-choice-phase" class="intro-phase hidden">
+      <div class="intro-dialogue-box choice-card">
+        <p data-i18n="intro.choice_desc">Now tell me, are you a new trainer just starting out, or a returning Pokemon Master?</p>
+        <div class="choice-buttons">
+          <button id="btn-choice-new" class="choice-btn new-player">
+            <div class="choice-icon">✨</div>
+            <div class="choice-text">
+              <strong data-i18n="intro.new_player_title">New Trainer</strong>
+              <span data-i18n="intro.new_player_desc">Register a new account</span>
+            </div>
+          </button>
+          <button id="btn-choice-returning" class="choice-btn old-player">
+            <div class="choice-icon">🏆</div>
+            <div class="choice-text">
+              <strong data-i18n="intro.returning_player_title">Returning Master</strong>
+              <span data-i18n="intro.returning_player_desc">Login with existing account</span>
+            </div>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Intro Music -->
+  <audio id="intro-music" loop>
+    <source src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3" type="audio/mpeg">
+  </audio>
+
   <!-- Custom title bar -->
   <div class="titlebar" id="titlebar">
     <div class="titlebar-logo">
