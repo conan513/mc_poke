@@ -1064,8 +1064,10 @@ animateParticles()
     if (needsSave) saveProfiles()
     renderProfiles()
 
-    // Trigger intro ALWAYS for testing (revert after check)
-    startIntro()
+    // DEBUG: Force intro
+    console.log('[Intro] Force starting intro...');
+    startIntro();
+    
     // if (profiles.length === 0) {
     //   startIntro()
     // } else {
