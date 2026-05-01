@@ -747,6 +747,7 @@ function handleRequest(req, res) {
         // Hozzáadás a whitelisthez
         sendCommand('whitelist on') // Biztos ami biztos
         sendCommand(`whitelist add ${username}`)
+        sendCommand('whitelist reload') // Frissítjük a cache-t
 
         // Eltároljuk az igazolást (10 percig érvényes a belépéshez - modpacks take time)
         const JOIN_TIMEOUT = 10 * 60 * 1000
