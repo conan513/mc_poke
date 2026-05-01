@@ -139,7 +139,9 @@ function createWindow() {
     mainWindow.loadURL('http://localhost:5173')
     // mainWindow.webContents.openDevTools()
   } else {
-    mainWindow.loadURL(remoteUrl).catch(() => loadLocalFallback())
+    mainWindow.webContents.session.clearCache().then(() => {
+      mainWindow.loadURL(remoteUrl).catch(() => loadLocalFallback())
+    })
   }
 
   // Handle load failures (e.g. server down or no internet)
