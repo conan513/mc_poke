@@ -11,7 +11,16 @@
   "stats_regions": "4 个地区",
   "stats_megas": "93 种超级进化",
   "profile_add_btn": "添加档案",
-  "offline_hint": "离线模式 – 不需要 Microsoft 账户"
+  "offline_hint": "离线模式 – 不需要 Microsoft 账户",
+  "tab_guest": "访客 (离线)",
+  "tab_account": "账号 (同步)",
+  "password_label": "密码",
+  "password_placeholder": "输入密码...",
+  "login_btn": "登录",
+  "register_btn": "注册",
+  "online_hint": "账号模式 – 安全配置文件同步",
+  "stats_raids": "Raid Dens",
+  "copyright": "Copyright © 2026 LUMYVERSE & Conan (Cobblemon Universe)"
  },
  "install": {
   "title": "安装中",
@@ -55,7 +64,10 @@
   "launch_denied": "服务器拒绝启动。",
   "username_required": "请提供名称以启动游戏！",
   "profile_exists": "此档案已存在！",
-  "profile_selected": "已选择 {}。点击“启动游戏”开始！"
+  "profile_selected": "已选择 {}。点击“启动游戏”开始！",
+  "fill_all_fields": "请填写所有字段！",
+  "login_success": "登录成功！",
+  "whitelisting": "Registering on whitelist..."
  },
  "titlebar": {
   "lang_title": "更换语言",
@@ -85,5 +97,38 @@
   "finished": "Sync finished! Downloaded: ",
   "deleting": "Deleting old synced files...",
   "downloading": "Downloading: "
+ },
+ "hub": {
+  "title": "Server Hub"
+ },
+ "showcase": {
+  "title": "Pokémon of the Week",
+  "desc_charizard": "Legendary Fire/Dragon type, one of the strongest challengers on the server!",
+  "desc_rayquaza": "Lord of the skies, a true legend from the Hoenn region!",
+  "desc_greninja": "A fast and deadly Water/Dark type ninja Pokémon.",
+  "desc_lucario": "Aura master Fighting/Steel type. Can you feel its power?",
+  "desc_gengar": "The Ghost/Poison type lurking in the dark, who loves to scare!"
+ },
+ "rewards": {
+  "title": "Daily Reward",
+  "desc_launcher": "Claim your daily free <strong style=\"color:var(--accent-gold)\">100 CobbleDollar</strong> reward, ready to spend on the server!",
+  "placeholder": "Minecraft Username",
+  "btn": "Claim",
+  "success": "Claim successful!",
+  "error_name": "Invalid name!"
+ },
+ "leaderboard": {
+  "title": "Hall of Fame",
+  "desc": "The most active Pokémon masters on the server by playtime.",
+  "rank": "Rank",
+  "player": "Player",
+  "playtime": "Playtime",
+  "empty": "No data yet.",
+  "error": "Error loading data.",
+  "cat_playtime": "Playtime",
+  "cat_caught": "Caught",
+  "cat_pokedex": "Pokédex",
+  "cat_shiny": "Shiny Pokémon",
+  "col_value": "Value"
  }
 }

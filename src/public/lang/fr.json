@@ -13,7 +13,14 @@
   "stats_raids": "Antres de Raid",
   "profile_add_btn": "Ajouter un profil",
   "copyright": "Copyright © 2026 LUMYVERSE & Conan (Cobblemon Universe)",
-  "offline_hint": "Mode hors ligne – aucun compte Microsoft requis"
+  "offline_hint": "Mode hors ligne – aucun compte Microsoft requis",
+  "tab_guest": "Invité (Hors ligne)",
+  "tab_account": "Compte (Sync en ligne)",
+  "password_label": "Mot de passe",
+  "password_placeholder": "Entrez le mot de passe...",
+  "login_btn": "Connexion",
+  "register_btn": "S'inscrire",
+  "online_hint": "Mode compte – Synchronisation sécurisée"
  },
  "install": {
   "title": "Installation",
@@ -57,7 +64,10 @@
   "launch_denied": "Le serveur a refusé le lancement.",
   "username_required": "Veuillez indiquer un nom pour lancer le jeu !",
   "profile_exists": "Ce profil existe déjà !",
-  "profile_selected": "{} sélectionné. Cliquez sur Jouer pour commencer !"
+  "profile_selected": "{} sélectionné. Cliquez sur Jouer pour commencer !",
+  "fill_all_fields": "Veuillez remplir tous les champs !",
+  "login_success": "Connexion réussie !",
+  "whitelisting": "Registering on whitelist..."
  },
  "titlebar": {
   "lang_title": "Changer de langue",
@@ -87,5 +97,38 @@
   "finished": "Sync finished! Downloaded: ",
   "deleting": "Deleting old synced files...",
   "downloading": "Downloading: "
+ },
+ "hub": {
+  "title": "Server Hub"
+ },
+ "showcase": {
+  "title": "Pokémon of the Week",
+  "desc_charizard": "Legendary Fire/Dragon type, one of the strongest challengers on the server!",
+  "desc_rayquaza": "Lord of the skies, a true legend from the Hoenn region!",
+  "desc_greninja": "A fast and deadly Water/Dark type ninja Pokémon.",
+  "desc_lucario": "Aura master Fighting/Steel type. Can you feel its power?",
+  "desc_gengar": "The Ghost/Poison type lurking in the dark, who loves to scare!"
+ },
+ "rewards": {
+  "title": "Daily Reward",
+  "desc_launcher": "Claim your daily free <strong style=\"color:var(--accent-gold)\">100 CobbleDollar</strong> reward, ready to spend on the server!",
+  "placeholder": "Minecraft Username",
+  "btn": "Claim",
+  "success": "Claim successful!",
+  "error_name": "Invalid name!"
+ },
+ "leaderboard": {
+  "title": "Hall of Fame",
+  "desc": "The most active Pokémon masters on the server by playtime.",
+  "rank": "Rank",
+  "player": "Player",
+  "playtime": "Playtime",
+  "empty": "No data yet.",
+  "error": "Error loading data.",
+  "cat_playtime": "Playtime",
+  "cat_caught": "Caught",
+  "cat_pokedex": "Pokédex",
+  "cat_shiny": "Shiny Pokémon",
+  "col_value": "Value"
  }
 }

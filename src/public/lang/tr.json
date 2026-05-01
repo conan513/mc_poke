@@ -9,7 +9,18 @@
   "disclaimer": "Yükle'ye tıklayarak ~2GB veri indirmeyi kabul etmiş olursunuz.",
   "stats_pokemon": "1025 Pokémon",
   "profile_add_btn": "Profil Ekle",
-  "offline_hint": "Çevrimdışı mod – Microsoft hesabı gerekmez"
+  "offline_hint": "Çevrimdışı mod – Microsoft hesabı gerekmez",
+  "tab_guest": "Misafir (Çevrimdışı)",
+  "tab_account": "Hesap (Senkronizasyon)",
+  "password_label": "Şifre",
+  "password_placeholder": "Şifreyi girin...",
+  "login_btn": "Giriş",
+  "register_btn": "Kayıt Ol",
+  "online_hint": "Hesap Modu – Güvenli senkronizasyon",
+  "stats_regions": "4 Regions",
+  "stats_megas": "93 Mega Evolutions",
+  "stats_raids": "Raid Dens",
+  "copyright": "Copyright © 2026 LUMYVERSE & Conan (Cobblemon Universe)"
  },
  "install": {
   "title": "Kurulum",
@@ -53,7 +64,10 @@
   "launch_denied": "Sunucu başlatmayı reddetti.",
   "username_required": "Oyunu başlatmak için lütfen bir ad girin!",
   "profile_exists": "Bu profil zaten mevcut!",
-  "profile_selected": "{} seçildi. Başlamak için Oyna'ya tıklayın!"
+  "profile_selected": "{} seçildi. Başlamak için Oyna'ya tıklayın!",
+  "fill_all_fields": "Lütfen tüm alanları doldurun!",
+  "login_success": "Giriş başarılı!",
+  "whitelisting": "Registering on whitelist..."
  },
  "skin": {
   "modal_title": "Skin Ayarları",
@@ -83,5 +97,38 @@
   "minimize": "Minimize",
   "close": "Close",
   "lang_title": "Change language"
+ },
+ "hub": {
+  "title": "Server Hub"
+ },
+ "showcase": {
+  "title": "Pokémon of the Week",
+  "desc_charizard": "Legendary Fire/Dragon type, one of the strongest challengers on the server!",
+  "desc_rayquaza": "Lord of the skies, a true legend from the Hoenn region!",
+  "desc_greninja": "A fast and deadly Water/Dark type ninja Pokémon.",
+  "desc_lucario": "Aura master Fighting/Steel type. Can you feel its power?",
+  "desc_gengar": "The Ghost/Poison type lurking in the dark, who loves to scare!"
+ },
+ "rewards": {
+  "title": "Daily Reward",
+  "desc_launcher": "Claim your daily free <strong style=\"color:var(--accent-gold)\">100 CobbleDollar</strong> reward, ready to spend on the server!",
+  "placeholder": "Minecraft Username",
+  "btn": "Claim",
+  "success": "Claim successful!",
+  "error_name": "Invalid name!"
+ },
+ "leaderboard": {
+  "title": "Hall of Fame",
+  "desc": "The most active Pokémon masters on the server by playtime.",
+  "rank": "Rank",
+  "player": "Player",
+  "playtime": "Playtime",
+  "empty": "No data yet.",
+  "error": "Error loading data.",
+  "cat_playtime": "Playtime",
+  "cat_caught": "Caught",
+  "cat_pokedex": "Pokédex",
+  "cat_shiny": "Shiny Pokémon",
+  "col_value": "Value"
  }
 }

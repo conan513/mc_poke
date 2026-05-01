@@ -13,7 +13,14 @@
   "stats_raids": "Raid Dennek",
   "profile_add_btn": "Profil hozzáadása",
   "copyright": "Copyright © 2026 LUMYVERSE & Conan (Cobblemon Universe)",
-  "offline_hint": "Offline mód – nem szükséges Microsoft fiók"
+  "offline_hint": "Offline mód – nem szükséges Microsoft fiók",
+  "tab_guest": "Vendég (Offline)",
+  "tab_account": "Fiók (Online Sync)",
+  "password_label": "Jelszó",
+  "password_placeholder": "Írd be a jelszavad...",
+  "login_btn": "Belépés",
+  "register_btn": "Regisztráció",
+  "online_hint": "Fiók mód – Biztonságos profil szinkronizáció"
  },
  "install": {
   "title": "Telepítés",
@@ -66,7 +73,9 @@
   "username_required": "Kérlek adj meg egy nevet a játék elindításához!",
   "profile_exists": "Ez a profil már létezik!",
   "profile_selected": "{} kiválasztva. Kattints a játékra!",
-  "whitelisting": "Regisztráció a szerver fehérlistájára..."
+  "whitelisting": "Regisztráció a szerver fehérlistájára...",
+  "fill_all_fields": "Kérlek tölts ki minden mezőt!",
+  "login_success": "Sikeres bejelentkezés!"
  },
  "titlebar": {
   "lang_title": "Nyelv váltása",

@@ -9,7 +9,18 @@
   "disclaimer": "Apăsând pe instalează, ești de acord să descarci ~2GB de date.",
   "stats_pokemon": "1025 Pokémon",
   "profile_add_btn": "Adaugă profil",
-  "offline_hint": "Mod offline – nu este necesar un cont Microsoft"
+  "offline_hint": "Mod offline – nu este necesar un cont Microsoft",
+  "tab_guest": "Oaspete (Offline)",
+  "tab_account": "Cont (Sincronizare)",
+  "password_label": "Parolă",
+  "password_placeholder": "Introdu parola...",
+  "login_btn": "Autentificare",
+  "register_btn": "Înregistrare",
+  "online_hint": "Mod Cont – Sincronizare securizată",
+  "stats_regions": "4 Regions",
+  "stats_megas": "93 Mega Evolutions",
+  "stats_raids": "Raid Dens",
+  "copyright": "Copyright © 2026 LUMYVERSE & Conan (Cobblemon Universe)"
  },
  "install": {
   "title": "Instalare",
@@ -53,7 +64,10 @@
   "launch_denied": "Serverul a refuzat lansarea.",
   "username_required": "Te rugăm să introduci un nume pentru a porni jocul!",
   "profile_exists": "Acest profil există deja!",
-  "profile_selected": "{} selectat. Apasă Joacă pentru a începe!"
+  "profile_selected": "{} selectat. Apasă Joacă pentru a începe!",
+  "fill_all_fields": "Vă rugăm să completați toate câmpurile!",
+  "login_success": "Autentificare reușită!",
+  "whitelisting": "Registering on whitelist..."
  },
  "skin": {
   "modal_title": "Setări Skin",
@@ -83,5 +97,38 @@
   "minimize": "Minimize",
   "close": "Close",
   "lang_title": "Change language"
+ },
+ "hub": {
+  "title": "Server Hub"
+ },
+ "showcase": {
+  "title": "Pokémon of the Week",
+  "desc_charizard": "Legendary Fire/Dragon type, one of the strongest challengers on the server!",
+  "desc_rayquaza": "Lord of the skies, a true legend from the Hoenn region!",
+  "desc_greninja": "A fast and deadly Water/Dark type ninja Pokémon.",
+  "desc_lucario": "Aura master Fighting/Steel type. Can you feel its power?",
+  "desc_gengar": "The Ghost/Poison type lurking in the dark, who loves to scare!"
+ },
+ "rewards": {
+  "title": "Daily Reward",
+  "desc_launcher": "Claim your daily free <strong style=\"color:var(--accent-gold)\">100 CobbleDollar</strong> reward, ready to spend on the server!",
+  "placeholder": "Minecraft Username",
+  "btn": "Claim",
+  "success": "Claim successful!",
+  "error_name": "Invalid name!"
+ },
+ "leaderboard": {
+  "title": "Hall of Fame",
+  "desc": "The most active Pokémon masters on the server by playtime.",
+  "rank": "Rank",
+  "player": "Player",
+  "playtime": "Playtime",
+  "empty": "No data yet.",
+  "error": "Error loading data.",
+  "cat_playtime": "Playtime",
+  "cat_caught": "Caught",
+  "cat_pokedex": "Pokédex",
+  "cat_shiny": "Shiny Pokémon",
+  "col_value": "Value"
  }
 }

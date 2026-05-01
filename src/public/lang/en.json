@@ -13,7 +13,14 @@
   "stats_raids": "Raid Dens",
   "profile_add_btn": "Add Profile",
   "copyright": "Copyright © 2026 LUMYVERSE & Conan (Cobblemon Universe)",
-  "offline_hint": "Offline mode – no Microsoft account required"
+  "offline_hint": "Offline mode – no Microsoft account required",
+  "tab_guest": "Guest (Offline)",
+  "tab_account": "Account (Online Sync)",
+  "password_label": "Password",
+  "password_placeholder": "Enter your password...",
+  "login_btn": "Login",
+  "register_btn": "Register",
+  "online_hint": "Account Mode – Secure profile synchronization"
  },
  "install": {
   "title": "Installing",
@@ -66,7 +73,9 @@
   "username_required": "Please provide a name to start the game!",
   "profile_exists": "This profile already exists!",
   "profile_selected": "{} selected. Click Play to start!",
-  "whitelisting": "Registering on server whitelist..."
+  "whitelisting": "Registering on server whitelist...",
+  "fill_all_fields": "Please fill in all fields!",
+  "login_success": "Login successful!"
  },
  "titlebar": {
   "lang_title": "Change language",

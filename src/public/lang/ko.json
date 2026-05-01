@@ -9,7 +9,18 @@
   "disclaimer": "설치를 클릭하면 약 2GB의 데이터 다운로드에 동의하게 됩니다.",
   "stats_pokemon": "1025 Pokémon",
   "profile_add_btn": "프로필 추가",
-  "offline_hint": "오프라인 모드 – Microsoft 계정이 필요하지 않습니다"
+  "offline_hint": "오프라인 모드 – Microsoft 계정이 필요하지 않습니다",
+  "tab_guest": "게스트 (오프라인)",
+  "tab_account": "계정 (동기화)",
+  "password_label": "비밀번호",
+  "password_placeholder": "비밀번호 입력...",
+  "login_btn": "로그인",
+  "register_btn": "회원가입",
+  "online_hint": "계정 모드 – 안전한 프로필 동기화",
+  "stats_regions": "4 Regions",
+  "stats_megas": "93 Mega Evolutions",
+  "stats_raids": "Raid Dens",
+  "copyright": "Copyright © 2026 LUMYVERSE & Conan (Cobblemon Universe)"
  },
  "install": {
   "title": "설치",
@@ -61,7 +72,10 @@
   "launch_denied": "서버에서 실행을 거부했습니다.",
   "username_required": "게임을 시작하려면 이름을 입력해 주세요!",
   "profile_exists": "이 프로필은 이미 존재합니다!",
-  "profile_selected": "{}이(가) 선택되었습니다. 플레이를 클릭하여 시작하세요!"
+  "profile_selected": "{}이(가) 선택되었습니다. 플레이를 클릭하여 시작하세요!",
+  "fill_all_fields": "모든 필드를 채워주세요!",
+  "login_success": "로그인 성공!",
+  "whitelisting": "Registering on whitelist..."
  },
  "skin": {
   "modal_title": "스킨 설정",
@@ -83,5 +97,38 @@
   "minimize": "Minimize",
   "close": "Close",
   "lang_title": "Change language"
+ },
+ "hub": {
+  "title": "Server Hub"
+ },
+ "showcase": {
+  "title": "Pokémon of the Week",
+  "desc_charizard": "Legendary Fire/Dragon type, one of the strongest challengers on the server!",
+  "desc_rayquaza": "Lord of the skies, a true legend from the Hoenn region!",
+  "desc_greninja": "A fast and deadly Water/Dark type ninja Pokémon.",
+  "desc_lucario": "Aura master Fighting/Steel type. Can you feel its power?",
+  "desc_gengar": "The Ghost/Poison type lurking in the dark, who loves to scare!"
+ },
+ "rewards": {
+  "title": "Daily Reward",
+  "desc_launcher": "Claim your daily free <strong style=\"color:var(--accent-gold)\">100 CobbleDollar</strong> reward, ready to spend on the server!",
+  "placeholder": "Minecraft Username",
+  "btn": "Claim",
+  "success": "Claim successful!",
+  "error_name": "Invalid name!"
+ },
+ "leaderboard": {
+  "title": "Hall of Fame",
+  "desc": "The most active Pokémon masters on the server by playtime.",
+  "rank": "Rank",
+  "player": "Player",
+  "playtime": "Playtime",
+  "empty": "No data yet.",
+  "error": "Error loading data.",
+  "cat_playtime": "Playtime",
+  "cat_caught": "Caught",
+  "cat_pokedex": "Pokédex",
+  "cat_shiny": "Shiny Pokémon",
+  "col_value": "Value"
  }
 }
