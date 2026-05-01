@@ -18,6 +18,11 @@
   align-items: center;
   justify-content: center;
   overflow: hidden;
+  pointer-events: auto !important;
+}
+
+#intro-overlay button {
+  cursor: pointer !important;
 }
 
 #intro-overlay.hidden {

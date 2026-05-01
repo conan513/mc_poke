@@ -11,24 +11,51 @@ let isOnlineUI = true
 
 // ── Intro Logic ──────────────────────────────────────────────
 async function startIntro() {
+  console.log('[Intro] Initializing RPG sequence...');
   const overlay = $id('intro-overlay')
+  if (!overlay) return console.error('[Intro] Overlay element not found!');
+  
   overlay.classList.remove('hidden')
   
-  const browserLang = navigator.language.split('-')[0]
-  const langNames = { 'hu': 'Magyar', 'en': 'English', 'de': 'Deutsch', 'fr': 'Français' }
-  $id('detected-lang-name').textContent = langNames[browserLang] || 'English'
+  const browserLang = (navigator.language || 'en').split('-')[0].toLowerCase()
+  const langNames = { 
+    'hu': 'Magyar', 'en': 'English', 'de': 'Deutsch', 
+    'fr': 'Français', 'es': 'Español', 'it': 'Italiano' 
+  }
+  
+  const detectedName = langNames[browserLang] || 'English'
+  console.log('[Intro] Detected language:', browserLang, '(', detectedName, ')');
+  
+  const langDisplay = $id('detected-lang-name')
+  if (langDisplay) langDisplay.textContent = detectedName
 
-  $id('btn-intro-confirm-lang').onclick = () => switchPhase2()
-  $id('btn-intro-change-lang').onclick = () => {
-    $id('lang-btn-launcher').click()
+  const btnConfirm = $id('btn-intro-confirm-lang')
+  const btnChange = $id('btn-intro-change-lang')
+
+  if (btnConfirm) {
+    btnConfirm.addEventListener('click', () => {
+      console.log('[Intro] Language confirmed');
+      switchPhase2()
+    })
+  }
+
+  if (btnChange) {
+    btnChange.addEventListener('click', () => {
+      console.log('[Intro] Opening language selector');
+      const langBtn = $id('lang-btn-launcher')
+      if (langBtn) langBtn.click()
+    })
   }
 
   function switchPhase2() {
+    console.log('[Intro] Switching to Phase 2 (The World)');
     $id('intro-lang-phase').classList.add('hidden')
     $id('intro-anim-phase').classList.remove('hidden')
     const music = $id('intro-music')
-    music.volume = 0.5
-    music.play().catch(() => {})
+    if (music) {
+      music.volume = 0.4
+      music.play().catch(err => console.warn('[Intro] Music autoplay blocked:', err))
+    }
     runIntroAnimation()
   }
 
@@ -53,35 +80,46 @@ async function startIntro() {
     let currentPitch = 1
     const totalPitches = 3
     
-    $id('btn-next-pitch').onclick = () => {
-      if (currentPitch < totalPitches) {
-        $id(`pitch-${currentPitch}`).classList.remove('active')
-        currentPitch++
-        $id(`pitch-${currentPitch}`).classList.add('active')
-        if (currentPitch === totalPitches) {
-          $id('btn-next-pitch').textContent = t('intro.start_btn')
+    const btnNext = $id('btn-next-pitch')
+    if (btnNext) {
+      btnNext.addEventListener('click', () => {
+        if (currentPitch < totalPitches) {
+          console.log('[Intro] Next pitch:', currentPitch + 1);
+          $id(`pitch-${currentPitch}`).classList.remove('active')
+          currentPitch++
+          $id(`pitch-${currentPitch}`).classList.add('active')
+          if (currentPitch === totalPitches) {
+            btnNext.textContent = t('intro.start_btn')
+          }
+        } else {
+          showChoicePhase()
         }
-      } else {
-        showChoicePhase()
-      }
+      })
     }
   }
 
   function showChoicePhase() {
+    console.log('[Intro] Switching to Choice Phase');
     $id('intro-anim-phase').classList.add('hidden')
     $id('intro-choice-phase').classList.remove('hidden')
     
-    $id('btn-choice-new').onclick = () => {
+    $id('btn-choice-new').addEventListener('click', () => {
+      console.log('[Intro] Choice: New Trainer');
       endIntro()
-      $id('tab-account').click()
-      $id('link-to-register').click()
-    }
+      const tabAcc = $id('tab-account')
+      const linkReg = $id('link-to-register')
+      if (tabAcc) tabAcc.click()
+      if (linkReg) linkReg.click()
+    })
     
-    $id('btn-choice-returning').onclick = () => {
+    $id('btn-choice-returning').addEventListener('click', () => {
+      console.log('[Intro] Choice: Returning Master');
       endIntro()
-      $id('tab-account').click()
-      $id('link-to-login').click()
-    }
+      const tabAcc = $id('tab-account')
+      const linkLog = $id('link-to-login')
+      if (tabAcc) tabAcc.click()
+      if (linkLog) linkLog.click()
+    })
   }
 
   function endIntro() {
