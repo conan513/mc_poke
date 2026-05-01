@@ -87,5 +87,33 @@
   "remove_profile": "Remove Profile",
   "multiplayer_hint": "In Multiplayer, SkinsRestorer automatically applies the skin!",
   "singleplayer_hint": "In Singleplayer, run in-game: <code>/skin url {}</code>"
+ },
+ "hub": {
+  "title": "Server Hub"
+ },
+ "showcase": {
+  "title": "Pokémon of the Week",
+  "desc_charizard": "Legendary Fire/Dragon type, one of the strongest challengers on the server!",
+  "desc_rayquaza": "Lord of the skies, a true legend from the Hoenn region!",
+  "desc_greninja": "A fast and deadly Water/Dark type ninja Pokémon.",
+  "desc_lucario": "Aura master Fighting/Steel type. Can you feel its power?",
+  "desc_gengar": "The Ghost/Poison type lurking in the dark, who loves to scare!"
+ },
+ "rewards": {
+  "title": "Daily Reward",
+  "desc_launcher": "Claim your daily free <strong style=\"color:var(--accent-gold)\">100 CobbleDollar</strong> reward, ready to spend on the server!",
+  "placeholder": "Minecraft Username",
+  "btn": "Claim",
+  "success": "Claim successful!",
+  "error_name": "Invalid name!"
+ },
+ "leaderboard": {
+  "title": "Hall of Fame",
+  "desc": "The most active Pokémon masters on the server by playtime.",
+  "rank": "Rank",
+  "player": "Player",
+  "playtime": "Playtime",
+  "empty": "No data yet.",
+  "error": "Error loading data."
  }
 }

@@ -531,6 +531,114 @@ $id('console-close').addEventListener('click', () => {
   $id('console-overlay').classList.add('hidden')
 })
 
+// ── Server Hub ────────────────────────────────────────────────
+$id('btn-server-hub').addEventListener('click', () => {
+  $id('hub-overlay').classList.remove('hidden')
+  fetchHubLeaderboard()
+})
+$id('btn-close-hub').addEventListener('click', () => {
+  $id('hub-overlay').classList.add('hidden')
+})
+
+const showcasePokemons = [
+  { name: "Charizard (Mega X)", sprite: "charizard-megax", descKey: "showcase.desc_charizard" },
+  { name: "Rayquaza", sprite: "rayquaza", descKey: "showcase.desc_rayquaza" },
+  { name: "Greninja", sprite: "greninja", descKey: "showcase.desc_greninja" },
+  { name: "Lucario (Mega)", sprite: "lucario-mega", descKey: "showcase.desc_lucario" },
+  { name: "Gengar", sprite: "gengar", descKey: "showcase.desc_gengar" }
+]
+
+function randomizeHubShowcase() {
+  const p = showcasePokemons[Math.floor(Math.random() * showcasePokemons.length)]
+  const img = $id('hub-showcase-sprite')
+  const nameEl = $id('hub-showcase-name')
+  const descEl = $id('hub-showcase-desc')
+  
+  if (img && nameEl && descEl) {
+    img.src = `https://play.pokemonshowdown.com/sprites/xyani/${p.sprite}.gif`
+    nameEl.textContent = p.name
+    descEl.setAttribute('data-i18n', p.descKey)
+    descEl.innerHTML = t(p.descKey)
+  }
+}
+randomizeHubShowcase()
+
+async function fetchHubLeaderboard() {
+  const tbody = $id('hub-leaderboard-body')
+  if (!tbody) return
+
+  // Read server URL from input or fallback to a default if testing.
+  let serverUrl = $id('input-server-url').value.trim()
+  if (!serverUrl) serverUrl = 'http://94.72.100.43:7878' // default from placeholder
+
+  try {
+    const res = await fetch(`${serverUrl}/api/leaderboard`)
+    const data = await res.json()
+
+    if (!data || data.length === 0) {
+      tbody.innerHTML = `<tr><td colspan="3" style="text-align:center; color:#888;">${t('leaderboard.empty')}</td></tr>`
+      return
+    }
+
+    let html = ''
+    data.forEach((p, index) => {
+      const rankClass = index < 3 ? `rank-${index + 1}` : ''
+      const rankContent = index < 3 ? `<span class="rank-badge ${rankClass}">${index + 1}</span>` : index + 1
+      html += `
+        <tr>
+          <td>${rankContent}</td>
+          <td style="font-weight: 600;">${p.username}</td>
+          <td style="color: var(--accent-yellow);">${p.playtime} óra</td>
+        </tr>
+      `
+    })
+    tbody.innerHTML = html
+  } catch (e) {
+    tbody.innerHTML = `<tr><td colspan="3" style="text-align:center; color:var(--accent-red);">${t('leaderboard.error')}</td></tr>`
+  }
+}
+
+$id('btn-hub-claim-reward').addEventListener('click', async () => {
+  const btn = $id('btn-hub-claim-reward')
+  const statusEl = $id('hub-reward-status')
+  const username = currentProfile ? currentProfile.name : ''
+  
+  if (!username) {
+    statusEl.className = 'hub-reward-status error'
+    statusEl.textContent = 'Jelentkezz be egy profillal!'
+    return
+  }
+
+  let serverUrl = $id('input-server-url').value.trim()
+  if (!serverUrl) serverUrl = 'http://94.72.100.43:7878'
+
+  btn.disabled = true
+  btn.innerHTML = '<div class="loading-spinner small" style="margin:0; width:16px; height:16px;"></div>'
+
+  try {
+    const res = await fetch(`${serverUrl}/api/rewards/claim`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ username })
+    })
+    const data = await res.json()
+
+    if (res.ok) {
+      statusEl.className = 'hub-reward-status success'
+      statusEl.textContent = data.message || t('rewards.success')
+    } else {
+      statusEl.className = 'hub-reward-status error'
+      statusEl.textContent = data.error || 'Hiba történt.'
+    }
+  } catch (e) {
+    statusEl.className = 'hub-reward-status error'
+    statusEl.textContent = 'Hálózati hiba.'
+  } finally {
+    btn.disabled = false
+    btn.innerHTML = `<span data-i18n="rewards.btn">${t('rewards.btn')}</span>`
+  }
+})
+
 // ── External links ────────────────────────────────────────────
 $id('link-modrinth').addEventListener('click', () => {
   window.cobble.openExternal('https://modrinth.com/modpack/cobbleverse')

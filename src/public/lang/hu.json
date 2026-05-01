@@ -87,5 +87,33 @@
   "remove_profile": "Profil törlése",
   "multiplayer_hint": "Multiplayer-ben a SkinsRestorer automatikusan alkalmazza a skint!",
   "singleplayer_hint": "Singleplayer-ben in-game futtasd: <code>/skin url {}</code>"
+ },
+ "hub": {
+  "title": "Szerver Központ"
+ },
+ "showcase": {
+  "title": "A Hét Pokémonja",
+  "desc_charizard": "Legendás Tűz/Sárkány típus, a szerver egyik legerősebb kihívója!",
+  "desc_rayquaza": "Az egek ura, egy igazi legenda a Hoenn régióból!",
+  "desc_greninja": "Gyors és halálos Víz/Sötét típusú nindzsa Pokémon.",
+  "desc_lucario": "Aura mester Harcos/Acél típus. Érzed az erejét?",
+  "desc_gengar": "A sötétben rejtőző Szellem/Méreg típus, aki imád ijesztgetni!"
+ },
+ "rewards": {
+  "title": "Napi Jutalom",
+  "desc_launcher": "Szerezd be a napi ingyenes <strong style=\"color:var(--accent-gold)\">100 CobbleDollar</strong> jutalmadat, amit egyből elkölthetsz a szerveren!",
+  "placeholder": "Minecraft Neved",
+  "btn": "Begyűjtés",
+  "success": "Sikeres begyűjtés!",
+  "error_name": "Érvénytelen név!"
+ },
+ "leaderboard": {
+  "title": "Dicsőségtábla",
+  "desc": "A legaktívabb Pokémon mesterek a szerveren játékidő alapján.",
+  "rank": "Helyezés",
+  "player": "Játékos",
+  "playtime": "Játékidő",
+  "empty": "Még nincsenek adatok.",
+  "error": "Hiba a betöltéskor."
  }
 }
