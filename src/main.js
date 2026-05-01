@@ -89,6 +89,7 @@ async function startIntro() {
     overlay.classList.add('hidden')
     showScreen('welcome')
   }
+}
 
 function sleep(ms) { return new Promise(resolve => setTimeout(resolve, ms)) }
 
