@@ -1099,107 +1099,83 @@ body::before {
 .console-log::-webkit-scrollbar-track { background: transparent; }
 .console-log::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 3px; }
 
-/* ── Server Hub Overlay ───────────────────────────────────────── */
-.hub-overlay {
+/* ── Home Dashboard (Integrated Hub) ─────────────────────────── */
+.home-dashboard {
   position: absolute;
-  inset: 0;
-  background: rgba(8,11,20,0.95);
-  backdrop-filter: blur(8px);
+  top: 40px;
+  left: 40px;
+  right: 60px;
+  bottom: 160px;
   display: flex;
   flex-direction: column;
-  z-index: 50;
-  transition: opacity 0.3s;
-}
-.hub-overlay.hidden {
-  opacity: 0;
-  pointer-events: none;
-}
-
-.hub-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 16px 20px;
-  border-bottom: 1px solid var(--border);
-  font-weight: 600;
-  font-size: 15px;
-}
-
-.hub-close {
-  background: transparent;
-  border: none;
-  color: var(--text-muted);
-  cursor: pointer;
-  font-size: 18px;
-  padding: 4px 8px;
-  border-radius: 4px;
-  transition: all 0.15s;
-}
-.hub-close:hover { background: rgba(255,255,255,0.08); color: var(--text-primary); }
-
-.hub-content {
-  flex: 1;
+  z-index: 10;
   overflow-y: auto;
-  padding: 24px;
+  padding-right: 10px;
 }
-.hub-content::-webkit-scrollbar { width: 6px; }
-.hub-content::-webkit-scrollbar-track { background: transparent; }
-.hub-content::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 3px; }
+.home-dashboard::-webkit-scrollbar { width: 4px; }
+.home-dashboard::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 10px; }
 
 .hub-grid {
   display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 20px;
-  max-width: 800px;
-  margin: 0 auto;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 16px;
 }
 
 .hub-card {
-  background: rgba(255, 255, 255, 0.02);
-  border: 1px solid rgba(255, 255, 255, 0.05);
-  border-radius: 16px;
-  padding: 20px;
+  background: rgba(10, 14, 25, 0.4);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 20px;
+  padding: 18px;
   display: flex;
   flex-direction: column;
-  transition: all 0.3s ease;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 .hub-card:hover {
-  background: rgba(255, 255, 255, 0.04);
-  border-color: rgba(255, 255, 255, 0.1);
-  box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+  background: rgba(20, 26, 45, 0.5);
+  border-color: rgba(255, 255, 255, 0.15);
+  transform: translateY(-4px);
+  box-shadow: 0 10px 30px rgba(0,0,0,0.4);
 }
 
 .hub-card h3 {
-  font-size: 16px;
+  font-size: 14px;
+  font-weight: 700;
   color: var(--text-primary);
-  margin-bottom: 16px;
+  margin-bottom: 14px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  opacity: 0.8;
 }
 
 /* Hub Showcase */
 .showcase-card { grid-column: span 1; }
 .rewards-card { grid-column: span 1; }
-.leaderboard-card { grid-column: span 2; }
+.leaderboard-card { grid-column: span 1; }
 
 .hub-showcase-container {
   position: relative;
-  height: 120px;
+  height: 100px;
   display: flex;
   align-items: center;
   justify-content: center;
-  margin-bottom: 12px;
+  margin-bottom: 10px;
 }
 #hub-showcase-sprite {
-  max-width: 100px;
-  max-height: 100px;
+  max-width: 80px;
+  max-height: 80px;
   z-index: 2;
   filter: drop-shadow(0 5px 10px rgba(0,0,0,0.5));
-  transform: scale(1.3);
+  transform: scale(1.4);
 }
 .hub-showcase-glow {
   position: absolute;
-  width: 80px; height: 80px;
+  width: 70px; height: 70px;
   background: radial-gradient(circle, var(--accent-gold) 0%, transparent 70%);
-  opacity: 0.15;
+  opacity: 0.2;
   border-radius: 50%;
   top: 50%; left: 50%;
   transform: translate(-50%, -50%);
@@ -1209,37 +1185,27 @@ body::before {
 #hub-showcase-name {
   text-align: center;
   color: var(--accent-gold);
-  font-size: 14px;
+  font-size: 13px;
+  font-weight: 700;
   margin-bottom: 4px;
 }
 #hub-showcase-desc {
   text-align: center;
   font-size: 11px;
   color: var(--text-muted);
+  line-height: 1.4;
 }
 
 /* Hub Rewards */
 .rewards-card p {
-  font-size: 12px;
+  font-size: 11px;
   color: var(--text-muted);
-  line-height: 1.5;
-  margin-bottom: 16px;
+  line-height: 1.6;
+  margin-bottom: 14px;
 }
 .hub-reward-form {
   display: flex;
   flex-direction: column;
-  gap: 10px;
-}
-#hub-reward-username {
-  background: rgba(0,0,0,0.2);
-  border: 1px solid var(--border);
-  padding: 10px;
-  border-radius: 8px;
-  color: white;
-  font-family: inherit;
-  font-size: 13px;
-  cursor: not-allowed;
-  opacity: 0.8;
 }
 .hub-reward-status {
   margin-top: 10px;

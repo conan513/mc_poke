@@ -238,6 +238,57 @@
         <!-- Background art panel -->
         <div class="home-art">
           <div class="art-overlay"></div>
+          
+          <!-- Server Dashboard (Integrated Hub) -->
+          <div class="home-dashboard" id="home-dashboard">
+            <div class="hub-grid">
+              <!-- Showcase -->
+              <div class="hub-card showcase-card">
+                <h3 data-i18n="showcase.title">A Hét Pokémonja</h3>
+                <div class="hub-showcase-container">
+                  <img id="hub-showcase-sprite" src="https://play.pokemonshowdown.com/sprites/xyani/charizard-megax.gif" alt="Showcase">
+                  <div class="hub-showcase-glow"></div>
+                </div>
+                <h4 id="hub-showcase-name">Charizard (Mega X)</h4>
+                <p id="hub-showcase-desc" data-i18n="showcase.desc_charizard">Legendás Tűz/Sárkány típus, a szerver egyik legerősebb kihívója!</p>
+              </div>
+
+              <!-- Daily Rewards -->
+              <div class="hub-card rewards-card">
+                <h3 data-i18n="rewards.title">Napi Jutalom</h3>
+                <p data-i18n="rewards.desc_launcher">Szerezd be a napi ingyenes <strong style="color:var(--accent-gold)">100 CobbleDollar</strong> jutalmadat, amit egyből elkölthetsz a szerveren!</p>
+                
+                <div class="hub-reward-form">
+                  <button id="btn-hub-claim-reward" class="btn-primary" style="padding: 10px; font-size: 14px;">
+                    <span data-i18n="rewards.btn">Begyűjtés</span>
+                  </button>
+                </div>
+                <div id="hub-reward-status" class="hub-reward-status"></div>
+              </div>
+
+              <!-- Leaderboard -->
+              <div class="hub-card leaderboard-card">
+                <h3 data-i18n="leaderboard.title">Dicsőségtábla</h3>
+                <div class="hub-leaderboard-container">
+                  <table class="hub-leaderboard-table">
+                    <thead>
+                      <tr>
+                        <th data-i18n="leaderboard.rank">Helyezés</th>
+                        <th data-i18n="leaderboard.player">Játékos</th>
+                        <th data-i18n="leaderboard.playtime">Játékidő</th>
+                      </tr>
+                    </thead>
+                    <tbody id="hub-leaderboard-body">
+                      <tr>
+                        <td colspan="3" class="hub-loading-td"><div class="loading-spinner small"></div></td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+          </div>
+
           <div class="art-content">
             <h1 class="game-title">COBBLEMON<br /><span>UNIVERSE</span></h1>
             <p class="game-tagline">Pokémon Adventure in Minecraft</p>
@@ -309,10 +360,6 @@
           </div>
 
           <div class="home-links">
-            <button class="link-btn special-link-btn" id="btn-server-hub" style="color: var(--accent-gold); border-color: rgba(251, 191, 36, 0.3); background: rgba(251, 191, 36, 0.05);">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width: 14px; height: 14px; vertical-align: middle; margin-right: 6px;"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
-              <span data-i18n="home.hub_btn">Szerver Központ</span>
-            </button>
             <button class="link-btn" id="link-modrinth">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width: 14px; height: 14px; vertical-align: middle; margin-right: 6px;"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></svg>
               Modrinth
@@ -341,65 +388,7 @@
         <div class="console-log" id="console-log"></div>
       </div>
 
-      <!-- Server Hub Overlay -->
-      <div class="hub-overlay hidden" id="hub-overlay">
-        <div class="hub-header">
-          <span class="hub-title">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width: 22px; height: 22px; vertical-align: middle; margin-right: 10px; color: var(--accent-gold);"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
-            <span data-i18n="hub.title">Szerver Központ</span>
-          </span>
-          <button class="hub-close" id="btn-close-hub">✕</button>
-        </div>
-        <div class="hub-content">
-          <div class="hub-grid">
-            <!-- Showcase -->
-            <div class="hub-card showcase-card">
-              <h3 data-i18n="showcase.title">A Hét Pokémonja</h3>
-              <div class="hub-showcase-container">
-                <img id="hub-showcase-sprite" src="https://play.pokemonshowdown.com/sprites/xyani/charizard-megax.gif" alt="Showcase">
-                <div class="hub-showcase-glow"></div>
-              </div>
-              <h4 id="hub-showcase-name">Charizard (Mega X)</h4>
-              <p id="hub-showcase-desc" data-i18n="showcase.desc_charizard">Legendás Tűz/Sárkány típus, a szerver egyik legerősebb kihívója!</p>
-            </div>
 
-            <!-- Daily Rewards -->
-            <div class="hub-card rewards-card">
-              <h3 data-i18n="rewards.title">Napi Jutalom</h3>
-              <p data-i18n="rewards.desc_launcher">Szerezd be a napi ingyenes <strong style="color:var(--accent-gold)">100 CobbleDollar</strong> jutalmadat, amit egyből elkölthetsz a szerveren!</p>
-              
-              <div class="hub-reward-form">
-                <input type="text" id="hub-reward-username" data-i18n-placeholder="rewards.placeholder" placeholder="Minecraft Neved" autocomplete="off" spellcheck="false" readonly>
-                <button id="btn-hub-claim-reward" class="btn-primary" style="padding: 10px; font-size: 14px;">
-                  <span data-i18n="rewards.btn">Begyűjtés</span>
-                </button>
-              </div>
-              <div id="hub-reward-status" class="hub-reward-status"></div>
-            </div>
-
-            <!-- Leaderboard -->
-            <div class="hub-card leaderboard-card">
-              <h3 data-i18n="leaderboard.title">Dicsőségtábla</h3>
-              <div class="hub-leaderboard-container">
-                <table class="hub-leaderboard-table">
-                  <thead>
-                    <tr>
-                      <th data-i18n="leaderboard.rank">Helyezés</th>
-                      <th data-i18n="leaderboard.player">Játékos</th>
-                      <th data-i18n="leaderboard.playtime">Játékidő</th>
-                    </tr>
-                  </thead>
-                  <tbody id="hub-leaderboard-body">
-                    <tr>
-                      <td colspan="3" class="hub-loading-td"><div class="loading-spinner small"></div></td>
-                    </tr>
-                  </tbody>
-                </table>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
     </div>
 
     <!-- ── MODAL: Skin Management ── -->

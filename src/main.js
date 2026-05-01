@@ -100,6 +100,12 @@ function showScreen(name) {
   requestAnimationFrame(() => {
     target.style.opacity = '1'
     target.classList.add('active')
+    
+    // Refresh Server Hub if entering home screen
+    if (name === 'home') {
+      randomizeHubShowcase()
+      fetchHubLeaderboard()
+    }
   })
 }
 
@@ -531,14 +537,9 @@ $id('console-close').addEventListener('click', () => {
   $id('console-overlay').classList.add('hidden')
 })
 
-// ── Server Hub ────────────────────────────────────────────────
-$id('btn-server-hub').addEventListener('click', () => {
-  $id('hub-overlay').classList.remove('hidden')
-  fetchHubLeaderboard()
-})
-$id('btn-close-hub').addEventListener('click', () => {
-  $id('hub-overlay').classList.add('hidden')
-})
+// ── Server Hub (Integrated) ──────────────────────────────────
+// Functions now triggered in showScreen('home')
+
 
 const showcasePokemons = [
   { name: "Charizard (Mega X)", sprite: "charizard-megax", descKey: "showcase.desc_charizard" },
