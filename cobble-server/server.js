@@ -504,7 +504,10 @@ function handleRequest(req, res) {
   if (url === '/app/' || url === '/app/index.html') {
     const filePath = path.join(DIST_DIR, 'index.html')
     if (fs.existsSync(filePath)) {
-      res.writeHead(200, { 'Content-Type': 'text/html' })
+      res.writeHead(200, { 
+        'Content-Type': 'text/html',
+        'Cache-Control': 'no-cache, no-store, must-revalidate'
+      })
       fs.createReadStream(filePath).pipe(res)
       return
     }
