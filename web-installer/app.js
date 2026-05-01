@@ -347,4 +347,106 @@ document.addEventListener('DOMContentLoaded', () => {
       }
     }, 600);
   });
+
+  // ── Pokemon Showcase Logic ────────────────────────────────────
+  const showcasePokemons = [
+    { name: "Charizard (Mega X)", sprite: "charizard-megax", descKey: "showcase.desc_charizard" },
+    { name: "Rayquaza", sprite: "rayquaza", descKey: "showcase.desc_rayquaza" },
+    { name: "Greninja", sprite: "greninja", descKey: "showcase.desc_greninja" },
+    { name: "Lucario (Mega)", sprite: "lucario-mega", descKey: "showcase.desc_lucario" },
+    { name: "Gengar", sprite: "gengar", descKey: "showcase.desc_gengar" }
+  ];
+
+  function randomizeShowcase() {
+    const p = showcasePokemons[Math.floor(Math.random() * showcasePokemons.length)];
+    const img = document.getElementById('showcase-sprite');
+    const nameEl = document.getElementById('showcase-name');
+    const descEl = document.querySelector('.showcase-info p');
+    
+    if (img && nameEl && descEl) {
+      img.src = `https://play.pokemonshowdown.com/sprites/xyani/${p.sprite}.gif`;
+      nameEl.textContent = p.name;
+      descEl.setAttribute('data-i18n', p.descKey);
+      descEl.innerHTML = t(p.descKey);
+    }
+  }
+  randomizeShowcase();
+
+  // ── Daily Rewards Logic ───────────────────────────────────────
+  const btnClaim = document.getElementById('btn-claim-reward');
+  const inputReward = document.getElementById('reward-username');
+  const rewardStatus = document.getElementById('reward-status');
+
+  if (btnClaim) {
+    btnClaim.addEventListener('click', async () => {
+      const username = inputReward.value.trim();
+      if (username.length < 3) {
+        rewardStatus.className = 'reward-status error';
+        rewardStatus.textContent = t('rewards.error_name') || 'Érvénytelen név!';
+        return;
+      }
+
+      btnClaim.disabled = true;
+      btnClaim.innerHTML = '<div class="loading-spinner small" style="margin:0; width:20px; height:20px;"></div>';
+
+      try {
+        const res = await fetch('/api/rewards/claim', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ username })
+        });
+        const data = await res.json();
+
+        if (res.ok) {
+          rewardStatus.className = 'reward-status success';
+          rewardStatus.textContent = data.message || t('rewards.success') || 'Sikeres begyűjtés!';
+          inputReward.value = '';
+        } else {
+          rewardStatus.className = 'reward-status error';
+          rewardStatus.textContent = data.error || 'Hiba történt.';
+        }
+      } catch (e) {
+        rewardStatus.className = 'reward-status error';
+        rewardStatus.textContent = 'Hálózati hiba.';
+      } finally {
+        btnClaim.disabled = false;
+        btnClaim.innerHTML = `<span data-i18n="rewards.btn">${t('rewards.btn') || 'Begyűjtés'}</span>`;
+      }
+    });
+  }
+
+  // ── Leaderboard Logic ─────────────────────────────────────────
+  async function fetchLeaderboard() {
+    const tbody = document.getElementById('leaderboard-body');
+    if (!tbody) return;
+
+    try {
+      const res = await fetch('/api/leaderboard');
+      const data = await res.json();
+
+      if (!data || data.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="3" style="text-align:center; color:#888;">${t('leaderboard.empty') || 'Még nincsenek adatok.'}</td></tr>`;
+        return;
+      }
+
+      let html = '';
+      data.forEach((p, index) => {
+        const rankClass = index < 3 ? `rank-${index + 1}` : '';
+        const rankContent = index < 3 ? `<span class="rank-badge ${rankClass}">${index + 1}</span>` : index + 1;
+        html += `
+          <tr>
+            <td>${rankContent}</td>
+            <td style="font-weight: 600;">${p.username}</td>
+            <td style="color: var(--accent-yellow);">${p.playtime} óra</td>
+          </tr>
+        `;
+      });
+      tbody.innerHTML = html;
+    } catch (e) {
+      tbody.innerHTML = `<tr><td colspan="3" style="text-align:center; color:var(--accent-red);">${t('leaderboard.error') || 'Hiba a betöltéskor.'}</td></tr>`;
+    }
+  }
+
+  fetchLeaderboard();
+  setInterval(fetchLeaderboard, 300000);
 });

@@ -66,6 +66,15 @@ console.log(`[Skins-Init] Absolute skins directory: ${path.resolve(SKINS_DIR)}`)
 const AUTH_FILE = path.join(DATA_DIR, '.admin-auth.json')
 const authTokens = new Map() // token → expiry ms
 
+// ── Daily Rewards State ──────────────────────────────────────────
+const REWARDS_FILE = path.join(DATA_DIR, 'daily_rewards.json')
+function loadRewards() {
+  try { return JSON.parse(fs.readFileSync(REWARDS_FILE, 'utf8')) } catch { return {} }
+}
+function saveRewards(data) {
+  fs.writeFileSync(REWARDS_FILE, JSON.stringify(data))
+}
+
 function loadAuth() {
   try { return JSON.parse(fs.readFileSync(AUTH_FILE, 'utf8')) } catch { return null }
 }
@@ -612,6 +621,98 @@ function handleRequest(req, res) {
       playersOnline: onlinePlayers.size,
       players: Array.from(onlinePlayers)
     }))
+    return
+  }
+
+  // ── Leaderboard API ───────────────────────────────────────
+  if (url === '/api/leaderboard' && req.method === 'GET') {
+    try {
+      const usercachePath = path.join(DATA_DIR, 'usercache.json')
+      const statsDir = path.join(DATA_DIR, 'world', 'stats')
+      
+      let usercache = []
+      if (fs.existsSync(usercachePath)) {
+        usercache = JSON.parse(fs.readFileSync(usercachePath, 'utf8'))
+      }
+
+      let leaderboard = []
+      if (fs.existsSync(statsDir)) {
+        const statFiles = fs.readdirSync(statsDir)
+        for (const file of statFiles) {
+          if (!file.endsWith('.json')) continue
+          const uuid = file.replace('.json', '')
+          const user = usercache.find(u => u.uuid === uuid)
+          const username = user ? user.name : 'Ismeretlen'
+          
+          try {
+            const stats = JSON.parse(fs.readFileSync(path.join(statsDir, file), 'utf8'))
+            const playtimeTicks = stats.stats?.['minecraft:custom']?.['minecraft:play_time'] || 0
+            const playtimeHours = Math.floor(playtimeTicks / 20 / 60 / 60)
+            
+            if (playtimeHours > 0) {
+              leaderboard.push({ username, playtime: playtimeHours })
+            }
+          } catch (e) {
+            console.error(`[Leaderboard] Hiba a stat fájl olvasásakor: ${file}`)
+          }
+        }
+      }
+      
+      // Sort by playtime descending, take top 10
+      leaderboard.sort((a, b) => b.playtime - a.playtime)
+      leaderboard = leaderboard.slice(0, 10)
+      
+      res.writeHead(200, { 'Content-Type': 'application/json' })
+      res.end(JSON.stringify(leaderboard))
+    } catch (e) {
+      res.writeHead(500, { 'Content-Type': 'application/json' })
+      res.end(JSON.stringify({ error: 'Belső hiba a ranglista lekérdezésekor.' }))
+    }
+    return
+  }
+
+  // ── Daily Rewards API ──────────────────────────────────────
+  if (url === '/api/rewards/claim' && req.method === 'POST') {
+    let body = ''
+    req.on('data', c => body += c)
+    req.on('end', () => {
+      try {
+        const { username } = JSON.parse(body)
+        if (!username || username.trim().length < 3) {
+          res.writeHead(400, { 'Content-Type': 'application/json' })
+          return res.end(JSON.stringify({ error: 'Érvénytelen felhasználónév.' }))
+        }
+        
+        const rewards = loadRewards()
+        const lastClaim = rewards[username] || 0
+        const now = Date.now()
+        const twentyFourHours = 24 * 60 * 60 * 1000
+        
+        if (now - lastClaim < twentyFourHours) {
+          const timeLeftMs = twentyFourHours - (now - lastClaim)
+          const hoursLeft = Math.floor(timeLeftMs / (1000 * 60 * 60))
+          const minsLeft = Math.floor((timeLeftMs % (1000 * 60 * 60)) / (1000 * 60))
+          res.writeHead(400, { 'Content-Type': 'application/json' })
+          return res.end(JSON.stringify({ error: `Már begyűjtötted! Várj még ${hoursLeft} órát és ${minsLeft} percet.` }))
+        }
+        
+        // Claim logic
+        rewards[username] = now
+        saveRewards(rewards)
+        
+        // Execute cobbledollars command
+        sendCommand(`cobbledollars add ${username} 100`)
+        
+        // Send tellraw message if online
+        sendCommand(`tellraw ${username} {"text":"[Rendszer] Sikeresen begyűjtötted a napi jutalmad (100 CobbleDollar) a weben!","color":"green"}`)
+        
+        res.writeHead(200, { 'Content-Type': 'application/json' })
+        res.end(JSON.stringify({ success: true, message: 'Jutalom sikeresen begyűjtve!' }))
+      } catch (e) {
+        res.writeHead(500, { 'Content-Type': 'application/json' })
+        res.end(JSON.stringify({ error: 'Hiba a jutalom begyűjtésekor.' }))
+      }
+    })
     return
   }
 
