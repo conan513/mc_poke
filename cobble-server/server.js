@@ -157,6 +157,7 @@ function startMinecraft() {
         setTimeout(() => {
           if (!onlinePlayers.has(user)) {
             console.log(`[Minecraft] ${user} grace period lejárt, eltávolítás a whitelistről.`)
+            sendCommand(`easywhitelist remove ${user}`)
             sendCommand(`whitelist remove ${user}`)
             verifiedLaunchers.delete(user)
           } else {
@@ -744,10 +745,11 @@ function handleRequest(req, res) {
         const ip = req.socket.remoteAddress
         console.log(`[Verification] Sikeres igazolás: ${username} (IP: ${ip})`)
 
-        // Hozzáadás a whitelisthez
-        sendCommand('whitelist on') // Biztos ami biztos
-        sendCommand(`whitelist add ${username}`)
-        sendCommand('whitelist reload') // Frissítjük a cache-t
+        // Hozzáadás a whitelisthez (EasyWhitelist modot használjuk a név alapú whitelisthöz)
+        sendCommand('whitelist on')
+        sendCommand(`easywhitelist add ${username}`)
+        sendCommand(`whitelist add ${username}`) // Backup vanilla whitelist
+        sendCommand('whitelist reload')
 
         // Eltároljuk az igazolást (10 percig érvényes a belépéshez - modpacks take time)
         const JOIN_TIMEOUT = 10 * 60 * 1000
@@ -757,6 +759,7 @@ function handleRequest(req, res) {
         setTimeout(() => {
           if (!onlinePlayers.has(username)) {
             console.log(`[Verification] ${username} nem lépett be időben (${JOIN_TIMEOUT/1000}s), whitelist remove.`)
+            sendCommand(`easywhitelist remove ${username}`)
             sendCommand(`whitelist remove ${username}`)
             verifiedLaunchers.delete(username)
           }

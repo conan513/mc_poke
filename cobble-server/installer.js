@@ -440,6 +440,7 @@ const EXTRA_MODS = [
   { slug: 'easyauth',                       loaders: ['fabric'], gameVersions: [MC_VERSION] },
   { slug: 'serene-seasons',                 loaders: ['fabric'], gameVersions: [MC_VERSION] },
   { slug: 'seasonhud-fabric',               loaders: ['fabric'], gameVersions: [MC_VERSION] },
+  { slug: 'easywhitelist',                  loaders: ['fabric'], gameVersions: [MC_VERSION] },
   // Új modok (felhasználói kérés)
   { slug: 'pneumono_gravestones',           loaders: ['fabric'], gameVersions: [MC_VERSION] },
   { slug: 'pneumono_core',                  loaders: ['fabric'], gameVersions: [MC_VERSION] },
