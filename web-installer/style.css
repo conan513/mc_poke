@@ -349,7 +349,6 @@ h1 {
   border: 1px solid rgba(255, 255, 255, 0.08);
   border-radius: 28px;
   padding: 2rem;
-  transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
   display: flex;
   flex-direction: column;
   gap: 1.5rem;
@@ -358,8 +357,6 @@ h1 {
 .alt-platform-card:hover {
   background: rgba(255, 255, 255, 0.05);
   border-color: var(--accent-blue);
-  transform: translateY(-5px);
-  box-shadow: 0 15px 40px rgba(0, 0, 0, 0.4);
 }
 
 .alt-arch-group {
@@ -415,7 +412,6 @@ h1 {
   background: rgba(255, 255, 255, 0.1);
   border-color: var(--accent-blue);
   color: var(--text-bright);
-  transform: translateX(5px);
 }
 
 /* Animations */
