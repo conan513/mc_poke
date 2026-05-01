@@ -965,10 +965,33 @@ body::before {
 }
 
 /* Links */
-.home-links {
-  display: flex;
-  gap: 6px;
-  margin-top: auto;
+.auth-toggle-footer {
+  margin-top: 15px;
+  text-align: center;
+  font-size: 0.9em;
+  color: var(--text-muted);
+}
+
+.auth-toggle-footer a {
+  color: var(--accent);
+  text-decoration: none;
+  font-weight: 600;
+  margin-left: 5px;
+  transition: color 0.2s;
+}
+
+.auth-toggle-footer a:hover {
+  color: var(--accent-hover);
+  text-decoration: underline;
+}
+
+.full-width {
+  width: 100%;
+  margin-top: 10px;
+}
+
+#auth-account-fields .form-group {
+  margin-bottom: 12px;
 }
 .link-btn {
   flex: 1;

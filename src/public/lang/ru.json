@@ -20,7 +20,13 @@
   "stats_regions": "4 Regions",
   "stats_megas": "93 Mega Evolutions",
   "stats_raids": "Raid Dens",
-  "copyright": "Copyright © 2026 LUMYVERSE & Conan (Cobblemon Universe)"
+  "copyright": "Copyright © 2026 LUMYVERSE & Conan (Cobblemon Universe)",
+  "confirm_password_label": "Confirm Password",
+  "confirm_password_placeholder": "Enter password again...",
+  "no_account": "Don't have an account?",
+  "have_account": "Already have an account?",
+  "go_to_register": "Register",
+  "go_to_login": "Login"
  },
  "install": {
   "title": "Установка",
@@ -67,7 +73,8 @@
   "profile_selected": "Выбран {}. Нажмите Играть, чтобы начать!",
   "fill_all_fields": "Пожалуйста, заполните все поля!",
   "login_success": "Успешный вход!",
-  "whitelisting": "Registering on whitelist..."
+  "whitelisting": "Registering on whitelist...",
+  "passwords_dont_match": "Passwords don't match!"
  },
  "titlebar": {
   "lang_title": "Сменить язык",

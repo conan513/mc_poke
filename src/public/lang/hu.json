@@ -20,7 +20,13 @@
   "password_placeholder": "Írd be a jelszavad...",
   "login_btn": "Belépés",
   "register_btn": "Regisztráció",
-  "online_hint": "Fiók mód – Biztonságos profil szinkronizáció"
+  "online_hint": "Fiók mód – Biztonságos profil szinkronizáció",
+  "confirm_password_label": "Jelszó megerősítése",
+  "confirm_password_placeholder": "Írd be a jelszavad újra...",
+  "no_account": "Nincs még fiókod?",
+  "have_account": "Már van fiókod?",
+  "go_to_register": "Regisztráció",
+  "go_to_login": "Bejelentkezés"
  },
  "install": {
   "title": "Telepítés",
@@ -75,7 +81,8 @@
   "profile_selected": "{} kiválasztva. Kattints a játékra!",
   "whitelisting": "Regisztráció a szerver fehérlistájára...",
   "fill_all_fields": "Kérlek tölts ki minden mezőt!",
-  "login_success": "Sikeres bejelentkezés!"
+  "login_success": "Sikeres bejelentkezés!",
+  "passwords_dont_match": "A két jelszó nem egyezik!"
  },
  "titlebar": {
   "lang_title": "Nyelv váltása",

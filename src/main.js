@@ -704,6 +704,98 @@ $id('link-folder').addEventListener('click', () => {
   window.cobble.openGameFolder()
 })
 
+// ── Auth Tab Logic ──────────────────────────────────────────
+$id('tab-guest').addEventListener('click', () => {
+  $id('tab-guest').classList.add('active')
+  $id('tab-account').classList.remove('active')
+  $id('group-username').classList.remove('hidden')
+  $id('auth-account-fields').classList.add('hidden')
+  $id('auth-hint').textContent = t('welcome.offline_hint')
+})
+
+$id('tab-account').addEventListener('click', () => {
+  $id('tab-account').classList.add('active')
+  $id('tab-guest').classList.remove('active')
+  $id('group-username').classList.add('hidden')
+  $id('auth-account-fields').classList.remove('hidden')
+  $id('auth-hint').textContent = t('welcome.online_hint')
+})
+
+// Toggle Login/Register Views
+$id('link-to-register').addEventListener('click', (e) => {
+  e.preventDefault()
+  $id('auth-login-view').classList.add('hidden')
+  $id('auth-register-view').classList.remove('hidden')
+})
+
+$id('link-to-login').addEventListener('click', (e) => {
+  e.preventDefault()
+  $id('auth-register-view').classList.add('hidden')
+  $id('auth-login-view').classList.remove('hidden')
+})
+
+// Login Logic
+$id('btn-auth-login').addEventListener('click', async () => {
+  const user = $id('auth-login-username').value.trim()
+  const pass = $id('auth-login-password').value
+  if (!user || !pass) return showToast(t('toast.fill_all_fields'))
+
+  try {
+    const serverUrl = $id('input-server-url').value.trim()
+    const res = await fetch(`${serverUrl.replace(/\/+$/, '')}/api/auth/login`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ username: user, password: pass })
+    })
+    const data = await res.json()
+    if (!res.ok) throw new Error(data.error || 'Login failed')
+
+    username = data.username
+    const accUuid = data.uuid
+    
+    // Save to profiles
+    const existing = profiles.find(p => p.name === username)
+    if (existing) {
+      existing.uuid = accUuid
+    } else {
+      profiles.push({ name: username, uuid: accUuid, profileId: crypto.randomUUID() })
+    }
+    saveProfiles()
+    renderProfiles()
+    
+    showToast(t('toast.login_success'))
+    $id('tab-guest').click() // Switch back to guest to show selected profile
+  } catch (e) {
+    showToast('❌ ' + e.message)
+  }
+})
+
+// Register Logic
+$id('btn-auth-register').addEventListener('click', async () => {
+  const user = $id('auth-register-username').value.trim()
+  const pass = $id('auth-register-password').value
+  const confirm = $id('auth-register-confirm').value
+  
+  if (!user || !pass || !confirm) return showToast(t('toast.fill_all_fields'))
+  if (pass !== confirm) return showToast(t('toast.passwords_dont_match'))
+
+  try {
+    const serverUrl = $id('input-server-url').value.trim()
+    const res = await fetch(`${serverUrl.replace(/\/+$/, '')}/api/auth/register`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ username: user, password: pass })
+    })
+    const data = await res.json()
+    if (!res.ok) throw new Error(data.error || 'Registration failed')
+
+    showToast(t('toast.login_success'))
+    $id('link-to-login').click() // Go to login after success
+  } catch (e) {
+    showToast('❌ ' + e.message)
+  }
+})
+
 $id('btn-switch-profile').addEventListener('click', () => {
   showScreen('welcome')
 })

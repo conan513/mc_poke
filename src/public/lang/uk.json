@@ -20,7 +20,13 @@
   "register_btn": "Реєстрація",
   "online_hint": "Режим акаунта – Безпечна синхронізація",
   "stats_raids": "Raid Dens",
-  "copyright": "Copyright © 2026 LUMYVERSE & Conan (Cobblemon Universe)"
+  "copyright": "Copyright © 2026 LUMYVERSE & Conan (Cobblemon Universe)",
+  "confirm_password_label": "Confirm Password",
+  "confirm_password_placeholder": "Enter password again...",
+  "no_account": "Don't have an account?",
+  "have_account": "Already have an account?",
+  "go_to_register": "Register",
+  "go_to_login": "Login"
  },
  "install": {
   "title": "Встановлення",
@@ -67,7 +73,8 @@
   "profile_selected": "Обрано {}. Натисніть Грати, щоб почати!",
   "fill_all_fields": "Будь ласка, заповніть усі поля!",
   "login_success": "Успішний вхід!",
-  "whitelisting": "Registering on whitelist..."
+  "whitelisting": "Registering on whitelist...",
+  "passwords_dont_match": "Passwords don't match!"
  },
  "titlebar": {
   "lang_title": "Змінити мову",

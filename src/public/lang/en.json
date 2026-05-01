@@ -20,7 +20,13 @@
   "password_placeholder": "Enter your password...",
   "login_btn": "Login",
   "register_btn": "Register",
-  "online_hint": "Account Mode – Secure profile synchronization"
+  "online_hint": "Account Mode – Secure profile synchronization",
+  "confirm_password_label": "Confirm Password",
+  "confirm_password_placeholder": "Enter password again...",
+  "no_account": "Don't have an account?",
+  "have_account": "Already have an account?",
+  "go_to_register": "Register",
+  "go_to_login": "Login"
  },
  "install": {
   "title": "Installing",
@@ -75,7 +81,8 @@
   "profile_selected": "{} selected. Click Play to start!",
   "whitelisting": "Registering on server whitelist...",
   "fill_all_fields": "Please fill in all fields!",
-  "login_success": "Login successful!"
+  "login_success": "Login successful!",
+  "passwords_dont_match": "Passwords don't match!"
  },
  "titlebar": {
   "lang_title": "Change language",

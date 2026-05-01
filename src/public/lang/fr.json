@@ -20,7 +20,13 @@
   "password_placeholder": "Entrez le mot de passe...",
   "login_btn": "Connexion",
   "register_btn": "S'inscrire",
-  "online_hint": "Mode compte – Synchronisation sécurisée"
+  "online_hint": "Mode compte – Synchronisation sécurisée",
+  "confirm_password_label": "Confirm Password",
+  "confirm_password_placeholder": "Enter password again...",
+  "no_account": "Don't have an account?",
+  "have_account": "Already have an account?",
+  "go_to_register": "Register",
+  "go_to_login": "Login"
  },
  "install": {
   "title": "Installation",
@@ -67,7 +73,8 @@
   "profile_selected": "{} sélectionné. Cliquez sur Jouer pour commencer !",
   "fill_all_fields": "Veuillez remplir tous les champs !",
   "login_success": "Connexion réussie !",
-  "whitelisting": "Registering on whitelist..."
+  "whitelisting": "Registering on whitelist...",
+  "passwords_dont_match": "Passwords don't match!"
  },
  "titlebar": {
   "lang_title": "Changer de langue",

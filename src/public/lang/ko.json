@@ -20,7 +20,13 @@
   "stats_regions": "4 Regions",
   "stats_megas": "93 Mega Evolutions",
   "stats_raids": "Raid Dens",
-  "copyright": "Copyright © 2026 LUMYVERSE & Conan (Cobblemon Universe)"
+  "copyright": "Copyright © 2026 LUMYVERSE & Conan (Cobblemon Universe)",
+  "confirm_password_label": "Confirm Password",
+  "confirm_password_placeholder": "Enter password again...",
+  "no_account": "Don't have an account?",
+  "have_account": "Already have an account?",
+  "go_to_register": "Register",
+  "go_to_login": "Login"
  },
  "install": {
   "title": "설치",
@@ -75,7 +81,8 @@
   "profile_selected": "{}이(가) 선택되었습니다. 플레이를 클릭하여 시작하세요!",
   "fill_all_fields": "모든 필드를 채워주세요!",
   "login_success": "로그인 성공!",
-  "whitelisting": "Registering on whitelist..."
+  "whitelisting": "Registering on whitelist...",
+  "passwords_dont_match": "Passwords don't match!"
  },
  "skin": {
   "modal_title": "스킨 설정",
