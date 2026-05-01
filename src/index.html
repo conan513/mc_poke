@@ -269,13 +269,21 @@
               <!-- Leaderboard -->
               <div class="hub-card leaderboard-card">
                 <h3 data-i18n="leaderboard.title">Dicsőségtábla</h3>
+                
+                <div class="hub-leaderboard-tabs">
+                  <button class="hub-tab active" data-cat="playtime" data-i18n="leaderboard.cat_playtime">Játékidő</button>
+                  <button class="hub-tab" data-cat="caught" data-i18n="leaderboard.cat_caught">Elfogott</button>
+                  <button class="hub-tab" data-cat="pokedex" data-i18n="leaderboard.cat_pokedex">Pokédex</button>
+                  <button class="hub-tab" data-cat="badges" data-i18n="leaderboard.cat_badges">Jelvények</button>
+                </div>
+
                 <div class="hub-leaderboard-container">
                   <table class="hub-leaderboard-table">
                     <thead>
                       <tr>
                         <th data-i18n="leaderboard.rank">Helyezés</th>
                         <th data-i18n="leaderboard.player">Játékos</th>
-                        <th data-i18n="leaderboard.playtime">Játékidő</th>
+                        <th id="leaderboard-value-header" data-i18n="leaderboard.playtime">Játékidő</th>
                       </tr>
                     </thead>
                     <tbody id="hub-leaderboard-body">

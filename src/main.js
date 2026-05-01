@@ -483,6 +483,7 @@ $id('btn-play').addEventListener('click', async () => {
   btn.querySelector('span:last-child').textContent = t('home.launching')
 
   const serverUrl = $id('input-server-url').value.trim()
+  showToast(t('toast.whitelisting'))
 
   // ── Launcher Verification ─────────────────────────────────
   try {
@@ -564,16 +565,33 @@ function randomizeHubShowcase() {
 }
 randomizeHubShowcase()
 
-async function fetchHubLeaderboard() {
+let currentLeaderboardCat = 'playtime'
+
+async function fetchHubLeaderboard(category = 'playtime') {
   const tbody = $id('hub-leaderboard-body')
+  const header = $id('leaderboard-value-header')
   if (!tbody) return
 
-  // Read server URL from input or fallback to a default if testing.
+  currentLeaderboardCat = category
+  
+  // Update header text based on category
+  const headerKeys = {
+    'playtime': 'leaderboard.playtime',
+    'caught': 'leaderboard.cat_caught',
+    'pokedex': 'leaderboard.cat_pokedex',
+    'badges': 'leaderboard.cat_badges'
+  }
+  if (header) {
+    header.setAttribute('data-i18n', headerKeys[category] || 'leaderboard.playtime')
+    header.textContent = t(headerKeys[category] || 'leaderboard.playtime')
+  }
+
+  // Read server URL
   let serverUrl = $id('input-server-url').value.trim()
-  if (!serverUrl) serverUrl = 'http://94.72.100.43:7878' // default from placeholder
+  if (!serverUrl) serverUrl = 'http://94.72.100.43:7878'
 
   try {
-    const res = await fetch(`${serverUrl}/api/leaderboard`)
+    const res = await fetch(`${serverUrl}/api/leaderboard?category=${category}`)
     const data = await res.json()
 
     if (!data || data.length === 0) {
@@ -585,11 +603,17 @@ async function fetchHubLeaderboard() {
     data.forEach((p, index) => {
       const rankClass = index < 3 ? `rank-${index + 1}` : ''
       const rankContent = index < 3 ? `<span class="rank-badge ${rankClass}">${index + 1}</span>` : index + 1
+      
+      let valDisplay = p.value || p.playtime || 0
+      let unit = ''
+      if (category === 'playtime') unit = ' óra'
+      else unit = ' db'
+
       html += `
         <tr>
           <td>${rankContent}</td>
           <td style="font-weight: 600;">${p.username}</td>
-          <td style="color: var(--accent-yellow);">${p.playtime} óra</td>
+          <td style="color: var(--accent-yellow);">${valDisplay}${unit}</td>
         </tr>
       `
     })
@@ -598,6 +622,15 @@ async function fetchHubLeaderboard() {
     tbody.innerHTML = `<tr><td colspan="3" style="text-align:center; color:var(--accent-red);">${t('leaderboard.error')}</td></tr>`
   }
 }
+
+// Tab event listeners
+document.querySelectorAll('.hub-tab').forEach(tab => {
+  tab.addEventListener('click', () => {
+    document.querySelectorAll('.hub-tab').forEach(t => t.classList.remove('active'))
+    tab.classList.add('active')
+    fetchHubLeaderboard(tab.dataset.cat)
+  })
+})
 
 $id('btn-hub-claim-reward').addEventListener('click', async () => {
   const btn = $id('btn-hub-claim-reward')

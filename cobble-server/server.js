@@ -151,9 +151,18 @@ function startMinecraft() {
       if (leaveMatch) {
         const user = leaveMatch[1]
         onlinePlayers.delete(user)
-        console.log(`[Minecraft] ${user} kilépett, eltávolítás a whitelistről.`)
-        sendCommand(`whitelist remove ${user}`)
-        verifiedLaunchers.delete(user)
+        console.log(`[Minecraft] ${user} kilépett. Whitelist eltávolítás 5 perc múlva (grace period)...`)
+        
+        // Várjunk 5 percet mielőtt levesszük, hogy legyen idő újracsatlakozni crash esetén
+        setTimeout(() => {
+          if (!onlinePlayers.has(user)) {
+            console.log(`[Minecraft] ${user} grace period lejárt, eltávolítás a whitelistről.`)
+            sendCommand(`whitelist remove ${user}`)
+            verifiedLaunchers.delete(user)
+          } else {
+            console.log(`[Minecraft] ${user} visszalépett a grace period alatt, whitelist megtartva.`)
+          }
+        }, 5 * 60 * 1000)
       }
     }
   })
@@ -736,19 +745,21 @@ function handleRequest(req, res) {
         console.log(`[Verification] Sikeres igazolás: ${username} (IP: ${ip})`)
 
         // Hozzáadás a whitelisthez
+        sendCommand('whitelist on') // Biztos ami biztos
         sendCommand(`whitelist add ${username}`)
 
-        // Eltároljuk az igazolást (60 mp-ig érvényes a belépéshez)
-        verifiedLaunchers.set(username, { ip, expiry: Date.now() + 60000 })
+        // Eltároljuk az igazolást (10 percig érvényes a belépéshez - modpacks take time)
+        const JOIN_TIMEOUT = 10 * 60 * 1000
+        verifiedLaunchers.set(username, { ip, expiry: Date.now() + JOIN_TIMEOUT })
 
-        // Időzítő: ha 60 mp után sincs online, vegyük le (ha csak "próbálkozott")
+        // Időzítő: ha 10 perc után sincs online, vegyük le (ha csak "próbálkozott")
         setTimeout(() => {
           if (!onlinePlayers.has(username)) {
-            console.log(`[Verification] ${username} nem lépett be időben, whitelist remove.`)
+            console.log(`[Verification] ${username} nem lépett be időben (${JOIN_TIMEOUT/1000}s), whitelist remove.`)
             sendCommand(`whitelist remove ${username}`)
             verifiedLaunchers.delete(username)
           }
-        }, 60000)
+        }, JOIN_TIMEOUT)
 
         res.writeHead(200, { 'Content-Type': 'application/json' })
         res.end(JSON.stringify({ success: true }))

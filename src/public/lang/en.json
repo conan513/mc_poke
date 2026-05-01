@@ -65,7 +65,8 @@
   "launch_denied": "Server denied launch.",
   "username_required": "Please provide a name to start the game!",
   "profile_exists": "This profile already exists!",
-  "profile_selected": "{} selected. Click Play to start!"
+  "profile_selected": "{} selected. Click Play to start!",
+  "whitelisting": "Registering on server whitelist..."
  },
  "titlebar": {
   "lang_title": "Change language",
@@ -114,6 +115,11 @@
   "player": "Player",
   "playtime": "Playtime",
   "empty": "No data yet.",
-  "error": "Error loading data."
+  "error": "Error loading data.",
+  "cat_playtime": "Playtime",
+  "cat_caught": "Caught",
+  "cat_pokedex": "Pokédex",
+  "cat_badges": "Badges",
+  "col_value": "Value"
  }
 }
