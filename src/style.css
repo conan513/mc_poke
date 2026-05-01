@@ -24,14 +24,7 @@
   display: none !important;
 }
 
-.intro-phase {
-  width: 100%;
-  height: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: opacity 0.8s ease-in-out;
-}
+/* Phase containers */
 
 .intro-card {
   background: rgba(255, 255, 255, 0.05);
@@ -64,8 +57,16 @@
 
 .intro-lang-buttons {
   display: flex;
-  gap: 15px;
-  margin-top: 20px;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: 25px;
+  pointer-events: all !important;
+}
+
+.intro-lang-buttons .btn-primary {
+  width: 100%;
+  padding: 15px;
+  font-size: 1.1em;
 }
 
 /* Phase 2: Animation */
@@ -126,11 +127,24 @@
 }
 
 /* ── INTRO OVERLAY (RPG STYLE) ────────────────────────────── */
+.intro-phase {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start; /* Move content to the left */
+  padding-left: 10%;
+  transition: opacity 0.8s ease-in-out;
+  position: relative;
+  z-index: 20;
+}
+
+/* Professor positioning (Right side) */
 .intro-professor-container {
   position: absolute;
   bottom: 0;
-  right: 10%;
-  height: 80vh;
+  right: 5%;
+  height: 90vh;
   z-index: 5;
   pointer-events: none;
   animation: professorSlideIn 1.5s cubic-bezier(0.22, 1, 0.36, 1);
@@ -139,27 +153,23 @@
 #intro-professor-img {
   height: 100%;
   object-fit: contain;
-  filter: drop-shadow(0 0 30px rgba(0,0,0,0.5));
-}
-
-@keyframes professorSlideIn {
-  from { transform: translateX(100px); opacity: 0; }
-  to { transform: translateX(0); opacity: 1; }
+  filter: drop-shadow(0 0 50px rgba(0,0,0,0.8));
 }
 
 .intro-dialogue-box {
   background: #fff !important;
   border: 4px solid #333 !important;
   border-radius: 12px !important;
-  padding: 30px !important;
-  max-width: 650px !important;
-  width: 90% !important;
+  padding: 40px !important;
+  max-width: 500px !important;
+  width: 40% !important;
   position: relative !important;
-  z-index: 9999999 !important;
+  z-index: 100 !important;
   box-shadow: 0 10px 40px rgba(0,0,0,0.6) !important;
   color: #333 !important;
   font-family: 'Outfit', sans-serif !important;
   animation: dialoguePop 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  pointer-events: all !important; /* Ensure clickability */
 }
 
 @keyframes dialoguePop {
