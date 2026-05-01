@@ -617,23 +617,33 @@ $id('btn-hub-claim-reward').addEventListener('click', async () => {
   btn.innerHTML = '<div class="loading-spinner small" style="margin:0; width:16px; height:16px;"></div>'
 
   try {
+    console.log('[Hub] Claiming reward for:', username)
     const res = await fetch(`${serverUrl}/api/rewards/claim`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ username })
     })
-    const data = await res.json()
+    
+    let data
+    const contentType = res.headers.get('content-type')
+    if (contentType && contentType.includes('application/json')) {
+      data = await res.json()
+    } else {
+      const text = await res.text()
+      throw new Error(text || 'Server error')
+    }
 
     if (res.ok) {
       statusEl.className = 'hub-reward-status success'
       statusEl.textContent = data.message || t('rewards.success')
     } else {
       statusEl.className = 'hub-reward-status error'
-      statusEl.textContent = data.error || 'Hiba történt.'
+      statusEl.textContent = data.error || 'Hiba: ' + res.status
     }
   } catch (e) {
+    console.error('[Hub] Reward claim error:', e)
     statusEl.className = 'hub-reward-status error'
-    statusEl.textContent = 'Hálózati hiba.'
+    statusEl.textContent = 'Hálózati hiba: ' + (e.message || 'Ismeretlen')
   } finally {
     btn.disabled = false
     btn.innerHTML = `<span data-i18n="rewards.btn">${t('rewards.btn')}</span>`

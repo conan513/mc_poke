@@ -1129,12 +1129,10 @@ body::before {
   padding: 18px;
   display: flex;
   flex-direction: column;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 .hub-card:hover {
   background: rgba(20, 26, 45, 0.5);
   border-color: rgba(255, 255, 255, 0.15);
-  transform: translateY(-4px);
   box-shadow: 0 10px 30px rgba(0,0,0,0.4);
 }
 
@@ -1173,14 +1171,14 @@ body::before {
 }
 .hub-showcase-glow {
   position: absolute;
-  width: 70px; height: 70px;
-  background: radial-gradient(circle, var(--accent-gold) 0%, transparent 70%);
-  opacity: 0.2;
+  width: 140px; height: 140px;
+  background: radial-gradient(circle, var(--accent-gold) 0%, transparent 65%);
+  opacity: 0.3;
   border-radius: 50%;
   top: 50%; left: 50%;
   transform: translate(-50%, -50%);
   z-index: 1;
-  animation: pulse-glow 3s infinite;
+  pointer-events: none;
 }
 #hub-showcase-name {
   text-align: center;
@@ -1222,8 +1220,12 @@ body::before {
   background: rgba(0,0,0,0.2);
   border-radius: 12px;
   border: 1px solid rgba(255,255,255,0.05);
-  overflow: hidden;
+  overflow-y: auto;
+  max-height: 250px;
 }
+.hub-leaderboard-container::-webkit-scrollbar { width: 4px; }
+.hub-leaderboard-container::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 4px; }
+
 .hub-leaderboard-table {
   width: 100%;
   border-collapse: collapse;
