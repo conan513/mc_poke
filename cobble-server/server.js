@@ -37,7 +37,7 @@ const dbConfig = {
 }
 
 const PORT = 8080
-const LAUNCHER_SECRET = 'CHANGE_THIS_SECRET'
+const LAUNCHER_SECRET = 'cobble-super-secret-key-2024'
 
 const DATA_DIR = path.join(__dirname, 'server-data')
 
@@ -180,7 +180,8 @@ const UPDATE_FAILED_FLAG = path.join(DATA_DIR, '.update-failed')
 // Játékosok nyomon követése
 const onlinePlayers = new Set()
 const verifiedLaunchers = new Map() // username -> { ip, expiry }
-const LAUNCHER_SECRET = 'cobble-super-secret-key-2024' // Csak a launcher és a szerver tudja
+
+// ── Whitelist & Server Status ──────────────────────────────────────────
 
 // Ensure sync directories exist
 SYNC_FOLDERS.forEach(f => {
@@ -558,7 +559,7 @@ setInterval(syncLeaderboardFromFiles, 15 * 60 * 1000)
 
 // ── Request handler ──────────────────────────────────────────
 
-function handleRequest(req, res) {
+async function handleRequest(req, res) {
   const url = req.url.split('?')[0].replace(/\/+/g, '/')
   console.log(`[Request] ${req.method} ${url}`)
 

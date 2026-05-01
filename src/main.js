@@ -518,8 +518,13 @@ $id('btn-play').addEventListener('click', async () => {
     return
   }
 
-  isGameRunning = true
-  btn.querySelector('span:last-child').textContent = t('home.running')
+    isGameRunning = true
+    btn.querySelector('span:last-child').textContent = t('home.running')
+  } catch (e) {
+    showToast('❌ ' + e.message)
+    btn.disabled = false
+    btn.querySelector('span:last-child').textContent = t('home.play_btn')
+  }
 })
 
 window.cobble.onGameLog((data) => {
