@@ -521,11 +521,29 @@ function handleRequest(req, res) {
     return true
   }
 
-  // ── Lang files – highest priority, with source fallback ──────
-  // Handles: /app/lang/xx.json  AND  /lang/xx.json
+  // ── Web installer lang files (/lang/xx.json) ─────────────────
+  if (url.startsWith('/lang/')) {
+    const langFile = path.basename(url) // e.g. 'hu.json'
+    const candidates = [
+      path.join(WEB_INSTALLER_DIR, 'lang', langFile),
+      path.join(__dirname, '..', 'web-installer', 'lang', langFile),
+    ]
+    for (const filePath of candidates) {
+      if (fs.existsSync(filePath)) {
+        res.writeHead(200, { 'Content-Type': 'application/json', 'Cache-Control': 'no-cache' })
+        fs.createReadStream(filePath).pipe(res)
+        return
+      }
+    }
+    res.writeHead(404, { 'Content-Type': 'application/json' })
+    res.end(JSON.stringify({ error: 'Web installer lang file not found: ' + langFile }))
+    return
+  }
+
+  // ── Launcher app lang files (/app/lang/xx.json) ───────────────
   // Tries dist/lang/ first, then falls back to src/public/lang/ in the repo.
-  if (url.startsWith('/app/lang/') || url.startsWith('/lang/')) {
-    const langFile = path.basename(url) // e.g. 'en.json'
+  if (url.startsWith('/app/lang/')) {
+    const langFile = path.basename(url)
     const candidates = [
       path.join(DIST_DIR, 'lang', langFile),
       path.join(__dirname, '..', 'src', 'public', 'lang', langFile),
@@ -538,7 +556,7 @@ function handleRequest(req, res) {
       }
     }
     res.writeHead(404, { 'Content-Type': 'application/json' })
-    res.end(JSON.stringify({ error: 'Lang file not found: ' + langFile }))
+    res.end(JSON.stringify({ error: 'Launcher lang file not found: ' + langFile }))
     return
   }
 
