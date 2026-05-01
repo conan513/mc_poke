@@ -19,6 +19,7 @@ web-installer/releases/
 # CobbleServer (Minecraft szerver adatok)
 # Ezek nem képezik a forráskód részét, nagy méretűek lennének és folyamatosan változnak
 cobble-server/server-data/
+cobble-server/config.json
 
 # Naplófájlok
 logs

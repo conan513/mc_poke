@@ -8,6 +8,7 @@ contextBridge.exposeInMainWorld('cobble', {
   // App path
   getAppPath: () => ipcRenderer.invoke('get-app-path'),
   getLocale: () => ipcRenderer.invoke('get-locale'),
+  getHWID: () => ipcRenderer.invoke('get-hwid'),
 
   // Installation
   install: (opts) => ipcRenderer.invoke('install', opts),

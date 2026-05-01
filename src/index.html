@@ -109,10 +109,17 @@
             <p class="card-desc" data-i18n="welcome.disclaimer">Add meg a felhasználóneved az offline játékhoz, majd válaszd ki a memóriakorlátot.</p>
 
             <div class="form-group">
+              <div class="auth-tabs">
+                <button class="auth-tab active" id="tab-guest" data-i18n="welcome.tab_guest">Vendég (Offline)</button>
+                <button class="auth-tab" id="tab-account" data-i18n="welcome.tab_account">Fiók (Online Sync)</button>
+              </div>
+            </div>
+
+            <div class="form-group" id="group-username">
               <label class="form-label">
                 <span class="label-icon">
                   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width: 14px; height: 14px; vertical-align: middle;"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
-                </span> <span data-i18n="welcome.username_label">Válassz profilt vagy adj hozzá újat</span>
+                </span> <span id="label-username" data-i18n="welcome.username_label">Válassz profilt vagy adj hozzá újat</span>
               </label>
               
               <div class="profile-list" id="profile-list">
@@ -136,8 +143,29 @@
                   </button>
                 </div>
               </div>
-              <span class="form-hint" data-i18n="welcome.offline_hint">Offline mód – nem szükséges Microsoft fiók</span>
             </div>
+
+            <div class="form-group" id="group-password" style="display: none;">
+              <label class="form-label">
+                <span class="label-icon">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width: 14px; height: 14px; vertical-align: middle;"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+                </span> <span data-i18n="welcome.password_label">Jelszó</span>
+              </label>
+              <input
+                class="form-input"
+                id="input-password"
+                type="password"
+                placeholder="Enter password..."
+                data-i18n-placeholder="welcome.password_placeholder"
+                autocomplete="current-password"
+              />
+              <div class="auth-actions" style="margin-top: 10px; display: flex; gap: 10px;">
+                <button class="btn-secondary" id="btn-login" style="flex: 1;" data-i18n="welcome.login_btn">Belépés</button>
+                <button class="btn-secondary" id="btn-register" style="flex: 1;" data-i18n="welcome.register_btn">Regisztráció</button>
+              </div>
+            </div>
+            
+            <span class="form-hint" id="auth-hint" data-i18n="welcome.offline_hint">Offline mód – nem szükséges Microsoft fiók</span>
 
             <div class="form-group">
               <label class="form-label">
@@ -274,7 +302,7 @@
                   <button class="hub-tab active" data-cat="playtime" data-i18n="leaderboard.cat_playtime">Játékidő</button>
                   <button class="hub-tab" data-cat="caught" data-i18n="leaderboard.cat_caught">Elfogott</button>
                   <button class="hub-tab" data-cat="pokedex" data-i18n="leaderboard.cat_pokedex">Pokédex</button>
-                  <button class="hub-tab" data-cat="badges" data-i18n="leaderboard.cat_badges">Jelvények</button>
+                  <button class="hub-tab" data-cat="shiny" data-i18n="leaderboard.cat_shiny">Shiny</button>
                 </div>
 
                 <div class="hub-leaderboard-container">

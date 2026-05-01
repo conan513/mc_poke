@@ -998,7 +998,7 @@ async function install({ username, ram, serverUrl }, onProgress) {
   progressCallback = null
 }
 
-async function launch({ username, ram, serverUrl }, onLog, onClose) {
+async function launch({ username, uuid, ram, serverUrl }, onLog, onClose) {
   migrateStructure()
 
   const mcDir = getGameDir()
@@ -1045,7 +1045,13 @@ async function launch({ username, ram, serverUrl }, onLog, onClose) {
 
 
   const opts = {
-    authorization: Authenticator.getAuth(username),
+    authorization: uuid ? {
+      access_token: 'null',
+      client_token: 'null',
+      uuid: uuid.replace(/-/g, ''), // MCLC often expects UUID without dashes for some fields
+      name: username,
+      user_properties: '{}'
+    } : Authenticator.getAuth(username),
     root: mcDir,
     version: {
       number: MC_VERSION,

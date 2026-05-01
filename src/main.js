@@ -166,7 +166,7 @@ $id('btn-install').addEventListener('click', async () => {
 
   // Automatikus mentés a profilok közé, ha új név
   if (!profiles.find(p => p.name === username)) {
-    profiles.push({ name: username, skinUrl: null, skinType: 'mojang', skinVal: username })
+    profiles.push({ name: username, skinUrl: null, skinType: 'mojang', skinVal: username, profileId: crypto.randomUUID() })
     saveProfiles()
     renderProfiles()
   }
@@ -487,25 +487,30 @@ $id('btn-play').addEventListener('click', async () => {
 
   // ── Launcher Verification ─────────────────────────────────
   try {
+    const hwid = await window.cobble.getHWID()
+    const currentProfile = getProfile(username)
+    const profileId = currentProfile ? currentProfile.profileId : null
+    const pUuid = currentProfile ? currentProfile.uuid : null
+
     const verifyRes = await fetch(`${serverUrl.replace(/\/+$/, '')}/api/launcher/verify`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ username, secret: LAUNCHER_SECRET })
+      body: JSON.stringify({ username, secret: LAUNCHER_SECRET, hwid, profileId, uuid: pUuid })
     })
-    
     if (!verifyRes.ok) {
       const errData = await verifyRes.json()
       throw new Error(errData.error || t('toast.launch_denied'))
     }
-    console.log('[Verification] Sikeres szerver oldali igazolás.')
-  } catch (e) {
-    showToast('❌ ' + t('toast.auth_error') + e.message)
-    btn.disabled = false
-    btn.querySelector('span:last-child').textContent = t('home.play_btn')
-    return
-  }
 
-  const result = await window.cobble.launch({ username, ram: selectedRam, serverUrl })
+    const verifyData = await verifyRes.json()
+    console.log('[Verification] Sikeres szerver oldali igazolás. UUID:', verifyData.uuid)
+    
+    const result = await window.cobble.launch({ 
+      username, 
+      uuid: verifyData.uuid, 
+      ram: selectedRam, 
+      serverUrl 
+    })
   if (!result.success) {
     showToast(t('home.launch_error') + result.error)
     btn.disabled = false
@@ -579,7 +584,7 @@ async function fetchHubLeaderboard(category = 'playtime') {
     'playtime': 'leaderboard.playtime',
     'caught': 'leaderboard.cat_caught',
     'pokedex': 'leaderboard.cat_pokedex',
-    'badges': 'leaderboard.cat_badges'
+    'shiny': 'leaderboard.cat_shiny'
   }
   if (header) {
     header.setAttribute('data-i18n', headerKeys[category] || 'leaderboard.playtime')
@@ -713,11 +718,100 @@ $id('btn-add-profile').addEventListener('click', () => {
     return
   }
   
-  profiles.push({ name, skinUrl: null, skinType: 'mojang', skinVal: name })
+  profiles.push({ name, skinUrl: null, skinType: 'mojang', skinVal: name, profileId: crypto.randomUUID() })
   saveProfiles()
   $id('input-username').value = ''
   renderProfiles()
   selectProfile(name)
+})
+
+// ── Account / Auth Logic ────────────────────────────────────
+let authMode = 'guest' // 'guest' or 'account'
+
+$id('tab-guest').addEventListener('click', () => {
+  authMode = 'guest'
+  $id('tab-guest').classList.add('active')
+  $id('tab-account').classList.remove('active')
+  $id('group-username').style.display = 'block'
+  $id('group-password').style.display = 'none'
+  $id('auth-hint').textContent = t('welcome.offline_hint')
+})
+
+$id('tab-account').addEventListener('click', () => {
+  authMode = 'account'
+  $id('tab-account').classList.add('active')
+  $id('tab-guest').classList.remove('active')
+  $id('group-username').style.display = 'block'
+  $id('group-password').style.display = 'block'
+  $id('auth-hint').textContent = t('welcome.online_hint')
+})
+
+$id('btn-register').addEventListener('click', async () => {
+  const name = $id('input-username').value.trim()
+  const password = $id('input-password').value.trim()
+  const serverUrl = $id('input-server-url').value.trim()
+
+  if (!name || !password) {
+    showToast('❌ ' + t('toast.fill_all_fields'))
+    return
+  }
+
+  try {
+    const res = await fetch(`${serverUrl.replace(/\/+$/, '')}/api/auth/register`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ username: name, password })
+    })
+    const data = await res.json()
+    if (res.ok) {
+      showToast('✅ ' + data.message)
+    } else {
+      showToast('❌ ' + (data.error || 'Hiba a regisztráció során.'))
+    }
+  } catch (e) {
+    showToast('❌ ' + e.message)
+  }
+})
+
+$id('btn-login').addEventListener('click', async () => {
+  const name = $id('input-username').value.trim()
+  const password = $id('input-password').value.trim()
+  const serverUrl = $id('input-server-url').value.trim()
+
+  if (!name || !password) {
+    showToast('❌ ' + t('toast.fill_all_fields'))
+    return
+  }
+
+  try {
+    const res = await fetch(`${serverUrl.replace(/\/+$/, '')}/api/auth/login`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ username: name, password })
+    })
+    const data = await res.json()
+    if (res.ok) {
+      showToast('✅ ' + t('toast.login_success'))
+      username = name
+      // Create or update profile with the permanent UUID from server
+      let p = getProfile(name)
+      if (!p) {
+        p = { name, skinUrl: null, profileId: crypto.randomUUID(), uuid: data.uuid }
+        profiles.push(p)
+      } else {
+        p.uuid = data.uuid // Update existing profile with server UUID
+      }
+      saveProfiles()
+      renderProfiles()
+      
+      // Auto start installation/launch
+      $id('btn-install').click()
+    } else {
+      showToast('❌ ' + (data.error || 'Hibás belépési adatok.'))
+    }
+  } catch (e) {
+    showToast('❌ ' + e.message)
+  }
 })
 
 // ── Particle Animation ─────────────────────────────────────────
@@ -779,6 +873,14 @@ animateParticles()
   // Profiles init
   try {
     profiles = JSON.parse(localStorage.getItem('cobble_profiles') || '[]')
+    let needsSave = false
+    profiles.forEach(p => {
+      if (!p.profileId) {
+        p.profileId = crypto.randomUUID()
+        needsSave = true
+      }
+    })
+    if (needsSave) saveProfiles()
     renderProfiles()
   } catch(e) {}
 
@@ -830,7 +932,7 @@ animateParticles()
       const name = e.target.value.trim()
       if (name.length >= 3 && /^[a-zA-Z0-9_]+$/.test(name)) {
         if (!profiles.find(p => p.name === name)) {
-          profiles.push({ name, skinUrl: null })
+          profiles.push({ name, skinUrl: null, profileId: crypto.randomUUID() })
           saveProfiles()
           renderProfiles()
         }

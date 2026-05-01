@@ -2,7 +2,36 @@ const { app, BrowserWindow, ipcMain, shell } = require('electron')
 const path = require('path')
 const fs = require('fs')
 const http = require('http')
+const os = require('os')
+const crypto = require('crypto')
 const launcher = require('./launcher')
+
+function getHWID() {
+  try {
+    const interfaces = os.networkInterfaces()
+    const macs = Object.values(interfaces)
+      .flat()
+      .filter(details => details && details.mac && details.mac !== '00:00:00:00:00:00')
+      .map(details => details.mac)
+      .sort()
+    
+    const platform = os.platform()
+    const arch = os.arch()
+    const cpus = os.cpus().map(c => c.model).sort()
+    const totalMemory = os.totalmem()
+    
+    // Kombináljuk a hardver adatokat egy fix stringbe
+    const rawId = `${platform}-${arch}-${cpus.join('|')}-${totalMemory}-${macs.join(',')}`
+    return crypto.createHash('sha256').update(rawId).digest('hex')
+  } catch (e) {
+    // Fallback: ha valami hiba lenne, generálunk egy random ID-t és elmentjük
+    const idPath = path.join(app.getPath('userData'), '.hwid')
+    if (fs.existsSync(idPath)) return fs.readFileSync(idPath, 'utf8')
+    const nid = crypto.randomUUID()
+    fs.writeFileSync(idPath, nid)
+    return nid
+  }
+}
 const { setupAutoUpdater } = require('./auto-updater')
 
 // ── Local fallback server ─────────────────────────────────────
@@ -186,6 +215,7 @@ ipcMain.on('window-close', () => {
 
 ipcMain.handle('get-app-path', () => app.getPath('userData'))
 ipcMain.handle('get-locale', () => app.getLocale())
+ipcMain.handle('get-hwid', () => getHWID())
 
 // Install / First Setup
 ipcMain.handle('install', async (event, { username, ram, serverUrl }) => {
@@ -221,9 +251,9 @@ ipcMain.handle('run-update', async (event, { username, ram, serverUrl }) => {
 })
 
 // Launch game
-ipcMain.handle('launch', async (event, { username, ram, serverUrl }) => {
+ipcMain.handle('launch', async (event, { username, uuid, ram, serverUrl }) => {
   try {
-    await launcher.launch({ username, ram, serverUrl }, (data) => {
+    await launcher.launch({ username, uuid, ram, serverUrl }, (data) => {
       mainWindow.webContents.send('game-log', data)
     }, () => {
       mainWindow.webContents.send('game-closed')

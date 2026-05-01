@@ -17,6 +17,8 @@
 const http = require('http')
 const fs = require('fs')
 const path = require('path')
+const mysql = require('mysql2/promise')
+const bcrypt = require('bcryptjs')
 const crypto = require('crypto')
 const os = require('os')
 const { spawn, execFile } = require('child_process')
@@ -25,8 +27,133 @@ const https = require('https')
 const EventEmitter = require('events')
 const serverEvents = new EventEmitter()
 
-const PORT = parseInt(process.env.PORT || '8080', 10)
+// ── Hardcoded Configuration ──────────────────────────────────
+const dbConfig = {
+  host: 'localhost',
+  port: 3306,
+  user: 'root',
+  password: '123456',
+  database: 'cobble_universe'
+}
+
+const PORT = 8080
+const LAUNCHER_SECRET = 'CHANGE_THIS_SECRET'
+
 const DATA_DIR = path.join(__dirname, 'server-data')
+
+// ── EasyAuth Auto-Config ─────────────────────────────────────
+function configureEasyAuth() {
+  const easyAuthDir = path.join(DATA_DIR, 'config', 'EasyAuth')
+  const easyAuthPath = path.join(easyAuthDir, 'storage.conf')
+  
+  // Mappa létrehozása ha nincs
+  if (!fs.existsSync(easyAuthDir)) {
+    fs.mkdirSync(easyAuthDir, { recursive: true })
+  }
+
+  if (!fs.existsSync(easyAuthPath)) {
+    // Ha nem létezik, létrehozzuk az alap sablont a mi adatainkkal
+    const template = `# EasyAuth Storage Configuration
+database-type=mysql
+
+mysql {
+    mysql-host=${dbConfig.host}
+    mysql-user=${dbConfig.user}
+    mysql-password="${dbConfig.password}"
+    mysql-database=${dbConfig.database}
+    mysql-table=easyauth
+}
+`
+    try {
+      fs.writeFileSync(easyAuthPath, template, 'utf8')
+      console.log('[EasyAuth] storage.conf létrehozva és konfigurálva.')
+    } catch (e) {
+      console.error('[EasyAuth] Nem sikerült létrehozni a konfigurációt:', e.message)
+    }
+  } else {
+    // Ha létezik, csak frissítjük az értékeket
+    try {
+      let content = fs.readFileSync(easyAuthPath, 'utf8')
+      content = content.replace(/database-type=.*/, 'database-type=mysql')
+      content = content.replace(/mysql-host=.*/, `mysql-host=${dbConfig.host}`)
+      content = content.replace(/mysql-user=.*/, `mysql-user=${dbConfig.user}`)
+      content = content.replace(/mysql-password=.*/, `mysql-password="${dbConfig.password}"`)
+      content = content.replace(/mysql-database=.*/, `mysql-database=${dbConfig.database}`)
+      content = content.replace(/mysql-table=.*/, 'mysql-table=easyauth')
+      fs.writeFileSync(easyAuthPath, content, 'utf8')
+      console.log('[EasyAuth] storage.conf frissítve.')
+    } catch (e) {
+      console.error('[EasyAuth] Hiba a frissítés során:', e.message)
+    }
+  }
+}
+
+let pool = null
+
+async function initDatabase() {
+  configureEasyAuth()
+  
+  try {
+    // Első csatlakozás adatbázis nélkül, hogy létrehozzuk ha nincs
+    const connection = await mysql.createConnection({
+      host: dbConfig.host,
+      port: dbConfig.port,
+      user: dbConfig.user,
+      password: dbConfig.password
+    })
+    await connection.query(`CREATE DATABASE IF NOT EXISTS ${dbConfig.database}`)
+    await connection.end()
+
+    // Most már csatlakozhatunk a konkrét adatbázishoz
+    pool = mysql.createPool(dbConfig)
+    
+    const tableQuery = `
+      CREATE TABLE IF NOT EXISTS leaderboard (
+        uuid VARCHAR(36) PRIMARY KEY,
+        username VARCHAR(100),
+        playtime DOUBLE DEFAULT 0,
+        caught INT DEFAULT 0,
+        pokedex INT DEFAULT 0,
+        shiny INT DEFAULT 0,
+        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+      )
+    `
+    const playersTableQuery = `
+      CREATE TABLE IF NOT EXISTS players (
+        id INT AUTO_INCREMENT PRIMARY KEY,
+        hwid VARCHAR(64),
+        profile_id VARCHAR(64),
+        username VARCHAR(100),
+        uuid VARCHAR(36) UNIQUE,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        last_login TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+        UNIQUE KEY hwid_profile (hwid, profile_id)
+      )
+    `
+    const usersTableQuery = `
+      CREATE TABLE IF NOT EXISTS easyauth (
+        id INT AUTO_INCREMENT PRIMARY KEY,
+        username VARCHAR(100) UNIQUE,
+        password VARCHAR(255),
+        uuid VARCHAR(36) UNIQUE,
+        regdate TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        lastip VARCHAR(45),
+        lastlogin TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+      )
+    `
+    await pool.query(tableQuery)
+    await pool.query(playersTableQuery)
+    await pool.query(usersTableQuery)
+    console.log('[MariaDB] Adatbázis és táblák inicializálva.')
+    
+    // Első szinkronizálás
+    syncLeaderboardFromFiles()
+  } catch (e) {
+    console.error('[MariaDB] Hiba az inicializáláskor:', e.message)
+  }
+}
+
+initDatabase()
 const SKINS_DIR = path.join(DATA_DIR, 'skins')
 const SYNC_FOLDERS = ['mods', 'datapacks', 'config', 'resourcepacks', 'shaderpacks']
 
@@ -326,6 +453,108 @@ function applySkinFromLocal(req, username, res) {
     res.end(JSON.stringify({ success: true, url: skinPublicUrl }))
   }
 }
+
+async function syncLeaderboardFromFiles() {
+  if (!pool) return
+  console.log('[MariaDB] Szinkronizálás indítása...')
+  
+  try {
+    const usercachePath = path.join(DATA_DIR, 'usercache.json')
+    const statsDir = path.join(DATA_DIR, 'world', 'stats')
+    const cobbleDir = path.join(DATA_DIR, 'world', 'cobblemonplayerdata')
+    
+    let usercache = []
+    if (fs.existsSync(usercachePath)) {
+      try { usercache = JSON.parse(fs.readFileSync(usercachePath, 'utf8')) } catch (e) { }
+    }
+
+    const players = new Map() // uuid -> data
+
+    // 1. Minecraft alap statisztikák (playtime, pokedex)
+    if (fs.existsSync(statsDir)) {
+      const files = fs.readdirSync(statsDir).filter(f => f.endsWith('.json'))
+      for (const file of files) {
+        const uuid = file.replace('.json', '')
+        try {
+          const stats = JSON.parse(fs.readFileSync(path.join(statsDir, file), 'utf8'))
+          const s = stats.stats || {}
+          const custom = s['minecraft:custom'] || {}
+          
+          const ticks = custom['minecraft:play_time'] || 0
+          const playtime = Math.round((ticks / 20 / 60 / 60) * 100) / 100
+          const pokedex = custom['cobblemon:dex_entries'] || custom['cobblemon:pokedex_count'] || 0
+          
+          const user = usercache.find(u => u.uuid === uuid)
+          const username = user ? user.name : 'Ismeretlen'
+          
+          players.set(uuid, { uuid, username, playtime, pokedex, caught: 0, shiny: 0 })
+        } catch (e) { }
+      }
+    }
+
+    // 2. Cobblemon specifikus adatok (caught, shiny)
+    if (fs.existsSync(cobbleDir)) {
+      // Replay recursive walk for partitioned folders
+      const walk = (dir) => {
+        const files = fs.readdirSync(dir)
+        for (const file of files) {
+          const fullPath = path.join(dir, file)
+          if (fs.statSync(fullPath).isDirectory()) {
+            walk(fullPath)
+          } else if (file.endsWith('.json') && !file.endsWith('.old')) {
+            const uuid = file.replace('.json', '')
+            try {
+              const data = JSON.parse(fs.readFileSync(fullPath, 'utf8'))
+              const adv = data.advancementData || {}
+              
+              if (players.has(uuid)) {
+                const p = players.get(uuid)
+                p.caught = adv.totalCaptureCount || 0
+                p.shiny = adv.totalShinyCaptureCount || 0
+              } else {
+                // If not in stats yet, still add
+                const user = usercache.find(u => u.uuid === uuid)
+                players.set(uuid, {
+                  uuid,
+                  username: user ? user.name : 'Ismeretlen',
+                  playtime: 0,
+                  pokedex: 0,
+                  caught: adv.totalCaptureCount || 0,
+                  shiny: adv.totalShinyCaptureCount || 0
+                })
+              }
+            } catch (e) { }
+          }
+        }
+      }
+      walk(cobbleDir)
+    }
+
+    // 3. Upsert az adatbázisba
+    for (const p of players.values()) {
+      if (p.playtime === 0 && p.caught === 0) continue // Skip empty players
+      
+      const query = `
+        INSERT INTO leaderboard (uuid, username, playtime, caught, pokedex, shiny)
+        VALUES (?, ?, ?, ?, ?, ?)
+        ON DUPLICATE KEY UPDATE 
+          username = VALUES(username),
+          playtime = VALUES(playtime),
+          caught = VALUES(caught),
+          pokedex = VALUES(pokedex),
+          shiny = VALUES(shiny)
+      `
+      await pool.execute(query, [p.uuid, p.username, p.playtime, p.caught, p.pokedex, p.shiny])
+    }
+    
+    console.log(`[MariaDB] Szinkronizálás kész. (${players.size} játékos frissítve)`)
+  } catch (e) {
+    console.error('[MariaDB] Hiba a szinkronizáláskor:', e.message)
+  }
+}
+
+// Szinkronizálás 15 percenként
+setInterval(syncLeaderboardFromFiles, 15 * 60 * 1000)
 
 // ── Request handler ──────────────────────────────────────────
 
@@ -640,44 +869,29 @@ function handleRequest(req, res) {
   // ── Leaderboard API ───────────────────────────────────────
   if (url === '/api/leaderboard' && req.method === 'GET') {
     try {
-      const usercachePath = path.join(DATA_DIR, 'usercache.json')
-      const statsDir = path.join(DATA_DIR, 'world', 'stats')
-      
-      let usercache = []
-      if (fs.existsSync(usercachePath)) {
-        usercache = JSON.parse(fs.readFileSync(usercachePath, 'utf8'))
+      if (!pool) {
+        res.writeHead(503, { 'Content-Type': 'application/json' })
+        return res.end(JSON.stringify({ error: 'Az adatbázis még nem áll készen.' }))
       }
 
-      let leaderboard = []
-      if (fs.existsSync(statsDir)) {
-        const statFiles = fs.readdirSync(statsDir)
-        for (const file of statFiles) {
-          if (!file.endsWith('.json')) continue
-          const uuid = file.replace('.json', '')
-          const user = usercache.find(u => u.uuid === uuid)
-          const username = user ? user.name : 'Ismeretlen'
-          
-          try {
-            const stats = JSON.parse(fs.readFileSync(path.join(statsDir, file), 'utf8'))
-            const playtimeTicks = stats.stats?.['minecraft:custom']?.['minecraft:play_time'] || 0
-            const playtimeHours = Math.floor(playtimeTicks / 20 / 60 / 60)
-            
-            if (playtimeHours > 0) {
-              leaderboard.push({ username, playtime: playtimeHours })
-            }
-          } catch (e) {
-            console.error(`[Leaderboard] Hiba a stat fájl olvasásakor: ${file}`)
-          }
-        }
-      }
+      const searchParams = new URL(req.url, `http://${req.headers.host || 'localhost'}`).searchParams
+      const category = searchParams.get('category') || 'playtime'
       
-      // Sort by playtime descending, take top 10
-      leaderboard.sort((a, b) => b.playtime - a.playtime)
-      leaderboard = leaderboard.slice(0, 10)
+      // Megengedett kategóriák a SQL injection elkerülésére
+      const allowedCats = ['playtime', 'caught', 'pokedex', 'shiny']
+      const orderBy = allowedCats.includes(category) ? category : 'playtime'
+
+      const [rows] = await pool.query(`
+        SELECT username, ${orderBy} as value, playtime 
+        FROM leaderboard 
+        ORDER BY ${orderBy} DESC 
+        LIMIT 10
+      `)
       
       res.writeHead(200, { 'Content-Type': 'application/json' })
-      res.end(JSON.stringify(leaderboard))
+      res.end(JSON.stringify(rows))
     } catch (e) {
+      console.error('[Leaderboard API Error]', e)
       res.writeHead(500, { 'Content-Type': 'application/json' })
       res.end(JSON.stringify({ error: 'Belső hiba a ranglista lekérdezésekor.' }))
     }
@@ -729,46 +943,138 @@ function handleRequest(req, res) {
     return
   }
 
+  // ── Registration API ─────────────────────────────
+  if (url === '/api/auth/register' && req.method === 'POST') {
+    let body = ''
+    req.on('data', c => body += c)
+    req.on('end', async () => {
+      try {
+        const { username, password } = JSON.parse(body)
+        if (!username || !password || username.length < 3 || password.length < 6) {
+          res.writeHead(400, { 'Content-Type': 'application/json' })
+          return res.end(JSON.stringify({ error: 'Érvénytelen adatok.' }))
+        }
+
+        if (!pool) {
+          res.writeHead(503, { 'Content-Type': 'application/json' })
+          return res.end(JSON.stringify({ error: 'Adatbázis nem elérhető.' }))
+        }
+
+        const [existing] = await pool.query('SELECT id FROM easyauth WHERE username = ?', [username])
+        if (existing.length > 0) {
+          res.writeHead(400, { 'Content-Type': 'application/json' })
+          return res.end(JSON.stringify({ error: 'Ez a felhasználónév már foglalt.' }))
+        }
+
+        const hash = await bcrypt.hash(password, 10)
+        const playerUuid = crypto.randomUUID()
+        
+        await pool.query('INSERT INTO easyauth (username, password, uuid) VALUES (?, ?, ?)', [username, hash, playerUuid])
+        
+        console.log(`[Auth] Új EasyAuth regisztráció: ${username}`)
+        res.writeHead(200, { 'Content-Type': 'application/json' })
+        res.end(JSON.stringify({ success: true, message: 'Sikeres regisztráció!' }))
+      } catch (e) {
+        res.writeHead(500, { 'Content-Type': 'application/json' })
+        res.end(JSON.stringify({ error: 'Szerver hiba.' }))
+      }
+    })
+    return
+  }
+
+  // ── Login API ─────────────────────────────
+  if (url === '/api/auth/login' && req.method === 'POST') {
+    let body = ''
+    req.on('data', c => body += c)
+    req.on('end', async () => {
+      try {
+        const { username, password } = JSON.parse(body)
+        if (!pool) {
+          res.writeHead(503, { 'Content-Type': 'application/json' })
+          return res.end(JSON.stringify({ error: 'Adatbázis nem elérhető.' }))
+        }
+
+        const [users] = await pool.query('SELECT password, uuid FROM easyauth WHERE username = ?', [username])
+        if (users.length === 0) {
+          res.writeHead(401, { 'Content-Type': 'application/json' })
+          return res.end(JSON.stringify({ error: 'Hibás adatok.' }))
+        }
+
+        const user = users[0]
+        const match = await bcrypt.compare(password, user.password)
+        if (!match) {
+          res.writeHead(401, { 'Content-Type': 'application/json' })
+          return res.end(JSON.stringify({ error: 'Hibás adatok.' }))
+        }
+
+        res.writeHead(200, { 'Content-Type': 'application/json' })
+        res.end(JSON.stringify({ success: true, uuid: user.uuid }))
+      } catch (e) {
+        res.writeHead(500, { 'Content-Type': 'application/json' })
+        res.end(JSON.stringify({ error: 'Szerver hiba.' }))
+      }
+    })
+    return
+  }
+
   // ── Launcher Verification API ─────────────────────────────
   if (url === '/api/launcher/verify' && req.method === 'POST') {
     let body = ''
     req.on('data', c => body += c)
-    req.on('end', () => {
+    req.on('end', async () => {
       try {
-        const { username, secret } = JSON.parse(body)
+        const { username, secret, hwid, profileId, uuid: requestedUuid } = JSON.parse(body)
         if (secret !== LAUNCHER_SECRET) {
-          console.warn(`[Verification] Hibás titkos kód: ${username}`)
-          res.writeHead(403)
-          return res.end(JSON.stringify({ error: 'Érvénytelen launcher kód.' }))
+          res.writeHead(403, { 'Content-Type': 'application/json' })
+          return res.end(JSON.stringify({ error: 'Érvénytelen titkos kód.' }))
         }
 
-        const ip = req.socket.remoteAddress
+        const ip = req.socket.remoteAddress.replace(/^.*:/, '') // IPv4 formátum kinyerése
+
+        let playerUuid = null
+        if (pool && hwid && profileId) {
+          try {
+            if (requestedUuid) {
+              playerUuid = requestedUuid
+              await pool.query('INSERT INTO players (hwid, profile_id, username, uuid) VALUES (?, ?, ?, ?) ON DUPLICATE KEY UPDATE username = ?, uuid = ?, last_login = NOW()', 
+                [hwid, profileId, username, playerUuid, username, playerUuid])
+              
+              // ── EASYAUTH AUTO-LOGIN BRIDGE ──
+              await pool.query('UPDATE easyauth SET lastip = ?, lastlogin = NOW() WHERE username = ?', [ip, username])
+              console.log(`[Verification] Account UUID & Session frissítve: ${username} -> ${playerUuid}`)
+            } else {
+              const [rows] = await pool.query('SELECT uuid FROM players WHERE hwid = ? AND profile_id = ?', [hwid, profileId])
+              if (rows.length > 0) {
+                playerUuid = rows[0].uuid
+                await pool.query('UPDATE players SET username = ?, last_login = NOW() WHERE hwid = ? AND profile_id = ?', [username, hwid, profileId])
+                console.log(`[Verification] Ismert profil: ${username} (Profile: ${profileId}) -> ${playerUuid}`)
+              } else {
+                playerUuid = crypto.randomUUID()
+                await pool.query('INSERT INTO players (hwid, profile_id, username, uuid) VALUES (?, ?, ?, ?)', [hwid, profileId, username, playerUuid])
+                console.log(`[Verification] Új profil regisztrálva: ${username} (Profile: ${profileId}) -> ${playerUuid}`)
+              }
+            }
+          } catch (dbErr) {
+            console.error('[Verification] DB hiba:', dbErr.message)
+          }
+        }
+
         console.log(`[Verification] Sikeres igazolás: ${username} (IP: ${ip})`)
 
-        // Hozzáadás a whitelisthez (EasyWhitelist modot használjuk a név alapú whitelisthöz)
+        // Hozzáadás a whitelisthez
         sendCommand('whitelist on')
         sendCommand(`easywhitelist add ${username}`)
         sendCommand(`whitelist add ${username}`) // Backup vanilla whitelist
         sendCommand('whitelist reload')
 
-        // Eltároljuk az igazolást (10 percig érvényes a belépéshez - modpacks take time)
+        // Eltároljuk az igazolást (10 percig érvényes)
         const JOIN_TIMEOUT = 10 * 60 * 1000
-        verifiedLaunchers.set(username, { ip, expiry: Date.now() + JOIN_TIMEOUT })
-
-        // Időzítő: ha 10 perc után sincs online, vegyük le (ha csak "próbálkozott")
-        setTimeout(() => {
-          if (!onlinePlayers.has(username)) {
-            console.log(`[Verification] ${username} nem lépett be időben (${JOIN_TIMEOUT/1000}s), whitelist remove.`)
-            sendCommand(`easywhitelist remove ${username}`)
-            sendCommand(`whitelist remove ${username}`)
-            verifiedLaunchers.delete(username)
-          }
-        }, JOIN_TIMEOUT)
+        verifiedLaunchers.set(username, { ip, expiry: Date.now() + JOIN_TIMEOUT, uuid: playerUuid })
 
         res.writeHead(200, { 'Content-Type': 'application/json' })
-        res.end(JSON.stringify({ success: true }))
+        res.end(JSON.stringify({ success: true, uuid: playerUuid }))
       } catch (e) {
-        res.writeHead(400)
+        res.writeHead(400, { 'Content-Type': 'application/json' })
         res.end(JSON.stringify({ error: e.message }))
       }
     })
