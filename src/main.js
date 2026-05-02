@@ -31,8 +31,54 @@ let isOnlineUI = true
 async function startIntro() {
   console.log('[Intro] Initializing RPG sequence...');
   const overlay = $id('intro-overlay')
-  if (!overlay) return console.error('[Intro] Overlay element not found!');
-  overlay.classList.remove('hidden')
+  if (overlay) {
+    overlay.style.opacity = '1';
+    overlay.classList.remove('hidden');
+  }
+  $id('intro-professor-container')?.classList.remove('walk-out');
+  $id('intro-wild-pokemon')?.classList.remove('walk-out');
+
+  // Clean up any existing floating pokemons from previous plays
+  const floaters = $id('intro-pokemon-floaters')
+  if (floaters) floaters.innerHTML = '';
+
+  $id('intro-wild-pokemon')?.classList.add('hidden');
+  $id('intro-flash')?.classList.add('hidden');
+  $id('intro-flash')?.classList.remove('active');
+
+  // Preload Pokemons to avoid delay during reveal
+  const reveals = ['bulbasaur','squirtle','charmander','pikachu','eevee','mew','togepi','jigglypuff','pichu','totodile','cyndaquil','chikorita','mudkip','torchic','treecko']
+  reveals.forEach(poke => {
+    const img = new Image();
+    img.src = `https://play.pokemonshowdown.com/sprites/xyani/${poke}.gif`;
+  });
+
+  // Reset pitch cards
+  const pitches = [1, 2, 3];
+  pitches.forEach(num => {
+    const p = $id(`pitch-${num}`);
+    if (p) {
+      if (num === 1) p.classList.add('active');
+      else p.classList.remove('active');
+    }
+  });
+  const btnNext = $id('btn-next-pitch');
+  if (btnNext) btnNext.textContent = t('intro.next');
+
+  // Initialize SoundCloud Widget
+  let musicWidget = null;
+  if (typeof SC !== 'undefined') {
+    const iframeElement = $id('intro-music-widget');
+    if (iframeElement) {
+      musicWidget = SC.Widget(iframeElement);
+    }
+  }
+
+  // Reset Music
+  if (musicWidget) {
+    musicWidget.pause();
+    musicWidget.seekTo(0);
+  }
 
   // ── Initialize 3D Professor (skinview3d) ──────────────────
   let professorViewer = null
@@ -43,17 +89,22 @@ async function startIntro() {
   
   if (profCanvas && typeof skinview3d !== 'undefined') {
     try {
+      if (window._introProfessorViewer) {
+        try { window._introProfessorViewer.dispose() } catch(e) {}
+      }
       professorViewer = new skinview3d.SkinViewer({
         canvas: profCanvas,
         width: 280,
         height: 480,
-        skin: 'https://mc-heads.net/skin/MHF_Alex',
+        skin: './2021_04_08_proffeser-oak-17401377.png',
       })
+      window._introProfessorViewer = professorViewer
       professorViewer.autoRotate = false
       professorViewer.controls.enabled = false
       professorViewer.zoom = 0.85
       professorViewer.animation = new skinview3d.WalkingAnimation()
-      professorViewer.animation.speed = 0.7
+      professorViewer.animation.speed = 0.5
+      professorViewer.playerObject.rotation.y = -0.8 // Look left while sliding in
     } catch(e) {
       console.warn('[Intro] 3D viewer init failed:', e.message)
     }
@@ -123,12 +174,40 @@ async function startIntro() {
   function startCinematicPhase() {
     cinematicPhase.classList.remove('hidden')
     if (profContainer) profContainer.classList.remove('hidden')
+    
+    // Start music immediately after language is confirmed
+    if (musicWidget) {
+      musicWidget.setVolume(30); 
+      musicWidget.play();
+    }
+    
     runCinematic()
   }
 
   async function runCinematic() {
-    await sleep(500) // Small delay before talking starts
-    if (skipCinematic) return
+    // Wait for the CSS slide-in animation (2.5s) to finish
+    await sleep(2500);
+    if (skipCinematic) return;
+
+    // Turn to face the player and become idle
+    if (professorViewer && professorViewer.playerObject) {
+      professorViewer.animation = new skinview3d.IdleAnimation();
+      professorViewer.animation.speed = 0.5;
+      
+      // Smoothly animate rotation to 0
+      let steps = 20;
+      let stepTime = 15;
+      let curRot = professorViewer.playerObject.rotation.y;
+      for (let i = 1; i <= steps; i++) {
+        if (skipCinematic) break;
+        professorViewer.playerObject.rotation.y = curRot - (curRot * (i/steps));
+        await sleep(stepTime);
+      }
+      professorViewer.playerObject.rotation.y = 0;
+    }
+    
+    await sleep(500); // Small pause before talking starts
+    if (skipCinematic) return;
 
     await typeWriter(cinematicText, getLine('intro.cinematic_1', 'Hello there! Welcome to the world of Pokémon!'))
     await sleep(900); if (skipCinematic) return
@@ -154,14 +233,16 @@ async function startIntro() {
     }
 
     // Flash
-    overlay.style.transition = 'background 0.08s'
-    overlay.style.background = 'radial-gradient(ellipse at center, #e8ffe8 0%, #b0f0b8 40%, #0d2211 100%)'
-    await sleep(120)
-    overlay.style.background = ''
-    overlay.style.transition = ''
+    const flash = $id('intro-flash')
+    if (flash) {
+      flash.classList.remove('hidden')
+      flash.classList.add('active')
+      setTimeout(() => flash.classList.add('hidden'), 600)
+    }
+    await sleep(100)
 
-    // Wild Pokémon appears
-    const reveals = ['charizard','bulbasaur','squirtle','pikachu','mewtwo','gengar','rayquaza']
+    // Wild Pokémon appears (only small body ones as requested)
+    const reveals = ['bulbasaur','squirtle','charmander','pikachu','eevee','mew','togepi','jigglypuff','pichu','totodile','cyndaquil','chikorita','mudkip','torchic','treecko']
     const revealPoke = reveals[Math.floor(Math.random() * reveals.length)]
     const wildEl  = $id('intro-wild-pokemon')
     const wildImg = $id('intro-wild-pokemon-img')
@@ -170,8 +251,8 @@ async function startIntro() {
       wildEl.classList.remove('hidden')
     }
     if (professorViewer) {
-      professorViewer.animation = new skinview3d.WalkingAnimation()
-      professorViewer.animation.speed = 0.6
+      professorViewer.animation = new skinview3d.IdleAnimation()
+      professorViewer.animation.speed = 0.5
     }
 
     await sleep(400); if (skipCinematic) return
@@ -185,7 +266,6 @@ async function startIntro() {
   function endCinematic() {
     if (cinematicDone) return
     cinematicDone = true; skipCinematic = true
-    $id('intro-wild-pokemon')?.classList.add('hidden')
     cinematicPhase.classList.add('hidden')
     switchPhase2()
   }
@@ -197,8 +277,6 @@ async function startIntro() {
   function switchPhase2() {
     console.log('[Intro] Switching to Phase 2 (The World)');
     $id('intro-anim-phase').classList.remove('hidden')
-    const music = $id('intro-music')
-    if (music) { music.volume = 0.4; music.play().catch(() => {}) }
     runIntroAnimation()
   }
 
@@ -242,20 +320,220 @@ async function startIntro() {
     console.log('[Intro] Switching to Choice Phase');
     $id('intro-anim-phase').classList.add('hidden')
     $id('intro-choice-phase').classList.remove('hidden')
-    $id('btn-choice-new').onclick = () => {
-      endIntro()
-      $id('tab-account')?.click()
-      $id('link-to-register')?.click()
+
+    // Expose endIntro for the global auth click handlers
+    // Final Exit Cinematic
+    async function runClosingCinematic() {
+      console.log('[Intro] Running closing cinematic...');
+      
+      // Clear dialogue box and show final message
+      $id('intro-auth-login-view').classList.add('hidden');
+      $id('intro-auth-register-view').classList.add('hidden');
+      $id('intro-auth-onetime-view').classList.add('hidden');
+      $id('btn-auth-back').classList.add('hidden');
+      
+      const authText = $id('auth-dialogue-text');
+      if (authText) {
+        authText.textContent = '';
+        skipCinematic = false;
+        await typeWriter(authText, getLine('intro.good_luck', 'Sok szerencsét a kalandodhoz! Találkozunk a világban!'));
+      }
+      await sleep(1500);
+      
+      // Hide dialogue box
+      $id('intro-auth-phase').classList.add('hidden');
+      
+      // Professor and Pokemon walk out
+      if (professorViewer) {
+        professorViewer.animation = new skinview3d.WalkingAnimation();
+        professorViewer.animation.speed = 0.5;
+        // Turn to the right
+        professorViewer.playerObject.rotation.y = 1.0; 
+      }
+      
+      $id('intro-professor-container')?.classList.add('walk-out');
+      $id('intro-wild-pokemon')?.classList.add('walk-out');
+      
+      await sleep(2000);
+      
+      // Final fade out of the whole thing
+      const overlay = $id('intro-overlay');
+      if (overlay) overlay.style.opacity = '0';
+      await sleep(1000);
+      
+      endIntro();
     }
-    $id('btn-choice-returning').onclick = () => {
+
+    window.endIntroFromAuth = runClosingCinematic;
+
+    $id('intro-explain-phase').onclick = () => { skipCinematic = true; }
+    $id('intro-auth-phase').onclick = (e) => { 
+      if(e.target.tagName !== 'INPUT' && e.target.tagName !== 'BUTTON') skipCinematic = true; 
+    }
+
+    $id('btn-choice-new').onclick = async () => {
+      // Show Explanation Phase
+      $id('intro-choice-phase').classList.add('hidden')
+      $id('intro-explain-phase').classList.remove('hidden')
+      
+      const explainTextEl = $id('intro-explain-text');
+      const explainButtons = $id('intro-explain-buttons');
+      const backBtn = $id('btn-explain-back');
+      
+      explainButtons.classList.add('hidden');
+      backBtn.classList.add('hidden');
+      explainTextEl.textContent = '';
+      
+      skipCinematic = false; // Allow typing animation again
+      const text = getLine('intro.explain_desc', 'A permanent account gives you access to cross-device syncing, leaderboards, and daily rewards! A one-time account is fast but cannot be recovered if you reinstall. Which path will you choose?');
+      
+      await typeWriter(explainTextEl, text);
+      
+      explainButtons.classList.remove('hidden');
+      backBtn.classList.remove('hidden');
+    }
+    
+    $id('btn-choice-returning').onclick = async () => {
+      // Show Login Phase
+      $id('intro-choice-phase').classList.add('hidden')
+      $id('intro-auth-phase').classList.remove('hidden')
+      $id('intro-auth-login-view').classList.remove('hidden')
+      $id('intro-auth-register-view').classList.add('hidden')
+      $id('intro-auth-onetime-view').classList.add('hidden')
+
+      // Reset login steps
+      $id('login-step-1').classList.remove('hidden')
+      $id('login-step-2').classList.add('hidden')
+      $id('auth-dialogue-text').textContent = ''
+      $id('auth-login-username').value = ''
+      $id('auth-login-password').value = ''
+
+      skipCinematic = false
+      await typeWriter($id('auth-dialogue-text'), getLine('intro.login_step_1', 'Üdvözöllek újra, Mester! Emlékeztetnél a nevedre?'))
+      $id('auth-login-username').focus()
+    }
+
+    $id('btn-login-next-1').onclick = async () => {
+      const user = $id('auth-login-username').value.trim()
+      if (!user) return showToast(t('toast.username_required'))
+      
+      $id('login-step-1').classList.add('hidden')
+      $id('auth-dialogue-text').textContent = ''
+      
+      skipCinematic = false
+      await typeWriter($id('auth-dialogue-text'), getLine('intro.login_step_2', `Örülök, hogy újra látlak, ${user}! Kérlek add meg a jelszavad.`))
+      $id('login-step-2').classList.remove('hidden')
+      $id('auth-login-password').focus()
+    }
+    
+    // Explanation Phase Buttons
+    $id('btn-choice-online').onclick = async () => {
+      $id('intro-explain-phase').classList.add('hidden')
+      $id('intro-auth-phase').classList.remove('hidden')
+      $id('intro-auth-register-view').classList.remove('hidden')
+      $id('intro-auth-login-view').classList.add('hidden')
+      $id('intro-auth-onetime-view').classList.add('hidden')
+
+      // Reset steps
+      $id('reg-step-1').classList.add('hidden');
+      $id('reg-step-2').classList.add('hidden');
+      $id('auth-dialogue-text').textContent = '';
+      $id('auth-register-username').value = '';
+      $id('auth-register-password').value = '';
+      $id('auth-register-confirm').value = '';
+      
+      // Step 1 dialogue
+      skipCinematic = false;
+      await typeWriter($id('auth-dialogue-text'), getLine('intro.reg_step_1', 'Kiváló választás! Egy tartós fiók. Nos, hogy hívjunk?'));
+      $id('reg-step-1').classList.remove('hidden');
+      $id('auth-register-username').focus();
+    }
+    
+    $id('btn-reg-next-1').onclick = async () => {
+      const user = $id('auth-register-username').value.trim();
+      
+      // Validation with Professor's voice
+      if (!user || user.length < 3) {
+        $id('auth-dialogue-text').textContent = '';
+        skipCinematic = false;
+        await typeWriter($id('auth-dialogue-text'), getLine('intro.err_user_short', 'Hoppá! Ez a név egy kicsit rövidnek tűnik. Legalább 3 karakterre szükségem lesz!'));
+        return;
+      }
+      if (!/^[a-zA-Z0-9_]+$/.test(user)) {
+        $id('auth-dialogue-text').textContent = '';
+        skipCinematic = false;
+        await typeWriter($id('auth-dialogue-text'), getLine('intro.err_user_chars', 'Sajnálom, de csak betűket, számokat és alulvonást használhatsz a nevedben!'));
+        return;
+      }
+      
+      // Check availability from server
+      try {
+        const serverUrl = $id('input-server-url').value.trim();
+        const res = await fetch(`${serverUrl.replace(/\/+$/, '')}/api/auth/check-username?username=${encodeURIComponent(user)}`);
+        const data = await res.json();
+        if (data && data.available === false) {
+          $id('auth-dialogue-text').textContent = '';
+          skipCinematic = false;
+          await typeWriter($id('auth-dialogue-text'), getLine('intro.err_user_taken', 'Úgy tűnik, ez a név már foglalt. Tudnál valami mást választani?'));
+          return;
+        }
+      } catch (e) {
+        console.warn('[Auth] Username check failed:', e);
+      }
+
+      $id('reg-step-1').classList.add('hidden');
+      $id('auth-dialogue-text').textContent = '';
+      
+      skipCinematic = false;
+      await typeWriter($id('auth-dialogue-text'), getLine('intro.reg_step_2_combined', `Ah, ${user}! Remek név. Kérlek adj meg egy titkos jelszavat, majd gépeld be még egyszer!`));
+      
+      $id('reg-step-2').classList.remove('hidden');
+      $id('auth-register-password').focus();
+    }
+
+
+    
+    $id('btn-choice-offline').onclick = async () => {
+      $id('intro-explain-phase').classList.add('hidden')
+      $id('intro-auth-phase').classList.remove('hidden')
+      $id('intro-auth-onetime-view').classList.remove('hidden')
+      $id('intro-auth-login-view').classList.add('hidden')
+      $id('intro-auth-register-view').classList.add('hidden')
+
+      $id('auth-dialogue-text').textContent = ''
+      $id('auth-onetime-username').value = ''
+
+      skipCinematic = false
+      await typeWriter($id('auth-dialogue-text'), getLine('intro.onetime_step_1', 'Rendben! Egy egyszeri kaland. Hogy hívjanak ebben a világban?'))
+      $id('auth-onetime-username').focus()
+    }
+
+    $id('btn-auth-onetime-start').onclick = () => {
+      const user = $id('auth-onetime-username').value.trim()
+      if (!user) return showToast(t('toast.username_required'))
+      username = user
+      localStorage.setItem('cobble_username', username)
       endIntro()
-      $id('tab-account')?.click()
-      $id('link-to-login')?.click()
+    }
+    
+    $id('btn-explain-back').onclick = () => {
+      $id('intro-explain-phase').classList.add('hidden')
+      $id('intro-choice-phase').classList.remove('hidden')
+    }
+    
+    // Auth Phase Back Button
+    $id('btn-auth-back').onclick = () => {
+      $id('intro-auth-phase').classList.add('hidden')
+      if (!$id('intro-auth-register-view').classList.contains('hidden')) {
+        $id('intro-explain-phase').classList.remove('hidden')
+      } else {
+        $id('intro-choice-phase').classList.remove('hidden')
+      }
     }
   }
 
   function endIntro() {
-    $id('intro-music').pause()
+    if (musicWidget) musicWidget.pause();
     if (professorViewer) { try { professorViewer.dispose() } catch(_) {} }
     overlay.classList.add('hidden')
     showScreen('welcome')
@@ -393,7 +671,11 @@ function showToast(msg) {
   t._timeout = setTimeout(() => t.classList.remove('show'), 4000)
 }
 
-// ── Window controls ───────────────────────────────────────────
+// ── Window controls & Intro Replay ──────────────────────────
+$id('btn-replay-intro')?.addEventListener('click', () => {
+  // Re-run the intro sequence from the beginning
+  startIntro()
+})
 $id('btn-minimize').addEventListener('click', () => { if(window.cobble) window.cobble.minimize() })
 $id('btn-close').addEventListener('click', () => { if(window.cobble) window.cobble.close() })
 
@@ -966,35 +1248,6 @@ $id('link-folder').addEventListener('click', () => {
   if (window.cobble) window.cobble.openGameFolder()
 })
 
-// ── Auth Tab Logic ──────────────────────────────────────────
-$id('tab-guest').addEventListener('click', () => {
-  $id('tab-guest').classList.add('active')
-  $id('tab-account').classList.remove('active')
-  $id('group-username').classList.remove('hidden')
-  $id('auth-account-fields').classList.add('hidden')
-  $id('auth-hint').textContent = t('welcome.offline_hint')
-})
-
-$id('tab-account').addEventListener('click', () => {
-  $id('tab-account').classList.add('active')
-  $id('tab-guest').classList.remove('active')
-  $id('group-username').classList.add('hidden')
-  $id('auth-account-fields').classList.remove('hidden')
-  $id('auth-hint').textContent = t('welcome.online_hint')
-})
-
-// Toggle Login/Register Views
-$id('link-to-register').addEventListener('click', (e) => {
-  e.preventDefault()
-  $id('auth-login-view').classList.add('hidden')
-  $id('auth-register-view').classList.remove('hidden')
-})
-
-$id('link-to-login').addEventListener('click', (e) => {
-  e.preventDefault()
-  $id('auth-register-view').classList.add('hidden')
-  $id('auth-login-view').classList.remove('hidden')
-})
 
 // Login Logic
 $id('btn-auth-login').addEventListener('click', async () => {
@@ -1024,9 +1277,10 @@ $id('btn-auth-login').addEventListener('click', async () => {
     }
     saveProfiles()
     renderProfiles()
+    selectProfile(username)
     
     showToast(t('toast.login_success'))
-    $id('tab-guest').click() // Switch back to guest to show selected profile
+    if (window.endIntroFromAuth) window.endIntroFromAuth()
   } catch (e) {
     showToast('❌ ' + e.message)
   }
@@ -1038,8 +1292,18 @@ $id('btn-auth-register').addEventListener('click', async () => {
   const pass = $id('auth-register-password').value
   const confirm = $id('auth-register-confirm').value
   
-  if (!user || !pass || !confirm) return showToast(t('toast.fill_all_fields'))
-  if (pass !== confirm) return showToast(t('toast.passwords_dont_match'))
+  if (!user || !pass || !confirm) {
+    $id('auth-dialogue-text').textContent = '';
+    skipCinematic = false;
+    typeWriter($id('auth-dialogue-text'), getLine('intro.err_fill_all', 'Ó, úgy tűnik valami lemaradt. Kérlek töltsd ki az összes mezőt!'));
+    return;
+  }
+  if (pass !== confirm) {
+    $id('auth-dialogue-text').textContent = '';
+    skipCinematic = false;
+    typeWriter($id('auth-dialogue-text'), getLine('intro.err_pass_mismatch', 'Hm, a két jelszó nem egyezik. Figyelj oda a gépelésnél!'));
+    return;
+  }
 
   try {
     const serverUrl = $id('input-server-url').value.trim()
@@ -1049,10 +1313,27 @@ $id('btn-auth-register').addEventListener('click', async () => {
       body: JSON.stringify({ username: user, password: pass })
     })
     const data = await res.json()
-    if (!res.ok) throw new Error(data.error || 'Registration failed')
+    if (!res.ok) {
+      $id('auth-dialogue-text').textContent = '';
+      skipCinematic = false;
+      typeWriter($id('auth-dialogue-text'), data.error || 'Registration failed');
+      return;
+    }
 
     showToast(t('toast.login_success'))
-    $id('link-to-login').click() // Go to login after success
+    
+    // Save new profile
+    const existing = profiles.find(p => p.name === user)
+    if (!existing) {
+      profiles.push({ name: user, profileId: crypto.randomUUID() })
+      saveProfiles()
+      renderProfiles()
+    }
+    selectProfile(user)
+    username = user
+
+    // Trigger closing cinematic
+    if (window.endIntroFromAuth) window.endIntroFromAuth()
   } catch (e) {
     showToast('❌ ' + e.message)
   }

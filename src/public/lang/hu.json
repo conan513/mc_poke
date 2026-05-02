@@ -82,7 +82,8 @@
     "whitelisting": "Regisztráció a szerver fehérlistájára...",
     "fill_all_fields": "Kérlek tölts ki minden mezőt!",
     "login_success": "Sikeres bejelentkezés!",
-    "passwords_dont_match": "A két jelszó nem egyezik!"
+    "passwords_dont_match": "A két jelszó nem egyezik!",
+    "username_taken": "Ez a név már foglalt! Válassz másikat!"
   },
   "titlebar": {
     "lang_title": "Nyelv váltása",
@@ -156,6 +157,24 @@
     "cinematic_1": "Szia! Üdvözöllek a Pokémon világában!",
     "cinematic_2": "Prof. Oak vagyok – mindenki Pokémon Professzornak hív!",
     "cinematic_3": "Ezt a világot Pokémonnak nevezett lények lakják!",
-    "cinematic_4": "Én ezeket a lenyűgöző lényeket tanulmányozom hivatásszerűen."
+    "cinematic_4": "Én ezeket a lenyűgöző lényeket tanulmányozom hivatásszerűen.",
+    "explain_desc": "Egy tartós fiók hozzáférést biztosít a felhőmentéshez, a Dicsőségtáblához és a napi jutalmakhoz! Az egyszeri fiók gyors, de újratelepítés után nem állítható helyre. Melyik utat választod?",
+    "btn_online_title": "Tartós Fiók",
+    "btn_online_desc": "Biztonságos mentés és statisztikák",
+    "btn_offline_title": "Egyszeri Fiók",
+    "btn_offline_desc": "Gyors kezdés, jelszó nélkül",
+    "btn_back": "Vissza",
+    "reg_step_1": "Kiváló választás! Egy tartós fiók. Nos, hogy hívjunk?",
+    "reg_step_2_combined": "Remek név! Kérlek adj meg egy titkos jelszavat, majd gépeld be még egyszer!",
+    "login_step_1": "Üdvözöllek újra, Mester! Emlékeztetnél a nevedre?",
+    "login_step_2": "Örülök, hogy újra látlak! Kérlek add meg a jelszavad.",
+    "onetime_step_1": "Rendben! Egy egyszeri kaland. Hogy hívjanak ebben a világban?",
+    "good_luck": "Sok szerencsét a kalandodhoz! Találkozunk a világban!",
+    "err_user_short": "Hoppá! Ez a név egy kicsit rövidnek tűnik. Legalább 3 karakterre szükségem lesz!",
+    "err_user_chars": "Sajnálom, de csak betűket, számokat és alulvonást használhatsz a nevedben!",
+    "err_user_taken": "Úgy tűnik, ez a név már foglalt. Tudnál valami mást választani?",
+    "err_pass_short": "Ez a jelszó túl gyenge! Kérlek, adj meg legalább 4 karaktert a biztonságod érdekében.",
+    "err_fill_all": "Ó, úgy tűnik valami lemaradt. Kérlek töltsd ki az összes mezőt!",
+    "err_pass_mismatch": "Hm, a két jelszó nem egyezik. Figyelj oda a gépelésnél!"
   }
 }

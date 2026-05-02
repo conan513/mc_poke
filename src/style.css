@@ -142,6 +142,23 @@
   100% { transform: translate(110vw, -80px) scaleX(-1); opacity: 0; }
 }
 
+#intro-flash {
+  position: fixed;
+  inset: 0;
+  z-index: 2000000;
+  background: white;
+  pointer-events: none;
+}
+
+#intro-flash.active {
+  animation: flashAnim 0.6s ease-out forwards;
+}
+
+@keyframes flashAnim {
+  0%   { opacity: 1; }
+  100% { opacity: 0; }
+}
+
 /* ── INTRO OVERLAY (RPG STYLE) ────────────────────────────── */
 
 /* Professor 3D model container (Right side) */
@@ -165,7 +182,7 @@
   position: relative;
   z-index: 2;
   filter: drop-shadow(0 20px 40px rgba(0,0,0,0.8));
-  animation: professorSlideIn 1.2s cubic-bezier(0.22, 1, 0.36, 1) both;
+  animation: professorSlideIn 2.5s linear both;
 }
 
 @keyframes professorSlideIn {
@@ -196,18 +213,18 @@
 
 @keyframes pokeballThrow {
   0%   { transform: translate(0, 0) rotate(0deg) scale(1); opacity: 1; }
-  30%  { transform: translate(-80px, -150px) rotate(-360deg) scale(1.1); opacity: 1; }
-  60%  { transform: translate(-380px, -60px) rotate(-540deg) scale(0.9); opacity: 1; }
-  85%  { transform: translate(-420px, 10px) rotate(-600deg) scale(0.6); opacity: 0.8; }
-  100% { transform: translate(-450px, 20px) rotate(-720deg) scale(0); opacity: 0; }
+  30%  { transform: translate(-50px, -150px) rotate(-360deg) scale(1.1); opacity: 1; }
+  60%  { transform: translate(-150px, -20px) rotate(-540deg) scale(0.9); opacity: 1; }
+  85%  { transform: translate(-180px, 150px) rotate(-600deg) scale(0.6); opacity: 0.8; }
+  100% { transform: translate(-200px, 180px) rotate(-720deg) scale(0); opacity: 0; }
 }
 
 /* Wild Pokemon reveal */
 .intro-wild-pokemon {
   position: fixed;
-  left: 35%;
-  top: 60%;
-  transform: translate(-50%, -50%);
+  right: 24%;
+  bottom: 2vh;
+  transform: translate(50%, 0%);
   z-index: 1000001;
   pointer-events: none;
   display: flex;
@@ -217,11 +234,14 @@
 }
 
 .intro-wild-pokemon img {
-  width: 200px;
-  height: 200px;
+  height: 160px;
+  width: auto;
+  max-width: 160px;
   object-fit: contain;
-  image-rendering: pixelated;
-  filter: drop-shadow(0 0 30px rgba(100,255,150,0.8)) drop-shadow(0 0 60px rgba(50,200,100,0.4));
+  /* Use default smooth browser scaling instead of pixelated */
+  image-rendering: auto; 
+  /* Slight graphics tuning: boost colors slightly and soften edges very subtly */
+  filter: saturate(1.15) contrast(1.05) drop-shadow(0px 8px 16px rgba(0,0,0,0.4));
   animation: pokemonReveal 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) both;
 }
 
@@ -235,12 +255,7 @@
 }
 
 .pokemon-sparkles {
-  position: absolute;
-  inset: -40px;
-  background: radial-gradient(circle, rgba(100,255,150,0.3) 0%, transparent 60%);
-  border-radius: 50%;
-  animation: sparkle 1s ease-in-out infinite alternate;
-  pointer-events: none;
+  display: none !important;
 }
 
 @keyframes sparkle {
@@ -256,7 +271,7 @@
   padding: 28px 36px;
   max-width: 520px;
   width: 44%;
-  min-width: 320px;
+  min-width: 340px;
   box-shadow: 8px 8px 0 #111, 0 20px 60px rgba(0,0,0,0.8);
   color: #1a1a1a;
   position: relative;
@@ -296,17 +311,27 @@
   opacity: 0.7;
 }
 
-/* Each phase fills the whole overlay */
+#intro-overlay {
+  transition: opacity 1s ease;
+}
+
 .intro-phase {
   position: absolute;
   inset: 0;
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   justify-content: flex-start;
-  padding: 0 0 0 8%;
+  padding: 22vh 0 0 8%;
   z-index: 999999;
   opacity: 1;
   transition: opacity 0.5s ease;
+}
+
+/* Exit animations */
+.walk-out {
+  transition: transform 3s linear, opacity 1s ease !important;
+  transform: translateX(600px) !important;
+  opacity: 0 !important;
 }
 
 .intro-phase.hidden {
@@ -321,9 +346,9 @@
   border: 4px solid #222 !important;
   border-radius: 16px !important;
   padding: 36px 40px !important;
-  max-width: 480px !important;
-  width: 42% !important;
-  min-width: 320px !important;
+  max-width: 520px !important;
+  width: 44% !important;
+  min-width: 340px !important;
   position: relative !important;
   z-index: 100 !important;
   box-shadow: 8px 8px 0 #111, 0 20px 60px rgba(0,0,0,0.8) !important;
@@ -344,6 +369,19 @@
   font-weight: 500;
   color: #1a1a1a;
   margin-bottom: 20px;
+}
+
+.intro-input {
+  background: #fff !important;
+  color: #1a1a1a !important;
+  border: 2px solid #ddd !important;
+  border-radius: 8px !important;
+  box-shadow: inset 0 2px 4px rgba(0,0,0,0.05) !important;
+}
+
+.intro-input:focus {
+  border-color: #3b82f6 !important;
+  outline: none;
 }
 
 /* Phase 2: anim phase – pitch cards */
@@ -381,6 +419,26 @@
   font-weight: 500;
   color: #1a1a1a;
   text-shadow: none;
+}
+
+/* Smooth reveal for buttons and inputs */
+@keyframes elementReveal {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.intro-dialogue-box button, 
+.intro-dialogue-box .form-group, 
+.intro-dialogue-box .choice-buttons,
+.intro-dialogue-box input,
+#intro-explain-buttons,
+#btn-explain-back {
+  animation: elementReveal 0.4s cubic-bezier(0.4, 0, 0.2, 1) both;
+}
+
+/* Adjust timing for back button to feel secondary */
+.intro-back-btn {
+  animation-delay: 0.1s !important;
 }
 
 #btn-next-pitch {

@@ -82,7 +82,8 @@
     "whitelisting": "Registering on server whitelist...",
     "fill_all_fields": "Please fill in all fields!",
     "login_success": "Login successful!",
-    "passwords_dont_match": "Passwords don't match!"
+    "passwords_dont_match": "Passwords don't match!",
+    "username_taken": "This name is already taken! Choose another one!"
   },
   "titlebar": {
     "lang_title": "Change language",
@@ -156,6 +157,24 @@
     "cinematic_1": "Hello there! Welcome to the world of Pokémon!",
     "cinematic_2": "My name is Prof. Oak – people call me the Pokémon Prof!",
     "cinematic_3": "This world is inhabited by creatures called Pokémon!",
-    "cinematic_4": "I study these fascinating creatures as my profession."
+    "cinematic_4": "I study these fascinating creatures as my profession.",
+    "explain_desc": "A permanent account gives you access to cross-device syncing, leaderboards, and daily rewards! A one-time account is fast but cannot be recovered if you reinstall. Which path will you choose?",
+    "btn_online_title": "Permanent Account",
+    "btn_online_desc": "Secure saves and stats",
+    "btn_offline_title": "One-time Account",
+    "btn_offline_desc": "Quick start, no password",
+    "btn_back": "Back",
+    "reg_step_1": "Excellent choice! A permanent account. Now, what shall we call you?",
+    "reg_step_2_combined": "A fine name! Please enter a secret password, then type it one more time!",
+    "login_step_1": "Welcome back, Master! Could you remind me of your name?",
+    "login_step_2": "Great to see you again! Please enter your password.",
+    "onetime_step_1": "Alright! A one-time adventure. What should we call you in this world?",
+    "good_luck": "Good luck on your adventure! I'll see you in the world of Pokémon!",
+    "err_user_short": "Oops! That name seems a bit short. I'll need at least 3 characters!",
+    "err_user_chars": "I'm sorry, but you can only use letters, numbers, and underscores in your name!",
+    "err_user_taken": "It seems that name is already taken. Could you choose something else?",
+    "err_pass_short": "That password is too weak! Please provide at least 4 characters for your security.",
+    "err_fill_all": "Oh, it seems something was left out. Please fill in all the fields!",
+    "err_pass_mismatch": "Hmm, the two passwords don't match. Be careful with your typing!"
   }
 }

@@ -9,10 +9,13 @@
   <link rel="stylesheet" href="./style.css" />
   <!-- 3D Minecraft skin viewer library -->
   <script src="https://unpkg.com/skinview3d@3.0.0-alpha.1/bundles/skinview3d.bundle.js"></script>
+  <!-- SoundCloud Widget API -->
+  <script src="https://w.soundcloud.com/player/api.js"></script>
 </head>
 <body>
   <!-- INTRO OVERLAY -->
   <div id="intro-overlay" class="hidden">
+    <div id="intro-flash" class="hidden"></div>
     <!-- Professor 3D Model (Global to Intro) -->
     <div class="intro-professor-container" id="intro-professor-container">
       <canvas id="intro-professor-canvas"></canvas>
@@ -100,12 +103,77 @@
         </div>
       </div>
     </div>
+
+    <!-- Phase 4: Online vs Offline Explanation -->
+    <div id="intro-explain-phase" class="intro-phase hidden">
+      <div class="intro-dialogue-box intro-choice-card">
+        <p id="intro-explain-text" data-i18n="intro.explain_desc"></p>
+        <div id="intro-explain-buttons" class="choice-buttons hidden" style="margin-top: 15px;">
+          <button id="btn-choice-online" class="choice-btn new-player">
+            <div class="choice-icon">🌐</div>
+            <div class="choice-text">
+              <strong data-i18n="intro.btn_online_title">Online Account</strong>
+              <span data-i18n="intro.btn_online_desc">Play anywhere, track stats</span>
+            </div>
+          </button>
+          <button id="btn-choice-offline" class="choice-btn old-player">
+            <div class="choice-icon">💾</div>
+            <div class="choice-text">
+              <strong data-i18n="intro.btn_offline_title">Offline Play</strong>
+              <span data-i18n="intro.btn_offline_desc">Save locally on device</span>
+            </div>
+          </button>
+        </div>
+        <button id="btn-explain-back" class="btn-secondary intro-back-btn hidden" style="margin-top: 15px; width: 100%;" data-i18n="intro.btn_back">Back</button>
+      </div>
+    </div>
+
+    <!-- Phase 5: Auth Forms (Login / Register) -->
+    <!-- Phase 5: Auth Forms (Login / Register / One-time) -->
+    <div id="intro-auth-phase" class="intro-phase hidden">
+      <div class="intro-dialogue-box intro-choice-card">
+        <button id="btn-auth-back" class="btn-icon-only intro-back-icon" title="Back" style="position: absolute; top: 10px; right: 10px; background: transparent; border: none; color: #1a1a1a; cursor: pointer;">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" style="width: 20px; height: 20px;"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+        </button>
+        
+        <p id="auth-dialogue-text" style="margin-bottom: 15px; font-weight: 500; font-size: 1.1rem; color: #1a1a1a;"></p>
+
+        <!-- Login Step-by-Step -->
+        <div id="intro-auth-login-view" class="hidden">
+          <div id="login-step-1">
+            <input type="text" class="form-input intro-input" id="auth-login-username" placeholder="Minecraft név..." style="width: 100%; box-sizing: border-box; margin-bottom: 15px;">
+            <button id="btn-login-next-1" class="btn-primary full-width" data-i18n="intro.next">Tovább</button>
+          </div>
+          <div id="login-step-2" class="hidden">
+            <input type="password" class="form-input intro-input" id="auth-login-password" data-i18n-attr="placeholder:welcome.password_placeholder" style="width: 100%; box-sizing: border-box; margin-bottom: 15px;">
+            <button id="btn-auth-login" class="btn-primary full-width" data-i18n="welcome.login_btn">Belépés</button>
+          </div>
+        </div>
+
+        <!-- Register Step-by-Step -->
+        <div id="intro-auth-register-view" class="hidden">
+          <div id="reg-step-1">
+            <input type="text" class="form-input intro-input" id="auth-register-username" placeholder="Minecraft név..." style="width: 100%; box-sizing: border-box; margin-bottom: 15px;">
+            <button id="btn-reg-next-1" class="btn-primary full-width" data-i18n="intro.next">Tovább</button>
+          </div>
+          <div id="reg-step-2" class="hidden">
+            <input type="password" class="form-input intro-input" id="auth-register-password" data-i18n-attr="placeholder:welcome.password_placeholder" style="width: 100%; box-sizing: border-box; margin-bottom: 10px;">
+            <input type="password" class="form-input intro-input" id="auth-register-confirm" data-i18n-attr="placeholder:welcome.confirm_password_placeholder" style="width: 100%; box-sizing: border-box; margin-bottom: 15px;">
+            <button id="btn-auth-register" class="btn-primary full-width" data-i18n="welcome.register_btn">Regisztráció</button>
+          </div>
+        </div>
+
+        <!-- One-time Account (Guest) -->
+        <div id="intro-auth-onetime-view" class="hidden">
+          <input type="text" class="form-input intro-input" id="auth-onetime-username" placeholder="Választott neved..." style="width: 100%; box-sizing: border-box; margin-bottom: 15px;">
+          <button id="btn-auth-onetime-start" class="btn-primary full-width" data-i18n="intro.start_btn">Kezdjük el!</button>
+        </div>
+      </div>
+    </div>
   </div>
 
-  <!-- Intro Music -->
-  <audio id="intro-music" loop>
-    <source src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3" type="audio/mpeg">
-  </audio>
+  <!-- Intro Music (SoundCloud Widget) -->
+  <iframe id="intro-music-widget" width="0" height="0" scrolling="no" frameborder="no" allow="autoplay" src="https://w.soundcloud.com/player/?url=https%3A//soundcloud.com/ori-david-995846850/pocket-monsters&auto_play=false&hide_related=true&show_comments=false&show_user=false&show_reposts=false&visual=false"></iframe>
 
   <!-- On-Screen Debug Log -->
   <div id="intro-debug-log"></div>
@@ -123,6 +191,10 @@
       </div>
     </div>
     <div class="titlebar-controls">
+      <button class="tb-btn" id="btn-replay-intro" title="Replay Intro" style="margin-right: 10px; font-size: 13px; padding: 0 10px; border-radius: 6px; display: flex; align-items: center; gap: 4px; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.1); cursor: pointer; color: #fff;">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width: 14px; height: 14px;"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
+        <span>Intro</span>
+      </button>
       <div class="lang-switcher-launcher">
         <button id="lang-btn-launcher" data-i18n-title="titlebar.lang_title" style="margin-right: 10px;">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width: 16px; height: 16px; display: inline-block; vertical-align: middle; margin-right: 4px;"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></svg>
@@ -207,13 +279,6 @@
             <h2 class="card-title" data-i18n="welcome.title">Üdvözöljük, Edző!</h2>
             <p class="card-desc" data-i18n="welcome.disclaimer">Add meg a felhasználóneved az offline játékhoz, majd válaszd ki a memóriakorlátot.</p>
 
-            <div class="form-group">
-              <div class="auth-tabs">
-                <button class="auth-tab active" id="tab-guest" data-i18n="welcome.tab_guest">Vendég (Offline)</button>
-                <button class="auth-tab" id="tab-account" data-i18n="welcome.tab_account">Fiók (Online Sync)</button>
-              </div>
-            </div>
-
             <div class="form-group" id="group-username">
               <label class="form-label">
                 <span class="label-icon">
@@ -240,61 +305,6 @@
                   <button class="btn-icon-only" id="btn-add-profile" data-i18n-title="welcome.profile_add_btn" title="Add profile">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" style="width: 18px; height: 18px;"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
                   </button>
-                </div>
-              </div>
-            </div>
-
-            <div id="auth-account-fields" class="hidden">
-              <!-- LOGIN VIEW -->
-              <div id="auth-login-view">
-                <div class="form-group">
-                  <label class="form-label">
-                    <span class="label-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width: 14px; height: 14px;"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg></span>
-                    <span data-i18n="welcome.username_label">Felhasználónév</span>
-                  </label>
-                  <input type="text" class="form-input" id="auth-login-username" placeholder="Minecraft név...">
-                </div>
-                <div class="form-group">
-                  <label class="form-label">
-                    <span class="label-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width: 14px; height: 14px;"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg></span>
-                    <span data-i18n="welcome.password_label">Jelszó</span>
-                  </label>
-                  <input type="password" class="form-input" id="auth-login-password" data-i18n-attr="placeholder:welcome.password_placeholder">
-                </div>
-                <button id="btn-auth-login" class="btn-primary full-width" data-i18n="welcome.login_btn">Belépés</button>
-                <div class="auth-toggle-footer">
-                  <span data-i18n="welcome.no_account">Nincs még fiókod?</span>
-                  <a href="#" id="link-to-register" data-i18n="welcome.go_to_register">Regisztráció</a>
-                </div>
-              </div>
-
-              <!-- REGISTER VIEW -->
-              <div id="auth-register-view" class="hidden">
-                <div class="form-group">
-                  <label class="form-label">
-                    <span class="label-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width: 14px; height: 14px;"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg></span>
-                    <span data-i18n="welcome.username_label">Felhasználónév</span>
-                  </label>
-                  <input type="text" class="form-input" id="auth-register-username" placeholder="Választott név...">
-                </div>
-                <div class="form-group">
-                  <label class="form-label">
-                    <span class="label-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width: 14px; height: 14px;"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg></span>
-                    <span data-i18n="welcome.password_label">Jelszó</span>
-                  </label>
-                  <input type="password" class="form-input" id="auth-register-password" data-i18n-attr="placeholder:welcome.password_placeholder">
-                </div>
-                <div class="form-group">
-                  <label class="form-label">
-                    <span class="label-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width: 14px; height: 14px;"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg></span>
-                    <span data-i18n="welcome.confirm_password_label">Jelszó megerősítése</span>
-                  </label>
-                  <input type="password" class="form-input" id="auth-register-confirm" data-i18n-attr="placeholder:welcome.confirm_password_placeholder">
-                </div>
-                <button id="btn-auth-register" class="btn-secondary full-width" data-i18n="welcome.register_btn">Regisztráció</button>
-                <div class="auth-toggle-footer">
-                  <span data-i18n="welcome.have_account">Már van fiókod?</span>
-                  <a href="#" id="link-to-login" data-i18n="welcome.go_to_login">Bejelentkezés</a>
                 </div>
               </div>
             </div>
