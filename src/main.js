@@ -509,6 +509,11 @@ async function startIntro() {
           } catch (e) {
             console.error('[Intro] Skin upload failed:', e);
           }
+          
+          // Update the UI avatar now that the skin is saved
+          if (typeof applyAvatar === 'function') {
+            applyAvatar();
+          }
         }
         btnSave.disabled = false;
         btnSave.textContent = originalText;
