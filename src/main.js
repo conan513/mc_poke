@@ -988,10 +988,6 @@ function showToast(msg) {
 }
 
 // ── Window controls & Intro Replay ──────────────────────────
-$id('btn-replay-intro')?.addEventListener('click', () => {
-  // Re-run the intro sequence from the beginning
-  startIntro()
-})
 $id('btn-minimize').addEventListener('click', () => { if(window.cobble) window.cobble.minimize() })
 $id('btn-close').addEventListener('click', () => { if(window.cobble) window.cobble.close() })
 
@@ -1712,9 +1708,12 @@ $id('btn-auth-register').addEventListener('click', async () => {
     // Save new profile
     const existing = profiles.find(p => p.name === user)
     if (!existing) {
-      profiles.push({ name: user, profileId: generateUUID() })
+      profiles.push({ name: user, profileId: generateUUID(), uuid: data.uuid })
       saveProfiles()
       renderProfiles()
+    } else {
+      existing.uuid = data.uuid
+      saveProfiles()
     }
     selectProfile(user)
     username = user
@@ -1738,27 +1737,8 @@ $id('btn-auth-register').addEventListener('click', async () => {
 $id('btn-switch-profile').addEventListener('click', () => {
   showScreen('welcome')
 })
-
-$id('btn-add-profile').addEventListener('click', () => {
-  const name = $id('input-username').value.trim()
-  if (!name || name.length < 3) {
-    showToast(t('toast.username_short'))
-    return
-  }
-  if (!/^[a-zA-Z0-9_]+$/.test(name)) {
-    showToast(t('toast.username_chars'))
-    return
-  }
-  if (profiles.find(p => p.name === name)) {
-    showToast(t('toast.profile_exists'))
-    return
-  }
-  
-  profiles.push({ name, skinUrl: null, skinType: 'mojang', skinVal: name, profileId: generateUUID() })
-  saveProfiles()
-  $id('input-username').value = ''
-  renderProfiles()
-  selectProfile(name)
+$id('btn-start-intro').addEventListener('click', () => {
+  startIntro()
 })
 
 // ── Account / Auth Legacy Logic (kept for compatibility) ────────

@@ -213,6 +213,27 @@ function hashPassword(password) {
   const hash = crypto.pbkdf2Sync(password, salt, 100000, 64, 'sha512').toString('hex')
   return { salt, hash }
 }
+
+/**
+ * Generates a deterministic Minecraft offline-mode UUID for a given username.
+ * Matches Java's UUID.nameUUIDFromBytes(("OfflinePlayer:" + name).getBytes(StandardCharsets.UTF_8))
+ */
+function getOfflineUUID(username) {
+  const hash = crypto.createHash('md5').update('OfflinePlayer:' + username).digest()
+  // Set version to 3 (MD5 based)
+  hash[6] = (hash[6] & 0x0f) | 0x30
+  // Set variant to RFC 4122
+  hash[8] = (hash[8] & 0x3f) | 0x80
+  
+  const hex = hash.toString('hex')
+  return [
+    hex.substring(0, 8),
+    hex.substring(8, 12),
+    hex.substring(12, 16),
+    hex.substring(16, 20),
+    hex.substring(20)
+  ].join('-')
+}
 function verifyPassword(password, salt, storedHash) {
   try {
     const h = crypto.pbkdf2Sync(password, salt, 100000, 64, 'sha512').toString('hex')
@@ -1000,9 +1021,10 @@ async function handleRequest(req, res) {
         }
 
         const hash = await bcrypt.hash(password, 10)
-        const playerUuid = crypto.randomUUID()
+        const playerUuid = getOfflineUUID(username)
         
-        await pool.query('INSERT INTO easyauth (username, password, uuid) VALUES (?, ?, ?)', [username, hash, playerUuid])
+        const ip = req.socket.remoteAddress.replace(/^.*:/, '')
+        await pool.query('INSERT INTO easyauth (username, password, uuid, lastip, lastlogin) VALUES (?, ?, ?, ?, NOW())', [username, hash, playerUuid, ip])
         
         console.log(`[Auth] Új EasyAuth regisztráció: ${username}`)
         res.writeHead(200, { 'Content-Type': 'application/json' })
@@ -1082,7 +1104,7 @@ async function handleRequest(req, res) {
                 await pool.query('UPDATE players SET username = ?, last_login = NOW() WHERE hwid = ? AND profile_id = ?', [username, hwid, profileId])
                 console.log(`[Verification] Ismert profil: ${username} (Profile: ${profileId}) -> ${playerUuid}`)
               } else {
-                playerUuid = crypto.randomUUID()
+                playerUuid = getOfflineUUID(username)
                 await pool.query('INSERT INTO players (hwid, profile_id, username, uuid) VALUES (?, ?, ?, ?)', [hwid, profileId, username, playerUuid])
                 console.log(`[Verification] Új profil regisztrálva: ${username} (Profile: ${profileId}) -> ${playerUuid}`)
               }
