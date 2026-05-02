@@ -165,11 +165,7 @@ async function startIntro() {
     // Using onclick to avoid multiple event listeners if called multiple times
     if (btnConfirm) {
       btnConfirm.onclick = async () => {
-        console.log('[Intro] Language confirmed:', browserLang);
-        // Actually apply the detected language if it differs from current
-        if (browserLang !== currentLang && langNames[browserLang]) {
-          await loadSpecificLanguage(browserLang);
-        }
+        console.log('[Intro] Language confirmed:', currentLang);
         langPhase.classList.add('hidden')
         startCinematicPhase()
       }
