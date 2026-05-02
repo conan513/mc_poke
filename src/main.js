@@ -1,5 +1,17 @@
 const $id = (id) => document.getElementById(id)
 
+// ── UUID Polyfill (works on HTTP without HTTPS/Electron) ──────
+function generateUUID() {
+  if (typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function') {
+    return crypto.randomUUID();
+  }
+  // Fallback for HTTP / older browsers
+  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, c => {
+    const r = Math.random() * 16 | 0;
+    return (c === 'x' ? r : (r & 0x3 | 0x8)).toString(16);
+  });
+}
+
 // ── On-Screen Logger ──────────────────────────────────────────
 function logToScreen(msg, type = 'info') {
   const log = $id('intro-debug-log')
@@ -586,7 +598,12 @@ async function loadLanguage() {
 
 async function loadSpecificLanguage(lang) {
   try {
-    const response = await fetch(`./lang/${lang}.json`)
+    // When running as web app (/app/), lang files are served at /app/lang/
+    // When running in Electron (file://), they're at ./lang/
+    const isWebMode = window.location.protocol === 'http:' || window.location.protocol === 'https:'
+    const langUrl = isWebMode ? `/app/lang/${lang}.json` : `./lang/${lang}.json`
+    const response = await fetch(langUrl)
+    if (!response.ok) throw new Error(`HTTP ${response.status}`)
     translations = await response.json()
     currentLang = lang
     localStorage.setItem('cobble_lang', lang)
@@ -726,7 +743,7 @@ $id('btn-install').addEventListener('click', async () => {
 
   // Automatikus mentés a profilok közé, ha új név
   if (!profiles.find(p => p.name === username)) {
-    profiles.push({ name: username, skinUrl: null, skinType: 'mojang', skinVal: username, profileId: crypto.randomUUID() })
+    profiles.push({ name: username, skinUrl: null, skinType: 'mojang', skinVal: username, profileId: generateUUID() })
     saveProfiles()
     renderProfiles()
   }
@@ -1320,7 +1337,7 @@ $id('btn-auth-login').addEventListener('click', async () => {
     if (existing) {
       existing.uuid = accUuid
     } else {
-      profiles.push({ name: username, uuid: accUuid, profileId: crypto.randomUUID() })
+      profiles.push({ name: username, uuid: accUuid, profileId: generateUUID() })
     }
     saveProfiles()
     renderProfiles()
@@ -1398,7 +1415,7 @@ $id('btn-auth-register').addEventListener('click', async () => {
     // Save new profile
     const existing = profiles.find(p => p.name === user)
     if (!existing) {
-      profiles.push({ name: user, profileId: crypto.randomUUID() })
+      profiles.push({ name: user, profileId: generateUUID() })
       saveProfiles()
       renderProfiles()
     }
@@ -1440,7 +1457,7 @@ $id('btn-add-profile').addEventListener('click', () => {
     return
   }
   
-  profiles.push({ name, skinUrl: null, skinType: 'mojang', skinVal: name, profileId: crypto.randomUUID() })
+  profiles.push({ name, skinUrl: null, skinType: 'mojang', skinVal: name, profileId: generateUUID() })
   saveProfiles()
   $id('input-username').value = ''
   renderProfiles()
@@ -1512,7 +1529,7 @@ animateParticles()
     let needsSave = false
     profiles.forEach(p => {
       if (!p.profileId) {
-        p.profileId = crypto.randomUUID()
+        p.profileId = generateUUID()
         needsSave = true
       }
     })
@@ -1579,7 +1596,7 @@ animateParticles()
       const name = e.target.value.trim()
       if (name.length >= 3 && /^[a-zA-Z0-9_]+$/.test(name)) {
         if (!profiles.find(p => p.name === name)) {
-          profiles.push({ name, skinUrl: null, profileId: crypto.randomUUID() })
+          profiles.push({ name, skinUrl: null, profileId: generateUUID() })
           saveProfiles()
           renderProfiles()
         }
