@@ -326,29 +326,37 @@ async function startIntro() {
     async function runClosingCinematic() {
       console.log('[Intro] Running closing cinematic...');
       
+      // Immediately disable pointer events so the user doesn't feel "stuck"
+      const overlay = $id('intro-overlay');
+      if (overlay) overlay.style.pointerEvents = 'none';
+
       // Clear dialogue box and show final message
-      $id('intro-auth-login-view').classList.add('hidden');
-      $id('intro-auth-register-view').classList.add('hidden');
-      $id('intro-auth-onetime-view').classList.add('hidden');
-      $id('btn-auth-back').classList.add('hidden');
+      $id('intro-auth-login-view')?.classList.add('hidden');
+      $id('intro-auth-register-view')?.classList.add('hidden');
+      $id('intro-auth-onetime-view')?.classList.add('hidden');
+      $id('btn-auth-back')?.classList.add('hidden');
       
       const authText = $id('auth-dialogue-text');
       if (authText) {
         authText.textContent = '';
         skipCinematic = false;
+        // Don't await forever, if user clicks it will skip
         await typeWriter(authText, getLine('intro.good_luck', 'Sok szerencsét a kalandodhoz! Találkozunk a világban!'));
       }
-      await sleep(1500);
+      await sleep(1000);
       
-      // Hide dialogue box
-      $id('intro-auth-phase').classList.add('hidden');
+      // Hide dialogue box bubble
+      $id('intro-auth-phase')?.classList.add('hidden');
       
       // Professor and Pokemon walk out
+      console.log('[Intro] Professor walking out...');
       if (professorViewer) {
-        professorViewer.animation = new skinview3d.WalkingAnimation();
-        professorViewer.animation.speed = 0.5;
-        // Turn to the right
-        professorViewer.playerObject.rotation.y = 1.0; 
+        try {
+          professorViewer.animation = new skinview3d.WalkingAnimation();
+          professorViewer.animation.speed = 0.8;
+          // Turn to the right
+          professorViewer.playerObject.rotation.y = 1.0; 
+        } catch (e) { console.warn('[Intro] Prof anim error:', e); }
       }
       
       $id('intro-professor-container')?.classList.add('walk-out');
@@ -356,11 +364,11 @@ async function startIntro() {
       
       await sleep(2000);
       
-      // Final fade out of the whole thing
-      const overlay = $id('intro-overlay');
+      // Final fade out
       if (overlay) overlay.style.opacity = '0';
       await sleep(1000);
       
+      console.log('[Intro] Cinematic finished, calling endIntro()');
       endIntro();
     }
 
@@ -468,17 +476,19 @@ async function startIntro() {
       
       // Check availability from server
       try {
-        const serverUrl = $id('input-server-url').value.trim();
+        let serverUrl = $id('input-server-url')?.value?.trim() || 'http://94.72.100.43:8080';
         const res = await fetch(`${serverUrl.replace(/\/+$/, '')}/api/auth/check-username?username=${encodeURIComponent(user)}`);
-        const data = await res.json();
-        if (data && data.available === false) {
-          $id('auth-dialogue-text').textContent = '';
-          skipCinematic = false;
-          await typeWriter($id('auth-dialogue-text'), getLine('intro.err_user_taken', 'Úgy tűnik, ez a név már foglalt. Tudnál valami mást választani?'));
-          return;
+        if (res.ok) {
+          const data = await res.json();
+          if (data && data.available === false) {
+            $id('auth-dialogue-text').textContent = '';
+            skipCinematic = false;
+            await typeWriter($id('auth-dialogue-text'), getLine('intro.err_user_taken', 'Úgy tűnik, ez a név már foglalt. Tudnál valami mást választani?'));
+            return;
+          }
         }
       } catch (e) {
-        console.warn('[Auth] Username check failed:', e);
+        console.warn('[Auth] Username check failed (likely endpoint missing):', e);
       }
 
       $id('reg-step-1').classList.add('hidden');
@@ -1305,8 +1315,14 @@ $id('btn-auth-register').addEventListener('click', async () => {
     return;
   }
 
+  const btn = $id('btn-auth-register');
+  const originalText = btn.textContent;
+  btn.disabled = true;
+  btn.textContent = '...';
+
   try {
-    const serverUrl = $id('input-server-url').value.trim()
+    const serverUrl = $id('input-server-url')?.value?.trim() || 'http://94.72.100.43:8080';
+    console.log('[Auth] Registering at:', serverUrl);
     const res = await fetch(`${serverUrl.replace(/\/+$/, '')}/api/auth/register`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -1316,7 +1332,10 @@ $id('btn-auth-register').addEventListener('click', async () => {
     if (!res.ok) {
       $id('auth-dialogue-text').textContent = '';
       skipCinematic = false;
-      typeWriter($id('auth-dialogue-text'), data.error || 'Registration failed');
+      const errorMsg = data.error || `Szerver hiba történt (${res.status})`;
+      await typeWriter($id('auth-dialogue-text'), errorMsg);
+      btn.disabled = false;
+      btn.textContent = originalText;
       return;
     }
 
@@ -1335,7 +1354,12 @@ $id('btn-auth-register').addEventListener('click', async () => {
     // Trigger closing cinematic
     if (window.endIntroFromAuth) window.endIntroFromAuth()
   } catch (e) {
-    showToast('❌ ' + e.message)
+    console.error('[Auth] Registration error:', e);
+    $id('auth-dialogue-text').textContent = '';
+    skipCinematic = false;
+    await typeWriter($id('auth-dialogue-text'), 'Hálózati hiba történt! Kérlek ellenőrizd a kapcsolatod. (Hiba: ' + e.message + ')');
+    btn.disabled = false;
+    btn.textContent = originalText;
   }
 })
 
