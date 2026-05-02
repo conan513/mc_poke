@@ -12,14 +12,39 @@
 </head>
 <body>
   <!-- INTRO OVERLAY -->
-  <div id="intro-overlay">
-    <!-- Professor Image (Global to Intro) -->
-    <div class="intro-professor-container">
-      <img src="./img/professor.png" id="intro-professor-img" alt="Professor">
+  <div id="intro-overlay" class="hidden">
+    <!-- Professor 3D Model (Global to Intro) -->
+    <div class="intro-professor-container" id="intro-professor-container">
+      <canvas id="intro-professor-canvas"></canvas>
+      <!-- Pokeball throw element -->
+      <div id="intro-pokeball" class="intro-pokeball hidden">
+        <svg viewBox="0 0 40 40" fill="none">
+          <circle cx="20" cy="20" r="19" fill="#e74c3c" stroke="#222" stroke-width="2"/>
+          <path d="M1 20 Q20 20 39 20" stroke="#222" stroke-width="2"/>
+          <circle cx="20" cy="20" r="5" fill="white" stroke="#222" stroke-width="2"/>
+          <path d="M1 20 Q20 20 39 20" fill="white"/>
+          <circle cx="20" cy="20" r="19" fill="none" stroke="#222" stroke-width="2"/>
+          <path d="M1 20 H39" stroke="#222" stroke-width="2"/>
+          <circle cx="20" cy="20" r="5" fill="white" stroke="#222" stroke-width="2"/>
+        </svg>
+      </div>
+      <!-- Pokemon reveal element -->
+      <div id="intro-wild-pokemon" class="intro-wild-pokemon hidden">
+        <img id="intro-wild-pokemon-img" src="" alt="Pokemon" />
+        <div class="pokemon-sparkles"></div>
+      </div>
+    </div>
+
+    <!-- Phase 0: Cinematic / Walk-in -->
+    <div id="intro-cinematic-phase" class="intro-phase hidden">
+      <div class="intro-cinematic-box">
+        <p id="intro-cinematic-text" class="intro-cinematic-text"></p>
+        <button id="btn-cinematic-skip" class="btn-secondary intro-skip-btn" data-i18n="intro.skip">Skip</button>
+      </div>
     </div>
 
     <!-- Phase 1: Language Check -->
-    <div id="intro-lang-phase" class="intro-phase">
+    <div id="intro-lang-phase" class="intro-phase hidden">
       <div class="intro-dialogue-box">
         <p data-i18n="intro.lang_desc">Hello there! Welcome to the world of Pokemon! Before we begin, is this your preferred language?</p>
         <div class="detected-lang-box">
@@ -47,9 +72,9 @@
           <div class="pitch-card" id="pitch-3">
             <p data-i18n="intro.pitch_3_desc">Are you ready to write your own story? A world of dreams and adventures with Pokemon awaits!</p>
           </div>
-        </div>
 
-        <button id="btn-next-pitch" class="btn-primary" data-i18n="intro.next">Next</button>
+          <button id="btn-next-pitch" class="btn-primary" data-i18n="intro.next">Next</button>
+        </div>
       </div>
     </div>
 
@@ -81,6 +106,9 @@
   <audio id="intro-music" loop>
     <source src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3" type="audio/mpeg">
   </audio>
+
+  <!-- On-Screen Debug Log -->
+  <div id="intro-debug-log"></div>
 
   <!-- Custom title bar -->
   <div class="titlebar" id="titlebar">
@@ -504,15 +532,15 @@
 
           <div class="home-links">
             <button class="link-btn" id="link-modrinth">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width: 14px; height: 14px; vertical-align: middle; margin-right: 6px;"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></svg>
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width: 14px; height: 14px; vertical-align: middle; margin-right: 4px;"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></svg>
               Modrinth
             </button>
             <button class="link-btn" id="link-discord">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width: 14px; height: 14px; vertical-align: middle; margin-right: 6px;"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width: 14px; height: 14px; vertical-align: middle; margin-right: 4px;"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
               Discord
             </button>
             <button class="link-btn" id="link-folder">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width: 16px; height: 16px; vertical-align: middle; margin-right: 6px;"><path d="M4 20h16a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.93a2 2 0 0 1-1.66-.9l-.82-1.2A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v13c0 1.1.9 2 2 2z"></path></svg>
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width: 14px; height: 14px; vertical-align: middle; margin-right: 4px;"><path d="M4 20h16a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.93a2 2 0 0 1-1.66-.9l-.82-1.2A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v13c0 1.1.9 2 2 2z"></path></svg>
               <span data-i18n="home.files_btn">Fájlok</span>
             </button>
           </div>

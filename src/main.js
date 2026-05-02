@@ -1,5 +1,23 @@
 const $id = (id) => document.getElementById(id)
 
+// ── On-Screen Logger ──────────────────────────────────────────
+function logToScreen(msg, type = 'info') {
+  const log = $id('intro-debug-log')
+  if (!log) return
+  const entry = document.createElement('div')
+  entry.className = `debug-entry debug-${type}`
+  entry.textContent = `[${new Date().toLocaleTimeString()}] ${msg}`
+  log.appendChild(entry)
+  log.scrollTop = log.scrollHeight
+}
+
+// Override console for easier debugging on screen
+const _log = console.log;
+const _err = console.error;
+console.log = (...args) => { _log(...args); logToScreen(args.join(' '), 'info'); }
+console.error = (...args) => { _err(...args); logToScreen(args.join(' '), 'error'); }
+window.onerror = (m, s, l, c, e) => { console.error(`${m} at ${s}:${l}`); }
+
 // ── State ────────────────────────────────────────────────────
 let selectedRam = localStorage.getItem('cobble_ram') || '4096'
 let username = localStorage.getItem('cobble_username') || ''
@@ -14,53 +32,178 @@ async function startIntro() {
   console.log('[Intro] Initializing RPG sequence...');
   const overlay = $id('intro-overlay')
   if (!overlay) return console.error('[Intro] Overlay element not found!');
-  
   overlay.classList.remove('hidden')
+
+  // ── Initialize 3D Professor (skinview3d) ──────────────────
+  let professorViewer = null
+  const profCanvas = $id('intro-professor-canvas')
+  // Ensure the canvas container is hidden until the cinematic starts
+  const profContainer = $id('intro-professor-container')
+  if (profContainer) profContainer.classList.add('hidden')
   
-  const browserLang = (navigator.language || 'en').split('-')[0].toLowerCase()
-  const langNames = { 
-    'hu': 'Magyar', 'en': 'English', 'de': 'Deutsch', 
-    'fr': 'Français', 'es': 'Español', 'it': 'Italiano' 
+  if (profCanvas && typeof skinview3d !== 'undefined') {
+    try {
+      professorViewer = new skinview3d.SkinViewer({
+        canvas: profCanvas,
+        width: 280,
+        height: 480,
+        skin: 'https://mc-heads.net/skin/MHF_Alex',
+      })
+      professorViewer.autoRotate = false
+      professorViewer.controls.enabled = false
+      professorViewer.zoom = 0.85
+      professorViewer.animation = new skinview3d.WalkingAnimation()
+      professorViewer.animation.speed = 0.7
+    } catch(e) {
+      console.warn('[Intro] 3D viewer init failed:', e.message)
+    }
   }
-  
-  const detectedName = langNames[browserLang] || 'English'
-  console.log('[Intro] Detected language:', browserLang, '(', detectedName, ')');
-  
-  const langDisplay = $id('detected-lang-name')
-  if (langDisplay) langDisplay.textContent = detectedName
 
-  const btnConfirm = $id('btn-intro-confirm-lang')
-  const btnChange = $id('btn-intro-change-lang')
+  // ── Phase 1: Language ─────────────────────────────────────
+  // Start with Language Phase first
+  setupLangPhase()
 
-  if (btnConfirm) {
-    btnConfirm.addEventListener('click', () => {
-      console.log('[Intro] Language confirmed');
-      switchPhase2()
+  function setupLangPhase() {
+    const langPhase = $id('intro-lang-phase')
+    langPhase.classList.remove('hidden')
+
+    const browserLang = (navigator.language || 'en').split('-')[0].toLowerCase()
+    const langNames = {
+      'hu':'Magyar','en':'English','de':'Deutsch','fr':'Français','es':'Español',
+      'it':'Italiano','pt':'Português','ru':'Русский','nl':'Nederlands',
+      'pl':'Polski','tr':'Türkçe','zh':'中文','uk':'Українська','ro':'Română'
+    }
+    const detectedName = langNames[browserLang] || 'English'
+    console.log('[Intro] Detected language:', browserLang, '(', detectedName, ')');
+    const langDisplay = $id('detected-lang-name')
+    if (langDisplay) langDisplay.textContent = detectedName
+
+    const btnConfirm = $id('btn-intro-confirm-lang')
+    const btnChange  = $id('btn-intro-change-lang')
+
+    // Using onclick to avoid multiple event listeners if called multiple times
+    if (btnConfirm) {
+      btnConfirm.onclick = () => {
+        console.log('[Intro] Language confirmed');
+        langPhase.classList.add('hidden')
+        startCinematicPhase()
+      }
+    }
+    if (btnChange) {
+      btnChange.onclick = () => {
+        $id('lang-btn-launcher')?.click()
+      }
+    }
+  }
+
+  // ── Phase 2: Cinematic walk-in ────────────────────────────
+  const cinematicPhase = $id('intro-cinematic-phase')
+  const cinematicText  = $id('intro-cinematic-text')
+  const skipBtn        = $id('btn-cinematic-skip')
+  let cinematicDone = false
+  let skipCinematic = false
+
+  function typeWriter(el, text, speed = 36) {
+    return new Promise(resolve => {
+      el.textContent = ''
+      let i = 0
+      const iv = setInterval(() => {
+        if (skipCinematic || i >= text.length) {
+          clearInterval(iv); el.textContent = text; resolve(); return
+        }
+        el.textContent += text[i++]
+      }, speed)
     })
   }
 
-  if (btnChange) {
-    btnChange.addEventListener('click', () => {
-      console.log('[Intro] Opening language selector');
-      const langBtn = $id('lang-btn-launcher')
-      if (langBtn) langBtn.click()
-    })
+  function getLine(key, fallback) {
+    const v = t(key); return (v && v !== key) ? v : fallback
   }
 
+  function startCinematicPhase() {
+    cinematicPhase.classList.remove('hidden')
+    if (profContainer) profContainer.classList.remove('hidden')
+    runCinematic()
+  }
+
+  async function runCinematic() {
+    await sleep(500) // Small delay before talking starts
+    if (skipCinematic) return
+
+    await typeWriter(cinematicText, getLine('intro.cinematic_1', 'Hello there! Welcome to the world of Pokémon!'))
+    await sleep(900); if (skipCinematic) return
+
+    await typeWriter(cinematicText, getLine('intro.cinematic_2', 'My name is Prof. Oak – people call me the Pokémon Prof!'))
+    await sleep(700); if (skipCinematic) return
+
+    // Professor throws pose
+    if (professorViewer) {
+      professorViewer.animation = new skinview3d.FlyingAnimation()
+      professorViewer.animation.speed = 0.3
+    }
+
+    // Show & animate the Pokéball
+    const pokeball = $id('intro-pokeball')
+    if (pokeball) {
+      pokeball.classList.remove('hidden')
+      await sleep(80)
+      pokeball.classList.add('throwing')
+      await sleep(900)
+      pokeball.classList.add('hidden')
+      pokeball.classList.remove('throwing')
+    }
+
+    // Flash
+    overlay.style.transition = 'background 0.08s'
+    overlay.style.background = 'radial-gradient(ellipse at center, #e8ffe8 0%, #b0f0b8 40%, #0d2211 100%)'
+    await sleep(120)
+    overlay.style.background = ''
+    overlay.style.transition = ''
+
+    // Wild Pokémon appears
+    const reveals = ['charizard','bulbasaur','squirtle','pikachu','mewtwo','gengar','rayquaza']
+    const revealPoke = reveals[Math.floor(Math.random() * reveals.length)]
+    const wildEl  = $id('intro-wild-pokemon')
+    const wildImg = $id('intro-wild-pokemon-img')
+    if (wildEl && wildImg) {
+      wildImg.src = `https://play.pokemonshowdown.com/sprites/xyani/${revealPoke}.gif`
+      wildEl.classList.remove('hidden')
+    }
+    if (professorViewer) {
+      professorViewer.animation = new skinview3d.WalkingAnimation()
+      professorViewer.animation.speed = 0.6
+    }
+
+    await sleep(400); if (skipCinematic) return
+    await typeWriter(cinematicText, getLine('intro.cinematic_3', 'This world is inhabited by creatures called Pokémon!'))
+    await sleep(900); if (skipCinematic) return
+    await typeWriter(cinematicText, getLine('intro.cinematic_4', 'I study these fascinating creatures as my profession.'))
+    await sleep(1000)
+    endCinematic()
+  }
+
+  function endCinematic() {
+    if (cinematicDone) return
+    cinematicDone = true; skipCinematic = true
+    $id('intro-wild-pokemon')?.classList.add('hidden')
+    cinematicPhase.classList.add('hidden')
+    switchPhase2()
+  }
+
+  skipBtn?.addEventListener('click', endCinematic)
+  cinematicPhase?.addEventListener('click', e => { if (e.target !== skipBtn) endCinematic() })
+
+  // ── Phase 3: The World Pitch ──────────────────────────────
   function switchPhase2() {
     console.log('[Intro] Switching to Phase 2 (The World)');
-    $id('intro-lang-phase').classList.add('hidden')
     $id('intro-anim-phase').classList.remove('hidden')
     const music = $id('intro-music')
-    if (music) {
-      music.volume = 0.4
-      music.play().catch(err => console.warn('[Intro] Music autoplay blocked:', err))
-    }
+    if (music) { music.volume = 0.4; music.play().catch(() => {}) }
     runIntroAnimation()
   }
 
   async function runIntroAnimation() {
-    const pkmns = ['pikachu', 'charizard', 'rayquaza', 'greninja', 'lucario', 'gengar', 'mewtwo', 'arceus']
+    const pkmns = ['pikachu','charizard','rayquaza','greninja','lucario','gengar','mewtwo','arceus']
     const container = $id('intro-pokemon-floaters')
     const spawnPkmn = () => {
       if ($id('intro-overlay').classList.contains('hidden')) return
@@ -76,25 +219,22 @@ async function startIntro() {
     }
     spawnPkmn()
 
-    // Pitch Sequence
     let currentPitch = 1
     const totalPitches = 3
-    
     const btnNext = $id('btn-next-pitch')
     if (btnNext) {
-      btnNext.addEventListener('click', () => {
+      // Avoid multiple event listeners
+      btnNext.onclick = () => {
         if (currentPitch < totalPitches) {
           console.log('[Intro] Next pitch:', currentPitch + 1);
           $id(`pitch-${currentPitch}`).classList.remove('active')
           currentPitch++
           $id(`pitch-${currentPitch}`).classList.add('active')
-          if (currentPitch === totalPitches) {
-            btnNext.textContent = t('intro.start_btn')
-          }
+          if (currentPitch === totalPitches) btnNext.textContent = t('intro.start_btn')
         } else {
           showChoicePhase()
         }
-      })
+      }
     }
   }
 
@@ -102,28 +242,21 @@ async function startIntro() {
     console.log('[Intro] Switching to Choice Phase');
     $id('intro-anim-phase').classList.add('hidden')
     $id('intro-choice-phase').classList.remove('hidden')
-    
-    $id('btn-choice-new').addEventListener('click', () => {
-      console.log('[Intro] Choice: New Trainer');
+    $id('btn-choice-new').onclick = () => {
       endIntro()
-      const tabAcc = $id('tab-account')
-      const linkReg = $id('link-to-register')
-      if (tabAcc) tabAcc.click()
-      if (linkReg) linkReg.click()
-    })
-    
-    $id('btn-choice-returning').addEventListener('click', () => {
-      console.log('[Intro] Choice: Returning Master');
+      $id('tab-account')?.click()
+      $id('link-to-register')?.click()
+    }
+    $id('btn-choice-returning').onclick = () => {
       endIntro()
-      const tabAcc = $id('tab-account')
-      const linkLog = $id('link-to-login')
-      if (tabAcc) tabAcc.click()
-      if (linkLog) linkLog.click()
-    })
+      $id('tab-account')?.click()
+      $id('link-to-login')?.click()
+    }
   }
 
   function endIntro() {
     $id('intro-music').pause()
+    if (professorViewer) { try { professorViewer.dispose() } catch(_) {} }
     overlay.classList.add('hidden')
     showScreen('welcome')
   }
@@ -138,7 +271,10 @@ async function loadLanguage() {
     if (saved) {
       currentLang = saved
     } else {
-      const locale = await window.cobble.getLocale()
+      let locale = 'en'
+      if (window.cobble) {
+        locale = await window.cobble.getLocale()
+      }
       const langCode = locale.split(/[-_]/)[0].toLowerCase()
       const available = ['hu', 'en', 'de', 'fr', 'es', 'it', 'pt', 'nl', 'ru', 'ja', 'ko', 'zh', 'pl', 'tr', 'ro', 'sv', 'da', 'no', 'fi', 'cs', 'uk']
       currentLang = available.includes(langCode) ? langCode : 'en'
@@ -258,8 +394,8 @@ function showToast(msg) {
 }
 
 // ── Window controls ───────────────────────────────────────────
-$id('btn-minimize').addEventListener('click', () => window.cobble.minimize())
-$id('btn-close').addEventListener('click', () => window.cobble.close())
+$id('btn-minimize').addEventListener('click', () => { if(window.cobble) window.cobble.minimize() })
+$id('btn-close').addEventListener('click', () => { if(window.cobble) window.cobble.close() })
 
 // ── RAM selector ──────────────────────────────────────────────
 document.querySelectorAll('.ram-btn').forEach(btn => {
@@ -315,7 +451,8 @@ const stepMap = {
 
 let overallPercent = 0
 
-window.cobble.onProgress(({ step, percent, message }) => {
+if (window.cobble) {
+  window.cobble.onProgress(({ step, percent, message }) => {
   // Update message and percent display
   $id('progress-msg').textContent = message || ''
   $id('progress-pct').textContent = `${percent}%`
@@ -359,7 +496,8 @@ window.cobble.onProgress(({ step, percent, message }) => {
   if (step === 'done') {
     setTimeout(goToHome, 800)
   }
-})
+  })
+}
 
 async function startInstall() {
   // Reset steps
@@ -649,18 +787,20 @@ $id('btn-play').addEventListener('click', async () => {
   }
 })
 
-window.cobble.onGameLog((data) => {
-  const log = $id('console-log')
-  log.textContent += data + '\n'
-  log.scrollTop = log.scrollHeight
-})
+if (window.cobble) {
+  window.cobble.onGameLog((data) => {
+    const log = $id('console-log')
+    log.textContent += data + '\n'
+    log.scrollTop = log.scrollHeight
+  })
 
-window.cobble.onGameClosed(() => {
-  isGameRunning = false
-  const btn = $id('btn-play')
-  btn.disabled = false
-  btn.querySelector('span:last-child').textContent = 'JÁTÉK INDÍTÁSA'
-})
+  window.cobble.onGameClosed(() => {
+    isGameRunning = false
+    const btn = $id('btn-play')
+    btn.disabled = false
+    btn.querySelector('span:last-child').textContent = 'JÁTÉK INDÍTÁSA'
+  })
+}
 
 // ── Console toggle ────────────────────────────────────────────
 $id('btn-console-toggle').addEventListener('click', () => {
@@ -817,13 +957,13 @@ $id('btn-hub-claim-reward').addEventListener('click', async () => {
 
 // ── External links ────────────────────────────────────────────
 $id('link-modrinth').addEventListener('click', () => {
-  window.cobble.openExternal('https://modrinth.com/modpack/cobbleverse')
+  if (window.cobble) window.cobble.openExternal('https://modrinth.com/modpack/cobbleverse')
 })
 $id('link-discord').addEventListener('click', () => {
-  window.cobble.openExternal('https://discord.lumy.fun')
+  if (window.cobble) window.cobble.openExternal('https://discord.lumy.fun')
 })
 $id('link-folder').addEventListener('click', () => {
-  window.cobble.openGameFolder()
+  if (window.cobble) window.cobble.openGameFolder()
 })
 
 // ── Auth Tab Logic ──────────────────────────────────────────
@@ -944,94 +1084,8 @@ $id('btn-add-profile').addEventListener('click', () => {
   selectProfile(name)
 })
 
-// ── Account / Auth Logic ────────────────────────────────────
+// ── Account / Auth Legacy Logic (kept for compatibility) ────────
 let authMode = 'guest' // 'guest' or 'account'
-
-$id('tab-guest').addEventListener('click', () => {
-  authMode = 'guest'
-  $id('tab-guest').classList.add('active')
-  $id('tab-account').classList.remove('active')
-  $id('group-username').style.display = 'block'
-  $id('group-password').style.display = 'none'
-  $id('auth-hint').textContent = t('welcome.offline_hint')
-})
-
-$id('tab-account').addEventListener('click', () => {
-  authMode = 'account'
-  $id('tab-account').classList.add('active')
-  $id('tab-guest').classList.remove('active')
-  $id('group-username').style.display = 'block'
-  $id('group-password').style.display = 'block'
-  $id('auth-hint').textContent = t('welcome.online_hint')
-})
-
-$id('btn-register').addEventListener('click', async () => {
-  const name = $id('input-username').value.trim()
-  const password = $id('input-password').value.trim()
-  const serverUrl = $id('input-server-url').value.trim()
-
-  if (!name || !password) {
-    showToast('❌ ' + t('toast.fill_all_fields'))
-    return
-  }
-
-  try {
-    const res = await fetch(`${serverUrl.replace(/\/+$/, '')}/api/auth/register`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ username: name, password })
-    })
-    const data = await res.json()
-    if (res.ok) {
-      showToast('✅ ' + data.message)
-    } else {
-      showToast('❌ ' + (data.error || 'Hiba a regisztráció során.'))
-    }
-  } catch (e) {
-    showToast('❌ ' + e.message)
-  }
-})
-
-$id('btn-login').addEventListener('click', async () => {
-  const name = $id('input-username').value.trim()
-  const password = $id('input-password').value.trim()
-  const serverUrl = $id('input-server-url').value.trim()
-
-  if (!name || !password) {
-    showToast('❌ ' + t('toast.fill_all_fields'))
-    return
-  }
-
-  try {
-    const res = await fetch(`${serverUrl.replace(/\/+$/, '')}/api/auth/login`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ username: name, password })
-    })
-    const data = await res.json()
-    if (res.ok) {
-      showToast('✅ ' + t('toast.login_success'))
-      username = name
-      // Create or update profile with the permanent UUID from server
-      let p = getProfile(name)
-      if (!p) {
-        p = { name, skinUrl: null, profileId: crypto.randomUUID(), uuid: data.uuid }
-        profiles.push(p)
-      } else {
-        p.uuid = data.uuid // Update existing profile with server UUID
-      }
-      saveProfiles()
-      renderProfiles()
-      
-      // Auto start installation/launch
-      $id('btn-install').click()
-    } else {
-      showToast('❌ ' + (data.error || 'Hibás belépési adatok.'))
-    }
-  } catch (e) {
-    showToast('❌ ' + e.message)
-  }
-})
 
 // ── Particle Animation ─────────────────────────────────────────
 const canvas = document.getElementById('particles-canvas')
@@ -1102,16 +1156,15 @@ animateParticles()
     if (needsSave) saveProfiles()
     renderProfiles()
 
-    // DEBUG: Force intro
-    console.log('[Intro] Force starting intro...');
-    startIntro();
-    
-    // if (profiles.length === 0) {
-    //   startIntro()
-    // } else {
-    //   showScreen('welcome')
-    // }
+    if (profiles.length === 0) {
+      console.log('[Intro] No profiles found, starting intro...');
+      startIntro();
+    } else {
+      console.log('[Intro] Profiles found, skipping intro...');
+      showScreen('welcome')
+    }
   } catch(e) {
+    console.error('[Init] Error:', e)
     showScreen('welcome')
   }
 
@@ -1127,11 +1180,11 @@ animateParticles()
     const savedUrl = localStorage.getItem('cobble_server_url')
     if (savedUrl) {
       $id('input-server-url').value = savedUrl
-      window.cobble.setUpdateServerUrl(savedUrl)
+      if (window.cobble) window.cobble.setUpdateServerUrl(savedUrl)
     } else {
       const defaultUrl = 'http://94.72.100.43:8080'
       $id('input-server-url').value = defaultUrl
-      window.cobble.setUpdateServerUrl(defaultUrl)
+      if (window.cobble) window.cobble.setUpdateServerUrl(defaultUrl)
     }
 
     const savedRam = localStorage.getItem('cobble_ram')
@@ -1174,17 +1227,15 @@ animateParticles()
   $id('input-server-url').addEventListener('input', (e) => {
     const url = e.target.value.trim()
     try { localStorage.setItem('cobble_server_url', url) } catch(e2) {}
-    if (url.startsWith('http')) {
+    if (url.startsWith('http') && window.cobble) {
       window.cobble.setUpdateServerUrl(url)
     }
   })
-  document.querySelectorAll('.ram-btn').forEach(btn => {
+  document.querySelectorAll('.ram-btn').forEach(btn =>
     btn.addEventListener('click', () => {
       try { localStorage.setItem('cobble_ram', btn.dataset.val) } catch(e) {}
     })
-  })
-
-  showScreen('welcome')
+  )
   
   // Update UI Status (Online/Offline)
   async function checkConnection() {
@@ -1252,20 +1303,14 @@ animateParticles()
   // Periodic check (every 30s)
   setInterval(checkConnection, 30000)
 
-  // Auto-launch handling from cobble:// protocol
+if (window.cobble) {
   window.cobble.onProtocolLaunch(() => {
-    console.log('Megérkezett a protocol-launch esemény!')
-    // Ha van mentett felhasználónév, próbáljunk meg automatikusan elindulni
-    if (username || $id('input-username').value.trim()) {
-      if (screens.home.classList.contains('active')) {
-        $id('btn-play').click()
-      } else if (screens.welcome.classList.contains('active')) {
-        $id('btn-install').click()
-      }
-    } else {
-      showToast(t('toast.username_required'))
-    }
+    console.log('[Protocol] Deep link detected, showing account tab')
+    showScreen('home')
+    const tabAcc = $id('tab-account')
+    if (tabAcc) tabAcc.click()
   })
+}
 })()
 
 // ── Skin Management Logic ──────────────────────────────────────
