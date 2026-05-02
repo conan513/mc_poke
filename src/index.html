@@ -42,9 +42,11 @@
     <div id="intro-cinematic-phase" class="intro-phase hidden">
       <div class="intro-cinematic-box">
         <p id="intro-cinematic-text" class="intro-cinematic-text"></p>
-        <button id="btn-cinematic-skip" class="btn-secondary intro-skip-btn" data-i18n="intro.skip">Skip</button>
+        <button id="btn-cinematic-next" class="btn-primary intro-next-btn hidden" style="margin-top: 15px; align-self: flex-end;" data-i18n="intro.next">Tovább</button>
       </div>
     </div>
+
+    <div class="intro-pokemon-container" id="intro-pokemon-floaters"></div>
 
     <!-- Phase 1: Language Check -->
     <div id="intro-lang-phase" class="intro-phase hidden">
@@ -57,48 +59,34 @@
           <button id="btn-intro-confirm-lang" class="btn-primary" data-i18n="intro.confirm_btn">Yes, let's go!</button>
           <button id="btn-intro-change-lang" class="btn-secondary" data-i18n="intro.change_btn">Change language</button>
         </div>
-        <!-- Inline language picker (shown when Change Language is clicked) -->
-        <div id="intro-lang-picker" class="intro-lang-picker hidden">
-          <button data-lang="hu">🇭🇺 Magyar</button>
-          <button data-lang="en">🇬🇧 English</button>
-          <button data-lang="de">🇩🇪 Deutsch</button>
-          <button data-lang="fr">🇫🇷 Français</button>
-          <button data-lang="es">🇪🇸 Español</button>
-          <button data-lang="it">🇮🇹 Italiano</button>
-          <button data-lang="pt">🇵🇹 Português</button>
-          <button data-lang="ru">🇷🇺 Русский</button>
-          <button data-lang="nl">🇳🇱 Nederlands</button>
-          <button data-lang="pl">🇵🇱 Polski</button>
-          <button data-lang="tr">🇹🇷 Türkçe</button>
-          <button data-lang="zh">🇨🇳 中文</button>
-          <button data-lang="uk">🇺🇦 Українська</button>
-          <button data-lang="ro">🇷🇴 Română</button>
+      </div>
+
+      <!-- Fullscreen Language Modal Overlay -->
+      <div id="intro-lang-modal-overlay" class="intro-lang-modal-overlay hidden">
+        <div class="intro-lang-modal-box">
+          <h2 style="margin-bottom: 25px; color: #1a1a1a; font-family: 'Outfit', sans-serif; text-align: center; font-size: 1.5rem;" data-i18n="intro.select_lang">Válassz nyelvet / Select Language</h2>
+          <div id="intro-lang-picker" class="intro-lang-picker-modal">
+            <button data-lang="hu">🇭🇺 Magyar</button>
+            <button data-lang="en">🇬🇧 English</button>
+            <button data-lang="de">🇩🇪 Deutsch</button>
+            <button data-lang="fr">🇫🇷 Français</button>
+            <button data-lang="es">🇪🇸 Español</button>
+            <button data-lang="it">🇮🇹 Italiano</button>
+            <button data-lang="pt">🇵🇹 Português</button>
+            <button data-lang="ru">🇷🇺 Русский</button>
+            <button data-lang="nl">🇳🇱 Nederlands</button>
+            <button data-lang="pl">🇵🇱 Polski</button>
+            <button data-lang="tr">🇹🇷 Türkçe</button>
+            <button data-lang="zh">🇨🇳 中文</button>
+            <button data-lang="uk">🇺🇦 Українська</button>
+            <button data-lang="ro">🇷🇴 Română</button>
+          </div>
+          <button id="btn-close-lang-modal" class="btn-secondary" style="margin-top: 30px; width: 100%; padding: 12px;" data-i18n="btn_back">Vissza / Back</button>
         </div>
       </div>
     </div>
 
-    <!-- Phase 2: Animated Intro / Pitch (The Pokemon World) -->
-    <div id="intro-anim-phase" class="intro-phase hidden">
-      <div class="intro-content">
-        <div class="intro-pokemon-container" id="intro-pokemon-floaters"></div>
-        
-        <div id="intro-pitch-container" class="intro-pitch-container">
-          <div class="pitch-card active" id="pitch-1">
-            <p data-i18n="intro.pitch_1_desc">This world is inhabited by creatures called Pokemon! For some, Pokemon are pets. Others use them for fights.</p>
-          </div>
-          <div class="pitch-card" id="pitch-2">
-            <p data-i18n="intro.pitch_2_desc">Myself... I study Pokemon as a profession. And here, in Cobblemon Universe, adventure awaits everyone!</p>
-          </div>
-          <div class="pitch-card" id="pitch-3">
-            <p data-i18n="intro.pitch_3_desc">Are you ready to write your own story? A world of dreams and adventures with Pokemon awaits!</p>
-          </div>
 
-          <button id="btn-next-pitch" class="btn-primary" data-i18n="intro.next">Next</button>
-        </div>
-      </div>
-    </div>
-
-    <!-- Phase 3: The Choice -->
     <div id="intro-choice-phase" class="intro-phase hidden">
       <div class="intro-dialogue-box intro-choice-card">
         <p data-i18n="intro.choice_desc">Now tell me, are you a new trainer just starting out, or a returning Pokemon Master?</p>

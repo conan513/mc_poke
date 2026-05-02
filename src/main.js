@@ -53,6 +53,20 @@ function typeWriter(el, text, speed = 36) {
   })
 }
 
+function waitForDialogueClick(buttonId) {
+  return new Promise(resolve => {
+    const btn = $id(buttonId);
+    if (btn) btn.classList.remove('hidden');
+    
+    const handler = () => {
+      btn.removeEventListener('click', handler);
+      btn.classList.add('hidden');
+      resolve();
+    };
+    btn.addEventListener('click', handler, { once: true });
+  });
+}
+
 function getLine(key, fallback) {
   const v = t(key); return (v && v !== key) ? v : fallback
 }
@@ -183,13 +197,19 @@ async function startIntro() {
     }
     if (btnChange) {
       btnChange.onclick = () => {
-        // Toggle the inline language picker
-        const picker = $id('intro-lang-picker');
-        if (picker) picker.classList.toggle('hidden');
+        const modal = $id('intro-lang-modal-overlay');
+        if (modal) modal.classList.remove('hidden');
       }
     }
 
-    // Handle inline language picker buttons
+    const btnCloseModal = $id('btn-close-lang-modal');
+    if (btnCloseModal) {
+      btnCloseModal.onclick = () => {
+        $id('intro-lang-modal-overlay')?.classList.add('hidden');
+      }
+    }
+
+    // Handle language picker buttons in the modal
     const picker = $id('intro-lang-picker');
     if (picker) {
       picker.querySelectorAll('button[data-lang]').forEach(btn => {
@@ -202,7 +222,7 @@ async function startIntro() {
           };
           await loadSpecificLanguage(lang);
           if (langDisplay) langDisplay.textContent = names[lang] || lang;
-          picker.classList.add('hidden');
+          $id('intro-lang-modal-overlay')?.classList.add('hidden');
         };
       });
     }
@@ -254,10 +274,10 @@ async function startIntro() {
     if (skipCinematic) return;
 
     await typeWriter(cinematicText, getLine('intro.cinematic_1', 'Hello there! Welcome to the world of Pokémon!'))
-    await sleep(900); if (skipCinematic) return
+    await waitForDialogueClick('btn-cinematic-next');
 
     await typeWriter(cinematicText, getLine('intro.cinematic_2', 'My name is Prof. Oak – people call me the Pokémon Prof!'))
-    await sleep(700); if (skipCinematic) return
+    await waitForDialogueClick('btn-cinematic-next');
 
     // Professor throws pose
     if (professorViewer) {
@@ -301,9 +321,20 @@ async function startIntro() {
 
     await sleep(400); if (skipCinematic) return
     await typeWriter(cinematicText, getLine('intro.cinematic_3', 'This world is inhabited by creatures called Pokémon!'))
-    await sleep(900); if (skipCinematic) return
-    await typeWriter(cinematicText, getLine('intro.cinematic_4', 'I study these fascinating creatures as my profession.'))
-    await sleep(1000)
+    await waitForDialogueClick('btn-cinematic-next');
+
+    // Start floating Pokémon animation while he continues talking
+    runIntroAnimation();
+
+    await typeWriter(cinematicText, getLine('intro.pitch_1_desc', 'For some, Pokémon are pets. Others use them for fights.'))
+    await waitForDialogueClick('btn-cinematic-next');
+
+    await typeWriter(cinematicText, getLine('intro.cinematic_4', 'Myself... I study these fascinating creatures as my profession.'))
+    await waitForDialogueClick('btn-cinematic-next');
+
+    await typeWriter(cinematicText, getLine('intro.pitch_3_desc', 'Are you ready to write your own story? A world of dreams and adventures awaits!'))
+    await waitForDialogueClick('btn-cinematic-next');
+
     endCinematic()
   }
 
@@ -311,22 +342,117 @@ async function startIntro() {
     if (cinematicDone) return
     cinematicDone = true; skipCinematic = true
     cinematicPhase.classList.add('hidden')
-    switchPhase2()
+    showChoicePhase()
   }
 
-  skipBtn?.addEventListener('click', endCinematic)
-  cinematicPhase?.addEventListener('click', e => { if (e.target !== skipBtn) endCinematic() })
-
-  // ── Phase 3: The World Pitch ──────────────────────────────
-  function switchPhase2() {
-    console.log('[Intro] Switching to Phase 2 (The World)');
-    $id('intro-anim-phase').classList.remove('hidden')
-    runIntroAnimation()
-  }
-
-  async function runIntroAnimation() {
-    const pkmns = ['pikachu','charizard','rayquaza','greninja','lucario','gengar','mewtwo','arceus']
+  function runIntroAnimation() {
+    const pkmns = [
+      "bulbasaur", "ivysaur", "venusaur", "charmander", "charmeleon", "charizard", "squirtle", "wartortle", "blastoise", "caterpie",
+      "metapod", "butterfree", "weedle", "kakuna", "beedrill", "pidgey", "pidgeotto", "pidgeot", "rattata", "raticate",
+      "spearow", "fearow", "ekans", "arbok", "pikachu", "raichu", "sandshrew", "sandslash", "nidoranf", "nidorina",
+      "nidoqueen", "nidoranm", "nidorino", "nidoking", "clefairy", "clefable", "vulpix", "ninetales", "jigglypuff", "wigglytuff",
+      "zubat", "golbat", "oddish", "gloom", "vileplume", "paras", "parasect", "venonat", "venomoth", "diglett",
+      "dugtrio", "meowth", "persian", "psyduck", "golduck", "mankey", "primeape", "growlithe", "arcanine", "poliwag",
+      "poliwhirl", "poliwrath", "abra", "kadabra", "alakazam", "machop", "machoke", "machamp", "bellsprout", "weepinbell",
+      "victreebel", "tentacool", "tentacruel", "geodude", "graveler", "golem", "ponyta", "rapidash", "slowpoke", "slowbro",
+      "magnemite", "magneton", "farfetchd", "doduo", "dodrio", "seel", "dewgong", "grimer", "muk", "shellder",
+      "cloyster", "gastly", "haunter", "gengar", "onix", "drowzee", "hypno", "krabby", "kingler", "voltorb",
+      "electrode", "exeggcute", "exeggutor", "cubone", "marowak", "hitmonlee", "hitmonchan", "lickitung", "koffing", "weezing",
+      "rhyhorn", "rhydon", "chansey", "tangela", "kangaskhan", "horsea", "seadra", "goldeen", "seaking", "staryu",
+      "starmie", "mrmime", "scyther", "jynx", "electabuzz", "magmar", "pinsir", "tauros", "magikarp", "gyarados",
+      "lapras", "ditto", "eevee", "vaporeon", "jolteon", "flareon", "porygon", "omanyte", "omastar", "kabuto",
+      "kabutops", "aerodactyl", "snorlax", "articuno", "zapdos", "moltres", "dratini", "dragonair", "dragonite", "mewtwo",
+      "mew", "chikorita", "bayleef", "meganium", "cyndaquil", "quilava", "typhlosion", "totodile", "croconaw", "feraligatr",
+      "sentret", "furret", "hoothoot", "noctowl", "ledyba", "ledian", "spinarak", "ariados", "crobat", "chinchou",
+      "lanturn", "pichu", "cleffa", "igglybuff", "togepi", "togetic", "natu", "xatu", "mareep", "flaaffy",
+      "ampharos", "bellossom", "marill", "azumarill", "sudowoodo", "politoed", "hoppip", "skiploom", "jumpluff", "aipom",
+      "sunkern", "sunflora", "yanma", "wooper", "quagsire", "espeon", "umbreon", "murkrow", "slowking", "misdreavus",
+      "unown", "wobbuffet", "girafarig", "pineco", "forretress", "dunsparce", "gligar", "steelix", "snubbull", "granbull",
+      "qwilfish", "scizor", "shuckle", "heracross", "sneasel", "teddiursa", "ursaring", "slugma", "magcargo", "swinub",
+      "piloswine", "corsola", "remoraid", "octillery", "delibird", "mantine", "skarmory", "houndour", "houndoom", "kingdra",
+      "phanpy", "donphan", "porygon2", "stantler", "smeargle", "tyrogue", "hitmontop", "smoochum", "elekid", "magby",
+      "miltank", "blissey", "raikou", "entei", "suicune", "larvitar", "pupitar", "tyranitar", "lugia", "hooh",
+      "celebi", "treecko", "grovyle", "sceptile", "torchic", "combusken", "blaziken", "mudkip", "marshtomp", "swampert",
+      "poochyena", "mightyena", "zigzagoon", "linoone", "wurmple", "silcoon", "beautifly", "cascoon", "dustox", "lotad",
+      "lombre", "ludicolo", "seedot", "nuzleaf", "shiftry", "taillow", "swellow", "wingull", "pelipper", "ralts",
+      "kirlia", "gardevoir", "surskit", "masquerain", "shroomish", "breloom", "slakoth", "vigoroth", "slaking", "nincada",
+      "ninjask", "shedinja", "whismur", "loudred", "exploud", "makuhita", "hariyama", "azurill", "nosepass", "skitty",
+      "delcatty", "sableye", "mawile", "aron", "lairon", "aggron", "meditite", "medicham", "electrike", "manectric",
+      "plusle", "minun", "volbeat", "illumise", "roselia", "gulpin", "swalot", "carvanha", "sharpedo", "wailmer",
+      "wailord", "numel", "camerupt", "torkoal", "spoink", "grumpig", "spinda", "trapinch", "vibrava", "flygon",
+      "cacnea", "cacturne", "swablu", "altaria", "zangoose", "seviper", "lunatone", "solrock", "barboach", "whiscash",
+      "corphish", "crawdaunt", "baltoy", "claydol", "lileep", "cradily", "anorith", "armaldo", "feebas", "milotic",
+      "castform", "kecleon", "shuppet", "banette", "duskull", "dusclops", "tropius", "chimecho", "absol", "wynaut",
+      "snorunt", "glalie", "spheal", "sealeo", "walrein", "clamperl", "huntail", "gorebyss", "relicanth", "luvdisc",
+      "bagon", "shelgon", "salamence", "beldum", "metang", "metagross", "regirock", "regice", "registeel", "latias",
+      "latios", "kyogre", "groudon", "rayquaza", "jirachi", "deoxys", "turtwig", "grotle", "torterra", "chimchar",
+      "monferno", "infernape", "piplup", "prinplup", "empoleon", "starly", "staravia", "staraptor", "bidoof", "bibarel",
+      "kricketot", "kricketune", "shinx", "luxio", "luxray", "budew", "roserade", "cranidos", "rampardos", "shieldon",
+      "bastiodon", "burmy", "wormadam", "mothim", "combee", "vespiquen", "pachirisu", "buizel", "floatzel", "cherubi",
+      "cherrim", "shellos", "gastrodon", "ambipom", "drifloon", "drifblim", "buneary", "lopunny", "mismagius", "honchkrow",
+      "glameow", "purugly", "chingling", "stunky", "skuntank", "bronzor", "bronzong", "bonsly", "mimejr", "happiny",
+      "chatot", "spiritomb", "gible", "gabite", "garchomp", "munchlax", "riolu", "lucario", "hippopotas", "hippowdon",
+      "skorupi", "drapion", "croagunk", "toxicroak", "carnivine", "finneon", "lumineon", "mantyke", "snover", "abomasnow",
+      "weavile", "magnezone", "lickilicky", "rhyperior", "tangrowth", "electivire", "magmortar", "togekiss", "yanmega", "leafeon",
+      "glaceon", "gliscor", "mamoswine", "porygonz", "gallade", "probopass", "dusknoir", "froslass", "rotom", "uxie",
+      "mesprit", "azelf", "dialga", "palkia", "heatran", "regigigas", "giratina", "cresselia", "phione", "manaphy",
+      "darkrai", "shaymin", "arceus", "victini", "snivy", "servine", "serperior", "tepig", "pignite", "emboar",
+      "oshawott", "dewott", "samurott", "patrat", "watchog", "lillipup", "herdier", "stoutland", "purrloin", "liepard",
+      "pansage", "simisage", "pansear", "simisear", "panpour", "simipour", "munna", "musharna", "pidove", "tranquill",
+      "unfezant", "blitzle", "zebstrika", "roggenrola", "boldore", "gigalith", "woobat", "swoobat", "drilbur", "excadrill",
+      "audino", "timburr", "gurdurr", "conkeldurr", "tympole", "palpitoad", "seismitoad", "throh", "sawk", "sewaddle",
+      "swadloon", "leavanny", "venipede", "whirlipede", "scolipede", "cottonee", "whimsicott", "petilil", "lilligant", "basculin",
+      "sandile", "krokorok", "krookodile", "darumaka", "darmanitan", "maractus", "dwebble", "crustle", "scraggy", "scrafty",
+      "sigilyph", "yamask", "cofagrigus", "tirtouga", "carracosta", "archen", "archeops", "trubbish", "garbodor", "zorua",
+      "zoroark", "minccino", "cinccino", "gothita", "gothorita", "gothitelle", "solosis", "duosion", "reuniclus", "ducklett",
+      "swanna", "vanillite", "vanillish", "vanilluxe", "deerling", "sawsbuck", "emolga", "karrablast", "escavalier", "foongus",
+      "amoonguss", "frillish", "jellicent", "alomomola", "joltik", "galvantula", "ferroseed", "ferrothorn", "klink", "klang",
+      "klinklang", "tynamo", "eelektrik", "eelektross", "elgyem", "beheeyem", "litwick", "lampent", "chandelure", "axew",
+      "fraxure", "haxorus", "cubchoo", "beartic", "cryogonal", "shelmet", "accelgor", "stunfisk", "mienfoo", "mienshao",
+      "druddigon", "golett", "golurk", "pawniard", "bisharp", "bouffalant", "rufflet", "braviary", "vullaby", "mandibuzz",
+      "heatmor", "durant", "deino", "zweilous", "hydreigon", "larvesta", "volcarona", "cobalion", "terrakion", "virizion",
+      "tornadus", "thundurus", "reshiram", "zekrom", "landorus", "kyurem", "keldeo", "meloetta", "genesect", "chespin",
+      "quilladin", "chesnaught", "fennekin", "braixen", "delphox", "froakie", "frogadier", "greninja", "bunnelby", "diggersby",
+      "fletchling", "fletchinder", "talonflame", "scatterbug", "spewpa", "vivillon", "litleo", "pyroar", "flabebe", "floette",
+      "florges", "skiddo", "gogoat", "pancham", "pangoro", "furfrou", "espurr", "meowstic", "honedge", "doublade",
+      "aegislash", "spritzee", "aromatisse", "swirlix", "slurpuff", "inkay", "malamar", "binacle", "barbaracle", "skrelp",
+      "dragalge", "clauncher", "clawitzer", "helioptile", "heliolisk", "tyrunt", "tyrantrum", "amaura", "aurorus", "sylveon",
+      "hawlucha", "dedenne", "carbink", "goomy", "sliggoo", "goodra", "klefki", "phantump", "trevenant", "pumpkaboo",
+      "gourgeist", "bergmite", "avalugg", "noibat", "noivern", "xerneas", "yveltal", "zygarde", "diancie", "hoopa",
+      "volcanion", "rowlet", "dartrix", "decidueye", "litten", "torracat", "incineroar", "popplio", "brionne", "primarina",
+      "pikipek", "trumbeak", "toucannon", "yungoos", "gumshoos", "grubbin", "charjabug", "vikavolt", "crabrawler", "crabominable",
+      "oricorio", "cutiefly", "ribombee", "rockruff", "lycanroc", "wishiwashi", "mareanie", "toxapex", "mudbray", "mudsdale",
+      "dewpider", "araquanid", "fomantis", "lurantis", "morelull", "shiinotic", "salandit", "salazzle", "stufful", "bewear",
+      "bounsweet", "steenee", "tsareena", "comfey", "oranguru", "passimian", "wimpod", "golisopod", "sandygast", "palossand",
+      "pyukumuku", "typenull", "silvally", "minior", "komala", "turtonator", "togedemaru", "mimikyu", "bruxish", "drampa",
+      "dhelmise", "jangmoo", "hakamoo", "kommoo", "tapukoko", "tapulele", "tapubulu", "tapufini", "cosmog", "cosmoem",
+      "solgaleo", "lunala", "nihilego", "buzzwole", "pheromosa", "xurkitree", "celesteela", "kartana", "guzzlord", "necrozma",
+      "magearna", "marshadow", "poipole", "naganadel", "stakataka", "blacephalon", "zeraora", "meltan", "melmetal", "grookey",
+      "thwackey", "rillaboom", "scorbunny", "raboot", "cinderace", "sobble", "drizzile", "inteleon", "skwovet", "greedent",
+      "rookidee", "corvisquire", "corviknight", "blipbug", "dottler", "orbeetle", "nickit", "thievul", "gossifleur", "eldegoss",
+      "wooloo", "dubwool", "chewtle", "drednaw", "yamper", "boltund", "rolycoly", "carkol", "coalossal", "applin",
+      "flapple", "appletun", "silicobra", "sandaconda", "cramorant", "arrokuda", "barraskewda", "toxel", "toxtricity", "sizzlipede",
+      "centiskorch", "clobbopus", "grapploct", "sinistea", "polteageist", "hatenna", "hattrem", "hatterene", "impidimp", "morgrem",
+      "grimmsnarl", "obstagoon", "perrserker", "cursola", "sirfetchd", "mrrime", "runerigus", "milcery", "alcremie", "falinks",
+      "pincurchin", "snom", "frosmoth", "stonjourner", "eiscue", "indeedee", "morpeko", "cufant", "copperajah", "dracozolt",
+      "arctozolt", "dracovish", "arctovish", "duraludon", "dreepy", "drakloak", "dragapult", "zacian", "zamazenta", "eternatus",
+      "kubfu", "urshifu", "zarude", "regieleki", "regidrago", "glastrier", "spectrier", "calyrex", "wyrdeer", "kleavor",
+      "ursaluna", "basculegion", "sneasler", "overqwil", "enamorus", "sprigatito", "floragato", "meowscarada", "fuecoco", "crocalor",
+      "skeledirge", "quaxly", "quaxwell", "quaquaval", "lechonk", "oinkologne", "tarountula", "spidops", "nymble", "lokix",
+      "pawmi", "pawmo", "pawmot", "tandemaus", "maushold", "fidough", "dachsbun", "smoliv", "dolliv", "arboliva",
+      "squawkabilly", "nacli", "naclstack", "garganacl", "charcadet", "armarouge", "ceruledge", "tadbulb", "bellibolt", "wattrel",
+      "kilowattrel", "maschiff", "mabosstiff", "shroodle", "grafaiai", "bramblin", "brambleghast", "toedscool", "toedscruel", "klawf",
+      "capsakid", "scovillain", "rellor", "rabsca", "flittle", "espathra", "tinkatink", "tinkatuff", "tinkaton", "wiglett",
+      "wugtrio", "bombirdier", "finizen", "palafin", "varoom", "revavroom", "cyclizar", "orthworm", "glimmet", "glimmora",
+      "greavard", "houndstone", "flamigo", "cetoddle", "cetitan", "veluza", "dondozo", "tatsugiri", "annihilape", "clodsire",
+      "farigiraf", "dudunsparce", "kingambit", "greattusk", "screamtail", "brutebonnet", "fluttermane", "slitherwing", "sandyshocks",
+      "irontreads", "ironbundle", "ironhands", "ironjugulis", "ironmoth", "ironthorns", "frigibax", "arctibax", "baxcalibur", "gimmighoul",
+      "gholdengo", "wochien", "chienpao", "tinglu", "chiyu", "roaringmoon", "ironvaliant", "koraidon", "miraidon", "walkingwake",
+      "ironleaves", "dipplin", "poltchageist", "sinistcha", "okidogi", "munkidori", "fezandipiti", "ogerpon", "archaludon", "hydrapple",
+      "gougingfire", "ragingbolt", "ironboulder", "ironcrown", "terapagos", "pecharunt"
+    ];
     const container = $id('intro-pokemon-floaters')
+    if (!container) return;
     const spawnPkmn = () => {
       if ($id('intro-overlay').classList.contains('hidden')) return
       const p = pkmns[Math.floor(Math.random() * pkmns.length)]
@@ -335,34 +461,20 @@ async function startIntro() {
       img.className = 'floating-pkmn'
       img.style.top = Math.random() * 80 + 'vh'
       img.style.animationDuration = (Math.random() * 5 + 10) + 's'
+      
+      // Cleanup broken images if showdown is missing a GIF
+      img.onerror = () => img.remove();
+      
       container.appendChild(img)
       setTimeout(() => img.remove(), 15000)
       setTimeout(spawnPkmn, Math.random() * 2000 + 1000)
     }
     spawnPkmn()
-
-    let currentPitch = 1
-    const totalPitches = 3
-    const btnNext = $id('btn-next-pitch')
-    if (btnNext) {
-      // Avoid multiple event listeners
-      btnNext.onclick = () => {
-        if (currentPitch < totalPitches) {
-          console.log('[Intro] Next pitch:', currentPitch + 1);
-          $id(`pitch-${currentPitch}`).classList.remove('active')
-          currentPitch++
-          $id(`pitch-${currentPitch}`).classList.add('active')
-          if (currentPitch === totalPitches) btnNext.textContent = t('intro.start_btn')
-        } else {
-          showChoicePhase()
-        }
-      }
-    }
   }
 
   function showChoicePhase() {
     console.log('[Intro] Switching to Choice Phase');
-    $id('intro-anim-phase').classList.add('hidden')
+    $id('intro-cinematic-phase')?.classList.add('hidden');
     $id('intro-choice-phase').classList.remove('hidden')
 
     // Expose endIntro for the global auth click handlers
