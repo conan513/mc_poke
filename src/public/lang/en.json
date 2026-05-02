@@ -173,8 +173,11 @@
     "err_user_short": "Oops! That name seems a bit short. I'll need at least 3 characters!",
     "err_user_chars": "I'm sorry, but you can only use letters, numbers, and underscores in your name!",
     "err_user_taken": "It seems that name is already taken. Could you choose something else?",
-    "err_pass_short": "That password is too weak! Please provide at least 4 characters for your security.",
+    "err_pass_short": "I'm sorry, but the password must be at least 6 characters long for your security!",
     "err_fill_all": "Oh, it seems something was left out. Please fill in all the fields!",
-    "err_pass_mismatch": "Hmm, the two passwords don't match. Be careful with your typing!"
+    "err_pass_mismatch": "Hmm, the two passwords don't match. Be careful with your typing!",
+    "connecting": "One moment, let me check with the headquarters...",
+    "err_invalid_credentials": "Incorrect username or password! Are you sure you typed it right? Try again!",
+    "err_timeout": "The server did not respond in time. Please try again in a few seconds!"
   }
 }

@@ -26,6 +26,24 @@ let isGameRunning = false
 let currentLang = 'en'
 let translations = {}
 let isOnlineUI = true
+let skipCinematic = false
+
+function typeWriter(el, text, speed = 36) {
+  return new Promise(resolve => {
+    el.textContent = ''
+    let i = 0
+    const iv = setInterval(() => {
+      if (skipCinematic || i >= text.length) {
+        clearInterval(iv); el.textContent = text; resolve(); return
+      }
+      el.textContent += text[i++]
+    }, speed)
+  })
+}
+
+function getLine(key, fallback) {
+  const v = t(key); return (v && v !== key) ? v : fallback
+}
 
 // ── Intro Logic ──────────────────────────────────────────────
 async function startIntro() {
@@ -148,28 +166,11 @@ async function startIntro() {
   }
 
   // ── Phase 2: Cinematic walk-in ────────────────────────────
+  let cinematicDone = false // reset on every startIntro() call
   const cinematicPhase = $id('intro-cinematic-phase')
   const cinematicText  = $id('intro-cinematic-text')
   const skipBtn        = $id('btn-cinematic-skip')
-  let cinematicDone = false
-  let skipCinematic = false
 
-  function typeWriter(el, text, speed = 36) {
-    return new Promise(resolve => {
-      el.textContent = ''
-      let i = 0
-      const iv = setInterval(() => {
-        if (skipCinematic || i >= text.length) {
-          clearInterval(iv); el.textContent = text; resolve(); return
-        }
-        el.textContent += text[i++]
-      }, speed)
-    })
-  }
-
-  function getLine(key, fallback) {
-    const v = t(key); return (v && v !== key) ? v : fallback
-  }
 
   function startCinematicPhase() {
     cinematicPhase.classList.remove('hidden')
@@ -373,6 +374,15 @@ async function startIntro() {
     }
 
     window.endIntroFromAuth = runClosingCinematic;
+
+    // Expose a helper so external auth handlers can show errors in the professor dialogue
+    window.introShowError = async (msg) => {
+      const el = $id('auth-dialogue-text');
+      if (!el) return;
+      el.textContent = '';
+      skipCinematic = false;
+      await typeWriter(el, msg);
+    };
 
     $id('intro-explain-phase').onclick = () => { skipCinematic = true; }
     $id('intro-auth-phase').onclick = (e) => { 
@@ -1263,17 +1273,44 @@ $id('link-folder').addEventListener('click', () => {
 $id('btn-auth-login').addEventListener('click', async () => {
   const user = $id('auth-login-username').value.trim()
   const pass = $id('auth-login-password').value
-  if (!user || !pass) return showToast(t('toast.fill_all_fields'))
+  if (!user || !pass) {
+    const emptyMsg = t('intro.err_fill_all') || t('toast.fill_all_fields')
+    if (window.introShowError) await window.introShowError(emptyMsg)
+    else showToast(emptyMsg)
+    return
+  }
+
+  const btn = $id('btn-auth-login');
+  const originalText = btn.textContent;
+  btn.disabled = true;
+  btn.textContent = '...';
+
+  // Show connecting message in professor dialogue
+  if (window.introShowError) await window.introShowError(t('intro.connecting') || 'Egy pillanat, megkérdezem a központot...');
+
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), 10000);
 
   try {
-    const serverUrl = $id('input-server-url').value.trim()
+    const serverUrl = $id('input-server-url').value.trim() || 'http://94.72.100.43:8080'
     const res = await fetch(`${serverUrl.replace(/\/+$/, '')}/api/auth/login`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ username: user, password: pass })
+      body: JSON.stringify({ username: user, password: pass }),
+      signal: controller.signal
     })
     const data = await res.json()
-    if (!res.ok) throw new Error(data.error || 'Login failed')
+    if (!res.ok) {
+      // Show error in professor dialogue
+      const errMsg = data.error
+        ? data.error
+        : (t('intro.err_invalid_credentials') || 'Hibás felhasználónév vagy jelszó! Próbáld újra.')
+      if (window.introShowError) await window.introShowError(errMsg)
+      else showToast('❌ ' + errMsg)
+      btn.disabled = false;
+      btn.textContent = originalText;
+      return
+    }
 
     username = data.username
     const accUuid = data.uuid
@@ -1292,7 +1329,14 @@ $id('btn-auth-login').addEventListener('click', async () => {
     showToast(t('toast.login_success'))
     if (window.endIntroFromAuth) window.endIntroFromAuth()
   } catch (e) {
-    showToast('❌ ' + e.message)
+    let msg = 'Hálózati hiba! Kérlek ellenőrizd a kapcsolatod. (Hiba: ' + e.message + ')';
+    if (e.name === 'AbortError') msg = t('intro.err_timeout') || 'A szerver nem válaszolt időben. Kérlek próbáld újra!';
+    if (window.introShowError) await window.introShowError(msg)
+    else showToast('❌ ' + msg)
+    btn.disabled = false;
+    btn.textContent = originalText;
+  } finally {
+    clearTimeout(timeoutId);
   }
 })
 
@@ -1302,10 +1346,10 @@ $id('btn-auth-register').addEventListener('click', async () => {
   const pass = $id('auth-register-password').value
   const confirm = $id('auth-register-confirm').value
   
-  if (!user || !pass || !confirm) {
+  if (pass.length < 6) {
     $id('auth-dialogue-text').textContent = '';
     skipCinematic = false;
-    typeWriter($id('auth-dialogue-text'), getLine('intro.err_fill_all', 'Ó, úgy tűnik valami lemaradt. Kérlek töltsd ki az összes mezőt!'));
+    await typeWriter($id('auth-dialogue-text'), getLine('intro.err_pass_short', 'Sajnálom, de a jelszónak legalább 6 karakterből kell állnia a biztonságod érdekében!'));
     return;
   }
   if (pass !== confirm) {
@@ -1320,13 +1364,23 @@ $id('btn-auth-register').addEventListener('click', async () => {
   btn.disabled = true;
   btn.textContent = '...';
 
+  // Show "Connecting..." message
+  $id('auth-dialogue-text').textContent = '';
+  skipCinematic = false;
+  await typeWriter($id('auth-dialogue-text'), getLine('intro.connecting', 'Egy pillanat, megkérdezem a központot...'));
+
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), 10000); // 10s timeout
+
   try {
     const serverUrl = $id('input-server-url')?.value?.trim() || 'http://94.72.100.43:8080';
     console.log('[Auth] Registering at:', serverUrl);
+    
     const res = await fetch(`${serverUrl.replace(/\/+$/, '')}/api/auth/register`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ username: user, password: pass })
+      body: JSON.stringify({ username: user, password: pass }),
+      signal: controller.signal
     })
     const data = await res.json()
     if (!res.ok) {
@@ -1357,9 +1411,13 @@ $id('btn-auth-register').addEventListener('click', async () => {
     console.error('[Auth] Registration error:', e);
     $id('auth-dialogue-text').textContent = '';
     skipCinematic = false;
-    await typeWriter($id('auth-dialogue-text'), 'Hálózati hiba történt! Kérlek ellenőrizd a kapcsolatod. (Hiba: ' + e.message + ')');
+    let msg = 'Hálózati hiba történt! Kérlek ellenőrizd a kapcsolatod. (Hiba: ' + e.message + ')';
+    if (e.name === 'AbortError') msg = 'A szerver nem válaszolt időben. Kérlek próbáld újra!';
+    await typeWriter($id('auth-dialogue-text'), msg);
     btn.disabled = false;
     btn.textContent = originalText;
+  } finally {
+    clearTimeout(timeoutId);
   }
 })
 

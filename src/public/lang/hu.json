@@ -173,8 +173,11 @@
     "err_user_short": "Hoppá! Ez a név egy kicsit rövidnek tűnik. Legalább 3 karakterre szükségem lesz!",
     "err_user_chars": "Sajnálom, de csak betűket, számokat és alulvonást használhatsz a nevedben!",
     "err_user_taken": "Úgy tűnik, ez a név már foglalt. Tudnál valami mást választani?",
-    "err_pass_short": "Ez a jelszó túl gyenge! Kérlek, adj meg legalább 4 karaktert a biztonságod érdekében.",
+    "err_pass_short": "Sajnálom, de a jelszónak legalább 6 karakterből kell állnia a biztonságod érdekében!",
     "err_fill_all": "Ó, úgy tűnik valami lemaradt. Kérlek töltsd ki az összes mezőt!",
-    "err_pass_mismatch": "Hm, a két jelszó nem egyezik. Figyelj oda a gépelésnél!"
+    "err_pass_mismatch": "Hm, a két jelszó nem egyezik. Figyelj oda a gépelésnél!",
+    "connecting": "Egy pillanat, megkérdezem a központot...",
+    "err_invalid_credentials": "Hibás felhasználónév vagy jelszó! Biztos jól gépelted? Próbáld újra!",
+    "err_timeout": "A szerver nem válaszolt időben. Kérlek próbáld újra néhány másodperc múlva!"
   }
 }
