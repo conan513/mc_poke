@@ -188,6 +188,10 @@
 
         <!-- Skin Selection Step (After Auth) -->
         <div id="intro-skin-select-view" class="hidden">
+          <div style="display: flex; justify-content: center; margin-bottom: 15px; position: relative;">
+            <div class="skin-preview-glow" style="width: 160px; height: 160px; top: 20px;"></div>
+            <canvas id="intro-skin-3d-canvas" style="position: relative; z-index: 2; filter: drop-shadow(0 10px 20px rgba(0,0,0,0.5));"></canvas>
+          </div>
           <div style="display: flex; gap: 10px; margin-bottom: 15px;">
             <button id="btn-intro-skin-mojang" class="btn-secondary active" style="flex: 1; padding: 10px; font-size: 0.9em;" data-i18n="skin.type_mojang">Mojang</button>
             <button id="btn-intro-skin-url" class="btn-secondary" style="flex: 1; padding: 10px; font-size: 0.9em;" data-i18n="skin.type_url">URL</button>

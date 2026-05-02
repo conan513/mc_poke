@@ -409,6 +409,26 @@ async function startIntro() {
       endIntro('home');
     }
 
+    let introSkinType = 'mojang';
+    let introSkinFileBase64 = '';
+    let introSkinViewer3D = null;
+
+    function updateIntroSkin3D() {
+      if (!introSkinViewer3D) return;
+      let url = 'https://mc-heads.net/skin/Steve';
+      const val = (introSkinType === 'file') ? introSkinFileBase64 : $id('intro-skin-input').value.trim();
+      
+      if (introSkinType === 'mojang') {
+         url = val ? `https://mc-heads.net/skin/${val}` : `https://mc-heads.net/skin/${username || 'Steve'}`;
+      } else if (introSkinType === 'url') {
+         url = val || 'https://mc-heads.net/skin/Steve';
+      } else if (introSkinType === 'file') {
+         url = val || 'https://mc-heads.net/skin/Steve';
+      }
+      
+      introSkinViewer3D.loadSkin(url).catch(e => console.warn('[Intro Skin3D]', e.message));
+    }
+
     window.endIntroFromAuth = async function() {
       console.log('[Intro] Auth success, showing skin phase...');
       $id('intro-auth-login-view')?.classList.add('hidden');
@@ -423,11 +443,30 @@ async function startIntro() {
         await typeWriter(authText, getLine('intro.skin_step_1', 'Nagyszerű! És hogy nézel ki? Használhatod a Mojang skinedet, vagy megadhatsz egy egyedi URL-t is!'));
       }
       
+      if (!introSkinViewer3D) {
+        const canvas = $id('intro-skin-3d-canvas');
+        if (canvas) {
+          try {
+            introSkinViewer3D = new skinview3d.SkinViewer({
+              canvas: canvas,
+              width: 140,
+              height: 220,
+              skin: 'https://mc-heads.net/skin/Steve'
+            });
+            introSkinViewer3D.autoRotate = true;
+            introSkinViewer3D.autoRotateSpeed = 0.8;
+            introSkinViewer3D.controls.enabled = true;
+            introSkinViewer3D.controls.enableZoom = false;
+            introSkinViewer3D.animation = new skinview3d.WalkingAnimation();
+            introSkinViewer3D.animation.speed = 0.5;
+            introSkinViewer3D.zoom = 0.9;
+          } catch(e) { console.warn('[Intro] Skin viewer init failed', e); }
+        }
+      }
+      updateIntroSkin3D();
+      
       $id('intro-skin-select-view')?.classList.remove('hidden');
     };
-
-    let introSkinType = 'mojang';
-    let introSkinFileBase64 = '';
 
     $id('btn-intro-skin-mojang')?.addEventListener('click', () => {
       introSkinType = 'mojang';
@@ -437,6 +476,7 @@ async function startIntro() {
       $id('intro-skin-input').classList.remove('hidden');
       $id('btn-intro-browse-skin').classList.add('hidden');
       $id('intro-skin-input').placeholder = 'Minecraft név (pl. Notch)';
+      updateIntroSkin3D();
     });
     $id('btn-intro-skin-url')?.addEventListener('click', () => {
       introSkinType = 'url';
@@ -446,6 +486,7 @@ async function startIntro() {
       $id('intro-skin-input').classList.remove('hidden');
       $id('btn-intro-browse-skin').classList.add('hidden');
       $id('intro-skin-input').placeholder = 'https://.../skin.png';
+      updateIntroSkin3D();
     });
     $id('btn-intro-skin-file')?.addEventListener('click', () => {
       introSkinType = 'file';
@@ -454,7 +495,10 @@ async function startIntro() {
       $id('btn-intro-skin-mojang').classList.remove('active');
       $id('intro-skin-input').classList.add('hidden');
       $id('btn-intro-browse-skin').classList.remove('hidden');
+      updateIntroSkin3D();
     });
+
+    $id('intro-skin-input')?.addEventListener('input', updateIntroSkin3D);
 
     $id('btn-intro-browse-skin')?.addEventListener('click', () => {
       $id('intro-skin-file-input')?.click();
@@ -468,11 +512,13 @@ async function startIntro() {
       const reader = new FileReader();
       reader.onload = (ev) => {
         introSkinFileBase64 = ev.target.result;
+        updateIntroSkin3D();
       };
       reader.readAsDataURL(file);
     });
 
     $id('btn-intro-skin-skip')?.addEventListener('click', () => {
+      if (introSkinViewer3D) { try { introSkinViewer3D.dispose(); } catch(_) {} }
       $id('intro-skin-select-view')?.classList.add('hidden');
       runClosingCinematic();
     });
@@ -518,6 +564,7 @@ async function startIntro() {
         btnSave.disabled = false;
         btnSave.textContent = originalText;
       }
+      if (introSkinViewer3D) { try { introSkinViewer3D.dispose(); } catch(_) {} }
       $id('intro-skin-select-view')?.classList.add('hidden');
       runClosingCinematic();
     });
