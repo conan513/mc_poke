@@ -126,7 +126,7 @@ async function startIntro() {
         canvas: profCanvas,
         width: 280,
         height: 480,
-        skin: './2021_04_08_proffeser-oak-17401377.png',
+        skin: './img/professor.png',
       })
       window._introProfessorViewer = professorViewer
       professorViewer.autoRotate = false
@@ -164,8 +164,12 @@ async function startIntro() {
 
     // Using onclick to avoid multiple event listeners if called multiple times
     if (btnConfirm) {
-      btnConfirm.onclick = () => {
-        console.log('[Intro] Language confirmed');
+      btnConfirm.onclick = async () => {
+        console.log('[Intro] Language confirmed:', browserLang);
+        // Actually apply the detected language if it differs from current
+        if (browserLang !== currentLang && langNames[browserLang]) {
+          await loadSpecificLanguage(browserLang);
+        }
         langPhase.classList.add('hidden')
         startCinematicPhase()
       }
@@ -381,8 +385,8 @@ async function startIntro() {
       if (overlay) overlay.style.opacity = '0';
       await sleep(1000);
       
-      console.log('[Intro] Cinematic finished, calling endIntro()');
-      endIntro();
+      console.log('[Intro] Cinematic finished, calling endIntro(home)');
+      endIntro('home');
     }
 
     window.endIntroFromAuth = runClosingCinematic;
@@ -564,11 +568,13 @@ async function startIntro() {
     }
   }
 
-  function endIntro() {
+  function endIntro(target) {
+    // After online auth → go to home; offline/one-time → go to welcome (install screen)
+    const dest = target || 'welcome'
     if (musicWidget) musicWidget.pause();
     if (professorViewer) { try { professorViewer.dispose() } catch(_) {} }
     overlay.classList.add('hidden')
-    showScreen('welcome')
+    showScreen(dest)
   }
 }
 
@@ -584,6 +590,9 @@ async function loadLanguage() {
       let locale = 'en'
       if (window.cobble) {
         locale = await window.cobble.getLocale()
+      } else {
+        // Web mode: use browser language
+        locale = navigator.language || navigator.userLanguage || 'en'
       }
       const langCode = locale.split(/[-_]/)[0].toLowerCase()
       const available = ['hu', 'en', 'de', 'fr', 'es', 'it', 'pt', 'nl', 'ru', 'ja', 'ko', 'zh', 'pl', 'tr', 'ro', 'sv', 'da', 'no', 'fi', 'cs', 'uk']
