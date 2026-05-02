@@ -944,6 +944,34 @@ async function handleRequest(req, res) {
     return
   }
 
+  // ── Username Check API ───────────────────────────
+  if (url.startsWith('/api/auth/check-username') && req.method === 'GET') {
+    const parsedUrl = new URL(req.url, `http://${req.headers.host}`)
+    const username = parsedUrl.searchParams.get('username')
+    
+    if (!username) {
+      res.writeHead(400, { 'Content-Type': 'application/json' })
+      return res.end(JSON.stringify({ error: 'Nincs megadva felhasználónév.' }))
+    }
+
+    if (!pool) {
+      res.writeHead(503, { 'Content-Type': 'application/json' })
+      return res.end(JSON.stringify({ error: 'Adatbázis nem elérhető.' }))
+    }
+
+    try {
+      const [existing] = await pool.query('SELECT id FROM easyauth WHERE username = ?', [username])
+      const available = existing.length === 0
+      res.writeHead(200, { 'Content-Type': 'application/json' })
+      res.end(JSON.stringify({ available }))
+    } catch (e) {
+      console.error('[Auth] Check username hiba:', e)
+      res.writeHead(500, { 'Content-Type': 'application/json' })
+      res.end(JSON.stringify({ error: 'Szerver hiba.' }))
+    }
+    return
+  }
+
   // ── Registration API ─────────────────────────────
   if (url === '/api/auth/register' && req.method === 'POST') {
     let body = ''
