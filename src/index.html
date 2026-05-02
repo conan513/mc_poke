@@ -185,6 +185,29 @@
           <input type="text" class="form-input intro-input" id="auth-onetime-username" placeholder="Választott neved..." style="width: 100%; box-sizing: border-box; margin-bottom: 15px;">
           <button id="btn-auth-onetime-start" class="btn-primary full-width" data-i18n="intro.start_btn">Kezdjük el!</button>
         </div>
+
+        <!-- Skin Selection Step (After Auth) -->
+        <div id="intro-skin-select-view" class="hidden">
+          <div style="display: flex; gap: 10px; margin-bottom: 15px;">
+            <button id="btn-intro-skin-mojang" class="btn-secondary active" style="flex: 1; padding: 10px; font-size: 0.9em;" data-i18n="skin.type_mojang">Mojang</button>
+            <button id="btn-intro-skin-url" class="btn-secondary" style="flex: 1; padding: 10px; font-size: 0.9em;" data-i18n="skin.type_url">URL</button>
+            <button id="btn-intro-skin-file" class="btn-secondary" style="flex: 1; padding: 10px; font-size: 0.9em;" data-i18n="skin.type_file">Fájl</button>
+          </div>
+          <input type="text" class="form-input intro-input" id="intro-skin-input" placeholder="Minecraft név (pl. Notch)" style="width: 100%; box-sizing: border-box; margin-bottom: 15px;">
+          
+          <!-- File selection inputs (hidden by default) -->
+          <input type="file" id="intro-skin-file-input" accept="image/png" class="hidden" />
+          <button class="btn-secondary hidden" id="btn-intro-browse-skin" style="width: 100%; margin-bottom: 15px; padding: 12px; border: 2px dashed #ccc; background: transparent;">
+            <span>
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width: 16px; height: 16px; vertical-align: middle; margin-right: 6px;"><path d="M4 20h16a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.93a2 2 0 0 1-1.66-.9l-.82-1.2A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v13c0 1.1.9 2 2 2z"></path></svg>
+              <span id="intro-skin-file-name" data-i18n="skin.browse_btn">Fájl kiválasztása...</span>
+            </span>
+          </button>
+          <div style="display: flex; gap: 10px;">
+            <button id="btn-intro-skin-skip" class="btn-secondary" style="flex: 1;" data-i18n="intro.skin_skip">Kihagyás</button>
+            <button id="btn-intro-skin-save" class="btn-primary" style="flex: 1;" data-i18n="intro.skin_save">Mentés</button>
+          </div>
+        </div>
       </div>
     </div>
   </div>

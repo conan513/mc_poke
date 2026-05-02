@@ -409,7 +409,113 @@ async function startIntro() {
       endIntro('home');
     }
 
-    window.endIntroFromAuth = runClosingCinematic;
+    window.endIntroFromAuth = async function() {
+      console.log('[Intro] Auth success, showing skin phase...');
+      $id('intro-auth-login-view')?.classList.add('hidden');
+      $id('intro-auth-register-view')?.classList.add('hidden');
+      $id('intro-auth-onetime-view')?.classList.add('hidden');
+      $id('btn-auth-back')?.classList.add('hidden');
+
+      const authText = $id('auth-dialogue-text');
+      if (authText) {
+        authText.textContent = '';
+        skipCinematic = false;
+        await typeWriter(authText, getLine('intro.skin_step_1', 'Nagyszerű! És hogy nézel ki? Használhatod a Mojang skinedet, vagy megadhatsz egy egyedi URL-t is!'));
+      }
+      
+      $id('intro-skin-select-view')?.classList.remove('hidden');
+    };
+
+    let introSkinType = 'mojang';
+    let introSkinFileBase64 = '';
+
+    $id('btn-intro-skin-mojang')?.addEventListener('click', () => {
+      introSkinType = 'mojang';
+      $id('btn-intro-skin-mojang').classList.add('active');
+      $id('btn-intro-skin-url').classList.remove('active');
+      $id('btn-intro-skin-file').classList.remove('active');
+      $id('intro-skin-input').classList.remove('hidden');
+      $id('btn-intro-browse-skin').classList.add('hidden');
+      $id('intro-skin-input').placeholder = 'Minecraft név (pl. Notch)';
+    });
+    $id('btn-intro-skin-url')?.addEventListener('click', () => {
+      introSkinType = 'url';
+      $id('btn-intro-skin-url').classList.add('active');
+      $id('btn-intro-skin-mojang').classList.remove('active');
+      $id('btn-intro-skin-file').classList.remove('active');
+      $id('intro-skin-input').classList.remove('hidden');
+      $id('btn-intro-browse-skin').classList.add('hidden');
+      $id('intro-skin-input').placeholder = 'https://.../skin.png';
+    });
+    $id('btn-intro-skin-file')?.addEventListener('click', () => {
+      introSkinType = 'file';
+      $id('btn-intro-skin-file').classList.add('active');
+      $id('btn-intro-skin-url').classList.remove('active');
+      $id('btn-intro-skin-mojang').classList.remove('active');
+      $id('intro-skin-input').classList.add('hidden');
+      $id('btn-intro-browse-skin').classList.remove('hidden');
+    });
+
+    $id('btn-intro-browse-skin')?.addEventListener('click', () => {
+      $id('intro-skin-file-input')?.click();
+    });
+
+    $id('intro-skin-file-input')?.addEventListener('change', (e) => {
+      const file = e.target.files[0];
+      if (!file) return;
+      
+      $id('intro-skin-file-name').textContent = file.name;
+      const reader = new FileReader();
+      reader.onload = (ev) => {
+        introSkinFileBase64 = ev.target.result;
+      };
+      reader.readAsDataURL(file);
+    });
+
+    $id('btn-intro-skin-skip')?.addEventListener('click', () => {
+      $id('intro-skin-select-view')?.classList.add('hidden');
+      runClosingCinematic();
+    });
+
+    $id('btn-intro-skin-save')?.addEventListener('click', async () => {
+      let val = '';
+      if (introSkinType === 'file') {
+        val = introSkinFileBase64;
+      } else {
+        val = $id('intro-skin-input').value.trim();
+      }
+      
+      const btnSave = $id('btn-intro-skin-save');
+      
+      if (val && username) {
+        const originalText = btnSave.textContent;
+        btnSave.disabled = true;
+        btnSave.textContent = '...';
+        
+        const p = getProfile(username);
+        if (p) {
+          p.skinType = introSkinType;
+          p.skinVal = val;
+          saveProfiles();
+          renderProfiles();
+          
+          currentSkinType = introSkinType;
+          currentSkinVal = val;
+          localStorage.setItem('cobble_skin_type', currentSkinType);
+          localStorage.setItem('cobble_skin_val', currentSkinVal);
+          
+          try {
+            await uploadSkinToServer();
+          } catch (e) {
+            console.error('[Intro] Skin upload failed:', e);
+          }
+        }
+        btnSave.disabled = false;
+        btnSave.textContent = originalText;
+      }
+      $id('intro-skin-select-view')?.classList.add('hidden');
+      runClosingCinematic();
+    });
 
     // Expose a helper so external auth handlers can show errors in the professor dialogue
     window.introShowError = async (msg) => {
