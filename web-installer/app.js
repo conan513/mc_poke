@@ -89,32 +89,34 @@ document.addEventListener('DOMContentLoaded', () => {
     let isArm = ua.includes('arm') || ua.includes('aarch64');
 
     if (ua.includes('win')) {
-      os = 'Windows';
+      os = t('os.win');
       // Detect ARM Windows (Snapdragon X Elite etc)
       if (ua.includes('arm64') || ua.includes('arm;')) {
-        os = 'Windows ARM';
+        os = t('os.win_arm');
         currentDownloadUrl = DOWNLOADS.winArm64;
       } else {
         currentDownloadUrl = DOWNLOADS.win;
       }
     } else if (ua.includes('mac')) {
-      os = 'macOS';
+      os = t('os.mac');
       // Detect Apple Silicon
       if (ua.includes('mac os x') && (ua.includes('arm64') || navigator.maxTouchPoints > 0)) {
-        os = 'macOS (Apple Silicon)';
+        os = t('os.mac_silicon');
         currentDownloadUrl = DOWNLOADS.macDmgArm64;
       } else {
-        os = 'macOS (Intel)';
+        os = t('os.mac_intel');
         currentDownloadUrl = DOWNLOADS.macDmg;
       }
     } else if (ua.includes('linux')) {
-      os = 'Linux';
+      os = t('os.linux');
       if (isArm) {
-        os = 'Linux ARM';
+        os = t('os.linux_arm');
         currentDownloadUrl = DOWNLOADS.linuxAppArm64;
       } else {
         currentDownloadUrl = DOWNLOADS.linuxApp;
       }
+    } else {
+      os = t('os.unknown');
     }
 
     // Update download button text and link
@@ -174,7 +176,7 @@ document.addEventListener('DOMContentLoaded', () => {
         modsData = (data.mods || []).filter(m => m.filename.endsWith('.jar'));
         renderModList();
       } catch (e) {
-        modListContent.innerHTML = '<p style="text-align:center;color:var(--accent-red)">Hiba a lista betöltésekor.</p>';
+        modListContent.innerHTML = `<p style="text-align:center;color:var(--accent-red)">${t('modal.error_mods')}</p>`;
       }
     } else {
       renderModList();
@@ -188,7 +190,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   function renderModList() {
     if (modsData.length === 0) {
-      modListContent.innerHTML = '<p style="text-align:center;color:#888">Nincsenek modok.</p>';
+      modListContent.innerHTML = `<p style="text-align:center;color:#888">${t('modal.no_mods')}</p>`;
       return;
     }
 
@@ -222,7 +224,7 @@ document.addEventListener('DOMContentLoaded', () => {
       const diff = targetTime - now;
 
       if (diff <= 0) {
-        restartEl.textContent = "NOW";
+        restartEl.textContent = t('status.now');
         clearInterval(countdownInterval);
         return;
       }
@@ -271,7 +273,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (data.players && data.players.length > 0) {
           playerCount.title = 'Online: ' + data.players.join(', ');
         } else {
-          playerCount.title = 'Nincs játékos online';
+          playerCount.title = t('status.no_players');
         }
       }
 
@@ -407,7 +409,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
       } catch (e) {
         rewardStatus.className = 'reward-status error';
-        rewardStatus.textContent = 'Hálózati hiba.';
+        rewardStatus.textContent = t('rewards.error_network');
       } finally {
         btnClaim.disabled = false;
         btnClaim.innerHTML = `<span data-i18n="rewards.btn">${t('rewards.btn') || 'Begyűjtés'}</span>`;

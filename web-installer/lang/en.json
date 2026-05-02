@@ -1,6 +1,18 @@
 {
   "modal": {
-    "mods_title": "Installed Mods"
+    "mods_title": "Installed Mods",
+    "error_mods": "Error loading list.",
+    "no_mods": "No mods."
+  },
+  "os": {
+    "win": "Windows",
+    "win_arm": "Windows ARM",
+    "mac": "macOS",
+    "mac_silicon": "macOS (Apple Silicon)",
+    "mac_intel": "macOS (Intel)",
+    "linux": "Linux",
+    "linux_arm": "Linux ARM",
+    "unknown": "Unknown"
   },
   "alternatives": {
     "linux_app": "AppImage",
@@ -23,7 +35,13 @@
     "win": "Installer (.exe)",
     "win_arm64": "ARM Installer (.exe)",
     "win_portable": "Portable (.exe)",
-    "win_portable_arm64": "ARM Portable (.exe)"
+    "win_portable_arm64": "ARM Portable (.exe)",
+    "arch_x64": "x64 (Intel / AMD)",
+    "arch_arm64": "ARM64 (Snapdragon / Native)",
+    "arch_linux_x64": "x86_64 (Intel / AMD)",
+    "arch_linux_arm64": "ARM64 (Pi / Pro)",
+    "arch_mac_arm64": "Apple Silicon (M1/M2/M3)",
+    "arch_mac_intel": "Intel (Legacy)"
   },
   "features": {
     "f1_desc": "All Pokémon from every generation are available, including Legendaries and Mythicals. No 'fakemons', just the classics.",
@@ -66,7 +84,9 @@
     "offline": "SERVER OFFLINE",
     "online": "SERVER ONLINE",
     "os_detected": "Detected system: ",
-    "see_all": "Looking for another version? See all downloads"
+    "see_all": "Looking for another version? See all downloads",
+    "now": "NOW",
+    "no_players": "No players online"
   },
   "showcase": {
     "title": "Pokémon of the Week",
@@ -82,7 +102,8 @@
     "placeholder": "Minecraft Username",
     "btn": "Claim",
     "success": "Claim successful!",
-    "error_name": "Invalid name!"
+    "error_name": "Invalid name!",
+    "error_network": "Network error."
   },
   "leaderboard": {
     "title": "Hall of Fame",

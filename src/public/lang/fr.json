@@ -79,7 +79,9 @@
   "titlebar": {
     "lang_title": "Changer de langue",
     "minimize": "Réduire",
-    "close": "Fermer"
+    "close": "Fermer",
+    "replay_intro": "Intro",
+    "lang_switcher": "Langue"
   },
   "skin": {
     "modal_title": "Paramètres du skin",
@@ -95,7 +97,9 @@
     "toast_upload_error": "Échec du téléchargement du skin (pas de connexion au serveur)",
     "remove_profile": "Supprimer le profil",
     "multiplayer_hint": "En multijoueur, SkinsRestorer applique automatiquement le skin !",
-    "singleplayer_hint": "En solo, exécutez en jeu:<code>/skin url {}</code>"
+    "singleplayer_hint": "En solo, exécutez en jeu:<code>/skin url {}</code>",
+    "type_mojang_placeholder": "ex: Notch",
+    "type_url_placeholder": "https://.../skin.png"
   },
   "sync": {
     "error": "Sync error: ",
@@ -122,7 +126,11 @@
     "placeholder": "Minecraft Username",
     "btn": "Claim",
     "success": "Claim successful!",
-    "error_name": "Invalid name!"
+    "error_name": "Invalid name!",
+    "error_no_profile": "Veuillez vous connecter avec un profil !",
+    "error_prefix": "Erreur : ",
+    "error_network": "Erreur réseau : ",
+    "error_unknown": "Inconnu"
   },
   "leaderboard": {
     "title": "Hall of Fame",
@@ -136,26 +144,32 @@
     "cat_caught": "Caught",
     "cat_pokedex": "Pokédex",
     "cat_shiny": "Shiny Pokémon",
-    "col_value": "Value"
+    "col_value": "Value",
+    "unit_hours": " heures",
+    "unit_pieces": " pcs"
   },
   "intro": {
-    "lang_desc": "Hello there! Welcome to the world of Pokemon! Before we begin, is this your preferred language?",
-    "confirm_btn": "Yes, let's go!",
-    "change_btn": "Change language",
-    "next": "Next",
-    "start_btn": "Let's Start!",
-    "pitch_1_desc": "This world is inhabited by creatures called Pokemon! For some, Pokemon are pets. Others use them for fights.",
-    "pitch_2_desc": "Myself... I study Pokemon as a profession. And here, in Cobblemon Universe, adventure awaits everyone!",
-    "pitch_3_desc": "Are you ready to write your own story? A world of dreams and adventures with Pokemon awaits! Let's go!",
-    "choice_desc": "Now tell me, are you a new trainer just starting out, or a returning Pokemon Master?",
-    "new_player_title": "New Trainer",
-    "new_player_desc": "Register a new account",
-    "returning_player_title": "Returning Master",
-    "returning_player_desc": "Login with existing account",
+    "lang_desc": "Bonjour ! Bienvenue dans le monde des Pokémon ! Avant de commencer, est-ce votre langue préférée ?",
+    "confirm_btn": "Oui, c'est parti !",
+    "change_btn": "Changer de langue",
+    "next": "Suivant",
+    "start_btn": "Commençons !",
+    "pitch_1_desc": "Ce monde est habité par des créatures appelées Pokémon ! Pour certains, les Pokémon sont des animaux de compagnie. D'autres les utilisent pour se battre.",
+    "pitch_2_desc": "Moi-même... j'étudie les Pokémon en tant que profession. Et ici, dans Cobblemon Universe, l'aventure attend tout le monde !",
+    "pitch_3_desc": "Êtes-vous prêt à écrire votre propre histoire ? Un monde de rêves et d'aventures avec les Pokémon vous attend ! C'est parti !",
+    "choice_desc": "Maintenant, dites-moi, êtes-vous un nouvel entraîneur qui débute, ou un Maître Pokémon de retour ?",
+    "new_player_title": "Nouvel Entraîneur",
+    "new_player_desc": "Créer un nouveau compte",
+    "returning_player_title": "Maître de retour",
+    "returning_player_desc": "Se connecter à un compte existant",
     "skip": "Passer",
     "cinematic_1": "Bonjour! Bienvenue dans le monde des Pokémon!",
     "cinematic_2": "Je m'appelle Prof. Chen – tout le monde m'appelle le Prof Pokémon!",
     "cinematic_3": "Ce monde est peuplé de créatures appelées Pokémon!",
-    "cinematic_4": "J'étudie ces créatures fascinantes comme profession."
+    "cinematic_4": "J'étudie ces créatures fascinantes comme profession.",
+    "select_lang": "Choisir la langue",
+    "name_placeholder": "Nom Minecraft...",
+    "err_network": "Erreur réseau ! Veuillez vérifier votre connexion. (Erreur : {})",
+    "err_server": "Une erreur de serveur est survenue ({})"
   }
 }

@@ -1,6 +1,18 @@
 {
   "modal": {
-    "mods_title": "Telepített Modok"
+    "mods_title": "Telepített Modok",
+    "error_mods": "Hiba a lista betöltésekor.",
+    "no_mods": "Nincsenek modok."
+  },
+  "os": {
+    "win": "Windows",
+    "win_arm": "Windows ARM",
+    "mac": "macOS",
+    "mac_silicon": "macOS (Apple Silicon)",
+    "mac_intel": "macOS (Intel)",
+    "linux": "Linux",
+    "linux_arm": "Linux ARM",
+    "unknown": "Ismeretlen"
   },
   "alternatives": {
     "linux_app": "AppImage",
@@ -23,7 +35,13 @@
     "win": "Telepítő (.exe)",
     "win_arm64": "ARM Telepítő (.exe)",
     "win_portable": "Portable (.exe)",
-    "win_portable_arm64": "ARM Portable (.exe)"
+    "win_portable_arm64": "ARM Portable (.exe)",
+    "arch_x64": "x64 (Intel / AMD)",
+    "arch_arm64": "ARM64 (Snapdragon / Native)",
+    "arch_linux_x64": "x86_64 (Intel / AMD)",
+    "arch_linux_arm64": "ARM64 (Pi / Pro)",
+    "arch_mac_arm64": "Apple Silicon (M1/M2/M3)",
+    "arch_mac_intel": "Intel (Legacy)"
   },
   "features": {
     "f1_desc": "Minden generáció összes Pokémonja elérhető, beleértve a Legendásokat és a Mythical lényeket is. Nincsenek 'fakemonok', csak a klasszikusok.",
@@ -66,7 +84,9 @@
     "offline": "SZERVER OFFLINE",
     "online": "SZERVER ONLINE",
     "os_detected": "Észlelt rendszer: ",
-    "see_all": "Más verziót keresel? Összes letöltés megtekintése"
+    "see_all": "Más verziót keresel? Összes letöltés megtekintése",
+    "now": "MOST",
+    "no_players": "Nincs játékos online"
   },
   "showcase": {
     "title": "A Hét Pokémonja",
@@ -82,7 +102,8 @@
     "placeholder": "Minecraft Neved",
     "btn": "Begyűjtés",
     "success": "Sikeres begyűjtés!",
-    "error_name": "Érvénytelen név!"
+    "error_name": "Érvénytelen név!",
+    "error_network": "Hálózati hiba."
   },
   "leaderboard": {
     "title": "Dicsőségtábla",

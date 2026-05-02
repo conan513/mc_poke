@@ -1,6 +1,8 @@
 {
   "modal": {
-    "mods_title": "Installed Mods"
+    "mods_title": "已安装的 Mod",
+    "error_mods": "加载列表时出错。",
+    "no_mods": "没有 Mod。"
   },
   "alternatives": {
     "linux_app": "AppImage",
@@ -21,7 +23,13 @@
     "text": "Looking for another platform?",
     "title": "寻找其他平台？",
     "win": "Installer (.exe)",
-    "win_portable": "Portable (.exe)"
+    "win_portable": "Portable (.exe)",
+    "arch_x64": "x64 (Intel / AMD)",
+    "arch_arm64": "ARM64 (Snapdragon / Native)",
+    "arch_linux_x64": "x86_64 (Intel / AMD)",
+    "arch_linux_arm64": "ARM64 (Pi / Pro)",
+    "arch_mac_arm64": "Apple Silicon (M1/M2/M3)",
+    "arch_mac_intel": "Intel (Legacy)"
   },
   "features": {
     "f1_desc": "拥有所有世代的所有宝可梦，包括传说级和幻之宝可梦。没有“假想宝可梦”，只有经典的。",
@@ -59,12 +67,36 @@
   "status": {
     "checking": "系统检查中...",
     "download": "下载客户端",
-    "download_confirm": "The launcher was not found on your computer. Would you like to download the installer?",
+    "download_confirm": "在您的电脑上找不到启动器。您想下载安装程序吗？",
     "launch": "启动游戏",
     "offline": "服务器离线",
     "online": "服务器在线",
     "os_detected": "检测到的系统： ",
-    "see_all": "寻找其他版本？查看所有下载"
+    "see_all": "寻找其他版本？查看所有下载",
+    "now": "现在",
+    "no_players": "没有玩家在线"
   },
-  "title": "下载 | Cobblemon Universe"
+  "title": "下载 | Cobblemon Universe",
+  "os": {
+    "win": "Windows",
+    "win_arm": "Windows ARM",
+    "mac": "macOS",
+    "mac_silicon": "macOS (Apple Silicon)",
+    "mac_intel": "macOS (Intel)",
+    "linux": "Linux",
+    "linux_arm": "Linux ARM",
+    "unknown": "未知"
+  },
+  "rewards": {
+    "error_network": "网络错误。"
+  },
+  "leaderboard": {
+    "title": "名人堂",
+    "desc": "按游戏时间计算的服务器上最活跃的宝可梦大师。",
+    "rank": "排名",
+    "player": "玩家",
+    "playtime": "游戏时间",
+    "empty": "暂无数据。",
+    "error": "加载数据时出错。"
+  }
 }

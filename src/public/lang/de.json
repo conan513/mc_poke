@@ -79,7 +79,9 @@
   "titlebar": {
     "lang_title": "Sprache ändern",
     "minimize": "Minimieren",
-    "close": "Schließen"
+    "close": "Schließen",
+    "replay_intro": "Intro",
+    "lang_switcher": "Sprache"
   },
   "skin": {
     "modal_title": "Skin-Einstellungen",
@@ -95,7 +97,9 @@
     "toast_upload_error": "Skin-Upload fehlgeschlagen (keine Serververbindung)",
     "remove_profile": "Profil entfernen",
     "multiplayer_hint": "Im Multiplayer wird der Skin automatisch von SkinsRestorer angewendet!",
-    "singleplayer_hint": "Im Singleplayer im Spiel ausführen: <code>/skin url {}</code>"
+    "singleplayer_hint": "Im Singleplayer im Spiel ausführen: <code>/skin url {}</code>",
+    "type_mojang_placeholder": "z.B. Notch",
+    "type_url_placeholder": "https://.../skin.png"
   },
   "sync": {
     "error": "Sync error: ",
@@ -122,7 +126,11 @@
     "placeholder": "Minecraft Username",
     "btn": "Claim",
     "success": "Claim successful!",
-    "error_name": "Invalid name!"
+    "error_name": "Invalid name!",
+    "error_no_profile": "Bitte mit einem Profil anmelden!",
+    "error_prefix": "Fehler: ",
+    "error_network": "Netzwerkfehler: ",
+    "error_unknown": "Unbekannt"
   },
   "leaderboard": {
     "title": "Hall of Fame",
@@ -136,26 +144,32 @@
     "cat_caught": "Caught",
     "cat_pokedex": "Pokédex",
     "cat_shiny": "Shiny Pokémon",
-    "col_value": "Value"
+    "col_value": "Value",
+    "unit_hours": " Std.",
+    "unit_pieces": " Stk."
   },
   "intro": {
-    "lang_desc": "Hello there! Welcome to the world of Pokemon! Before we begin, is this your preferred language?",
-    "confirm_btn": "Yes, let's go!",
-    "change_btn": "Change language",
-    "next": "Next",
-    "start_btn": "Let's Start!",
-    "pitch_1_desc": "This world is inhabited by creatures called Pokemon! For some, Pokemon are pets. Others use them for fights.",
-    "pitch_2_desc": "Myself... I study Pokemon as a profession. And here, in Cobblemon Universe, adventure awaits everyone!",
-    "pitch_3_desc": "Are you ready to write your own story? A world of dreams and adventures with Pokemon awaits! Let's go!",
-    "choice_desc": "Now tell me, are you a new trainer just starting out, or a returning Pokemon Master?",
-    "new_player_title": "New Trainer",
-    "new_player_desc": "Register a new account",
-    "returning_player_title": "Returning Master",
-    "returning_player_desc": "Login with existing account",
+    "lang_desc": "Hallo! Willkommen in der Welt der Pokémon! Bevor wir beginnen: Ist dies deine bevorzugte Sprache?",
+    "confirm_btn": "Ja, los geht's!",
+    "change_btn": "Sprache ändern",
+    "next": "Weiter",
+    "start_btn": "Fangen wir an!",
+    "pitch_1_desc": "Diese Welt wird von Wesen bewohnt, die man Pokémon nennt! Für manche sind sie Haustiere, andere nutzen sie zum Kämpfen.",
+    "pitch_2_desc": "Ich selbst... ich erforsche Pokémon beruflich. Und hier, im Cobblemon Universe, erwartet jeden ein Abenteuer!",
+    "pitch_3_desc": "Bist du bereit, deine eigene Geschichte zu schreiben? Eine Welt voller Träume und Abenteuer mit Pokémon erwartet dich! Los geht's!",
+    "choice_desc": "Sag mir, bist du ein neuer Trainer, der gerade erst anfängt, oder ein zurückkehrender Pokémon-Meister?",
+    "new_player_title": "Neuer Trainer",
+    "new_player_desc": "Ein neues Konto registrieren",
+    "returning_player_title": "Rückkehrender Meister",
+    "returning_player_desc": "Mit bestehendem Konto anmelden",
     "skip": "Überspringen",
     "cinematic_1": "Hallo! Willkommen in der Welt der Pokémon!",
     "cinematic_2": "Ich bin Prof. Eich – alle nennen mich den Pokémon-Prof!",
     "cinematic_3": "Diese Welt ist von Wesen namens Pokémon bevölkert!",
-    "cinematic_4": "Ich erforsche diese faszinierenden Wesen als meinen Beruf."
+    "cinematic_4": "Ich erforsche diese faszinierenden Wesen als meinen Beruf.",
+    "select_lang": "Sprache wählen",
+    "name_placeholder": "Minecraft-Name...",
+    "err_network": "Netzwerkfehler! Bitte überprüfe deine Verbindung. (Fehler: {})",
+    "err_server": "Serverfehler aufgetreten ({})"
   }
 }

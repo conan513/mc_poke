@@ -90,7 +90,9 @@
     "toast_upload_error": "Încărcarea skin-ului a eșuat (lipsă conexiune la server)",
     "remove_profile": "Șterge profilul",
     "multiplayer_hint": "În multiplayer, SkinsRestorer aplică automat skin-ul!",
-    "singleplayer_hint": "În singleplayer, rulează în joc: <code>/skin url {}</code>"
+    "singleplayer_hint": "În singleplayer, rulează în joc: <code>/skin url {}</code>",
+    "type_mojang_placeholder": "ex: Notch",
+    "type_url_placeholder": "https://.../skin.png"
   },
   "sync": {
     "error": "Sync error: ",
@@ -103,7 +105,9 @@
   "titlebar": {
     "minimize": "Minimize",
     "close": "Close",
-    "lang_title": "Change language"
+    "lang_title": "Change language",
+    "replay_intro": "Intro",
+    "lang_switcher": "Limbă"
   },
   "hub": {
     "title": "Server Hub"
@@ -122,7 +126,11 @@
     "placeholder": "Minecraft Username",
     "btn": "Claim",
     "success": "Claim successful!",
-    "error_name": "Invalid name!"
+    "error_name": "Invalid name!",
+    "error_no_profile": "Vă rugăm să vă autentificați cu un profil!",
+    "error_prefix": "Eroare: ",
+    "error_network": "Eroare de rețea: ",
+    "error_unknown": "Necunoscut"
   },
   "leaderboard": {
     "title": "Hall of Fame",
@@ -136,26 +144,32 @@
     "cat_caught": "Caught",
     "cat_pokedex": "Pokédex",
     "cat_shiny": "Shiny Pokémon",
-    "col_value": "Value"
+    "col_value": "Value",
+    "unit_hours": " ore",
+    "unit_pieces": " buc"
   },
   "intro": {
-    "lang_desc": "Hello there! Welcome to the world of Pokemon! Before we begin, is this your preferred language?",
-    "confirm_btn": "Yes, let's go!",
-    "change_btn": "Change language",
-    "next": "Next",
-    "start_btn": "Let's Start!",
-    "pitch_1_desc": "This world is inhabited by creatures called Pokemon! For some, Pokemon are pets. Others use them for fights.",
-    "pitch_2_desc": "Myself... I study Pokemon as a profession. And here, in Cobblemon Universe, adventure awaits everyone!",
-    "pitch_3_desc": "Are you ready to write your own story? A world of dreams and adventures with Pokemon awaits! Let's go!",
-    "choice_desc": "Now tell me, are you a new trainer just starting out, or a returning Pokemon Master?",
-    "new_player_title": "New Trainer",
-    "new_player_desc": "Register a new account",
-    "returning_player_title": "Returning Master",
-    "returning_player_desc": "Login with existing account",
+    "lang_desc": "Bună! Bine ai venit în lumea Pokémon! Înainte de a începe, este aceasta limba ta preferată?",
+    "confirm_btn": "Da, să mergem!",
+    "change_btn": "Schimbă limba",
+    "next": "Înainte",
+    "start_btn": "Să începem!",
+    "pitch_1_desc": "Această lume este locuită de creaturi numite Pokémon! Pentru unii, Pokémonii sunt animale de companie. Alții îi folosesc pentru lupte.",
+    "pitch_2_desc": "Eu însumi... studiez Pokémonii ca profesie. Și aici, în Cobblemon Universe, aventura îi așteaptă pe toți!",
+    "pitch_3_desc": "Ești gata să îți scrii propria poveste? O lume de vis și aventuri cu Pokémon te așteaptă! Să mergem!",
+    "choice_desc": "Acum spune-mi, ești un antrenor nou care abia începe, sau un Maestru Pokémon care revine?",
+    "new_player_title": "Antrenor Nou",
+    "new_player_desc": "Înregistrează un cont nou",
+    "returning_player_title": "Maestru care Revine",
+    "returning_player_desc": "Autentifică-te cu un cont existent",
     "skip": "Sari",
     "cinematic_1": "Bună! Bun venit în lumea Pokémon!",
     "cinematic_2": "Mă numesc Prof. Oak – toți mă numesc Profesorul Pokémon!",
     "cinematic_3": "Această lume este locuită de creaturi numite Pokémon!",
-    "cinematic_4": "Studiez aceste creaturi fascinante ca profesie."
+    "cinematic_4": "Studiez aceste creaturi fascinante ca profesie.",
+    "select_lang": "Selectează limba",
+    "name_placeholder": "Nume Minecraft...",
+    "err_network": "Eroare de rețea! Te rugăm să verifici conexiunea. (Eroare: {})",
+    "err_server": "A apărut o eroare de server ({})"
   }
 }

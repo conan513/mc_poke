@@ -90,7 +90,9 @@
     "toast_upload_error": "Skin upload mislukt (geen serververbinding)",
     "remove_profile": "Profiel verwijderen",
     "multiplayer_hint": "In Multiplayer past SkinsRestorer automatisch de skin toe!",
-    "singleplayer_hint": "In Singleplayer, voer in-game uit: <code>/skin url {}</code>"
+    "singleplayer_hint": "In Singleplayer, voer in-game uit: <code>/skin url {}</code>",
+    "type_mojang_placeholder": "bijv. Notch",
+    "type_url_placeholder": "https://.../skin.png"
   },
   "sync": {
     "error": "Sync error: ",
@@ -103,7 +105,9 @@
   "titlebar": {
     "minimize": "Minimize",
     "close": "Close",
-    "lang_title": "Change language"
+    "lang_title": "Change language",
+    "replay_intro": "Intro",
+    "lang_switcher": "Taal"
   },
   "hub": {
     "title": "Server Hub"
@@ -122,7 +126,11 @@
     "placeholder": "Minecraft Username",
     "btn": "Claim",
     "success": "Claim successful!",
-    "error_name": "Invalid name!"
+    "error_name": "Invalid name!",
+    "error_no_profile": "Log in met een profiel!",
+    "error_prefix": "Fout: ",
+    "error_network": "Netwerkfout: ",
+    "error_unknown": "Onbekend"
   },
   "leaderboard": {
     "title": "Hall of Fame",
@@ -136,26 +144,32 @@
     "cat_caught": "Caught",
     "cat_pokedex": "Pokédex",
     "cat_shiny": "Shiny Pokémon",
-    "col_value": "Value"
+    "col_value": "Value",
+    "unit_hours": " uur",
+    "unit_pieces": " st"
   },
   "intro": {
-    "lang_desc": "Hello there! Welcome to the world of Pokemon! Before we begin, is this your preferred language?",
-    "confirm_btn": "Yes, let's go!",
-    "change_btn": "Change language",
-    "next": "Next",
-    "start_btn": "Let's Start!",
-    "pitch_1_desc": "This world is inhabited by creatures called Pokemon! For some, Pokemon are pets. Others use them for fights.",
-    "pitch_2_desc": "Myself... I study Pokemon as a profession. And here, in Cobblemon Universe, adventure awaits everyone!",
-    "pitch_3_desc": "Are you ready to write your own story? A world of dreams and adventures with Pokemon awaits! Let's go!",
-    "choice_desc": "Now tell me, are you a new trainer just starting out, or a returning Pokemon Master?",
-    "new_player_title": "New Trainer",
-    "new_player_desc": "Register a new account",
-    "returning_player_title": "Returning Master",
-    "returning_player_desc": "Login with existing account",
+    "lang_desc": "Hallo daar! Welkom in de wereld van Pokemon! Voordat we beginnen, is dit je voorkeurstaal?",
+    "confirm_btn": "Ja, laten we gaan!",
+    "change_btn": "Taal wijzigen",
+    "next": "Volgende",
+    "start_btn": "Laten we beginnen!",
+    "pitch_1_desc": "Deze wereld wordt bewoond door wezens die Pokemon worden genoemd! Voor sommigen zijn Pokemon huisdieren. Anderen gebruiken ze om te vechten.",
+    "pitch_2_desc": "Ikzelf... ik bestudeer Pokemon als beroep. En hier, in Cobblemon Universe, wacht er een avontuur op iedereen!",
+    "pitch_3_desc": "Ben je klaar om je eigen verhaal te schrijven? Een wereld vol dromen en avonturen met Pokemon wacht op je! Laten we gaan!",
+    "choice_desc": "Vertel me nu, ben je een nieuwe trainer die net begint, of een terugkerende Pokemon Master?",
+    "new_player_title": "Nieuwe Trainer",
+    "new_player_desc": "Registreer een nieuw account",
+    "returning_player_title": "Terugkerende Master",
+    "returning_player_desc": "Inloggen met bestaand account",
     "skip": "Overslaan",
     "cinematic_1": "Hallo! Welkom in de wereld van Pokémon!",
     "cinematic_2": "Ik ben Prof. Oak – iedereen noemt me de Pokémon Prof!",
     "cinematic_3": "Deze wereld wordt bewoond door wezens genaamd Pokémon!",
-    "cinematic_4": "Ik bestudeer deze fascinerende wezens als beroep."
+    "cinematic_4": "Ik bestudeer deze fascinerende wezens als beroep.",
+    "select_lang": "Selecteer taal",
+    "name_placeholder": "Minecraft-naam...",
+    "err_network": "Netwerkfout! Controleer je verbinding. (Fout: {})",
+    "err_server": "Er is een serverfout opgetreden ({})"
   }
 }

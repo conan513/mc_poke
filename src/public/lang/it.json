@@ -90,7 +90,9 @@
     "toast_upload_error": "Caricamento skin fallito (nessuna connessione al server)",
     "remove_profile": "Rimuovi profilo",
     "multiplayer_hint": "In multigiocatore, SkinsRestorer applica la skin automaticamente!",
-    "singleplayer_hint": "In giocatore singolo, esegui in gioco: <code>/skin url {}</code>"
+    "singleplayer_hint": "In giocatore singolo, esegui in gioco: <code>/skin url {}</code>",
+    "type_mojang_placeholder": "es: Notch",
+    "type_url_placeholder": "https://.../skin.png"
   },
   "sync": {
     "error": "Sync error: ",
@@ -103,7 +105,9 @@
   "titlebar": {
     "minimize": "Minimize",
     "close": "Close",
-    "lang_title": "Change language"
+    "lang_title": "Change language",
+    "replay_intro": "Intro",
+    "lang_switcher": "Lingua"
   },
   "hub": {
     "title": "Server Hub"
@@ -122,7 +126,11 @@
     "placeholder": "Minecraft Username",
     "btn": "Claim",
     "success": "Claim successful!",
-    "error_name": "Invalid name!"
+    "error_name": "Invalid name!",
+    "error_no_profile": "Per favore, accedi con un profilo!",
+    "error_prefix": "Errore: ",
+    "error_network": "Errore di rete: ",
+    "error_unknown": "Sconosciuto"
   },
   "leaderboard": {
     "title": "Hall of Fame",
@@ -136,26 +144,32 @@
     "cat_caught": "Caught",
     "cat_pokedex": "Pokédex",
     "cat_shiny": "Shiny Pokémon",
-    "col_value": "Value"
+    "col_value": "Value",
+    "unit_hours": " ore",
+    "unit_pieces": " pz"
   },
   "intro": {
-    "lang_desc": "Hello there! Welcome to the world of Pokemon! Before we begin, is this your preferred language?",
-    "confirm_btn": "Yes, let's go!",
-    "change_btn": "Change language",
-    "next": "Next",
-    "start_btn": "Let's Start!",
-    "pitch_1_desc": "This world is inhabited by creatures called Pokemon! For some, Pokemon are pets. Others use them for fights.",
-    "pitch_2_desc": "Myself... I study Pokemon as a profession. And here, in Cobblemon Universe, adventure awaits everyone!",
-    "pitch_3_desc": "Are you ready to write your own story? A world of dreams and adventures with Pokemon awaits! Let's go!",
-    "choice_desc": "Now tell me, are you a new trainer just starting out, or a returning Pokemon Master?",
-    "new_player_title": "New Trainer",
-    "new_player_desc": "Register a new account",
-    "returning_player_title": "Returning Master",
-    "returning_player_desc": "Login with existing account",
+    "lang_desc": "Ciao! Benvenuto nel mondo dei Pokémon! Prima di iniziare, è questa la tua lingua preferita?",
+    "confirm_btn": "Sì, andiamo!",
+    "change_btn": "Cambia lingua",
+    "next": "Avanti",
+    "start_btn": "Iniziamo!",
+    "pitch_1_desc": "Questo mondo è abitato da creature chiamate Pokémon! Per alcuni, i Pokémon sono animali domestici. Altri li usano per combattere.",
+    "pitch_2_desc": "Io stesso... studio i Pokémon come professione. E qui, in Cobblemon Universe, l'avventura aspetta tutti!",
+    "pitch_3_desc": "Sei pronto a scrivere la tua storia? Un mondo di sogni e avventure con i Pokémon ti aspetta! Andiamo!",
+    "choice_desc": "Ora dimmi, sei un nuovo allenatore che ha appena iniziato, o un Maestro Pokémon che ritorna?",
+    "new_player_title": "Nuovo Allenatore",
+    "new_player_desc": "Registra un nuovo account",
+    "returning_player_title": "Maestro che ritorna",
+    "returning_player_desc": "Accedi con un account esistente",
     "skip": "Salta",
     "cinematic_1": "Ciao! Benvenuto nel mondo dei Pokémon!",
     "cinematic_2": "Mi chiamo Prof. Oak – tutti mi chiamano il Prof. Pokémon!",
     "cinematic_3": "Questo mondo è abitato da creature chiamate Pokémon!",
-    "cinematic_4": "Studio queste affascinanti creature come professione."
+    "cinematic_4": "Studio queste affascinanti creature come professione.",
+    "select_lang": "Seleziona lingua",
+    "name_placeholder": "Nome Minecraft...",
+    "err_network": "Errore di rete! Per favore controlla la tua connessione. (Errore: {})",
+    "err_server": "Si è verificato un errore del server ({})"
   }
 }

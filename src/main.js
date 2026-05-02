@@ -122,11 +122,35 @@ async function startIntro() {
 
   // Initialize SoundCloud Widget
   let musicWidget = null;
+  let isMusicFading = false;
+
   if (typeof SC !== 'undefined') {
     const iframeElement = $id('intro-music-widget');
     if (iframeElement) {
       musicWidget = SC.Widget(iframeElement);
     }
+  }
+
+  function fadeMusicOut(durationMs = 10000) {
+    if (!musicWidget || isMusicFading) return;
+    isMusicFading = true;
+    const startVolume = 30; 
+    const steps = 40; 
+    const stepDuration = durationMs / steps;
+    const volumeStep = startVolume / steps;
+    let currentVolume = startVolume;
+
+    const interval = setInterval(() => {
+      currentVolume -= volumeStep;
+      if (currentVolume <= 0) {
+        musicWidget.setVolume(0);
+        musicWidget.pause();
+        clearInterval(interval);
+        isMusicFading = false;
+      } else {
+        musicWidget.setVolume(currentVolume);
+      }
+    }, stepDuration);
   }
 
   // Reset Music
@@ -481,6 +505,7 @@ async function startIntro() {
     // Final Exit Cinematic
     async function runClosingCinematic() {
       console.log('[Intro] Running closing cinematic...');
+      fadeMusicOut(10000);
       
       // Immediately disable pointer events so the user doesn't feel "stuck"
       const overlay = $id('intro-overlay');
@@ -497,7 +522,7 @@ async function startIntro() {
         authText.textContent = '';
         skipCinematic = false;
         // Don't await forever, if user clicks it will skip
-        await typeWriter(authText, getLine('intro.good_luck', 'Sok szerencsét a kalandodhoz! Találkozunk a világban!'));
+        await typeWriter(authText, getLine('intro.good_luck', 'Good luck on your adventure! I\'ll see you in the world of Pokémon!'));
       }
       await sleep(1000);
       
@@ -559,7 +584,7 @@ async function startIntro() {
       if (authText) {
         authText.textContent = '';
         skipCinematic = false;
-        await typeWriter(authText, getLine('intro.skin_step_1', 'Nagyszerű! És hogy nézel ki? Használhatod a Mojang skinedet, vagy megadhatsz egy egyedi URL-t is!'));
+        await typeWriter(authText, getLine('intro.skin_step_1', 'Great! And what do you look like? You can use your Mojang skin or provide a custom URL!'));
       }
       
       if (!introSkinViewer3D) {
@@ -594,7 +619,7 @@ async function startIntro() {
       $id('btn-intro-skin-file').classList.remove('active');
       $id('intro-skin-input').classList.remove('hidden');
       $id('btn-intro-browse-skin').classList.add('hidden');
-      $id('intro-skin-input').placeholder = 'Minecraft név (pl. Notch)';
+      $id('intro-skin-input').placeholder = t('skin.type_mojang_placeholder');
       updateIntroSkin3D();
     });
     $id('btn-intro-skin-url')?.addEventListener('click', () => {
@@ -604,7 +629,7 @@ async function startIntro() {
       $id('btn-intro-skin-file').classList.remove('active');
       $id('intro-skin-input').classList.remove('hidden');
       $id('btn-intro-browse-skin').classList.add('hidden');
-      $id('intro-skin-input').placeholder = 'https://.../skin.png';
+      $id('intro-skin-input').placeholder = t('skin.type_url_placeholder');
       updateIntroSkin3D();
     });
     $id('btn-intro-skin-file')?.addEventListener('click', () => {
@@ -697,31 +722,31 @@ async function startIntro() {
       await typeWriter(el, msg);
     };
 
-    $id('intro-explain-phase').onclick = () => { skipCinematic = true; }
-    $id('intro-auth-phase').onclick = (e) => { 
+    $id('intro-explain-phase')?.addEventListener('click', () => { skipCinematic = true; });
+    $id('intro-auth-phase')?.addEventListener('click', (e) => { 
       if(e.target.tagName !== 'INPUT' && e.target.tagName !== 'BUTTON') skipCinematic = true; 
-    }
+    });
 
     $id('btn-choice-new').onclick = async () => {
-      // Show Explanation Phase
+      // Go directly to Register Phase
       $id('intro-choice-phase').classList.add('hidden')
-      $id('intro-explain-phase').classList.remove('hidden')
+      $id('intro-auth-phase').classList.remove('hidden')
+      $id('intro-auth-register-view').classList.remove('hidden')
+      $id('intro-auth-login-view').classList.add('hidden')
+      $id('intro-auth-onetime-view')?.classList.add('hidden')
+
+      // Reset steps
+      $id('reg-step-1').classList.remove('hidden')
+      $id('reg-step-2').classList.add('hidden')
+      $id('auth-dialogue-text').textContent = ''
+      $id('auth-register-username').value = ''
+      $id('auth-register-password').value = ''
+      $id('auth-register-confirm').value = ''
       
-      const explainTextEl = $id('intro-explain-text');
-      const explainButtons = $id('intro-explain-buttons');
-      const backBtn = $id('btn-explain-back');
-      
-      explainButtons.classList.add('hidden');
-      backBtn.classList.add('hidden');
-      explainTextEl.textContent = '';
-      
-      skipCinematic = false; // Allow typing animation again
-      const text = getLine('intro.explain_desc', 'A permanent account gives you access to cross-device syncing, leaderboards, and daily rewards! A one-time account is fast but cannot be recovered if you reinstall. Which path will you choose?');
-      
-      await typeWriter(explainTextEl, text);
-      
-      explainButtons.classList.remove('hidden');
-      backBtn.classList.remove('hidden');
+      // Step 1 dialogue
+      skipCinematic = false
+      await typeWriter($id('auth-dialogue-text'), getLine('intro.reg_step_1', 'Excellent choice! Now, what shall we call you?'))
+      $id('auth-register-username').focus()
     }
     
     $id('btn-choice-returning').onclick = async () => {
@@ -730,7 +755,7 @@ async function startIntro() {
       $id('intro-auth-phase').classList.remove('hidden')
       $id('intro-auth-login-view').classList.remove('hidden')
       $id('intro-auth-register-view').classList.add('hidden')
-      $id('intro-auth-onetime-view').classList.add('hidden')
+      $id('intro-auth-onetime-view')?.classList.add('hidden')
 
       // Reset login steps
       $id('login-step-1').classList.remove('hidden')
@@ -740,7 +765,7 @@ async function startIntro() {
       $id('auth-login-password').value = ''
 
       skipCinematic = false
-      await typeWriter($id('auth-dialogue-text'), getLine('intro.login_step_1', 'Üdvözöllek újra, Mester! Emlékeztetnél a nevedre?'))
+      await typeWriter($id('auth-dialogue-text'), getLine('intro.login_step_1', 'Welcome back, Master! Could you remind me of your name?'))
       $id('auth-login-username').focus()
     }
 
@@ -752,32 +777,9 @@ async function startIntro() {
       $id('auth-dialogue-text').textContent = ''
       
       skipCinematic = false
-      await typeWriter($id('auth-dialogue-text'), getLine('intro.login_step_2', `Örülök, hogy újra látlak, ${user}! Kérlek add meg a jelszavad.`))
+      await typeWriter($id('auth-dialogue-text'), getLine('intro.login_step_2', `Great to see you again, ${user}! Please enter your password.`))
       $id('login-step-2').classList.remove('hidden')
       $id('auth-login-password').focus()
-    }
-    
-    // Explanation Phase Buttons
-    $id('btn-choice-online').onclick = async () => {
-      $id('intro-explain-phase').classList.add('hidden')
-      $id('intro-auth-phase').classList.remove('hidden')
-      $id('intro-auth-register-view').classList.remove('hidden')
-      $id('intro-auth-login-view').classList.add('hidden')
-      $id('intro-auth-onetime-view').classList.add('hidden')
-
-      // Reset steps
-      $id('reg-step-1').classList.add('hidden');
-      $id('reg-step-2').classList.add('hidden');
-      $id('auth-dialogue-text').textContent = '';
-      $id('auth-register-username').value = '';
-      $id('auth-register-password').value = '';
-      $id('auth-register-confirm').value = '';
-      
-      // Step 1 dialogue
-      skipCinematic = false;
-      await typeWriter($id('auth-dialogue-text'), getLine('intro.reg_step_1', 'Kiváló választás! Egy tartós fiók. Nos, hogy hívjunk?'));
-      $id('reg-step-1').classList.remove('hidden');
-      $id('auth-register-username').focus();
     }
     
     $id('btn-reg-next-1').onclick = async () => {
@@ -787,13 +789,13 @@ async function startIntro() {
       if (!user || user.length < 3) {
         $id('auth-dialogue-text').textContent = '';
         skipCinematic = false;
-        await typeWriter($id('auth-dialogue-text'), getLine('intro.err_user_short', 'Hoppá! Ez a név egy kicsit rövidnek tűnik. Legalább 3 karakterre szükségem lesz!'));
+        await typeWriter($id('auth-dialogue-text'), getLine('intro.err_user_short', 'Oops! That name seems a bit short. I\'ll need at least 3 characters!'));
         return;
       }
       if (!/^[a-zA-Z0-9_]+$/.test(user)) {
         $id('auth-dialogue-text').textContent = '';
         skipCinematic = false;
-        await typeWriter($id('auth-dialogue-text'), getLine('intro.err_user_chars', 'Sajnálom, de csak betűket, számokat és alulvonást használhatsz a nevedben!'));
+        await typeWriter($id('auth-dialogue-text'), getLine('intro.err_user_chars', 'I\'m sorry, but you can only use letters, numbers, and underscores in your name!'));
         return;
       }
       
@@ -806,7 +808,7 @@ async function startIntro() {
           if (data && data.available === false) {
             $id('auth-dialogue-text').textContent = '';
             skipCinematic = false;
-            await typeWriter($id('auth-dialogue-text'), getLine('intro.err_user_taken', 'Úgy tűnik, ez a név már foglalt. Tudnál valami mást választani?'));
+            await typeWriter($id('auth-dialogue-text'), getLine('intro.err_user_taken', 'It seems that name is already taken. Could you choose something else?'));
             return;
           }
         }
@@ -818,50 +820,18 @@ async function startIntro() {
       $id('auth-dialogue-text').textContent = '';
       
       skipCinematic = false;
-      await typeWriter($id('auth-dialogue-text'), getLine('intro.reg_step_2_combined', `Ah, ${user}! Remek név. Kérlek adj meg egy titkos jelszavat, majd gépeld be még egyszer!`));
+      await typeWriter($id('auth-dialogue-text'), getLine('intro.reg_step_2_combined', `Ah, ${user}! A fine name. Please enter a secret password, then type it one more time!`));
       
       $id('reg-step-2').classList.remove('hidden');
       $id('auth-register-password').focus();
     }
 
-
-    
-    $id('btn-choice-offline').onclick = async () => {
-      $id('intro-explain-phase').classList.add('hidden')
-      $id('intro-auth-phase').classList.remove('hidden')
-      $id('intro-auth-onetime-view').classList.remove('hidden')
-      $id('intro-auth-login-view').classList.add('hidden')
-      $id('intro-auth-register-view').classList.add('hidden')
-
-      $id('auth-dialogue-text').textContent = ''
-      $id('auth-onetime-username').value = ''
-
-      skipCinematic = false
-      await typeWriter($id('auth-dialogue-text'), getLine('intro.onetime_step_1', 'Rendben! Egy egyszeri kaland. Hogy hívjanak ebben a világban?'))
-      $id('auth-onetime-username').focus()
-    }
-
-    $id('btn-auth-onetime-start').onclick = () => {
-      const user = $id('auth-onetime-username').value.trim()
-      if (!user) return showToast(t('toast.username_required'))
-      username = user
-      localStorage.setItem('cobble_username', username)
-      endIntro()
-    }
-    
-    $id('btn-explain-back').onclick = () => {
-      $id('intro-explain-phase').classList.add('hidden')
-      $id('intro-choice-phase').classList.remove('hidden')
-    }
+    // Explanation Phase Buttons [DELETED]
     
     // Auth Phase Back Button
     $id('btn-auth-back').onclick = () => {
       $id('intro-auth-phase').classList.add('hidden')
-      if (!$id('intro-auth-register-view').classList.contains('hidden')) {
-        $id('intro-explain-phase').classList.remove('hidden')
-      } else {
-        $id('intro-choice-phase').classList.remove('hidden')
-      }
+      $id('intro-choice-phase').classList.remove('hidden')
     }
   }
 
@@ -871,7 +841,7 @@ async function startIntro() {
     if (isInstalling) {
       dest = 'install';
     }
-    if (musicWidget) musicWidget.pause();
+    if (musicWidget && !isMusicFading) musicWidget.pause();
     if (professorViewer) { try { professorViewer.dispose() } catch(_) {} }
     overlay.classList.add('hidden')
     showScreen(dest)
@@ -1135,7 +1105,7 @@ if (window.cobble) {
     isInstalling = false;
     const introMsg = $id('intro-install-msg');
     if (introMsg) {
-      introMsg.textContent = 'Telepítés kész!';
+      introMsg.textContent = t('install.done');
       setTimeout(() => {
         $id('intro-install-progress-container')?.classList.add('hidden');
       }, 2000);
@@ -1444,7 +1414,7 @@ if (window.cobble) {
     isGameRunning = false
     const btn = $id('btn-play')
     btn.disabled = false
-    btn.querySelector('span:last-child').textContent = 'JÁTÉK INDÍTÁSA'
+    btn.querySelector('span:last-child').textContent = t('home.play_btn')
   })
 }
 
@@ -1524,8 +1494,8 @@ async function fetchHubLeaderboard(category = 'playtime') {
       
       let valDisplay = p.value || p.playtime || 0
       let unit = ''
-      if (category === 'playtime') unit = ' óra'
-      else unit = ' db'
+      if (category === 'playtime') unit = t('leaderboard.unit_hours')
+      else unit = t('leaderboard.unit_pieces')
 
       html += `
         <tr>
@@ -1557,7 +1527,7 @@ $id('btn-hub-claim-reward').addEventListener('click', async () => {
   
   if (!username) {
     statusEl.className = 'hub-reward-status error'
-    statusEl.textContent = 'Jelentkezz be egy profillal!'
+    statusEl.textContent = t('rewards.error_no_profile')
     return
   }
 
@@ -1589,12 +1559,12 @@ $id('btn-hub-claim-reward').addEventListener('click', async () => {
       statusEl.textContent = data.message || t('rewards.success')
     } else {
       statusEl.className = 'hub-reward-status error'
-      statusEl.textContent = data.error || 'Hiba: ' + res.status
+      statusEl.textContent = data.error || t('rewards.error_prefix') + res.status
     }
   } catch (e) {
     console.error('[Hub] Reward claim error:', e)
     statusEl.className = 'hub-reward-status error'
-    statusEl.textContent = 'Hálózati hiba: ' + (e.message || 'Ismeretlen')
+    statusEl.textContent = t('rewards.error_network') + (e.message || t('rewards.error_unknown'))
   } finally {
     btn.disabled = false
     btn.innerHTML = `<span data-i18n="rewards.btn">${t('rewards.btn')}</span>`
@@ -1630,7 +1600,7 @@ $id('btn-auth-login').addEventListener('click', async () => {
   btn.textContent = '...';
 
   // Show connecting message in professor dialogue
-  if (window.introShowError) await window.introShowError(t('intro.connecting') || 'Egy pillanat, megkérdezem a központot...');
+  if (window.introShowError) await window.introShowError(t('intro.connecting') || 'One moment, let me check with the headquarters...');
 
   const controller = new AbortController();
   const timeoutId = setTimeout(() => controller.abort(), 10000);
@@ -1648,7 +1618,7 @@ $id('btn-auth-login').addEventListener('click', async () => {
       // Show error in professor dialogue
       const errMsg = data.error
         ? data.error
-        : (t('intro.err_invalid_credentials') || 'Hibás felhasználónév vagy jelszó! Próbáld újra.')
+        : (t('intro.err_invalid_credentials') || 'Incorrect username or password! Are you sure you typed it right? Try again!')
       if (window.introShowError) await window.introShowError(errMsg)
       else showToast('❌ ' + errMsg)
       btn.disabled = false;
@@ -1673,8 +1643,8 @@ $id('btn-auth-login').addEventListener('click', async () => {
     showToast(t('toast.login_success'))
     if (window.endIntroFromAuth) window.endIntroFromAuth()
   } catch (e) {
-    let msg = 'Hálózati hiba! Kérlek ellenőrizd a kapcsolatod. (Hiba: ' + e.message + ')';
-    if (e.name === 'AbortError') msg = t('intro.err_timeout') || 'A szerver nem válaszolt időben. Kérlek próbáld újra!';
+    let msg = t('intro.err_network').replace('{}', e.message);
+    if (e.name === 'AbortError') msg = t('intro.err_timeout') || 'The server did not respond in time. Please try again!';
     if (window.introShowError) await window.introShowError(msg)
     else showToast('❌ ' + msg)
     btn.disabled = false;
@@ -1693,13 +1663,13 @@ $id('btn-auth-register').addEventListener('click', async () => {
   if (pass.length < 6) {
     $id('auth-dialogue-text').textContent = '';
     skipCinematic = false;
-    await typeWriter($id('auth-dialogue-text'), getLine('intro.err_pass_short', 'Sajnálom, de a jelszónak legalább 6 karakterből kell állnia a biztonságod érdekében!'));
+    await typeWriter($id('auth-dialogue-text'), getLine('intro.err_pass_short', 'I\'m sorry, but the password must be at least 6 characters long for your security!'));
     return;
   }
   if (pass !== confirm) {
     $id('auth-dialogue-text').textContent = '';
     skipCinematic = false;
-    typeWriter($id('auth-dialogue-text'), getLine('intro.err_pass_mismatch', 'Hm, a két jelszó nem egyezik. Figyelj oda a gépelésnél!'));
+    typeWriter($id('auth-dialogue-text'), getLine('intro.err_pass_mismatch', 'Hmm, the two passwords don\'t match. Be careful with your typing!'));
     return;
   }
 
@@ -1711,7 +1681,7 @@ $id('btn-auth-register').addEventListener('click', async () => {
   // Show "Connecting..." message
   $id('auth-dialogue-text').textContent = '';
   skipCinematic = false;
-  await typeWriter($id('auth-dialogue-text'), getLine('intro.connecting', 'Egy pillanat, megkérdezem a központot...'));
+  await typeWriter($id('auth-dialogue-text'), getLine('intro.connecting', 'One moment, let me check with the headquarters...'));
 
   const controller = new AbortController();
   const timeoutId = setTimeout(() => controller.abort(), 10000); // 10s timeout
@@ -1730,7 +1700,7 @@ $id('btn-auth-register').addEventListener('click', async () => {
     if (!res.ok) {
       $id('auth-dialogue-text').textContent = '';
       skipCinematic = false;
-      const errorMsg = data.error || `Szerver hiba történt (${res.status})`;
+      const errorMsg = data.error || t('intro.err_server').replace('{}', res.status);
       await typeWriter($id('auth-dialogue-text'), errorMsg);
       btn.disabled = false;
       btn.textContent = originalText;
@@ -1755,8 +1725,8 @@ $id('btn-auth-register').addEventListener('click', async () => {
     console.error('[Auth] Registration error:', e);
     $id('auth-dialogue-text').textContent = '';
     skipCinematic = false;
-    let msg = 'Hálózati hiba történt! Kérlek ellenőrizd a kapcsolatod. (Hiba: ' + e.message + ')';
-    if (e.name === 'AbortError') msg = 'A szerver nem válaszolt időben. Kérlek próbáld újra!';
+    let msg = t('intro.err_network').replace('{}', e.message);
+    if (e.name === 'AbortError') msg = t('intro.err_timeout') || 'The server did not respond in time. Please try again!';
     await typeWriter($id('auth-dialogue-text'), msg);
     btn.disabled = false;
     btn.textContent = originalText;
@@ -2104,7 +2074,7 @@ function updateSpHint() {
 
   if (serverUrl && username) {
     const skinUrl = `${serverUrl.replace(/\/+$/, '')}/skins/${username}.png`
-    hintText.innerHTML = `SP in-game parancs: <code>/skin url ${skinUrl}</code>`
+    hintText.innerHTML = `${t('skin.singleplayer_hint').replace('{}', `<code>${skinUrl}</code>`)}`
     hint.style.display = 'flex'
   } else {
     hint.style.display = 'none'

@@ -98,12 +98,16 @@
     "toast_upload_error": "Skinin lataus epäonnistui (ei palvelinyhteyttä)",
     "remove_profile": "Poista profiili",
     "multiplayer_hint": "Moninpelissä SkinsRestorer asettaa skinin automaattisesti!",
-    "singleplayer_hint": "Yksinpelissä suorita pelissä: <code>/skin url {}</code>"
+    "singleplayer_hint": "Yksinpelissä suorita pelissä: <code>/skin url {}</code>",
+    "type_mojang_placeholder": "esim. Notch",
+    "type_url_placeholder": "https://.../skin.png"
   },
   "titlebar": {
     "minimize": "Minimize",
     "close": "Close",
-    "lang_title": "Change language"
+    "lang_title": "Change language",
+    "replay_intro": "Intro",
+    "lang_switcher": "Kieli"
   },
   "hub": {
     "title": "Server Hub"
@@ -122,7 +126,11 @@
     "placeholder": "Minecraft Username",
     "btn": "Claim",
     "success": "Claim successful!",
-    "error_name": "Invalid name!"
+    "error_name": "Invalid name!",
+    "error_no_profile": "Kirjaudu sisään profiililla!",
+    "error_prefix": "Virhe: ",
+    "error_network": "Verkkovirhe: ",
+    "error_unknown": "Tuntematon"
   },
   "leaderboard": {
     "title": "Hall of Fame",
@@ -136,26 +144,32 @@
     "cat_caught": "Caught",
     "cat_pokedex": "Pokédex",
     "cat_shiny": "Shiny Pokémon",
-    "col_value": "Value"
+    "col_value": "Value",
+    "unit_hours": " tuntia",
+    "unit_pieces": " kpl"
   },
   "intro": {
-    "lang_desc": "Hello there! Welcome to the world of Pokemon! Before we begin, is this your preferred language?",
-    "confirm_btn": "Yes, let's go!",
-    "change_btn": "Change language",
-    "next": "Next",
-    "start_btn": "Let's Start!",
-    "pitch_1_desc": "This world is inhabited by creatures called Pokemon! For some, Pokemon are pets. Others use them for fights.",
-    "pitch_2_desc": "Myself... I study Pokemon as a profession. And here, in Cobblemon Universe, adventure awaits everyone!",
-    "pitch_3_desc": "Are you ready to write your own story? A world of dreams and adventures with Pokemon awaits! Let's go!",
-    "choice_desc": "Now tell me, are you a new trainer just starting out, or a returning Pokemon Master?",
-    "new_player_title": "New Trainer",
-    "new_player_desc": "Register a new account",
-    "returning_player_title": "Returning Master",
-    "returning_player_desc": "Login with existing account",
+    "lang_desc": "Hei! Tervetuloa Pokémon-maailmaan! Ennen kuin aloitamme, onko tämä ensisijainen kielesi?",
+    "confirm_btn": "Kyllä, mennään!",
+    "change_btn": "Vaihda kieli",
+    "next": "Seuraava",
+    "start_btn": "Aloitetaan!",
+    "pitch_1_desc": "Tässä maailmassa asuu olentoja, joita kutsutaan Pokémoneiksi! Joillekin Pokémonit ovat lemmikkejä. Toiset käyttävät niitä taisteluun.",
+    "pitch_2_desc": "Minä itse... tutkin Pokémoneja ammatikseni. Ja täällä, Cobblemon Universessa, seikkailu odottaa kaikkia!",
+    "pitch_3_desc": "Oletko valmis kirjoittamaan oman tarinasi? Unelmien ja seikkailujen maailma Pokémonien kanssa odottaa! Mennään!",
+    "choice_desc": "Kerrohan nyt, oletko uusi valmentaja vasta aloittamassa, vai palaava Pokémon-mestari?",
+    "new_player_title": "Uusi valmentaja",
+    "new_player_desc": "Rekisteröi uusi tili",
+    "returning_player_title": "Palaava mestari",
+    "returning_player_desc": "Kirjaudu sisään olemassa olevalla tilillä",
     "skip": "Skip",
     "cinematic_1": "Hello there! Welcome to the world of Pokémon!",
     "cinematic_2": "My name is Prof. Oak – people call me the Pokémon Prof!",
     "cinematic_3": "This world is inhabited by creatures called Pokémon!",
-    "cinematic_4": "I study these fascinating creatures as my profession."
+    "cinematic_4": "I study these fascinating creatures as my profession.",
+    "select_lang": "Valitse kieli",
+    "name_placeholder": "Minecraft-nimi...",
+    "err_network": "Verkkovirhe! Tarkista yhteys. (Virhe: {})",
+    "err_server": "Palvelinvirhe tapahtui ({})"
   }
 }

@@ -1,6 +1,8 @@
 {
   "modal": {
-    "mods_title": "Installed Mods"
+    "mods_title": "Mods Instalados",
+    "error_mods": "Erro ao carregar a lista.",
+    "no_mods": "Nenhum mod."
   },
   "alternatives": {
     "linux_app": "AppImage",
@@ -21,7 +23,13 @@
     "text": "Looking for another platform?",
     "title": "Procurando outra plataforma?",
     "win": "Installer (.exe)",
-    "win_portable": "Portable (.exe)"
+    "win_portable": "Portable (.exe)",
+    "arch_x64": "x64 (Intel / AMD)",
+    "arch_arm64": "ARM64 (Snapdragon / Native)",
+    "arch_linux_x64": "x86_64 (Intel / AMD)",
+    "arch_linux_arm64": "ARM64 (Pi / Pro)",
+    "arch_mac_arm64": "Apple Silicon (M1/M2/M3)",
+    "arch_mac_intel": "Intel (Legacy)"
   },
   "features": {
     "f1_desc": "Todos os Pokémon de cada geração estão disponíveis, incluindo lendários e míticos. Sem 'fakemons', apenas os clássicos.",
@@ -59,12 +67,36 @@
   "status": {
     "checking": "Verificando sistema...",
     "download": "Baixar Cliente",
-    "download_confirm": "The launcher was not found on your computer. Would you like to download the installer?",
+    "download_confirm": "O launcher não foi encontrado no seu computador. Deseja descarregar o instalador?",
     "launch": "Iniciar Jogo",
     "offline": "SERVIDOR OFFLINE",
     "online": "SERVIDOR ONLINE",
     "os_detected": "Sistema detectado: ",
-    "see_all": "Procurando outra versão? Ver todos os downloads"
+    "see_all": "Procurando outra versão? Ver todos os downloads",
+    "now": "AGORA",
+    "no_players": "Nenhum jogador online"
   },
-  "title": "Download | Cobblemon Universe"
+  "title": "Download | Cobblemon Universe",
+  "os": {
+    "win": "Windows",
+    "win_arm": "Windows ARM",
+    "mac": "macOS",
+    "mac_silicon": "macOS (Apple Silicon)",
+    "mac_intel": "macOS (Intel)",
+    "linux": "Linux",
+    "linux_arm": "Linux ARM",
+    "unknown": "Desconhecido"
+  },
+  "rewards": {
+    "error_network": "Erro de rede."
+  },
+  "leaderboard": {
+    "title": "Hall da Fama",
+    "desc": "Os mestres Pokémon mais ativos no servidor por tempo de jogo.",
+    "rank": "Ranque",
+    "player": "Jogador",
+    "playtime": "Tempo de jogo",
+    "empty": "Ainda sem dados.",
+    "error": "Erro ao carregar os dados."
+  }
 }

@@ -79,7 +79,9 @@
   "titlebar": {
     "lang_title": "更换语言",
     "minimize": "最小化",
-    "close": "关闭"
+    "close": "关闭",
+    "replay_intro": "片头",
+    "lang_switcher": "语言"
   },
   "skin": {
     "modal_title": "皮肤设置",
@@ -95,7 +97,9 @@
     "toast_upload_error": "皮肤上传失败（无法连接服务器）",
     "remove_profile": "删除档案",
     "multiplayer_hint": "在多人游戏中，SkinsRestorer 会自动应用皮肤！",
-    "singleplayer_hint": "在单人游戏中，请在游戏内运行：<code>/skin url {}</code>"
+    "singleplayer_hint": "在单人游戏中，请在游戏内运行：<code>/skin url {}</code>",
+    "type_mojang_placeholder": "例如: Notch",
+    "type_url_placeholder": "https://.../skin.png"
   },
   "sync": {
     "error": "Sync error: ",
@@ -122,7 +126,11 @@
     "placeholder": "Minecraft Username",
     "btn": "Claim",
     "success": "Claim successful!",
-    "error_name": "Invalid name!"
+    "error_name": "Invalid name!",
+    "error_no_profile": "请使用个人资料登录！",
+    "error_prefix": "错误: ",
+    "error_network": "网络错误: ",
+    "error_unknown": "未知"
   },
   "leaderboard": {
     "title": "Hall of Fame",
@@ -136,26 +144,32 @@
     "cat_caught": "Caught",
     "cat_pokedex": "Pokédex",
     "cat_shiny": "Shiny Pokémon",
-    "col_value": "Value"
+    "col_value": "Value",
+    "unit_hours": " 小时",
+    "unit_pieces": " 个"
   },
   "intro": {
-    "lang_desc": "Hello there! Welcome to the world of Pokemon! Before we begin, is this your preferred language?",
-    "confirm_btn": "Yes, let's go!",
-    "change_btn": "Change language",
-    "next": "Next",
-    "start_btn": "Let's Start!",
-    "pitch_1_desc": "This world is inhabited by creatures called Pokemon! For some, Pokemon are pets. Others use them for fights.",
-    "pitch_2_desc": "Myself... I study Pokemon as a profession. And here, in Cobblemon Universe, adventure awaits everyone!",
-    "pitch_3_desc": "Are you ready to write your own story? A world of dreams and adventures with Pokemon awaits! Let's go!",
-    "choice_desc": "Now tell me, are you a new trainer just starting out, or a returning Pokemon Master?",
-    "new_player_title": "New Trainer",
-    "new_player_desc": "Register a new account",
-    "returning_player_title": "Returning Master",
-    "returning_player_desc": "Login with existing account",
+    "lang_desc": "你好！欢迎来到精灵宝可梦的世界！在开始之前，这是您的首选语言吗？",
+    "confirm_btn": "是的，开始吧！",
+    "change_btn": "更改语言",
+    "next": "下一步",
+    "start_btn": "让我们开始吧！",
+    "pitch_1_desc": "这个世界居住着被称为宝可梦的生物！对某些人来说，宝可梦是宠物。其他人则用它们来战斗。",
+    "pitch_2_desc": "我自己... 我的职业是研究宝可梦。在这里，在 Cobblemon Universe，每个人都有冒险在等待着他们！",
+    "pitch_3_desc": "你准备好书写自己的故事了吗？一个充满宝可梦梦想和冒险的世界正等待着你！出发吧！",
+    "choice_desc": "现在告诉我，你是一个刚开始的新训练师，还是一个回归的宝可梦大师？",
+    "new_player_title": "新训练师",
+    "new_player_desc": "注册新账号",
+    "returning_player_title": "回归大师",
+    "returning_player_desc": "登录现有账号",
     "skip": "跳过",
     "cinematic_1": "你好！欢迎来到宝可梦的世界！",
     "cinematic_2": "我是橡树博士 – 大家都叫我宝可梦教授！",
     "cinematic_3": "这个世界里住着叫做宝可梦的生物！",
-    "cinematic_4": "我以研究这些迷人的生物为职业。"
+    "cinematic_4": "我以研究这些迷人的生物为职业。",
+    "select_lang": "选择语言",
+    "name_placeholder": "Minecraft 名字...",
+    "err_network": "网络错误！请检查您的连接。（错误：{}）",
+    "err_server": "发生服务器错误 ({})"
   }
 }

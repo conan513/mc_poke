@@ -1,6 +1,8 @@
 {
   "modal": {
-    "mods_title": "Installed Mods"
+    "mods_title": "Mods Installés",
+    "error_mods": "Erreur lors du chargement de la liste.",
+    "no_mods": "Aucun mod."
   },
   "alternatives": {
     "linux_app": "AppImage",
@@ -21,7 +23,13 @@
     "text": "Vous cherchez une autre plateforme ?",
     "title": "Vous cherchez une autre plateforme ?",
     "win": "Installer (.exe)",
-    "win_portable": "Portable (.exe)"
+    "win_portable": "Portable (.exe)",
+    "arch_x64": "x64 (Intel / AMD)",
+    "arch_arm64": "ARM64 (Snapdragon / Native)",
+    "arch_linux_x64": "x86_64 (Intel / AMD)",
+    "arch_linux_arm64": "ARM64 (Pi / Pro)",
+    "arch_mac_arm64": "Apple Silicon (M1/M2/M3)",
+    "arch_mac_intel": "Intel (Legacy)"
   },
   "features": {
     "f1_desc": "Tous les Pokémon de chaque génération sont disponibles, y compris les Légendaires et les Fabuleux. Pas de 'fakemons', juste les classiques.",
@@ -59,12 +67,36 @@
   "status": {
     "checking": "Vérification du système...",
     "download": "Télécharger le client",
-    "download_confirm": "The launcher was not found on your computer. Would you like to download the installer?",
+    "download_confirm": "Le lanceur n'a pas été trouvé sur votre ordinateur. Souhaitez-vous télécharger l'installateur ?",
     "launch": "Lancer le jeu",
     "offline": "SERVEUR HORS LIGNE",
     "online": "SERVEUR EN LIGNE",
     "os_detected": "Système détecté : ",
-    "see_all": "Vous cherchez une autre version ? Voir tous les téléchargements"
+    "see_all": "Vous cherchez une autre version ? Voir tous les téléchargements",
+    "now": "MAINTENANT",
+    "no_players": "Aucun joueur en ligne"
   },
-  "title": "Télécharger | Cobblemon Universe"
+  "title": "Télécharger | Cobblemon Universe",
+  "os": {
+    "win": "Windows",
+    "win_arm": "Windows ARM",
+    "mac": "macOS",
+    "mac_silicon": "macOS (Apple Silicon)",
+    "mac_intel": "macOS (Intel)",
+    "linux": "Linux",
+    "linux_arm": "Linux ARM",
+    "unknown": "Inconnu"
+  },
+  "rewards": {
+    "error_network": "Erreur réseau."
+  },
+  "leaderboard": {
+    "title": "Tableau d'honneur",
+    "desc": "Les maîtres Pokémon les plus actifs sur le serveur par temps de jeu.",
+    "rank": "Rang",
+    "player": "Joueur",
+    "playtime": "Temps de jeu",
+    "empty": "Pas encore de données.",
+    "error": "Erreur lors du chargement des données."
+  }
 }

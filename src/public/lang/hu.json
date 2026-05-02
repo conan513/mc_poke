@@ -88,7 +88,9 @@
   "titlebar": {
     "lang_title": "Nyelv váltása",
     "minimize": "Minimalizálás",
-    "close": "Bezárás"
+    "close": "Bezárás",
+    "replay_intro": "Intro",
+    "lang_switcher": "Nyelv"
   },
   "skin": {
     "modal_title": "Skin Beállítása",
@@ -104,7 +106,9 @@
     "toast_upload_error": "Skin feltöltés sikertelen (nincs szerver kapcsolat)",
     "remove_profile": "Profil törlése",
     "multiplayer_hint": "Multiplayer-ben a SkinsRestorer automatikusan alkalmazza a skint!",
-    "singleplayer_hint": "Singleplayer-ben in-game futtasd: <code>/skin url {}</code>"
+    "singleplayer_hint": "Singleplayer-ben in-game futtasd: <code>/skin url {}</code>",
+    "type_mojang_placeholder": "pl. Notch",
+    "type_url_placeholder": "https://.../skin.png"
   },
   "hub": {
     "title": "Szerver Központ"
@@ -123,7 +127,11 @@
     "placeholder": "Minecraft Neved",
     "btn": "Begyűjtés",
     "success": "Sikeres begyűjtés!",
-    "error_name": "Érvénytelen név!"
+    "error_name": "Érvénytelen név!",
+    "error_no_profile": "Jelentkezz be egy profillal!",
+    "error_prefix": "Hiba: ",
+    "error_network": "Hálózati hiba: ",
+    "error_unknown": "Ismeretlen"
   },
   "leaderboard": {
     "title": "Dicsőségtábla",
@@ -137,7 +145,9 @@
     "cat_caught": "Elfogott",
     "cat_pokedex": "Pokédex",
     "cat_shiny": "Shiny Pokémon",
-    "col_value": "Érték"
+    "col_value": "Érték",
+    "unit_hours": " óra",
+    "unit_pieces": " db"
   },
   "intro": {
     "lang_desc": "Üdvözöllek! Ez a Pokémonok világa! Mielőtt elkezdenénk... ez a te anyanyelved?",
@@ -181,6 +191,10 @@
     "err_pass_mismatch": "Hm, a két jelszó nem egyezik. Figyelj oda a gépelésnél!",
     "connecting": "Egy pillanat, megkérdezem a központot...",
     "err_invalid_credentials": "Hibás felhasználónév vagy jelszó! Biztos jól gépelted? Próbáld újra!",
-    "err_timeout": "A szerver nem válaszolt időben. Kérlek próbáld újra néhány másodperc múlva!"
+    "err_timeout": "A szerver nem válaszolt időben. Kérlek próbáld újra néhány másodperc múlva!",
+    "select_lang": "Válassz nyelvet",
+    "name_placeholder": "Minecraft név...",
+    "err_network": "Hálózati hiba történt! Kérlek ellenőrizd a kapcsolatod. (Hiba: {})",
+    "err_server": "Szerver hiba történt ({})"
   }
 }

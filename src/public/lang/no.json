@@ -98,12 +98,16 @@
     "toast_upload_error": "Opplasting av skin mislyktes (ingen servertilkobling)",
     "remove_profile": "Fjern profil",
     "multiplayer_hint": "I multiplayer brukes skinnet automatisk av SkinsRestorer!",
-    "singleplayer_hint": "I singleplayer, kjør i spillet: <code>/skin url {}</code>"
+    "singleplayer_hint": "I singleplayer, kjør i spillet: <code>/skin url {}</code>",
+    "type_mojang_placeholder": "f.eks. Notch",
+    "type_url_placeholder": "https://.../skin.png"
   },
   "titlebar": {
     "minimize": "Minimize",
     "close": "Close",
-    "lang_title": "Change language"
+    "lang_title": "Change language",
+    "replay_intro": "Intro",
+    "lang_switcher": "Språk"
   },
   "hub": {
     "title": "Server Hub"
@@ -122,7 +126,11 @@
     "placeholder": "Minecraft Username",
     "btn": "Claim",
     "success": "Claim successful!",
-    "error_name": "Invalid name!"
+    "error_name": "Invalid name!",
+    "error_no_profile": "Vennligst logg inn med en profil!",
+    "error_prefix": "Feil: ",
+    "error_network": "Nettverksfeil: ",
+    "error_unknown": "Ukjent"
   },
   "leaderboard": {
     "title": "Hall of Fame",
@@ -136,26 +144,32 @@
     "cat_caught": "Caught",
     "cat_pokedex": "Pokédex",
     "cat_shiny": "Shiny Pokémon",
-    "col_value": "Value"
+    "col_value": "Value",
+    "unit_hours": " timer",
+    "unit_pieces": " stk"
   },
   "intro": {
-    "lang_desc": "Hello there! Welcome to the world of Pokemon! Before we begin, is this your preferred language?",
-    "confirm_btn": "Yes, let's go!",
-    "change_btn": "Change language",
-    "next": "Next",
-    "start_btn": "Let's Start!",
-    "pitch_1_desc": "This world is inhabited by creatures called Pokemon! For some, Pokemon are pets. Others use them for fights.",
-    "pitch_2_desc": "Myself... I study Pokemon as a profession. And here, in Cobblemon Universe, adventure awaits everyone!",
-    "pitch_3_desc": "Are you ready to write your own story? A world of dreams and adventures with Pokemon awaits! Let's go!",
-    "choice_desc": "Now tell me, are you a new trainer just starting out, or a returning Pokemon Master?",
-    "new_player_title": "New Trainer",
-    "new_player_desc": "Register a new account",
-    "returning_player_title": "Returning Master",
-    "returning_player_desc": "Login with existing account",
+    "lang_desc": "Hei der! Velkommen til Pokémons verden! Før vi begynner, er dette ditt foretrukne språk?",
+    "confirm_btn": "Ja, la oss gå!",
+    "change_btn": "Endre språk",
+    "next": "Neste",
+    "start_btn": "La oss starte!",
+    "pitch_1_desc": "Denne verdenen er bebodd av skapninger kalt Pokémon! For noen er Pokémon kjæledyr. Andre bruker dem til kamp.",
+    "pitch_2_desc": "Jeg selv... jeg studerer Pokémon som profesjon. Og her, i Cobblemon Universe, venter eventyret på alle!",
+    "pitch_3_desc": "Er du klar for å skrive din egen historie? En verden av drømmer og eventyr med Pokémon venter! La oss gå!",
+    "choice_desc": "Fortell meg nå, er du en ny trener som nettopp har startet, eller en returnerende Pokémon-mester?",
+    "new_player_title": "Ny trener",
+    "new_player_desc": "Registrer en ny konto",
+    "returning_player_title": "Returnerende mester",
+    "returning_player_desc": "Logg inn med eksisterende konto",
     "skip": "Hopp over",
     "cinematic_1": "Hei! Velkommen til Pokémons verden!",
     "cinematic_2": "Jeg er Prof. Oak – alle kaller meg Pokémon-professoren!",
     "cinematic_3": "Denne verdenen er bebodd av skapninger kalt Pokémon!",
-    "cinematic_4": "Jeg studerer disse fascinerende skapningene som yrke."
+    "cinematic_4": "Jeg studerer disse fascinerende skapningene som yrke.",
+    "select_lang": "Velg språk",
+    "name_placeholder": "Minecraft-navn...",
+    "err_network": "Nettverksfeil! Vennligst sjekk forbindelsen din. (Feil: {})",
+    "err_server": "Det oppsto en serverfeil ({})"
   }
 }

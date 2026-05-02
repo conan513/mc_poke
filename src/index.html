@@ -42,7 +42,7 @@
     <div id="intro-cinematic-phase" class="intro-phase hidden">
       <div class="intro-cinematic-box">
         <p id="intro-cinematic-text" class="intro-cinematic-text"></p>
-        <button id="btn-cinematic-next" class="btn-primary intro-next-btn hidden" style="margin-top: 15px; align-self: flex-end;" data-i18n="intro.next">Tovább</button>
+        <button id="btn-cinematic-next" class="btn-primary intro-next-btn hidden" style="margin-top: 15px; align-self: flex-end;" data-i18n="intro.next">Next</button>
       </div>
     </div>
 
@@ -64,7 +64,7 @@
       <!-- Fullscreen Language Modal Overlay -->
       <div id="intro-lang-modal-overlay" class="intro-lang-modal-overlay hidden">
         <div class="intro-lang-modal-box">
-          <h2 style="margin-bottom: 25px; color: #1a1a1a; font-family: 'Outfit', sans-serif; text-align: center; font-size: 1.5rem;" data-i18n="intro.select_lang">Válassz nyelvet / Select Language</h2>
+          <h2 style="margin-bottom: 25px; color: #1a1a1a; font-family: 'Outfit', sans-serif; text-align: center; font-size: 1.5rem;" data-i18n="intro.select_lang">Select Language</h2>
           <div id="intro-lang-picker" class="intro-lang-picker-modal">
             <button data-lang="hu">🇭🇺 Magyar</button>
             <button data-lang="en">🇬🇧 English</button>
@@ -81,7 +81,7 @@
             <button data-lang="uk">🇺🇦 Українська</button>
             <button data-lang="ro">🇷🇴 Română</button>
           </div>
-          <button id="btn-close-lang-modal" class="btn-secondary" style="margin-top: 30px; width: 100%; padding: 12px;" data-i18n="btn_back">Vissza / Back</button>
+          <button id="btn-close-lang-modal" class="btn-secondary" style="margin-top: 30px; width: 100%; padding: 12px;" data-i18n="btn_back">Back</button>
         </div>
       </div>
     </div>
@@ -109,29 +109,7 @@
       </div>
     </div>
 
-    <!-- Phase 4: Online vs Offline Explanation -->
-    <div id="intro-explain-phase" class="intro-phase hidden">
-      <div class="intro-dialogue-box intro-choice-card">
-        <p id="intro-explain-text" data-i18n="intro.explain_desc"></p>
-        <div id="intro-explain-buttons" class="choice-buttons hidden" style="margin-top: 15px;">
-          <button id="btn-choice-online" class="choice-btn new-player">
-            <div class="choice-icon">🌐</div>
-            <div class="choice-text">
-              <strong data-i18n="intro.btn_online_title">Online Account</strong>
-              <span data-i18n="intro.btn_online_desc">Play anywhere, track stats</span>
-            </div>
-          </button>
-          <button id="btn-choice-offline" class="choice-btn old-player">
-            <div class="choice-icon">💾</div>
-            <div class="choice-text">
-              <strong data-i18n="intro.btn_offline_title">Offline Play</strong>
-              <span data-i18n="intro.btn_offline_desc">Save locally on device</span>
-            </div>
-          </button>
-        </div>
-        <button id="btn-explain-back" class="btn-secondary intro-back-btn hidden" style="margin-top: 15px; width: 100%;" data-i18n="intro.btn_back">Back</button>
-      </div>
-    </div>
+    <!-- Phase 4: Online vs Offline Explanation [DELETED] -->
 
     <!-- Phase 5: Auth Forms (Login / Register) -->
     <!-- Phase 5: Auth Forms (Login / Register / One-time) -->
@@ -146,8 +124,8 @@
         <!-- Login Step-by-Step -->
         <div id="intro-auth-login-view" class="hidden">
           <div id="login-step-1">
-            <input type="text" class="form-input intro-input" id="auth-login-username" placeholder="Minecraft név..." style="width: 100%; box-sizing: border-box; margin-bottom: 15px;">
-            <button id="btn-login-next-1" class="btn-primary full-width" data-i18n="intro.next">Tovább</button>
+            <input type="text" class="form-input intro-input" id="auth-login-username" data-i18n-attr="placeholder:intro.name_placeholder" style="width: 100%; box-sizing: border-box; margin-bottom: 15px;">
+            <button id="btn-login-next-1" class="btn-primary full-width" data-i18n="intro.next">Next</button>
           </div>
           <div id="login-step-2" class="hidden">
             <input type="password" class="form-input intro-input" id="auth-login-password" data-i18n-attr="placeholder:welcome.password_placeholder" style="width: 100%; box-sizing: border-box; margin-bottom: 15px;">
@@ -158,8 +136,8 @@
         <!-- Register Step-by-Step -->
         <div id="intro-auth-register-view" class="hidden">
           <div id="reg-step-1">
-            <input type="text" class="form-input intro-input" id="auth-register-username" placeholder="Minecraft név..." style="width: 100%; box-sizing: border-box; margin-bottom: 15px;">
-            <button id="btn-reg-next-1" class="btn-primary full-width" data-i18n="intro.next">Tovább</button>
+            <input type="text" class="form-input intro-input" id="auth-register-username" data-i18n-attr="placeholder:intro.name_placeholder" style="width: 100%; box-sizing: border-box; margin-bottom: 15px;">
+            <button id="btn-reg-next-1" class="btn-primary full-width" data-i18n="intro.next">Next</button>
           </div>
           <div id="reg-step-2" class="hidden">
             <input type="password" class="form-input intro-input" id="auth-register-password" data-i18n-attr="placeholder:welcome.password_placeholder" style="width: 100%; box-sizing: border-box; margin-bottom: 10px;">
@@ -168,11 +146,7 @@
           </div>
         </div>
 
-        <!-- One-time Account (Guest) -->
-        <div id="intro-auth-onetime-view" class="hidden">
-          <input type="text" class="form-input intro-input" id="auth-onetime-username" placeholder="Választott neved..." style="width: 100%; box-sizing: border-box; margin-bottom: 15px;">
-          <button id="btn-auth-onetime-start" class="btn-primary full-width" data-i18n="intro.start_btn">Kezdjük el!</button>
-        </div>
+        <!-- One-time Account (Guest) [DELETED] -->
 
         <!-- Skin Selection Step (After Auth) -->
         <div id="intro-skin-select-view" class="hidden">
@@ -183,9 +157,9 @@
           <div style="display: flex; gap: 10px; margin-bottom: 15px;">
             <button id="btn-intro-skin-mojang" class="btn-secondary active" style="flex: 1; padding: 10px; font-size: 0.9em;" data-i18n="skin.type_mojang">Mojang</button>
             <button id="btn-intro-skin-url" class="btn-secondary" style="flex: 1; padding: 10px; font-size: 0.9em;" data-i18n="skin.type_url">URL</button>
-            <button id="btn-intro-skin-file" class="btn-secondary" style="flex: 1; padding: 10px; font-size: 0.9em;" data-i18n="skin.type_file">Fájl</button>
+            <button id="btn-intro-skin-file" class="btn-secondary" style="flex: 1; padding: 10px; font-size: 0.9em;" data-i18n="skin.type_file">Local File</button>
           </div>
-          <input type="text" class="form-input intro-input" id="intro-skin-input" placeholder="Minecraft név (pl. Notch)" style="width: 100%; box-sizing: border-box; margin-bottom: 15px;">
+          <input type="text" class="form-input intro-input" id="intro-skin-input" data-i18n-attr="placeholder:skin.type_mojang_placeholder" style="width: 100%; box-sizing: border-box; margin-bottom: 15px;">
           
           <!-- File selection inputs (hidden by default) -->
           <input type="file" id="intro-skin-file-input" accept="image/png" class="hidden" />
@@ -231,18 +205,18 @@
       <span class="titlebar-title">Cobblemon Universe</span>
       <div class="ui-status-indicator" id="ui-status">
         <span class="status-dot"></span>
-        <span class="status-text" data-i18n="home.ui_online">Online Felület</span>
+        <span class="status-text" data-i18n="home.ui_online">Online UI</span>
       </div>
     </div>
     <div class="titlebar-controls">
-      <button class="tb-btn" id="btn-replay-intro" title="Replay Intro" style="margin-right: 10px; font-size: 13px; padding: 0 10px; border-radius: 6px; display: flex; align-items: center; gap: 4px; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.1); cursor: pointer; color: #fff;">
+      <button class="tb-btn" id="btn-replay-intro" data-i18n-title="titlebar.replay_intro" title="Replay Intro" style="margin-right: 10px; font-size: 13px; padding: 0 10px; border-radius: 6px; display: flex; align-items: center; gap: 4px; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.1); cursor: pointer; color: #fff;">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width: 14px; height: 14px;"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
-        <span>Intro</span>
+        <span data-i18n="titlebar.replay_intro">Intro</span>
       </button>
       <div class="lang-switcher-launcher">
         <button id="lang-btn-launcher" data-i18n-title="titlebar.lang_title" style="margin-right: 10px;">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width: 16px; height: 16px; display: inline-block; vertical-align: middle; margin-right: 4px;"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></svg>
-          <span>Lang</span>
+          <span data-i18n="titlebar.lang_switcher">Lang</span>
         </button>
         <div class="lang-dropdown-launcher" id="lang-dropdown-launcher">
           <button data-lang="hu">Magyar</button>
@@ -645,7 +619,7 @@
                 <button class="tab-btn" data-skin-type="file" data-i18n="skin.type_file">Helyi Fájl</button>
               </div>
               <div id="skin-input-container">
-                <input type="text" id="input-skin-val" class="form-input" placeholder="pl. Steve" style="margin-top: 10px;" />
+                <input type="text" id="input-skin-val" class="form-input" data-i18n-attr="placeholder:skin.type_mojang_placeholder" style="margin-top: 10px;" />
               </div>
               <input type="file" id="input-skin-file" accept="image/png" class="hidden" />
               <button class="btn-secondary hidden" id="btn-browse-skin" style="width: 100%; margin-top: 10px;">

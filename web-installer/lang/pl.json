@@ -1,6 +1,8 @@
 {
   "modal": {
-    "mods_title": "Installed Mods"
+    "mods_title": "Zainstalowane Mody",
+    "error_mods": "Błąd podczas ładowania listy.",
+    "no_mods": "Brak modów."
   },
   "alternatives": {
     "linux_app": "AppImage",
@@ -21,7 +23,13 @@
     "text": "Szukasz innej platformy?",
     "title": "Szukasz innej platformy?",
     "win": "Installer (.exe)",
-    "win_portable": "Portable (.exe)"
+    "win_portable": "Portable (.exe)",
+    "arch_x64": "x64 (Intel / AMD)",
+    "arch_arm64": "ARM64 (Snapdragon / Native)",
+    "arch_linux_x64": "x86_64 (Intel / AMD)",
+    "arch_linux_arm64": "ARM64 (Pi / Pro)",
+    "arch_mac_arm64": "Apple Silicon (M1/M2/M3)",
+    "arch_mac_intel": "Intel (Legacy)"
   },
   "features": {
     "f1_desc": "Dostępne są wszystkie Pokémony z każdej generacji, w tym legendarne i mityczne. Żadnych 'fakemonów', tylko klasyka.",
@@ -59,12 +67,36 @@
   "status": {
     "checking": "Sprawdzanie systemu...",
     "download": "Pobierz Klienta",
-    "download_confirm": "The launcher was not found on your computer. Would you like to download the installer?",
+    "download_confirm": "Launcher nie został znaleziony na Twoim komputerze. Czy chcesz pobrać instalator?",
     "launch": "Uruchom Grę",
     "offline": "SERWER OFFLINE",
     "online": "SERWER ONLINE",
     "os_detected": "Wykryty system: ",
-    "see_all": "Szukasz innej wersji? Zobacz wszystkie pliki do pobrania"
+    "see_all": "Szukasz innej wersji? Zobacz wszystkie pliki do pobrania",
+    "now": "TERAZ",
+    "no_players": "Brak graczy online"
   },
-  "title": "Pobierz | Cobblemon Universe"
+  "title": "Pobierz | Cobblemon Universe",
+  "os": {
+    "win": "Windows",
+    "win_arm": "Windows ARM",
+    "mac": "macOS",
+    "mac_silicon": "macOS (Apple Silicon)",
+    "mac_intel": "macOS (Intel)",
+    "linux": "Linux",
+    "linux_arm": "Linux ARM",
+    "unknown": "Nieznany"
+  },
+  "rewards": {
+    "error_network": "Błąd sieci."
+  },
+  "leaderboard": {
+    "title": "Aleja Sław",
+    "desc": "Najbardziej aktywni mistrzowie Pokémon na serwerze według czasu gry.",
+    "rank": "Ranga",
+    "player": "Gracz",
+    "playtime": "Czas gry",
+    "empty": "Brak danych.",
+    "error": "Błąd ładowania danych."
+  }
 }

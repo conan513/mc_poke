@@ -1,6 +1,8 @@
 {
   "modal": {
-    "mods_title": "Installed Mods"
+    "mods_title": "Встановлені моди",
+    "error_mods": "Помилка при завантаженні списку.",
+    "no_mods": "Моди відсутні."
   },
   "alternatives": {
     "linux_app": "AppImage",
@@ -21,7 +23,13 @@
     "text": "Шукаєте іншу платформу?",
     "title": "Шукаєте іншу платформу?",
     "win": "Installer (.exe)",
-    "win_portable": "Portable (.exe)"
+    "win_portable": "Portable (.exe)",
+    "arch_x64": "x64 (Intel / AMD)",
+    "arch_arm64": "ARM64 (Snapdragon / Native)",
+    "arch_linux_x64": "x86_64 (Intel / AMD)",
+    "arch_linux_arm64": "ARM64 (Pi / Pro)",
+    "arch_mac_arm64": "Apple Silicon (M1/M2/M3)",
+    "arch_mac_intel": "Intel (Legacy)"
   },
   "features": {
     "f1_desc": "Доступні всі покемони з кожного покоління, включаючи легендарних та міфічних. Жодних 'фейкмонів', тільки класика.",
@@ -59,12 +67,36 @@
   "status": {
     "checking": "Перевірка системи...",
     "download": "Завантажити клієнт",
-    "download_confirm": "The launcher was not found on your computer. Would you like to download the installer?",
+    "download_confirm": "Лаунчер не знайдено на вашому комп'ютері. Бажаєте завантажити установник?",
     "launch": "Запустити гру",
     "offline": "СЕРВЕР ОФФЛАЙН",
     "online": "СЕРВЕР ОНЛАЙН",
     "os_detected": "Виявлена система: ",
-    "see_all": "Шукаєте іншу версію? Переглянути всі завантаження"
+    "see_all": "Шукаєте іншу версію? Переглянути всі завантаження",
+    "now": "ЗАРАЗ",
+    "no_players": "Немає гравців онлайн"
   },
-  "title": "Завантажити | Cobblemon Universe"
+  "title": "Завантажити | Cobblemon Universe",
+  "os": {
+    "win": "Windows",
+    "win_arm": "Windows ARM",
+    "mac": "macOS",
+    "mac_silicon": "macOS (Apple Silicon)",
+    "mac_intel": "macOS (Intel)",
+    "linux": "Linux",
+    "linux_arm": "Linux ARM",
+    "unknown": "Невідомо"
+  },
+  "rewards": {
+    "error_network": "Помилка мережі."
+  },
+  "leaderboard": {
+    "title": "Зал слави",
+    "desc": "Найактивніші майстри покемонів на сервері за ігровим часом.",
+    "rank": "Ранг",
+    "player": "Гравець",
+    "playtime": "Ігровий час",
+    "empty": "Даних поки немає.",
+    "error": "Помилка при завантаженні даних."
+  }
 }

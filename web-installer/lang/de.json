@@ -1,6 +1,8 @@
 {
   "modal": {
-    "mods_title": "Installed Mods"
+    "mods_title": "Installierte Mods",
+    "error_mods": "Fehler beim Laden der Liste.",
+    "no_mods": "Keine Mods."
   },
   "alternatives": {
     "linux_app": "AppImage",
@@ -21,7 +23,13 @@
     "text": "Suchen Sie nach einer anderen Plattform?",
     "title": "Suchst du eine andere Plattform?",
     "win": "Installer (.exe)",
-    "win_portable": "Portable (.exe)"
+    "win_portable": "Portable (.exe)",
+    "arch_x64": "x64 (Intel / AMD)",
+    "arch_arm64": "ARM64 (Snapdragon / Native)",
+    "arch_linux_x64": "x86_64 (Intel / AMD)",
+    "arch_linux_arm64": "ARM64 (Pi / Pro)",
+    "arch_mac_arm64": "Apple Silicon (M1/M2/M3)",
+    "arch_mac_intel": "Intel (Legacy)"
   },
   "features": {
     "f1_desc": "Alle Pokémon aus jeder Generation sind verfügbar, einschließlich Legendärer und Mysteriöser Pokémon. Keine 'Fakemons', nur die Klassiker.",
@@ -59,12 +67,36 @@
   "status": {
     "checking": "System wird geprüft...",
     "download": "Download",
-    "download_confirm": "The launcher was not found on your computer. Would you like to download the installer?",
+    "download_confirm": "Der Launcher wurde auf Ihrem Computer nicht gefunden. Möchten Sie das Installationsprogramm herunterladen?",
     "launch": "Spiel starten",
     "offline": "SERVER OFFLINE",
     "online": "SERVER ONLINE",
     "os_detected": "Erkanntes System: ",
-    "see_all": "Andere Version gesucht? Alle Downloads anzeigen"
+    "see_all": "Andere Version gesucht? Alle Downloads anzeigen",
+    "now": "JETZT",
+    "no_players": "Keine Spieler online"
   },
-  "title": "Download | Cobblemon Universe"
+  "title": "Download | Cobblemon Universe",
+  "os": {
+    "win": "Windows",
+    "win_arm": "Windows ARM",
+    "mac": "macOS",
+    "mac_silicon": "macOS (Apple Silicon)",
+    "mac_intel": "macOS (Intel)",
+    "linux": "Linux",
+    "linux_arm": "Linux ARM",
+    "unknown": "Unbekannt"
+  },
+  "rewards": {
+    "error_network": "Netzwerkfehler."
+  },
+  "leaderboard": {
+    "title": "Dicsőségtábla",
+    "desc": "Die aktivsten Pokémon-Meister auf dem Server nach Spielzeit.",
+    "rank": "Rang",
+    "player": "Spieler",
+    "playtime": "Spielzeit",
+    "empty": "Noch keine Daten.",
+    "error": "Fehler beim Laden der Daten."
+  }
 }
