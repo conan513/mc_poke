@@ -141,9 +141,16 @@ async function initDatabase() {
         lastlogin TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
       )
     `
+    const rewardsTableQuery = `
+      CREATE TABLE IF NOT EXISTS daily_rewards (
+        username VARCHAR(100) PRIMARY KEY,
+        last_claim TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+      )
+    `
     await pool.query(tableQuery)
     await pool.query(playersTableQuery)
     await pool.query(usersTableQuery)
+    await pool.query(rewardsTableQuery)
     console.log('[MariaDB] Adatbázis és táblák inicializálva.')
     
     // Első szinkronizálás
@@ -194,14 +201,6 @@ console.log(`[Skins-Init] Absolute skins directory: ${path.resolve(SKINS_DIR)}`)
 const AUTH_FILE = path.join(DATA_DIR, '.admin-auth.json')
 const authTokens = new Map() // token → expiry ms
 
-// ── Daily Rewards State ──────────────────────────────────────────
-const REWARDS_FILE = path.join(DATA_DIR, 'daily_rewards.json')
-function loadRewards() {
-  try { return JSON.parse(fs.readFileSync(REWARDS_FILE, 'utf8')) } catch { return {} }
-}
-function saveRewards(data) {
-  fs.writeFileSync(REWARDS_FILE, JSON.stringify(data))
-}
 
 function loadAuth() {
   try { return JSON.parse(fs.readFileSync(AUTH_FILE, 'utf8')) } catch { return null }
@@ -903,7 +902,7 @@ async function handleRequest(req, res) {
   if (url === '/api/rewards/claim' && req.method === 'POST') {
     let body = ''
     req.on('data', c => body += c)
-    req.on('end', () => {
+    req.on('end', async () => {
       try {
         const { username } = JSON.parse(body)
         if (!username || username.trim().length < 3) {
@@ -911,8 +910,13 @@ async function handleRequest(req, res) {
           return res.end(JSON.stringify({ error: 'Érvénytelen felhasználónév.' }))
         }
         
-        const rewards = loadRewards()
-        const lastClaim = rewards[username] || 0
+        if (!pool) {
+          res.writeHead(500, { 'Content-Type': 'application/json' })
+          return res.end(JSON.stringify({ error: 'Adatbázis hiba.' }))
+        }
+
+        const [rows] = await pool.execute('SELECT last_claim FROM daily_rewards WHERE username = ?', [username])
+        const lastClaim = rows.length > 0 ? new Date(rows[0].last_claim).getTime() : 0
         const now = Date.now()
         const twentyFourHours = 24 * 60 * 60 * 1000
         
@@ -925,8 +929,7 @@ async function handleRequest(req, res) {
         }
         
         // Claim logic
-        rewards[username] = now
-        saveRewards(rewards)
+        await pool.execute('INSERT INTO daily_rewards (username, last_claim) VALUES (?, CURRENT_TIMESTAMP) ON DUPLICATE KEY UPDATE last_claim = CURRENT_TIMESTAMP', [username])
         
         // Execute cobbledollars command
         sendCommand(`cobbledollars add ${username} 100`)
@@ -937,6 +940,7 @@ async function handleRequest(req, res) {
         res.writeHead(200, { 'Content-Type': 'application/json' })
         res.end(JSON.stringify({ success: true, message: 'Jutalom sikeresen begyűjtve!' }))
       } catch (e) {
+        console.error('[Rewards] Hiba:', e.message)
         res.writeHead(500, { 'Content-Type': 'application/json' })
         res.end(JSON.stringify({ error: 'Hiba a jutalom begyűjtésekor.' }))
       }
