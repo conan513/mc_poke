@@ -37,6 +37,7 @@ const BLACKLISTED_MODS = [
   // injection error on startup). serene-seasons → glitchcore → libjf-unsafe-v0 is the
   // full chain. Blacklisting the jar ensures cleanup removes it even if the modpack ships it.
   'libjf-unsafe-v0',
+  'biome-replacer',
 ];
 
 const JAVA_URLS = {
@@ -460,6 +461,8 @@ const EXTRA_MODS = [
   { slug: 'collective',                     loaders: ['fabric'], gameVersions: [MC_VERSION] }, // village-spawn-point
   { slug: 'glitchcore',                     loaders: ['fabric'], gameVersions: [MC_VERSION] }, // serene-seasons (kötelező dep)
   { slug: 'forge-config-api-port',          loaders: ['fabric'], gameVersions: [MC_VERSION] }, // seasonhud-fabric
+  // Cobblemon TCG
+  { slug: 'cobbletcg',                      loaders: ['fabric'], gameVersions: [MC_VERSION] },
 ];
 
 /**
