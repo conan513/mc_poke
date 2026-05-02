@@ -72,6 +72,17 @@ async function startIntro() {
   const floaters = $id('intro-pokemon-floaters')
   if (floaters) floaters.innerHTML = '';
 
+  // ── Background Install Kickoff ────────────────────────────────
+  if (window.cobble) {
+    window.cobble.checkInstalled().then(status => {
+      if (!status.installed && !isInstalling) {
+        isInstalling = true;
+        $id('intro-install-progress-container')?.classList.remove('hidden');
+        startInstall().catch(e => console.warn('[Intro] Background install error:', e));
+      }
+    }).catch(e => console.warn('[Intro] Check installed error:', e));
+  }
+
   $id('intro-wild-pokemon')?.classList.add('hidden');
   $id('intro-flash')?.classList.add('hidden');
   $id('intro-flash')?.classList.remove('active');
@@ -744,7 +755,10 @@ async function startIntro() {
 
   function endIntro(target) {
     // After online auth → go to home; offline/one-time → go to welcome (install screen)
-    const dest = target || 'welcome'
+    let dest = target || 'welcome'
+    if (isInstalling) {
+      dest = 'install';
+    }
     if (musicWidget) musicWidget.pause();
     if (professorViewer) { try { professorViewer.dispose() } catch(_) {} }
     overlay.classList.add('hidden')
@@ -952,6 +966,7 @@ const stepMap = {
 }
 
 let overallPercent = 0
+let isInstalling = false
 
 if (window.cobble) {
   window.cobble.onProgress(({ step, percent, message }) => {
@@ -963,10 +978,19 @@ if (window.cobble) {
   // Map step to overall progress
   const stepWeights = { java: [0,20], minecraft: [20,55], fabric: [55,65], modpack: [65,100], done: [100,100] }
   const range = stepWeights[step]
+  let overall = percent;
   if (range) {
-    const overall = range[0] + ((percent / 100) * (range[1] - range[0]))
+    overall = range[0] + ((percent / 100) * (range[1] - range[0]))
     $id('progress-fill').style.width = `${Math.round(overall)}%`
     $id('progress-pct').textContent = `${Math.round(overall)}%`
+  }
+
+  // Update intro UI with overall progress
+  const introFill = $id('intro-install-fill');
+  if (introFill) {
+    introFill.style.width = `${Math.round(overall)}%`;
+    $id('intro-install-pct').textContent = `${Math.round(overall)}%`;
+    $id('intro-install-msg').textContent = message || t('install.preparing');
   }
 
   // Update step indicators
@@ -996,6 +1020,14 @@ if (window.cobble) {
   }
 
   if (step === 'done') {
+    isInstalling = false;
+    const introMsg = $id('intro-install-msg');
+    if (introMsg) {
+      introMsg.textContent = 'Telepítés kész!';
+      setTimeout(() => {
+        $id('intro-install-progress-container')?.classList.add('hidden');
+      }, 2000);
+    }
     setTimeout(goToHome, 800)
   }
   })
@@ -1027,8 +1059,8 @@ async function startInstall() {
 function goToHome() {
   // Update home screen with real version info from state
   const status = window._lastInstallStatus || {}
-  $id('player-name-display').textContent = username
-  $id('player-avatar').textContent = username.charAt(0).toUpperCase()
+  $id('player-name-display').textContent = username || 'Trainer'
+  $id('player-avatar').textContent = (username && username.length > 0) ? username.charAt(0).toUpperCase() : '?'
   $id('home-ram-display').textContent = `${selectedRam} MB`
 
   if (status.modpackVersion) {
@@ -1070,7 +1102,7 @@ function renderProfiles() {
     
     // Generate avatar style based on profile skin data
     let avatarStyle = ''
-    let avatarContent = p.name.charAt(0).toUpperCase()
+    let avatarContent = (p.name && p.name.length > 0) ? p.name.charAt(0).toUpperCase() : '?'
     
     if (p.skinType === 'url' && p.skinVal) {
       avatarStyle = `background-image: url(${p.skinVal}); background-size: 800%; background-position: 14.28% 14.28%; image-rendering: pixelated;`

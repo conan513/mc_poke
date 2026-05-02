@@ -1002,7 +1002,7 @@ async function handleRequest(req, res) {
         
         console.log(`[Auth] Új EasyAuth regisztráció: ${username}`)
         res.writeHead(200, { 'Content-Type': 'application/json' })
-        res.end(JSON.stringify({ success: true, message: 'Sikeres regisztráció!' }))
+        res.end(JSON.stringify({ success: true, message: 'Sikeres regisztráció!', username, uuid: playerUuid }))
       } catch (e) {
         res.writeHead(500, { 'Content-Type': 'application/json' })
         res.end(JSON.stringify({ error: 'Szerver hiba.' }))
@@ -1037,7 +1037,7 @@ async function handleRequest(req, res) {
         }
 
         res.writeHead(200, { 'Content-Type': 'application/json' })
-        res.end(JSON.stringify({ success: true, uuid: user.uuid }))
+        res.end(JSON.stringify({ success: true, uuid: user.uuid, username }))
       } catch (e) {
         res.writeHead(500, { 'Content-Type': 'application/json' })
         res.end(JSON.stringify({ error: 'Szerver hiba.' }))

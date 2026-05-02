@@ -259,8 +259,8 @@
 /* Wild Pokemon reveal */
 .intro-wild-pokemon {
   position: fixed;
-  right: 24%;
-  bottom: 2vh;
+  right: 32%;
+  bottom: 4vh;
   transform: translate(50%, 0%);
   z-index: 1000001;
   pointer-events: none;
@@ -358,7 +358,7 @@
   display: flex;
   align-items: flex-start;
   justify-content: flex-start;
-  padding: 22vh 0 0 8%;
+  padding: 15vh 0 0 8%;
   z-index: 999999;
   opacity: 1;
   transition: opacity 0.5s ease;
