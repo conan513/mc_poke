@@ -126,7 +126,7 @@ async function startIntro() {
         canvas: profCanvas,
         width: 280,
         height: 480,
-        skin: './img/professor.png',
+        skin: './img/oak-skin.png',
       })
       window._introProfessorViewer = professorViewer
       professorViewer.autoRotate = false
@@ -176,8 +176,28 @@ async function startIntro() {
     }
     if (btnChange) {
       btnChange.onclick = () => {
-        $id('lang-btn-launcher')?.click()
+        // Toggle the inline language picker
+        const picker = $id('intro-lang-picker');
+        if (picker) picker.classList.toggle('hidden');
       }
+    }
+
+    // Handle inline language picker buttons
+    const picker = $id('intro-lang-picker');
+    if (picker) {
+      picker.querySelectorAll('button[data-lang]').forEach(btn => {
+        btn.onclick = async () => {
+          const lang = btn.dataset.lang;
+          const names = {
+            'hu':'Magyar','en':'English','de':'Deutsch','fr':'Français','es':'Español',
+            'it':'Italiano','pt':'Português','ru':'Русский','nl':'Nederlands',
+            'pl':'Polski','tr':'Türkçe','zh':'中文','uk':'Українська','ro':'Română'
+          };
+          await loadSpecificLanguage(lang);
+          if (langDisplay) langDisplay.textContent = names[lang] || lang;
+          picker.classList.add('hidden');
+        };
+      });
     }
   }
 
