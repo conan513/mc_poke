@@ -91,12 +91,20 @@
     "error_network": "Errore di rete."
   },
   "leaderboard": {
-    "title": "Albo d'oro",
+    "title": "Albo d'Oro",
     "desc": "I più attivi maestri Pokémon sul server per tempo di gioco.",
     "rank": "Rango",
     "player": "Giocatore",
     "playtime": "Tempo di gioco",
     "empty": "Ancora nessun dato.",
     "error": "Errore nel caricamento dei dati."
+  },
+  "showcase": {
+    "title": "Pokémon della Settimana",
+    "desc_charizard": "Legendary Fire/Dragon type, one of the strongest challengers on the server!",
+    "desc_rayquaza": "Lord of the skies, a true legend from the Hoenn region!",
+    "desc_greninja": "A fast and deadly Water/Dark type ninja Pokémon.",
+    "desc_lucario": "Aura master Fighting/Steel type. Can you feel its power?",
+    "desc_gengar": "The Ghost/Poison type lurking in the dark, who loves to scare!"
   }
 }

@@ -91,12 +91,20 @@
     "error_network": "Netzwerkfehler."
   },
   "leaderboard": {
-    "title": "Dicsőségtábla",
+    "title": "Ruhmeshalle",
     "desc": "Die aktivsten Pokémon-Meister auf dem Server nach Spielzeit.",
     "rank": "Rang",
     "player": "Spieler",
     "playtime": "Spielzeit",
     "empty": "Noch keine Daten.",
     "error": "Fehler beim Laden der Daten."
+  },
+  "showcase": {
+    "title": "Pokémon der Woche",
+    "desc_charizard": "Legendary Fire/Dragon type, one of the strongest challengers on the server!",
+    "desc_rayquaza": "Lord of the skies, a true legend from the Hoenn region!",
+    "desc_greninja": "A fast and deadly Water/Dark type ninja Pokémon.",
+    "desc_lucario": "Aura master Fighting/Steel type. Can you feel its power?",
+    "desc_gengar": "The Ghost/Poison type lurking in the dark, who loves to scare!"
   }
 }

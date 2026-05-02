@@ -98,5 +98,13 @@
     "playtime": "Czas gry",
     "empty": "Brak danych.",
     "error": "Błąd ładowania danych."
+  },
+  "showcase": {
+    "title": "Pokémon Tygodnia",
+    "desc_charizard": "Legendary Fire/Dragon type, one of the strongest challengers on the server!",
+    "desc_rayquaza": "Lord of the skies, a true legend from the Hoenn region!",
+    "desc_greninja": "A fast and deadly Water/Dark type ninja Pokémon.",
+    "desc_lucario": "Aura master Fighting/Steel type. Can you feel its power?",
+    "desc_gengar": "The Ghost/Poison type lurking in the dark, who loves to scare!"
   }
 }
