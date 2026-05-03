@@ -124,7 +124,8 @@
     "desc_arceus": "A Pokémon világ teremtője, aki minden típus felett uralkodik.",
     "desc_lugia": "A tenger ezüstös őrzője, akinek szárnycsapása vihart kavar.",
     "desc_dialga": "Az idő ura, aki képes megállítani vagy felgyorsítani a pillanatot.",
-    "desc_palkia": "A tér ura, aki képes párhuzamos dimenziókat összekötni."
+    "desc_palkia": "A tér ura, aki képes párhuzamos dimenziókat összekötni.",
+    "generic_desc": "Egy különleges {} a Cobblemon világából. Találd meg és szelídítsd meg!"
   },
   "rewards": {
     "title": "Napi Jutalom",

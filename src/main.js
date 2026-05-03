@@ -1609,11 +1609,22 @@ async function randomizeHubShowcase() {
     if (!res.ok) throw new Error('Showcase fetch failed')
     const p = await res.json()
     
-    if (img) img.src = `https://play.pokemonshowdown.com/sprites/xyani/${p.sprite || 'pikachu'}.gif`
+    if (img) {
+      img.src = `https://play.pokemonshowdown.com/sprites/ani/${p.sprite || 'pikachu'}.gif`
+      img.onerror = () => {
+        img.src = `https://play.pokemonshowdown.com/sprites/dex/${p.sprite || 'pikachu'}.png`
+      }
+    }
     if (nameEl) nameEl.textContent = p.name || '???'
     if (descEl) {
-      descEl.setAttribute('data-i18n', p.descKey)
-      descEl.textContent = t(p.descKey)
+      const localized = t(p.descKey)
+      if (localized === p.descKey) {
+        // Use API description if available, otherwise fallback to generic
+        descEl.textContent = p.apiDesc || t('showcase.generic_desc').replace('{}', p.name)
+      } else {
+        descEl.setAttribute('data-i18n', p.descKey)
+        descEl.textContent = localized
+      }
     }
   } catch (e) {
     console.warn('[Showcase] Error:', e)

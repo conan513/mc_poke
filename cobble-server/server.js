@@ -356,18 +356,29 @@ const onlinePlayers = new Set()
 const verifiedLaunchers = new Map() // username -> { ip, expiry }
 
 // ── Pokémon of the Day Showcase ───────────────────────────────
-const showcasePokemons = [
-  { id: "charizard", name: "Charizard", sprite: "charizard", descKey: "showcase.desc_charizard" },
-  { id: "rayquaza", name: "Rayquaza", sprite: "rayquaza", descKey: "showcase.desc_rayquaza" },
-  { id: "greninja", name: "Greninja", sprite: "greninja", descKey: "showcase.desc_greninja" },
-  { id: "lucario", name: "Lucario", sprite: "lucario", descKey: "showcase.desc_lucario" },
-  { id: "gengar", name: "Gengar", sprite: "gengar", descKey: "showcase.desc_gengar" },
-  { id: "mewtwo", name: "Mewtwo", sprite: "mewtwo", descKey: "showcase.desc_mewtwo" },
-  { id: "arceus", name: "Arceus", sprite: "arceus", descKey: "showcase.desc_arceus" },
-  { id: "lugia", name: "Lugia", sprite: "lugia", descKey: "showcase.desc_lugia" },
-  { id: "dialga", name: "Dialga", sprite: "dialga", descKey: "showcase.desc_dialga" },
-  { id: "palkia", name: "Palkia", sprite: "palkia", descKey: "showcase.desc_palkia" }
-]
+// Load full pokemon list (1025)
+let showcasePokemons = []
+try {
+  const listPath = path.join(__dirname, 'pokemon_list.txt')
+  if (fs.existsSync(listPath)) {
+    const lines = fs.readFileSync(listPath, 'utf8').split('\n').map(s => s.trim()).filter(s => s)
+    showcasePokemons = lines.map(id => ({
+      id: id,
+      name: id.charAt(0).toUpperCase() + id.slice(1),
+      sprite: id,
+      descKey: `showcase.desc_${id}`
+    }))
+    console.log(`[Showcase] Loaded ${showcasePokemons.length} Pokémon for daily rotation.`)
+  } else {
+    // Fallback if list missing
+    showcasePokemons = [
+      { id: "charizard", name: "Charizard", sprite: "charizard", descKey: "showcase.desc_charizard" },
+      { id: "rayquaza", name: "Rayquaza", sprite: "rayquaza", descKey: "showcase.desc_rayquaza" }
+    ]
+  }
+} catch (e) {
+  console.error('[Showcase] Error loading pokemon list:', e.message)
+}
 
 let currentShowcase = null
 
@@ -418,11 +429,29 @@ function boostSpawnRate(pokemonId) {
   }
 }
 
-function updateShowcase() {
-  // Véletlenszerű választás minden alkalommal, amikor lefut (server indítás/újraindítás)
+async function updateShowcase() {
+  if (showcasePokemons.length === 0) return
+  
   const index = Math.floor(Math.random() * showcasePokemons.length)
-  currentShowcase = showcasePokemons[index]
+  currentShowcase = { ...showcasePokemons[index] }
   console.log(`[Showcase] New Pokémon for this session: ${currentShowcase.name}`)
+
+  // Dinamikus leírás lekérése (PokeAPI), ha nincs statikus leírásunk
+  try {
+    // Csak akkor kérjük le, ha nincs egyedi leírás a lang fájlokban (vagy csak generáltatunk)
+    // Megjegyzés: a kliens oldalon is eldönthetjük, de itt a szerveren eltároljuk az angol alap verziót
+    const res = await fetch(`https://pokeapi.co/api/v2/pokemon-species/${currentShowcase.id}`)
+    if (res.ok) {
+      const data = await res.json()
+      const entry = data.flavor_text_entries.find(e => e.language.name === 'en')
+      if (entry) {
+        currentShowcase.apiDesc = entry.flavor_text.replace(/[\f\n\r]/g, ' ')
+        console.log(`[Showcase] Description fetched for ${currentShowcase.name}`)
+      }
+    }
+  } catch (e) {
+    console.warn(`[Showcase] Could not fetch description from API: ${e.message}`)
+  }
   
   // Datapack generálása a boosthoz
   boostSpawnRate(currentShowcase.id)
