@@ -176,6 +176,54 @@ function configureSkinRestorer() {
   }
 }
 
+// ── CobbledLevels Auto-Config ────────────────────────────────
+function configureCobbledLevels() {
+  const configPath = path.join(DATA_DIR, 'config', 'cobbledlevels.json')
+  
+  if (fs.existsSync(configPath)) {
+    try {
+      let content = fs.readFileSync(configPath, 'utf8')
+      let json = JSON.parse(content)
+      let modified = false
+      
+      if (json.PartyScaling && json.PartyScaling.Enabled !== false) {
+        json.PartyScaling.Enabled = false
+        modified = true
+      }
+      if (json.DifficultyScaling && json.DifficultyScaling.Enabled !== false) {
+        json.DifficultyScaling.Enabled = false
+        modified = true
+      }
+      if (json.DistanceScaling && json.DistanceScaling.Influence !== 1.0) {
+        json.DistanceScaling.Influence = 1.0
+        modified = true
+      }
+      
+      // Clear override lists if they are not empty
+      const lists = [
+        "DimensionMinLevel", "DimensionMaxLevel", 
+        "BiomeMinLevel", "BiomeMaxLevel", 
+        "StructureMinLevel", "StructureMaxLevel", 
+        "SpeciesLevelRanges"
+      ]
+      
+      lists.forEach(list => {
+        if (json[list] && json[list].length > 0) {
+          json[list] = []
+          modified = true
+        }
+      })
+
+      if (modified) {
+        fs.writeFileSync(configPath, JSON.stringify(json, null, 2), 'utf8')
+        console.log('[CobbledLevels] cobbledlevels.json beállítások frissítve.')
+      }
+    } catch (e) {
+      console.error('[CobbledLevels] Hiba a konfiguráció frissítésekor:', e.message)
+    }
+  }
+}
+
 // ── EasyAuth Auto-Config ─────────────────────────────────────
 function configureEasyAuth() {
   const easyAuthDir = path.join(DATA_DIR, 'config', 'EasyAuth')
@@ -229,6 +277,7 @@ async function initDatabase() {
   configureEasyAuth()
   configureGravestones()
   configureSkinRestorer()
+  configureCobbledLevels()
   
   try {
     // Első csatlakozás adatbázis nélkül, hogy létrehozzuk ha nincs
