@@ -1200,12 +1200,23 @@ function renderProfiles() {
     item.innerHTML = `
       <div class="p-avatar" style="${avatarStyle}">${avatarContent}</div>
       <div class="p-name">${p.name}</div>
+      ${p.savedPassword ? `
+      <div class="p-forget" data-i18n-title="welcome.forget_password" title="Mentett jelszó törlése">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="width: 14px; height: 14px;"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+      </div>` : ''}
       <div class="p-remove" data-i18n-title="skin.remove_profile" title="Profil törlése">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="width: 14px; height: 14px;"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
       </div>
     `
     
-    item.addEventListener('click', (e) => {
+    item.addEventListener('click', async (e) => {
+      if (e.target.closest('.p-forget')) {
+        p.savedPassword = null
+        saveProfiles()
+        renderProfiles()
+        showToast('Mentett jelszó törölve!')
+        return
+      }
       if (e.target.closest('.p-remove')) {
         profiles = profiles.filter(pr => pr.name !== p.name)
         if (username === p.name) username = ''
@@ -1213,7 +1224,26 @@ function renderProfiles() {
         renderProfiles()
         return
       }
-      selectProfile(p.name)
+
+      if (p.savedPassword) {
+        try {
+          const serverUrl = $id('input-server-url').value.trim() || 'http://94.72.100.43:8080'
+          const res = await fetch(`${serverUrl.replace(/\/+$/, '')}/api/auth/login`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ username: p.name, password: p.savedPassword })
+          })
+          if (res.ok) {
+            selectProfile(p.name)
+            return
+          } else {
+            p.savedPassword = null
+            saveProfiles()
+          }
+        } catch (_) {}
+      }
+
+      openProfileLoginModal(p.name)
     })
     
     list.appendChild(item)
@@ -1221,6 +1251,98 @@ function renderProfiles() {
   
   updateUI()
 }
+
+let pendingProfileName = null
+
+function openProfileLoginModal(name) {
+  pendingProfileName = name
+  const display = $id('profile-login-username-display')
+  if (display) display.textContent = name
+  const input = $id('input-profile-password')
+  if (input) input.value = ''
+  const checkbox = $id('check-remember-password')
+  if (checkbox) checkbox.checked = false
+  
+  const modal = $id('modal-profile-login')
+  if (modal) {
+    modal.classList.remove('hidden')
+    setTimeout(() => {
+      modal.classList.add('active')
+      if (input) input.focus()
+    }, 10)
+  }
+}
+
+$id('btn-close-profile-login')?.addEventListener('click', () => {
+  const modal = $id('modal-profile-login')
+  if (modal) {
+    modal.classList.remove('active')
+    setTimeout(() => modal.classList.add('hidden'), 300)
+  }
+})
+
+$id('btn-submit-profile-login')?.addEventListener('click', async () => {
+  const name = pendingProfileName
+  const pass = $id('input-profile-password').value
+  if (!name || !pass) {
+    showToast(t('intro.err_fill_all') || 'Minden mező kitöltése kötelező!')
+    return
+  }
+
+  const btn = $id('btn-submit-profile-login');
+  const originalText = btn.textContent;
+  btn.disabled = true;
+  btn.innerHTML = '<div class="loading-spinner small" style="margin:0; width:16px; height:16px;"></div>';
+
+  try {
+    const serverUrl = $id('input-server-url').value.trim() || 'http://94.72.100.43:8080'
+    const res = await fetch(`${serverUrl.replace(/\/+$/, '')}/api/auth/login`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ username: name, password: pass })
+    })
+    
+    if (!res.ok) {
+      showToast(t('intro.err_login') || 'Hibás jelszó vagy felhasználónév!')
+      btn.disabled = false;
+      btn.textContent = originalText;
+      return
+    }
+
+    // Success
+    if ($id('check-remember-password')?.checked) {
+      const p = getProfile(name)
+      if (p) {
+        p.savedPassword = pass
+        saveProfiles()
+      }
+    }
+
+    const modal = $id('modal-profile-login')
+    if (modal) {
+      modal.classList.remove('active')
+      setTimeout(() => modal.classList.add('hidden'), 300)
+    }
+    
+    // Reset button state on success so it's usable again if they go back
+    btn.disabled = false
+    btn.textContent = originalText
+    
+    selectProfile(name)
+
+  } catch (e) {
+    showToast('Hálózati hiba: ' + e.message)
+    btn.disabled = false;
+    btn.textContent = originalText;
+  }
+})
+
+// Allow pressing Enter in password field to submit
+$id('input-profile-password')?.addEventListener('keypress', (e) => {
+  if (e.key === 'Enter') {
+    $id('btn-submit-profile-login').click()
+  }
+})
 
 async function selectProfile(name) {
   username = name
