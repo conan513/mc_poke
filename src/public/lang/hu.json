@@ -114,12 +114,17 @@
     "title": "Szerver Központ"
   },
   "showcase": {
-    "title": "A Hét Pokémonja",
+    "title": "A Nap Pokémonja",
     "desc_charizard": "Legendás Tűz/Sárkány típus, a szerver egyik legerősebb kihívója!",
     "desc_rayquaza": "Az egek ura, egy igazi legenda a Hoenn régióból!",
     "desc_greninja": "Gyors és halálos Víz/Sötét típusú nindzsa Pokémon.",
     "desc_lucario": "Aura mester Harcos/Acél típus. Érzed az erejét?",
-    "desc_gengar": "A sötétben rejtőző Szellem/Méreg típus, aki imád ijesztgetni!"
+    "desc_gengar": "A sötétben rejtőző Szellem/Méreg típus, aki imád ijesztgetni!",
+    "desc_mewtwo": "A mesterségesen létrehozott pszichikus Pokémon, ereje határtalan.",
+    "desc_arceus": "A Pokémon világ teremtője, aki minden típus felett uralkodik.",
+    "desc_lugia": "A tenger ezüstös őrzője, akinek szárnycsapása vihart kavar.",
+    "desc_dialga": "Az idő ura, aki képes megállítani vagy felgyorsítani a pillanatot.",
+    "desc_palkia": "A tér ura, aki képes párhuzamos dimenziókat összekötni."
   },
   "rewards": {
     "title": "Napi Jutalom",
@@ -144,9 +149,10 @@
     "cat_playtime": "Játékidő",
     "cat_caught": "Elfogott",
     "cat_pokedex": "Pokédex",
-    "cat_shiny": "Shiny Pokémon",
+    "cat_shiny": "Shiny",
     "col_value": "Érték",
-    "unit_hours": " óra",
+    "unit_hours": "ó",
+    "unit_minutes": "p",
     "unit_pieces": " db"
   },
   "intro": {

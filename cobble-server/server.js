@@ -355,6 +355,80 @@ const UPDATE_FAILED_FLAG = path.join(DATA_DIR, '.update-failed')
 const onlinePlayers = new Set()
 const verifiedLaunchers = new Map() // username -> { ip, expiry }
 
+// ── Pokémon of the Day Showcase ───────────────────────────────
+const showcasePokemons = [
+  { id: "charizard", name: "Charizard", sprite: "charizard", descKey: "showcase.desc_charizard" },
+  { id: "rayquaza", name: "Rayquaza", sprite: "rayquaza", descKey: "showcase.desc_rayquaza" },
+  { id: "greninja", name: "Greninja", sprite: "greninja", descKey: "showcase.desc_greninja" },
+  { id: "lucario", name: "Lucario", sprite: "lucario", descKey: "showcase.desc_lucario" },
+  { id: "gengar", name: "Gengar", sprite: "gengar", descKey: "showcase.desc_gengar" },
+  { id: "mewtwo", name: "Mewtwo", sprite: "mewtwo", descKey: "showcase.desc_mewtwo" },
+  { id: "arceus", name: "Arceus", sprite: "arceus", descKey: "showcase.desc_arceus" },
+  { id: "lugia", name: "Lugia", sprite: "lugia", descKey: "showcase.desc_lugia" },
+  { id: "dialga", name: "Dialga", sprite: "dialga", descKey: "showcase.desc_dialga" },
+  { id: "palkia", name: "Palkia", sprite: "palkia", descKey: "showcase.desc_palkia" }
+]
+
+let currentShowcase = null
+
+function boostSpawnRate(pokemonId) {
+  try {
+    const dpDir = path.join(DATA_DIR, 'world', 'datapacks', 'daily_boost')
+    const spawnDir = path.join(dpDir, 'data', 'cobblemon', 'spawn_pool_world')
+    
+    // Remove old boost if exists
+    if (fs.existsSync(dpDir)) {
+      fs.rmSync(dpDir, { recursive: true, force: true })
+    }
+    
+    // Create new boost datapack
+    fs.mkdirSync(spawnDir, { recursive: true })
+    
+    // pack.mcmeta
+    const mcmeta = {
+      pack: {
+        pack_format: 15,
+        description: `Daily Boost for ${pokemonId}`
+      }
+    }
+    fs.writeFileSync(path.join(dpDir, 'pack.mcmeta'), JSON.stringify(mcmeta, null, 2))
+    
+    // Spawn rule
+    const spawnRule = {
+      "enabled": true,
+      "steps": [
+        {
+          "id": `boost_${pokemonId}`,
+          "pokemon": `nbt:{"name": "cobblemon:${pokemonId}"}`,
+          "bucket": "common",
+          "weight": 10.0,
+          "condition": {
+            "canSpawnPokemon": true
+          }
+        }
+      ]
+    }
+    // Note: The specific format for Cobblemon might vary slightly by version, 
+    // but this is a standard approach for adding a pokemon to the common pool.
+    fs.writeFileSync(path.join(spawnDir, `${pokemonId}.json`), JSON.stringify(spawnRule, null, 2))
+    
+    console.log(`[Showcase] Spawn boost applied for ${pokemonId} via datapack.`)
+  } catch (e) {
+    console.error(`[Showcase] Failed to apply spawn boost: ${e.message}`)
+  }
+}
+
+function updateShowcase() {
+  // Véletlenszerű választás minden alkalommal, amikor lefut (server indítás/újraindítás)
+  const index = Math.floor(Math.random() * showcasePokemons.length)
+  currentShowcase = showcasePokemons[index]
+  console.log(`[Showcase] New Pokémon for this session: ${currentShowcase.name}`)
+  
+  // Datapack generálása a boosthoz
+  boostSpawnRate(currentShowcase.id)
+}
+// Az updateShowcase() hívását kivesszük innen, és betesszük a start() folyamatba
+
 // ── Whitelist & Server Status ──────────────────────────────────────────
 
 // Ensure sync directories exist
@@ -452,6 +526,10 @@ function startMinecraft() {
         isServerReady = true
         serverEvents.emit('ready')
         sendCommand('whitelist on')
+        // Announce daily pokemon
+        if (currentShowcase) {
+          sendCommand(`say [Server] A mai nap Pokémonja: ${currentShowcase.name}! Spawn rate BOOST aktív!`)
+        }
       }
 
       // "Herobrine joined the game"
@@ -670,7 +748,7 @@ async function syncLeaderboardFromFiles() {
           
           const ticks = custom['minecraft:play_time'] || 0
           const playtime = Math.round((ticks / 20 / 60 / 60) * 100) / 100
-          const pokedex = custom['cobblemon:dex_entries'] || custom['cobblemon:pokedex_count'] || 0
+          const pokedex = custom['cobblemon:dex_entries'] || custom['cobblemon:pokedex_count'] || custom['cobblemon:pokedex_captured'] || custom['cobblemon:pokedex_total'] || 0
           
           const user = usercache.find(u => u.uuid === uuid)
           const username = user ? user.name : 'Ismeretlen'
@@ -697,18 +775,22 @@ async function syncLeaderboardFromFiles() {
               
               if (players.has(uuid)) {
                 const p = players.get(uuid)
-                p.caught = adv.totalCaptureCount || 0
-                p.shiny = adv.totalShinyCaptureCount || 0
+                // Try multiple paths for capture counts (different Cobblemon versions)
+                p.caught = data.totalCaptureCount || (data.advancementData && data.advancementData.totalCaptureCount) || (data.extraData && data.extraData['cobblemon:total_captured']) || 0
+                p.shiny = data.totalShinyCaptureCount || (data.advancementData && data.advancementData.totalShinyCaptureCount) || (data.extraData && data.extraData['cobblemon:total_shiny_captured']) || 0
               } else {
                 // If not in stats yet, still add
                 const user = usercache.find(u => u.uuid === uuid)
+                const caught = data.totalCaptureCount || (data.advancementData && data.advancementData.totalCaptureCount) || (data.extraData && data.extraData['cobblemon:total_captured']) || 0
+                const shiny = data.totalShinyCaptureCount || (data.advancementData && data.advancementData.totalShinyCaptureCount) || (data.extraData && data.extraData['cobblemon:total_shiny_captured']) || 0
+                
                 players.set(uuid, {
                   uuid,
                   username: user ? user.name : 'Ismeretlen',
                   playtime: 0,
                   pokedex: 0,
-                  caught: adv.totalCaptureCount || 0,
-                  shiny: adv.totalShinyCaptureCount || 0
+                  caught: caught,
+                  shiny: shiny
                 })
               }
             } catch (e) { }
@@ -1051,6 +1133,14 @@ async function handleRequest(req, res) {
       playersOnline: onlinePlayers.size,
       players: Array.from(onlinePlayers)
     }))
+    return
+  }
+
+  // ── Showcase API ──────────────────────────────────────────
+  if (url === '/api/showcase' && req.method === 'GET') {
+    if (!currentShowcase) updateShowcase()
+    res.writeHead(200, { 'Content-Type': 'application/json' })
+    res.end(JSON.stringify(currentShowcase))
     return
   }
 
@@ -1769,6 +1859,7 @@ function scheduleNightlyRestart() {
         logInfo(msgDone)
       }
 
+      updateShowcase() // Új Pokémon választása az éjszakai újraindításnál
       startMinecraft()
 
       if (!skipUpdate) {
@@ -1790,6 +1881,7 @@ function scheduleNightlyRestart() {
         fs.writeFileSync(UPDATE_FAILED_FLAG, 'true')
         
         logInfo('[Scheduler] 🔄 Restarting with previous working version...')
+        updateShowcase()
         startMinecraft()
       } else {
         // If it failed even with skipUpdate (normal restart failed), just log it
@@ -1836,6 +1928,7 @@ async function start() {
 
     // 3. Start Minecraft Server
     activeJavaPath = javaPath
+    updateShowcase() // Pokémon választás és datapack generálás az indítás előtt
     startMinecraft()
     
     // Initial start health check (optional but good)

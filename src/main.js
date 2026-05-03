@@ -189,6 +189,36 @@ async function startIntro() {
     }
   }
 
+  // ── Back to Launcher Button ──────────────────────────────
+  const btnQuit = $id('btn-intro-quit')
+  if (btnQuit) {
+    btnQuit.onclick = () => {
+      console.log('[Intro] User quit intro, returning to welcome screen.');
+      // Stop music
+      if (musicWidget) {
+        musicWidget.pause();
+        musicWidget.setVolume(0);
+      }
+      // Cleanup floaters
+      const floaters = $id('intro-pokemon-floaters');
+      if (floaters) floaters.innerHTML = '';
+      
+      // Reset state
+      skipCinematic = true;
+      cinematicDone = true;
+      
+      // Hide intro, show welcome
+      overlay.classList.add('hidden');
+      overlay.style.opacity = '0';
+      showScreen('welcome');
+      
+      // Dispose 3D viewer if exists
+      if (professorViewer) {
+        try { professorViewer.dispose(); } catch(e) {}
+      }
+    }
+  }
+
   // ── Phase 1: Language ─────────────────────────────────────
   // Start with Language Phase first
   setupLangPhase()
@@ -1565,29 +1595,33 @@ $id('console-close').addEventListener('click', () => {
 // Functions now triggered in showScreen('home')
 
 
-const showcasePokemons = [
-  { name: "Charizard (Mega X)", sprite: "charizard-megax", descKey: "showcase.desc_charizard" },
-  { name: "Rayquaza", sprite: "rayquaza", descKey: "showcase.desc_rayquaza" },
-  { name: "Greninja", sprite: "greninja", descKey: "showcase.desc_greninja" },
-  { name: "Lucario (Mega)", sprite: "lucario-mega", descKey: "showcase.desc_lucario" },
-  { name: "Gengar", sprite: "gengar", descKey: "showcase.desc_gengar" }
-]
+// Showcase fetch from server handled in randomizeHubShowcase() below
 
-function randomizeHubShowcase() {
-  const p = showcasePokemons[Math.floor(Math.random() * showcasePokemons.length)]
+
+async function randomizeHubShowcase() {
+  const serverUrl = $id('input-server-url')?.value?.trim() || 'http://94.72.100.43:8080'
   const img = $id('hub-showcase-sprite')
   const nameEl = $id('hub-showcase-name')
   const descEl = $id('hub-showcase-desc')
   
-  if (img && nameEl && descEl) {
-    img.src = `https://play.pokemonshowdown.com/sprites/xyani/${p.sprite}.gif`
-    nameEl.textContent = p.name
-    descEl.setAttribute('data-i18n', p.descKey)
-    descEl.innerHTML = t(p.descKey)
+  try {
+    const res = await fetch(`${serverUrl}/api/showcase`)
+    if (!res.ok) throw new Error('Showcase fetch failed')
+    const p = await res.json()
+    
+    if (img) img.src = `https://play.pokemonshowdown.com/sprites/xyani/${p.sprite || 'pikachu'}.gif`
+    if (nameEl) nameEl.textContent = p.name || '???'
+    if (descEl) {
+      descEl.setAttribute('data-i18n', p.descKey)
+      descEl.textContent = t(p.descKey)
+    }
+  } catch (e) {
+    console.warn('[Showcase] Error:', e)
   }
 }
 randomizeHubShowcase()
 
+let leaderboardCache = {}
 let currentLeaderboardCat = 'playtime'
 
 async function fetchHubLeaderboard(category = 'playtime') {
@@ -1609,6 +1643,11 @@ async function fetchHubLeaderboard(category = 'playtime') {
     header.textContent = t(headerKeys[category] || 'leaderboard.playtime')
   }
 
+  // Use cache if available to prevent flicker
+  if (leaderboardCache[category]) {
+    renderLeaderboard(leaderboardCache[category], category)
+  }
+
   // Read server URL
   let serverUrl = $id('input-server-url').value.trim()
   if (!serverUrl) serverUrl = 'http://94.72.100.43:7878'
@@ -1616,34 +1655,55 @@ async function fetchHubLeaderboard(category = 'playtime') {
   try {
     const res = await fetch(`${serverUrl}/api/leaderboard?category=${category}`)
     const data = await res.json()
+    
+    leaderboardCache[category] = data
+    renderLeaderboard(data, category)
+  } catch (e) {
+    if (!leaderboardCache[category]) {
+      tbody.innerHTML = `<tr><td colspan="3" style="text-align:center; color:var(--accent-red);">${t('leaderboard.error')}</td></tr>`
+    }
+  }
+}
 
-    if (!data || data.length === 0) {
-      tbody.innerHTML = `<tr><td colspan="3" style="text-align:center; color:#888;">${t('leaderboard.empty')}</td></tr>`
-      return
+function renderLeaderboard(data, category) {
+  const tbody = $id('hub-leaderboard-body')
+  if (!tbody) return
+
+  if (!data || data.length === 0) {
+    tbody.innerHTML = `<tr><td colspan="3" style="text-align:center; color:#888;">${t('leaderboard.empty')}</td></tr>`
+    return
+  }
+
+  let html = ''
+  data.forEach((p, index) => {
+    const rankClass = index < 3 ? `rank-${index + 1}` : ''
+    const rankContent = index < 3 ? `<span class="rank-badge ${rankClass}">${index + 1}</span>` : index + 1
+    
+    // BUG FIX: Removed fallback to p.playtime which caused "0" values to show playtime instead
+    let rawValue = parseFloat(p.value)
+    if (isNaN(rawValue)) rawValue = 0
+
+    let valDisplay = ''
+    if (category === 'playtime') {
+      // The server sends playtime in HOURS (e.g. 1.25)
+      const totalMins = Math.round(rawValue * 60)
+      const h = Math.floor(totalMins / 60)
+      const m = totalMins % 60
+      valDisplay = `${h}${t('leaderboard.unit_hours')} ${m}${t('leaderboard.unit_minutes')}`
+    } else {
+      // Caught / Shiny / Pokedex are whole numbers
+      valDisplay = `${Math.floor(rawValue)}${t('leaderboard.unit_pieces')}`
     }
 
-    let html = ''
-    data.forEach((p, index) => {
-      const rankClass = index < 3 ? `rank-${index + 1}` : ''
-      const rankContent = index < 3 ? `<span class="rank-badge ${rankClass}">${index + 1}</span>` : index + 1
-      
-      let valDisplay = p.value || p.playtime || 0
-      let unit = ''
-      if (category === 'playtime') unit = t('leaderboard.unit_hours')
-      else unit = t('leaderboard.unit_pieces')
-
-      html += `
-        <tr>
-          <td>${rankContent}</td>
-          <td style="font-weight: 600;">${p.username}</td>
-          <td style="color: var(--accent-yellow);">${valDisplay}${unit}</td>
-        </tr>
-      `
-    })
-    tbody.innerHTML = html
-  } catch (e) {
-    tbody.innerHTML = `<tr><td colspan="3" style="text-align:center; color:var(--accent-red);">${t('leaderboard.error')}</td></tr>`
-  }
+    html += `
+      <tr>
+        <td class="rank-cell">${rankContent}</td>
+        <td class="player-cell" style="font-weight: 600;">${p.username}</td>
+        <td class="value-cell" style="color: var(--accent-yellow); font-family: 'JetBrains Mono', monospace;">${valDisplay}</td>
+      </tr>
+    `
+  })
+  tbody.innerHTML = html
 }
 
 // Tab event listeners

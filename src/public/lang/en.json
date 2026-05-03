@@ -114,12 +114,17 @@
     "title": "Server Hub"
   },
   "showcase": {
-    "title": "Pokémon of the Week",
+    "title": "Pokémon of the Day",
     "desc_charizard": "Legendary Fire/Dragon type, one of the strongest challengers on the server!",
     "desc_rayquaza": "Lord of the skies, a true legend from the Hoenn region!",
     "desc_greninja": "A fast and deadly Water/Dark type ninja Pokémon.",
     "desc_lucario": "Aura master Fighting/Steel type. Can you feel its power?",
-    "desc_gengar": "The Ghost/Poison type lurking in the dark, who loves to scare!"
+    "desc_gengar": "The Ghost/Poison type lurking in the dark, who loves to scare!",
+    "desc_mewtwo": "The artificially created psychic Pokémon, its power is limitless.",
+    "desc_arceus": "The creator of the Pokémon world, ruling over all types.",
+    "desc_lugia": "The silver guardian of the sea, whose wingbeats stir up storms.",
+    "desc_dialga": "The master of time, capable of stopping or accelerating the moment.",
+    "desc_palkia": "The master of space, capable of connecting parallel dimensions."
   },
   "rewards": {
     "title": "Daily Reward",
@@ -144,9 +149,10 @@
     "cat_playtime": "Playtime",
     "cat_caught": "Caught",
     "cat_pokedex": "Pokédex",
-    "cat_shiny": "Shiny Pokémon",
+    "cat_shiny": "Shiny",
     "col_value": "Value",
-    "unit_hours": " hours",
+    "unit_hours": "h",
+    "unit_minutes": "m",
     "unit_pieces": " pcs"
   },
   "intro": {
