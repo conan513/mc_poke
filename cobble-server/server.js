@@ -156,6 +156,14 @@ async function initDatabase() {
       // Ha már létezik az oszlop (Error 1060), akkor ezt figyelmen kívül hagyjuk
     }
 
+    // EasyAuth offline módban a játékos nevét használja az 'uuid' oszlopban.
+    // Kijavítjuk a korábban offline UUID-val (pl. hyphenes) regisztráltakat.
+    try {
+      await pool.query('UPDATE easyauth SET uuid = username WHERE uuid LIKE "%-%"')
+    } catch (e) {
+      // Ignoráljuk
+    }
+
     console.log('[MariaDB] Adatbázis és táblák inicializálva.')
     
     // Első szinkronizálás
@@ -1040,7 +1048,8 @@ async function handleRequest(req, res) {
           data_version: 1
         }
 
-        await pool.query('INSERT INTO easyauth (username, uuid, data) VALUES (?, ?, ?)', [username, playerUuid, JSON.stringify(data)])
+        // Az EasyAuth offline szerveren az 'uuid' oszlopban is a játékos nevét várja!
+        await pool.query('INSERT INTO easyauth (username, uuid, data) VALUES (?, ?, ?)', [username, username, JSON.stringify(data)])
         
         console.log(`[Auth] Új EasyAuth regisztráció: ${username}`)
         res.writeHead(200, { 'Content-Type': 'application/json' })
