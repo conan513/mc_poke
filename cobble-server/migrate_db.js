@@ -11,32 +11,45 @@ async function migrate() {
   let connection;
   try {
     connection = await mysql.createConnection(dbConfig);
-    console.log('Migrating EasyAuth table columns...');
+    console.log('Migrating EasyAuth table to V2 (JSON Data column)...');
     
-    // Check if columns exist and rename them
+    // Check if 'data' column exists
     const [columns] = await connection.execute('SHOW COLUMNS FROM easyauth');
     const columnNames = columns.map(c => c.Field);
     
-    if (columnNames.includes('regdate') && !columnNames.includes('reg_date')) {
-      await connection.execute('ALTER TABLE easyauth CHANGE regdate reg_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP');
-      console.log('- Renamed regdate to reg_date');
+    if (!columnNames.includes('data')) {
+      console.log('- Adding "data" column...');
+      await connection.execute('ALTER TABLE easyauth ADD COLUMN data LONGTEXT');
     }
-    if (columnNames.includes('lastip') && !columnNames.includes('last_ip')) {
-      await connection.execute('ALTER TABLE easyauth CHANGE lastip last_ip VARCHAR(45)');
-      console.log('- Renamed lastip to last_ip');
-    }
-    if (columnNames.includes('lastlogin') && !columnNames.includes('last_login')) {
-      await connection.execute('ALTER TABLE easyauth CHANGE lastlogin last_login TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP');
-      console.log('- Renamed lastlogin to last_login');
+
+    // Migrate existing rows if data is null
+    const [rows] = await connection.execute('SELECT * FROM easyauth WHERE data IS NULL');
+    console.log(`- Migrating ${rows.length} existing users to JSON format...`);
+
+    for (const row of rows) {
+      // Handle different possible column names from previous attempts
+      const password = row.password;
+      const last_ip = row.last_ip || row.lastip || '';
+      const reg_date = row.reg_date || row.regdate || new Date().toISOString();
+      
+      const data = {
+        password: password,
+        last_ip: last_ip,
+        last_authenticated_date: new Date().toISOString(),
+        login_tries: 0,
+        last_kicked_date: "1970-01-01T00:00:00Z",
+        online_account: "UNKNOWN",
+        registration_date: new Date(reg_date).toISOString(),
+        data_version: 1
+      };
+
+      await connection.execute('UPDATE easyauth SET data = ? WHERE id = ?', [JSON.stringify(data), row.id]);
+      console.log(`  * Migrated user: ${row.username}`);
     }
     
     console.log('Migration completed successfully.');
   } catch (e) {
     console.error('Migration failed:', e.message);
-    console.log('You might need to run these manually in your SQL console:');
-    console.log('ALTER TABLE easyauth CHANGE regdate reg_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP;');
-    console.log('ALTER TABLE easyauth CHANGE lastip last_ip VARCHAR(45);');
-    console.log('ALTER TABLE easyauth CHANGE lastlogin last_login TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP;');
   } finally {
     if (connection) await connection.end();
   }

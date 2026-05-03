@@ -134,11 +134,8 @@ async function initDatabase() {
       CREATE TABLE IF NOT EXISTS easyauth (
         id INT AUTO_INCREMENT PRIMARY KEY,
         username VARCHAR(100) UNIQUE,
-        password VARCHAR(255),
         uuid VARCHAR(36) UNIQUE,
-        reg_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-        last_ip VARCHAR(45),
-        last_login TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+        data LONGTEXT
       )
     `
     const rewardsTableQuery = `
@@ -151,6 +148,14 @@ async function initDatabase() {
     await pool.query(playersTableQuery)
     await pool.query(usersTableQuery)
     await pool.query(rewardsTableQuery)
+
+    // Ha a tábla korábban jött létre a data oszlop nélkül, ezzel hozzáadjuk
+    try {
+      await pool.query('ALTER TABLE easyauth ADD COLUMN data LONGTEXT')
+    } catch (e) {
+      // Ha már létezik az oszlop (Error 1060), akkor ezt figyelmen kívül hagyjuk
+    }
+
     console.log('[MariaDB] Adatbázis és táblák inicializálva.')
     
     // Első szinkronizálás
@@ -1020,11 +1025,22 @@ async function handleRequest(req, res) {
           return res.end(JSON.stringify({ error: 'Ez a felhasználónév már foglalt.' }))
         }
 
-        const hash = await bcrypt.hash(password, 10)
+        const hash = await bcrypt.hash(password, 12)
         const playerUuid = getOfflineUUID(username)
-        
         const ip = req.headers['x-forwarded-for'] || req.socket.remoteAddress.replace(/^.*:/, '')
-        await pool.query('INSERT INTO easyauth (username, password, uuid, last_ip, reg_date) VALUES (?, ?, ?, ?, NOW())', [username, hash, playerUuid, ip])
+        
+        const data = {
+          password: hash,
+          last_ip: ip,
+          last_authenticated_date: new Date().toISOString(),
+          login_tries: 0,
+          last_kicked_date: "1970-01-01T00:00:00Z",
+          online_account: "UNKNOWN",
+          registration_date: new Date().toISOString(),
+          data_version: 1
+        }
+
+        await pool.query('INSERT INTO easyauth (username, uuid, data) VALUES (?, ?, ?)', [username, playerUuid, JSON.stringify(data)])
         
         console.log(`[Auth] Új EasyAuth regisztráció: ${username}`)
         res.writeHead(200, { 'Content-Type': 'application/json' })
@@ -1049,14 +1065,15 @@ async function handleRequest(req, res) {
           return res.end(JSON.stringify({ error: 'Adatbázis nem elérhető.' }))
         }
 
-        const [users] = await pool.query('SELECT password, uuid FROM easyauth WHERE username = ?', [username])
+        const [users] = await pool.query('SELECT data, uuid FROM easyauth WHERE username = ?', [username])
         if (users.length === 0) {
           res.writeHead(401, { 'Content-Type': 'application/json' })
           return res.end(JSON.stringify({ error: 'Hibás adatok.' }))
         }
 
         const user = users[0]
-        const match = await bcrypt.compare(password, user.password)
+        const userData = JSON.parse(user.data || '{}')
+        const match = await bcrypt.compare(password, userData.password || '')
         if (!match) {
           res.writeHead(401, { 'Content-Type': 'application/json' })
           return res.end(JSON.stringify({ error: 'Hibás adatok.' }))
@@ -1095,8 +1112,14 @@ async function handleRequest(req, res) {
                 [hwid, profileId, username, playerUuid, username, playerUuid])
               
               // ── EASYAUTH AUTO-LOGIN BRIDGE ──
-              await pool.query('UPDATE easyauth SET last_ip = ?, last_login = NOW() WHERE username = ?', [ip, username])
-              console.log(`[Verification] Account UUID & Session frissítve: ${username} -> ${playerUuid}`)
+              const [eRows] = await pool.query('SELECT data FROM easyauth WHERE username = ?', [username])
+              if (eRows.length > 0) {
+                const eData = JSON.parse(eRows[0].data || '{}')
+                eData.last_ip = ip
+                eData.last_authenticated_date = new Date().toISOString()
+                await pool.query('UPDATE easyauth SET data = ? WHERE username = ?', [JSON.stringify(eData), username])
+                console.log(`[Verification] EasyAuth Session frissítve: ${username}`)
+              }
             } else {
               const [rows] = await pool.query('SELECT uuid FROM players WHERE hwid = ? AND profile_id = ?', [hwid, profileId])
               if (rows.length > 0) {
