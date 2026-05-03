@@ -41,6 +41,141 @@ const LAUNCHER_SECRET = 'cobble-super-secret-key-2024'
 
 const DATA_DIR = path.join(__dirname, 'server-data')
 
+// ── Gravestones Auto-Config ──────────────────────────────────
+function configureGravestones() {
+  const configDir = path.join(DATA_DIR, 'config')
+  const gravestonesPath = path.join(configDir, 'gravestones.json')
+  
+  if (!fs.existsSync(configDir)) {
+    fs.mkdirSync(configDir, { recursive: true })
+  }
+
+  if (fs.existsSync(gravestonesPath)) {
+    try {
+      let content = fs.readFileSync(gravestonesPath, 'utf8')
+      let json = JSON.parse(content)
+      let modified = false
+      
+      if (json.decay_with_time !== false) {
+        json.decay_with_time = false
+        modified = true
+      }
+      if (json.spawn_gravestones_with_keepinv !== true) {
+        json.spawn_gravestones_with_keepinv = true
+        modified = true
+      }
+      
+      if (modified) {
+        fs.writeFileSync(gravestonesPath, JSON.stringify(json, null, 2), 'utf8')
+        console.log('[Gravestones] gravestones.json beállítások frissítve.')
+      }
+    } catch (e) {
+      console.error('[Gravestones] Hiba a konfiguráció frissítésekor:', e.message)
+    }
+  } else {
+    // Default settings with the requested modifications
+    const defaultSettings = {
+      "decay_with_deaths": true,
+      "decay_with_time": false,
+      "decay_time": 576000,
+      "decay_time_type": "TICKS",
+      "damage_to_break": 3,
+      "aesthetic_decay": false,
+      "store_experience": true,
+      "experience_cap": true,
+      "experience_kept": "VANILLA",
+      "experience_decay": false,
+      "drop_experience": false,
+      "gravestone_accessible_owner_only": true,
+      "broadcast_collect_in_chat": false,
+      "broadcast_coordinates_in_chat": false,
+      "aesthetic_gravestones": true,
+      "spawn_gravestone_skeletons": false,
+      "spawn_gravestones_in_creative": true,
+      "spawn_gravestones_with_keepinv": true,
+      "show_heads": true,
+      "time_format": "MMDDYYYY",
+      "console_info": false
+    }
+    try {
+      fs.writeFileSync(gravestonesPath, JSON.stringify(defaultSettings, null, 2), 'utf8')
+      console.log('[Gravestones] gravestones.json létrehozva és konfigurálva.')
+    } catch (e) {
+      console.error('[Gravestones] Hiba a konfiguráció létrehozásakor:', e.message)
+    }
+  }
+}
+
+// ── SkinRestorer Auto-Config ─────────────────────────────────
+function configureSkinRestorer() {
+  const srDir = path.join(DATA_DIR, 'config', 'skinrestorer')
+  const srConfigPath = path.join(srDir, 'config.json')
+  
+  if (!fs.existsSync(srDir)) {
+    fs.mkdirSync(srDir, { recursive: true })
+  }
+
+  if (fs.existsSync(srConfigPath)) {
+    try {
+      let content = fs.readFileSync(srConfigPath, 'utf8')
+      let json = JSON.parse(content)
+      let modified = false
+      
+      if (json.join) {
+        if (json.join.refreshSkin !== false) {
+          json.join.refreshSkin = false
+          modified = true
+        }
+        if (json.join.autoFetch && json.join.autoFetch.enabled !== false) {
+          json.join.autoFetch.enabled = false
+          modified = true
+        }
+      }
+      
+      if (modified) {
+        fs.writeFileSync(srConfigPath, JSON.stringify(json, null, 2), 'utf8')
+        console.log('[SkinRestorer] config.json beállítások frissítve.')
+      }
+    } catch (e) {
+      console.error('[SkinRestorer] Hiba a konfiguráció frissítésekor:', e.message)
+    }
+  } else {
+    // Default settings with the requested modifications
+    const defaultSettings = {
+      "language": "en_us",
+      "join": {
+        "refreshSkin": false,
+        "skipRefreshProviders": [],
+        "applyDelay": 0,
+        "autoFetch": {
+          "enabled": false,
+          "overrideExisting": false,
+          "provider": "mojang"
+        }
+      },
+      "request": {
+        "proxy": "",
+        "timeout": 10,
+        "userAgent": ""
+      },
+      "providers": {
+        "mojang": { "enabled": true, "name": "mojang", "cache": { "enabled": true, "duration": 60 } },
+        "ely_by": { "enabled": true, "name": "ely.by", "cache": { "enabled": true, "duration": 60 } },
+        "mineskin": { "apiKey": "", "proxyUrlUpload": false, "enabled": true, "name": "web", "cache": { "enabled": true, "duration": 300 } },
+        "collection": { "sources": [], "enabled": false, "name": "collection", "cache": { "enabled": true, "duration": 604800 } },
+        "custom": []
+      },
+      "version": 2
+    }
+    try {
+      fs.writeFileSync(srConfigPath, JSON.stringify(defaultSettings, null, 2), 'utf8')
+      console.log('[SkinRestorer] config.json létrehozva és konfigurálva.')
+    } catch (e) {
+      console.error('[SkinRestorer] Hiba a konfiguráció létrehozásakor:', e.message)
+    }
+  }
+}
+
 // ── EasyAuth Auto-Config ─────────────────────────────────────
 function configureEasyAuth() {
   const easyAuthDir = path.join(DATA_DIR, 'config', 'EasyAuth')
@@ -92,6 +227,8 @@ let pool = null
 
 async function initDatabase() {
   configureEasyAuth()
+  configureGravestones()
+  configureSkinRestorer()
   
   try {
     // Első csatlakozás adatbázis nélkül, hogy létrehozzuk ha nincs
