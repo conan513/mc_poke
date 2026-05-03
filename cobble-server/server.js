@@ -136,9 +136,9 @@ async function initDatabase() {
         username VARCHAR(100) UNIQUE,
         password VARCHAR(255),
         uuid VARCHAR(36) UNIQUE,
-        regdate TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-        lastip VARCHAR(45),
-        lastlogin TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+        reg_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        last_ip VARCHAR(45),
+        last_login TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
       )
     `
     const rewardsTableQuery = `
@@ -1023,8 +1023,8 @@ async function handleRequest(req, res) {
         const hash = await bcrypt.hash(password, 10)
         const playerUuid = getOfflineUUID(username)
         
-        const ip = req.socket.remoteAddress.replace(/^.*:/, '')
-        await pool.query('INSERT INTO easyauth (username, password, uuid, lastip, lastlogin) VALUES (?, ?, ?, ?, NOW())', [username, hash, playerUuid, ip])
+        const ip = req.headers['x-forwarded-for'] || req.socket.remoteAddress.replace(/^.*:/, '')
+        await pool.query('INSERT INTO easyauth (username, password, uuid, last_ip, reg_date) VALUES (?, ?, ?, ?, NOW())', [username, hash, playerUuid, ip])
         
         console.log(`[Auth] Új EasyAuth regisztráció: ${username}`)
         res.writeHead(200, { 'Content-Type': 'application/json' })
@@ -1095,7 +1095,7 @@ async function handleRequest(req, res) {
                 [hwid, profileId, username, playerUuid, username, playerUuid])
               
               // ── EASYAUTH AUTO-LOGIN BRIDGE ──
-              await pool.query('UPDATE easyauth SET lastip = ?, lastlogin = NOW() WHERE username = ?', [ip, username])
+              await pool.query('UPDATE easyauth SET last_ip = ?, last_login = NOW() WHERE username = ?', [ip, username])
               console.log(`[Verification] Account UUID & Session frissítve: ${username} -> ${playerUuid}`)
             } else {
               const [rows] = await pool.query('SELECT uuid FROM players WHERE hwid = ? AND profile_id = ?', [hwid, profileId])

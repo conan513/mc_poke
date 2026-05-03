@@ -1024,6 +1024,7 @@ $id('btn-install').addEventListener('click', async () => {
   }
 
   // Check if already installed
+  if (!window.cobble) return
   const status = await window.cobble.checkInstalled()
   window._lastInstallStatus = status
   if (status.allDone) {
@@ -1126,6 +1127,7 @@ async function startInstall() {
   $id('progress-pct').textContent = '0%'
 
   const serverUrl = $id('input-server-url').value.trim()
+  if (!window.cobble) return { success: false, error: 'Not in launcher' }
   const result = await window.cobble.install({ username, ram: selectedRam, serverUrl })
 
   if (!result.success) {
@@ -1241,6 +1243,7 @@ async function selectProfile(name) {
   await syncSkinFromServer(name)
   
   // Ugrás a főképernyőre (ha már telepítve van)
+  if (!window.cobble) return
   const status = await window.cobble.checkInstalled()
   if (status.allDone) {
     window._lastInstallStatus = status
@@ -1293,6 +1296,7 @@ async function runUpdateCheck() {
   banner.classList.add('hidden')
 
   try {
+    if (!window.cobble) return
     const updates = await window.cobble.checkForUpdates()
     const parts = []
 
@@ -1359,7 +1363,19 @@ $id('btn-play').addEventListener('click', async () => {
 
   // ── Launcher Verification ─────────────────────────────────
   try {
-    const hwid = await window.cobble.getHWID()
+    // ── Get HWID with fallback for Web/Browser environments ──
+    let hwid = null
+    if (window.cobble && typeof window.cobble.getHWID === 'function') {
+      hwid = await window.cobble.getHWID()
+    } else {
+      // Fallback: use a persistent random ID stored in localStorage
+      hwid = localStorage.getItem('cobble_hwid')
+      if (!hwid) {
+        hwid = generateUUID()
+        localStorage.setItem('cobble_hwid', hwid)
+      }
+      console.warn('[Launcher] window.cobble.getHWID not found, using fallback ID:', hwid)
+    }
     const currentProfile = getProfile(username)
     const profileId = currentProfile ? currentProfile.profileId : null
     const pUuid = currentProfile ? currentProfile.uuid : null
@@ -1377,6 +1393,7 @@ $id('btn-play').addEventListener('click', async () => {
     const verifyData = await verifyRes.json()
     console.log('[Verification] Sikeres szerver oldali igazolás. UUID:', verifyData.uuid)
     
+    if (!window.cobble) return { success: false, error: 'Not in launcher' }
     const result = await window.cobble.launch({ 
       username, 
       uuid: verifyData.uuid, 
