@@ -133,9 +133,11 @@ async function initDatabase() {
     const usersTableQuery = `
       CREATE TABLE IF NOT EXISTS easyauth (
         id INT AUTO_INCREMENT PRIMARY KEY,
-        username VARCHAR(100) UNIQUE,
-        uuid VARCHAR(36) UNIQUE,
-        data LONGTEXT
+        username VARCHAR(255) UNIQUE,
+        username_lower VARCHAR(255),
+        uuid VARCHAR(255),
+        data LONGTEXT,
+        last_ip VARCHAR(45)
       )
     `
     const rewardsTableQuery = `
@@ -168,6 +170,13 @@ async function initDatabase() {
         const realUuid = [hex.substring(0, 8), hex.substring(8, 12), hex.substring(12, 16), hex.substring(16, 20), hex.substring(20)].join('-')
         await pool.query('UPDATE easyauth SET uuid = ? WHERE username = ?', [realUuid, uname])
       }
+    } catch (e) {
+      // Ignoráljuk
+    }
+
+    // Biztosítjuk, hogy a username_lower oszlop is ki legyen töltve (az EasyAuth ezt használja keresésre!)
+    try {
+      await pool.query('UPDATE easyauth SET username_lower = LOWER(username) WHERE username_lower IS NULL OR username_lower = ""')
     } catch (e) {
       // Ignoráljuk
     }
@@ -1056,7 +1065,7 @@ async function handleRequest(req, res) {
           data_version: 1
         }
 
-        await pool.query('INSERT INTO easyauth (username, uuid, data) VALUES (?, ?, ?)', [username, playerUuid, JSON.stringify(data)])
+        await pool.query('INSERT INTO easyauth (username, username_lower, uuid, data, last_ip) VALUES (?, ?, ?, ?, ?)', [username, username.toLowerCase(), playerUuid, JSON.stringify(data), ip])
         
         console.log(`[Auth] Új EasyAuth regisztráció: ${username}`)
         res.writeHead(200, { 'Content-Type': 'application/json' })
@@ -1127,16 +1136,6 @@ async function handleRequest(req, res) {
               await pool.query('INSERT INTO players (hwid, profile_id, username, uuid) VALUES (?, ?, ?, ?) ON DUPLICATE KEY UPDATE username = ?, uuid = ?, last_login = NOW()', 
                 [hwid, profileId, username, playerUuid, username, playerUuid])
               
-              // ── EASYAUTH AUTO-LOGIN BRIDGE ──
-              const [eRows] = await pool.query('SELECT data FROM easyauth WHERE username = ?', [username])
-              if (eRows.length > 0) {
-                const eData = JSON.parse(eRows[0].data || '{}')
-                eData.last_ip = ip
-                eData.last_authenticated_date = new Date().toISOString()
-                await pool.query('UPDATE easyauth SET data = ? WHERE username = ?', [JSON.stringify(eData), username])
-                console.log(`[Verification] EasyAuth Session frissítve: ${username}`)
-              }
-            } else {
               const [rows] = await pool.query('SELECT uuid FROM players WHERE hwid = ? AND profile_id = ?', [hwid, profileId])
               if (rows.length > 0) {
                 playerUuid = rows[0].uuid
@@ -1148,6 +1147,20 @@ async function handleRequest(req, res) {
                 console.log(`[Verification] Új profil regisztrálva: ${username} (Profile: ${profileId}) -> ${playerUuid}`)
               }
             }
+
+            // ── EASYAUTH AUTO-LOGIN BRIDGE ──
+            // Minden sikeres indításkor (Play gomb) frissítjük a játékos IP-jét az adatbázisban,
+            // így mire ténylegesen csatlakozik a Minecraft szerverhez, az EasyAuth látni fogja az új IP-t
+            // és a Session funkció miatt automatikusan beengedi jelszó nélkül!
+            const [eRows] = await pool.query('SELECT data FROM easyauth WHERE username = ?', [username])
+            if (eRows.length > 0) {
+              const eData = JSON.parse(eRows[0].data || '{}')
+              eData.last_ip = ip
+              eData.last_authenticated_date = new Date().toISOString()
+              await pool.query('UPDATE easyauth SET data = ?, last_ip = ? WHERE username = ?', [JSON.stringify(eData), ip, username])
+              console.log(`[Verification] EasyAuth IP frissítve az automatikus belépéshez: ${username} -> ${ip}`)
+            }
+
           } catch (dbErr) {
             console.error('[Verification] DB hiba:', dbErr.message)
           }
