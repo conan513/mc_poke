@@ -153,6 +153,9 @@ async function initDatabase() {
     try {
       await pool.query('ALTER TABLE easyauth ADD COLUMN data LONGTEXT')
     } catch (e) {
+      // Ignoráljuk
+    }
+
     // Visszaállítjuk a helyes Offline UUID-kat az adatbázisban, ha korábban elrontottuk volna
     try {
       const [rows] = await pool.query('SELECT username FROM easyauth WHERE uuid NOT LIKE "%-%"')
