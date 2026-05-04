@@ -1012,37 +1012,54 @@ async function launch({ username, uuid, ram, serverUrl }, onLog, onClose) {
 
   onLog?.(`[Launcher] Fabric Loader: ${loaderVersion}`)
 
-  // ── Sync Custom Server Mods ──────────────────────────────────
-  if (serverUrl && serverUrl.trim() !== '') {
-    try {
-      const modsDir = path.join(instanceDir, 'mods')
-      await syncServerMods(serverUrl.trim(), instanceDir, onLog)
-      
-      // Setup local skin config for singleplayer (SkinsRestorer Fabric mod)
-      await prepareLocalSkinConfig(instanceDir, username, serverUrl.trim())
-    } catch (e) {
-      onLog?.(`[Sync-Hiba] Kivétel a szinkronizáció során: ${e.message}`)
+  // ── Unified Server Resolution ────────────────────────────────
+  const DEFAULT_HOST = "94.72.100.43"
+  const DEFAULT_SYNC_PORT = "8080"
+  
+  let rawInput = serverUrl?.trim() || DEFAULT_HOST
+  let syncUrl = rawInput
+  
+  // Prepend http:// if missing
+  if (!syncUrl.startsWith('http')) syncUrl = 'http://' + syncUrl
+  
+  // Parse to get host and check for port
+  let targetHost = DEFAULT_HOST
+  try {
+    const urlObj = new URL(syncUrl)
+    targetHost = urlObj.hostname
+    
+    // If no port was provided in raw input, append default sync port
+    if (!urlObj.port && !rawInput.includes(':')) {
+      syncUrl = `${urlObj.protocol}//${urlObj.hostname}:${DEFAULT_SYNC_PORT}`
     }
+  } catch (e) {
+    targetHost = rawInput.split(':')[0] || DEFAULT_HOST
+    if (!rawInput.includes(':')) syncUrl = `http://${targetHost}:${DEFAULT_SYNC_PORT}`
+  }
+
+  onLog?.(`[Launcher] Szerver: ${targetHost} | Sync: ${syncUrl}`)
+
+  // ── Sync Custom Server Mods ──────────────────────────────────
+  try {
+    await syncServerMods(syncUrl, instanceDir, onLog)
+    // Log skin URL for reference
+    await prepareLocalSkinConfig(instanceDir, username, syncUrl)
+  } catch (e) {
+    onLog?.(`[Sync-Hiba] Kivétel a szinkronizáció során: ${e.message}`)
   }
 
   // ── Cleanup Blacklisted/Broken Mods ─────────────────────────
   await cleanupClientMods(onLog)
 
-  // ── Modrinth Individual Mod Updates (Disabled - handled by server sync) ──
-  // await updateModsFromModrinth(onLog)
-
   // ── Ensure Server is in servers.dat ──────────────────────────
-  if (serverUrl) {
-    try {
-      await updateServersDat(instanceDir, serverUrl)
-      onLog?.(`[Launcher] Szerver lista frissítve: ${serverUrl}`)
-    } catch (e) {
-      onLog?.(`[Launcher-Hiba] Nem sikerült frissíteni a szerver listát: ${e.message}`)
-    }
+  try {
+    await updateServersDat(instanceDir, targetHost)
+    onLog?.(`[Launcher] Szerver lista ellenőrizve: ${targetHost}`)
+  } catch (e) {
+    onLog?.(`[Launcher-Hiba] Nem sikerült frissíteni a szerver listát: ${e.message}`)
   }
 
   const client = new Client()
-
 
   const opts = {
     authorization: uuid ? {
@@ -1064,8 +1081,17 @@ async function launch({ username, uuid, ram, serverUrl }, onLog, onClose) {
     },
     javaPath: java,
     gameDirectory: instanceDir,
+    quickPlay: {
+      type: 'multiplayer',
+      identifier: `${targetHost}:25565`
+    },
     overrides: {
       gameDirectory: instanceDir,
+      customArgs: ['--quickPlayMultiplayer', `${targetHost}:25565`]
+    },
+    server: {
+      host: targetHost,
+      port: 25565
     },
     customArgs: [
       '-XX:+UseG1GC', '-XX:+ParallelRefProcEnabled', '-XX:MaxGCPauseMillis=200',
@@ -1165,20 +1191,9 @@ async function prepareLocalSkinConfig(instanceDir, username, serverUrl) {
  * Updates or creates the servers.dat file to ensure the target server is in the list.
  * This writes a raw NBT buffer to avoid heavy dependencies.
  */
-async function updateServersDat(instanceDir, serverUrl) {
+async function updateServersDat(instanceDir, host) {
   try {
-    let host = "94.72.100.43" // Default fallback
-    
-    if (serverUrl && serverUrl.trim() !== '') {
-      try {
-        let cleanUrl = serverUrl.trim()
-        if (!cleanUrl.startsWith('http')) cleanUrl = 'http://' + cleanUrl
-        const url = new URL(cleanUrl)
-        host = url.hostname || serverUrl.trim().split(':')[0]
-      } catch (e) {
-        host = serverUrl.trim().split(':')[0]
-      }
-    }
+    if (!host) host = "94.72.100.43" // Default fallback
 
     const name = "Cobblemon Universe"
     const serversDatPath = path.join(instanceDir, 'servers.dat')
