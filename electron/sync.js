@@ -59,7 +59,8 @@ function fetchManifest(serverUrl) {
 const FORCED_REMOVALS = [
   'custom-splash-screen', 'customsplashscreen', 'mobsbegone', 'soundsbegone', 
   'interactic', 'fancymenu', 'konkrete', 'drippyloadingscreen', 'loadingscreen', 'notenoughcrashes',
-  'cobblemon-rustling-spots', 'rustlingspots'
+  'zombified-player', 'zombifiedplayer', 'squaremap', 'ordered-player-list', 'player-mobs', 'maplink',
+  'pneumono_gravestones', 'pneumono_core'
 ]
 
 async function syncServerMods(serverUrl, instanceDir, onLog) {
