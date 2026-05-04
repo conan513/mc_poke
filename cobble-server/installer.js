@@ -421,6 +421,7 @@ async function updateModsFromModrinth() {
  */
 const EXTRA_MODS = [
   { slug: 'chipped',                        loaders: ['fabric'], gameVersions: [MC_VERSION] },
+  { slug: 'creeper-firework',               loaders: ['fabric'], gameVersions: [MC_VERSION] },
   { slug: 'terrablender',                   loaders: ['fabric'], gameVersions: [MC_VERSION] },
   { slug: 'skinrestorer',                   loaders: ['fabric'], gameVersions: [MC_VERSION] },
   // Cobblemon extra mods
