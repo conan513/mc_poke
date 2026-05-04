@@ -33,11 +33,8 @@ const STATE_BAK = path.join(SERVER_DIR, '.server-install-state.json.bak')
 const BLACKLISTED_MODS = [
   'no hunger', 'mobsbegone', 'no ender dragon', 'soundsbegone',
   'interactic', 'custom-splash-screen', 'customsplashscreen', 'battlecam', 'lenientdeath',
-  // libjf-unsafe-v0 conflicts with fabric-resource-loader-v0's LanguageMixin (fatal ASM
-  // injection error on startup). serene-seasons → glitchcore → libjf-unsafe-v0 is the
-  // full chain. Blacklisting the jar ensures cleanup removes it even if the modpack ships it.
-  'libjf-unsafe-v0',
   'biome-replacer',
+  'fancymenu', 'konkrete', 'drippyloadingscreen', 'loadingscreen'
 ];
 
 const JAVA_URLS = {
@@ -834,41 +831,7 @@ async function install() {
     }
   }
 
-  // 4. Custom assets inject (FancyMenu) for Sync Server
-  try {
-    const customFancymenuDir = path.join(__dirname, '..', 'build-assets', 'fancymenu')
-    const destFancymenuDir = path.join(SERVER_DIR, 'config', 'fancymenu')
-
-    if (fs.existsSync(customFancymenuDir)) {
-      logInfo('[Installer] Egyedi FancyMenu konfig másolása a szerver adatai közé (szinkronizáláshoz)...')
-
-      const copyRecursive = (src, dest) => {
-        fs.mkdirSync(dest, { recursive: true })
-        for (const entry of fs.readdirSync(src, { withFileTypes: true })) {
-          const srcPath = path.join(src, entry.name)
-          const destPath = path.join(dest, entry.name)
-          if (entry.isDirectory()) {
-            copyRecursive(srcPath, destPath)
-          } else {
-            fs.copyFileSync(srcPath, destPath)
-          }
-        }
-      }
-
-      // Régi fájlok teljes törlése másolás előtt
-      if (fs.existsSync(destFancymenuDir)) {
-        fs.rmSync(destFancymenuDir, { recursive: true, force: true })
-        logInfo('[Installer] Korábbi FancyMenu konfig teljesen törölve a tiszta cseréhez.')
-      }
-
-      copyRecursive(customFancymenuDir, destFancymenuDir)
-      logInfo('[Installer] FancyMenu konfig sikeresen átmásolva.')
-    }
-  } catch (err) {
-    logError(`[Installer] Hiba a FancyMenu konfig másolásakor: ${err.message}`)
-  }
-
-  // 5. Extra Mods (Chipped, TerraBlender)
+  // 4. Extra Mods (Chipped, TerraBlender)
   await ensureExtraMods()
 
   // 6. Blacklist Cleanup (Ensure unwanted mods are gone)
