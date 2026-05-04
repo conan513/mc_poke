@@ -376,7 +376,8 @@ async function initDatabase() {
   }
 }
 
-initDatabase()
+
+// initDatabase() removed from global scope to be awaited in start()
 const SKINS_DIR = path.join(DATA_DIR, 'skins')
 const SYNC_FOLDERS = ['mods', 'datapacks', 'config', 'resourcepacks', 'shaderpacks']
 
@@ -1937,7 +1938,7 @@ function scheduleNightlyRestart() {
         logInfo(msgDone)
       }
 
-      updateShowcase() // Új Pokémon választása az éjszakai újraindításnál
+      await updateShowcase() // Új Pokémon választása az éjszakai újraindításnál
       startMinecraft()
 
       if (!skipUpdate) {
@@ -1959,7 +1960,7 @@ function scheduleNightlyRestart() {
         fs.writeFileSync(UPDATE_FAILED_FLAG, 'true')
         
         logInfo('[Scheduler] 🔄 Restarting with previous working version...')
-        updateShowcase()
+        await updateShowcase()
         startMinecraft()
       } else {
         // If it failed even with skipUpdate (normal restart failed), just log it
@@ -1979,6 +1980,9 @@ async function start() {
     // 1. Install / Update Modpack and Fabric Server
     const javaPath = await install()
     invalidateManifest()
+
+    // 1.5 Initialize Database and Configs (Awaited to ensure configs are written first)
+    await initDatabase()
 
     // 2. Start HTTP Sync Server
     const server = http.createServer(handleRequest)
@@ -2006,7 +2010,7 @@ async function start() {
 
     // 3. Start Minecraft Server
     activeJavaPath = javaPath
-    updateShowcase() // Pokémon választás és datapack generálás az indítás előtt
+    await updateShowcase() // Pokémon választás és datapack generálás az indítás előtt
     startMinecraft()
     
     // Initial start health check (optional but good)
