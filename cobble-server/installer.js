@@ -34,7 +34,7 @@ const BLACKLISTED_MODS = [
   'no hunger', 'mobsbegone', 'no ender dragon', 'soundsbegone',
   'interactic', 'custom-splash-screen', 'customsplashscreen', 'battlecam', 'lenientdeath',
   'biome-replacer',
-  'fancymenu', 'konkrete', 'drippyloadingscreen', 'loadingscreen'
+  'fancymenu', 'konkrete', 'drippyloadingscreen', 'loadingscreen', 'notenoughcrashes'
 ];
 
 const JAVA_URLS = {

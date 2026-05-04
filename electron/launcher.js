@@ -1047,16 +1047,15 @@ async function launch({ username, uuid, ram, serverUrl }, onLog, onClose) {
   } catch (e) {
     onLog?.(`[Sync-Hiba] Kivétel a szinkronizáció során: ${e.message}`)
   }
-
   // ── Cleanup Blacklisted/Broken Mods ─────────────────────────
   await cleanupClientMods(onLog)
 
-  // ── Ensure Server is in servers.dat ──────────────────────────
+  // ── Ensure Server is in servers.dat & Skip First-Launch Warnings ──
   try {
-    await updateServersDat(instanceDir, targetHost)
-    onLog?.(`[Launcher] Szerver lista ellenőrizve: ${targetHost}`)
+    await ensureFirstLaunchConfigs(instanceDir, targetHost)
+    onLog?.(`[Launcher] Indítási konfigurációk ellenőrizve: ${targetHost}`)
   } catch (e) {
-    onLog?.(`[Launcher-Hiba] Nem sikerült frissíteni a szerver listát: ${e.message}`)
+    onLog?.(`[Launcher-Hiba] Nem sikerült frissíteni a konfigurációkat: ${e.message}`)
   }
 
   const client = new Client()
@@ -1188,6 +1187,60 @@ async function prepareLocalSkinConfig(instanceDir, username, serverUrl) {
 }
 
 /**
+ * Ensures options.txt and servers.dat are ready for a seamless first launch.
+ */
+async function ensureFirstLaunchConfigs(instanceDir, host) {
+  try {
+    const defaultOptionsDir = path.join(instanceDir, 'config', 'defaultoptions')
+    fse.ensureDirSync(defaultOptionsDir)
+    
+    const optionsPath = path.join(defaultOptionsDir, 'options.txt')
+    let optionsContent = ''
+
+    if (fs.existsSync(optionsPath)) {
+      optionsContent = fs.readFileSync(optionsPath, 'utf8')
+    }
+
+    const settingsToEnsure = {
+      'skipMultiplayerWarning': 'true',
+      'onboardAccessibility': 'false',
+      'joinedFirstServer': 'true',
+      'tutorialStep': 'none',
+      'realmsNotifications': 'false',
+      'telemetryOptInExtra': 'false',
+      'chatLinksPrompt': 'false',
+      'showSubtitles': 'false',
+      'autoJump': 'false',
+      'syncChunkWrites': 'false'
+    }
+
+    let modified = false
+    for (const [key, value] of Object.entries(settingsToEnsure)) {
+      if (!optionsContent.includes(`${key}:`)) {
+        optionsContent += `${key}:${value}\n`
+        modified = true
+      } else {
+        const regex = new RegExp(`^${key}:.*`, 'm')
+        const currentLine = optionsContent.match(regex)
+        if (currentLine && !currentLine[0].includes(value)) {
+          optionsContent = optionsContent.replace(regex, `${key}:${value}`)
+          modified = true
+        }
+      }
+    }
+
+    if (modified) {
+      fs.writeFileSync(optionsPath, optionsContent)
+      console.log('[Launcher] Kezdeti beállítások (options.txt) frissítve.')
+    }
+
+    await updateServersDat(defaultOptionsDir, host)
+  } catch (e) {
+    console.error('[Launcher] Hiba a kezdeti beállításoknál:', e.message)
+  }
+}
+
+/**
  * Updates or creates the servers.dat file to ensure the target server is in the list.
  * This writes a raw NBT buffer to avoid heavy dependencies.
  */
@@ -1216,38 +1269,39 @@ async function updateServersDat(instanceDir, host) {
     const hostBuf = Buffer.from(host, 'utf8')
     
     // NBT Structure for servers.dat:
-    // Compound (root, nameless)
-    //   List (name: "servers", type: Compound)
-    //     Compound (entry 0, nameless)
-    //       String (name: "name", value: "Cobblemon Universe")
-    //       String (name: "ip", value: host)
+    // Compound (root)
+    //   List "servers" (Compound)
+    //     Compound
+    //       String "name": "Cobblemon Universe"
+    //       String "ip": host
+    //       Byte "acceptTextures": 1 (Always)
     //     End
     //   End
     // End
     
     const parts = [
-      Buffer.from([0x0A, 0x00, 0x00]), // Root Compound (Type 10, Name Length 0)
-      
-      Buffer.from([0x09, 0x00, 0x07]), // List Tag (Type 9), Name Length 7
+      Buffer.from([0x0A, 0x00, 0x00]), // Root Compound
+      Buffer.from([0x09, 0x00, 0x07]), // List Tag, Name "servers"
       Buffer.from("servers", 'utf8'),
-      Buffer.from([0x0A]),             // List element type: Compound (10)
-      Buffer.from([0x00, 0x00, 0x00, 0x01]), // List length: 1
+      Buffer.from([0x0A]),             // Compound type
+      Buffer.from([0x00, 0x00, 0x00, 0x01]), // Length 1
       
-      // The first element of a List of Compounds starts directly with its tags, 
-      // NOT with a 0x0A tag ID.
-      
-      Buffer.from([0x08, 0x00, 0x04]), // String Tag (8), Name Length 4: "name"
+      Buffer.from([0x08, 0x00, 0x04]), // String "name"
       Buffer.from("name", 'utf8'),
-      Buffer.from([Math.floor(nameBuf.length / 256), nameBuf.length % 256]), // Value Length
+      Buffer.from([Math.floor(nameBuf.length / 256), nameBuf.length % 256]),
       nameBuf,
       
-      Buffer.from([0x08, 0x00, 0x02]), // String Tag (8), Name Length 2: "ip"
+      Buffer.from([0x08, 0x00, 0x02]), // String "ip"
       Buffer.from("ip", 'utf8'),
-      Buffer.from([Math.floor(hostBuf.length / 256), hostBuf.length % 256]), // Value Length
+      Buffer.from([Math.floor(hostBuf.length / 256), hostBuf.length % 256]),
       hostBuf,
+
+      Buffer.from([0x01, 0x00, 0x0E]), // Byte "acceptTextures"
+      Buffer.from("acceptTextures", 'utf8'),
+      Buffer.from([0x01]),             // Value: 1 (Enabled/Always)
       
-      Buffer.from([0x00]),             // End of Server Compound
-      Buffer.from([0x00])              // End of Root Compound
+      Buffer.from([0x00]),             // End element
+      Buffer.from([0x00])              // End root
     ]
     
     const uncompressed = Buffer.concat(parts)

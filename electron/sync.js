@@ -58,7 +58,7 @@ function fetchManifest(serverUrl) {
 // This runs even if the sync server is unreachable.
 const FORCED_REMOVALS = [
   'custom-splash-screen', 'customsplashscreen', 'mobsbegone', 'soundsbegone', 
-  'interactic', 'fancymenu', 'konkrete', 'drippyloadingscreen', 'loadingscreen'
+  'interactic', 'fancymenu', 'konkrete', 'drippyloadingscreen', 'loadingscreen', 'notenoughcrashes'
 ]
 
 async function syncServerMods(serverUrl, instanceDir, onLog) {
