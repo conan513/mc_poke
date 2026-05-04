@@ -271,6 +271,68 @@ mysql {
   }
 }
 
+// ── Creeper Firework Auto-Config ─────────────────────────────
+function configureCreeperFirework() {
+  const configPath = path.join(DATA_DIR, 'config', 'creeper_firework.json5')
+  
+  if (fs.existsSync(configPath)) {
+    try {
+      let content = fs.readFileSync(configPath, 'utf8')
+      let modified = false
+      
+      if (content.match(/"CREEPER_EXPLODE_INTO_FIREWORK"\s*:\s*true/)) {
+        content = content.replace(/"CREEPER_EXPLODE_INTO_FIREWORK"\s*:\s*true/g, '"CREEPER_EXPLODE_INTO_FIREWORK": false')
+        modified = true
+      }
+      
+      if (content.match(/"CREEPER_FIREWORK_DESTROY_BLOCK"\s*:\s*true/)) {
+        content = content.replace(/"CREEPER_FIREWORK_DESTROY_BLOCK"\s*:\s*true/g, '"CREEPER_FIREWORK_DESTROY_BLOCK": false')
+        modified = true
+      }
+      
+      if (content.match(/"CREEPER_FIREWORK_HURT_CREATURE"\s*:\s*false/)) {
+        content = content.replace(/"CREEPER_FIREWORK_HURT_CREATURE"\s*:\s*false/g, '"CREEPER_FIREWORK_HURT_CREATURE": true')
+        modified = true
+      }
+      
+      if (modified) {
+        fs.writeFileSync(configPath, content, 'utf8')
+        console.log('[CreeperFirework] creeper_firework.json5 beállítások frissítve (rombolás letiltva).')
+      }
+    } catch (e) {
+      console.error('[CreeperFirework] Hiba a konfiguráció frissítésekor:', e.message)
+    }
+  } else {
+    const defaultSettings = `{
+	// Will creeper's active-explosion turn into firework?
+	"CREEPER_EXPLODE_INTO_FIREWORK": false,
+	// Will the active-explosion firework destroy nearby environment just like creeper normally exploding?
+	"CREEPER_FIREWORK_DESTROY_BLOCK": false,
+	// Will the active-explosion firework effect hurt nearby creature?
+	"CREEPER_FIREWORK_HURT_CREATURE": true,
+	// The probability of creeper turning into firework when actively explodes. It must be bigger than 0.0 and not exceed 1.0.
+	"CREEPER_EXPLODE_INTO_FIREWORK_PROBABILITY": 1.0,
+	// Will creeper explode into firework when die?
+	"CREEPER_EXPLODE_INTO_FIREWORK_WHEN_DIE": false,
+	// Will the death-explosion firework destroy nearby environment just like creeper normally exploding?
+	"CREEPER_DEATH_FIREWORK_DESTROY_BLOCK": false,
+	// Will the death-explosion firework effect hurt nearby creature?
+	"CREEPER_DEATH_FIREWORK_HURT_CREATURE": true,
+	// The probability of creeper turning into firework when die. It must be bigger than 0.0 and not exceed 1.0.
+	"CREEPER_EXPLODE_INTO_FIREWORK_PROBABILITY_WHEN_DIE": 1.0
+}`
+    const configDir = path.join(DATA_DIR, 'config')
+    if (!fs.existsSync(configDir)) fs.mkdirSync(configDir, { recursive: true })
+    
+    try {
+      fs.writeFileSync(configPath, defaultSettings, 'utf8')
+      console.log('[CreeperFirework] creeper_firework.json5 létrehozva (rombolás letiltva).')
+    } catch (e) {
+      console.error('[CreeperFirework] Hiba a konfiguráció létrehozásakor:', e.message)
+    }
+  }
+}
+
 let pool = null
 
 async function initDatabase() {
@@ -278,6 +340,7 @@ async function initDatabase() {
   configureGravestones()
   configureSkinRestorer()
   configureCobbledLevels()
+  configureCreeperFirework()
   
   try {
     // Első csatlakozás adatbázis nélkül, hogy létrehozzuk ha nincs
