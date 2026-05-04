@@ -36,14 +36,14 @@ const FABRIC_INSTALLER_META_URL = 'https://meta.fabricmc.net/v2/versions/install
 let resolvedFabricLoaderVersion = null
 let resolvedFabricInstallerVersion = null
 
-// Java 21 download URLs per platform
+// Java 23 download URLs per platform
 const JAVA_URLS = {
-  linux_x64: 'https://github.com/adoptium/temurin21-binaries/releases/download/jdk-21.0.5%2B11/OpenJDK21U-jdk_x64_linux_hotspot_21.0.5_11.tar.gz',
-  linux_arm64: 'https://github.com/adoptium/temurin21-binaries/releases/download/jdk-21.0.5%2B11/OpenJDK21U-jdk_aarch64_linux_hotspot_21.0.5_11.tar.gz',
-  win32_x64: 'https://github.com/adoptium/temurin21-binaries/releases/download/jdk-21.0.5%2B11/OpenJDK21U-jdk_x64_windows_hotspot_21.0.5_11.zip',
-  win32_arm64: 'https://github.com/adoptium/temurin21-binaries/releases/download/jdk-21.0.5%2B11/OpenJDK21U-jdk_aarch64_windows_hotspot_21.0.5_11.zip',
-  darwin_x64: 'https://github.com/adoptium/temurin21-binaries/releases/download/jdk-21.0.5%2B11/OpenJDK21U-jdk_x64_mac_hotspot_21.0.5_11.tar.gz',
-  darwin_arm64: 'https://github.com/adoptium/temurin21-binaries/releases/download/jdk-21.0.5%2B11/OpenJDK21U-jdk_aarch64_mac_hotspot_21.0.5_11.tar.gz',
+  linux_x64: 'https://github.com/adoptium/temurin23-binaries/releases/download/jdk-23.0.1%2B11/OpenJDK23U-jdk_x64_linux_hotspot_23.0.1_11.tar.gz',
+  linux_arm64: 'https://github.com/adoptium/temurin23-binaries/releases/download/jdk-23.0.1%2B11/OpenJDK23U-jdk_aarch64_linux_hotspot_23.0.1_11.tar.gz',
+  win32_x64: 'https://github.com/adoptium/temurin23-binaries/releases/download/jdk-23.0.1%2B11/OpenJDK23U-jdk_x64_windows_hotspot_23.0.1_11.zip',
+  win32_arm64: 'https://github.com/adoptium/temurin23-binaries/releases/download/jdk-23.0.1%2B11/OpenJDK23U-jdk_aarch64_windows_hotspot_23.0.1_11.zip',
+  darwin_x64: 'https://github.com/adoptium/temurin23-binaries/releases/download/jdk-23.0.1%2B11/OpenJDK23U-jdk_x64_mac_hotspot_23.0.1_11.tar.gz',
+  darwin_arm64: 'https://github.com/adoptium/temurin23-binaries/releases/download/jdk-23.0.1%2B11/OpenJDK23U-jdk_aarch64_mac_hotspot_23.0.1_11.tar.gz',
 }
 
 // State file helpers
@@ -102,7 +102,7 @@ function getGameDir() {
 }
 
 function getJavaDir() {
-  return path.join(getRootDataDir(), 'java21')
+  return path.join(getRootDataDir(), 'java23')
 }
 
 function getModpackDir() {
@@ -254,7 +254,7 @@ async function installJava() {
   const javaExe = getJavaExecutable()
 
   if (fs.existsSync(javaExe)) {
-    sendProgress('java', 100, 'Java 21 már telepítve ✓')
+    sendProgress('java', 100, 'Java 23 már telepítve ✓')
     javaPath = javaExe
     return
   }
@@ -266,15 +266,15 @@ async function installJava() {
 
   if (!url) throw new Error(`Nem támogatott platform: ${platform} ${arch}`)
 
-  sendProgress('java', 0, 'Java 21 letöltése...')
+  sendProgress('java', 0, 'Java 23 letöltése...')
   const ext = url.endsWith('.zip') ? '.zip' : '.tar.gz'
-  const javaDl = path.join(getGameDir(), `java21${ext}`)
+  const javaDl = path.join(getGameDir(), `java23${ext}`)
 
   await downloadFile(url, javaDl, (p) => {
-    sendProgress('java', Math.round(p * 60), `Java 21 letöltése: ${Math.round(p * 100)}%`)
+    sendProgress('java', Math.round(p * 60), `Java 23 letöltése: ${Math.round(p * 100)}%`)
   })
 
-  sendProgress('java', 65, 'Java 21 kicsomagolása...')
+  sendProgress('java', 65, 'Java 23 kicsomagolása...')
   fse.ensureDirSync(javaDir)
 
   if (ext === '.zip') {

@@ -360,6 +360,8 @@ async function updateModsFromModrinth() {
 
     let updatedCount = 0;
     for (const projectId of projectsToCheck) {
+      // Felhasználói kérés: cobblemon-additions (W2pr9jyL) ne legyen frissítve soha
+      if (projectId === 'W2pr9jyL') continue;
       try {
         const query = `loaders=${encodeURIComponent('["fabric"]')}&game_versions=${encodeURIComponent(`["${MC_VERSION}"]`)}`
         const versions = await modrinthRequest(`/v2/project/${projectId}/version?${query}`);
@@ -441,7 +443,25 @@ const EXTRA_MODS = [
   { slug: 'seasonhud-fabric',               loaders: ['fabric'], gameVersions: [MC_VERSION] },
   { slug: 'easywhitelist',                  loaders: ['fabric'], gameVersions: [MC_VERSION] },
   // Új modok (felhasználói kérés)
+  { slug: 'mobsbegone',                     loaders: ['fabric'], gameVersions: [MC_VERSION] },
   { slug: 'vmp-fabric',                     loaders: ['fabric'], gameVersions: [MC_VERSION] },
+  { slug: 'fix-cobblemon-pokemon-experience', loaders: ['fabric'], gameVersions: [MC_VERSION] },
+  { slug: 'cobblemon-poke-stops',           loaders: ['fabric'], gameVersions: [MC_VERSION] },
+  { slug: 'cobblemon-pet-a-poke',           loaders: ['fabric'], gameVersions: [MC_VERSION] },
+  { slug: 'pokemon-field-lab',              loaders: ['fabric'], gameVersions: [MC_VERSION] },
+  { slug: 'cobblemon-pokerus',              loaders: ['fabric'], gameVersions: [MC_VERSION] },
+  { slug: 'livelierpokemon',                loaders: ['fabric'], gameVersions: [MC_VERSION] },
+  { slug: 'pokebike',                       loaders: ['fabric'], gameVersions: [MC_VERSION] },
+  { slug: 'cobblemonmovedex',               loaders: ['fabric'], gameVersions: [MC_VERSION] },
+  { slug: 'cobblemon-alpha-project',        loaders: ['fabric'], gameVersions: [MC_VERSION] },
+  { slug: 'cobblemarks+',                   loaders: ['fabric'], gameVersions: [MC_VERSION] },
+  { slug: 'rad-gyms',                       loaders: ['fabric'], gameVersions: [MC_VERSION] },
+  { slug: 'cobblemon-underground-mining-minigame', loaders: ['fabric'], gameVersions: [MC_VERSION] },
+  { slug: 'cobble-contests',                loaders: ['fabric'], gameVersions: [MC_VERSION] },
+  { slug: 'cobblemon-trials-edition',       loaders: ['fabric'], gameVersions: [MC_VERSION] },
+  { slug: 'cobblemon-battle-tower',         loaders: ['fabric'], gameVersions: [MC_VERSION] },
+  { slug: 'cobblemon-simple-pokecenters',   loaders: ['fabric'], gameVersions: [MC_VERSION] },
+  { slug: 'cobblemon-integrations',         loaders: ['fabric'], gameVersions: [MC_VERSION] },
   { slug: 'lootr',                          loaders: ['fabric'], gameVersions: [MC_VERSION] },
   { slug: 'lootrmon',                       loaders: ['fabric'], gameVersions: [MC_VERSION] },
   { slug: 'cobblemon-farmers',              loaders: ['fabric'], gameVersions: [MC_VERSION] },
@@ -449,6 +469,13 @@ const EXTRA_MODS = [
   { slug: 'cobblemon_expeditions',          loaders: ['fabric'], gameVersions: [MC_VERSION] },
   // distanthorizons ELTÁVOLÍTVA (felhasználói kérés) — serene-seasons-x-distant-horizons szintén
   // Függőségek (dependencies)
+  { slug: 'cobblemore-library',             loaders: ['fabric'], gameVersions: [MC_VERSION] },
+  { slug: 'pommel-held-item-models',        loaders: ['fabric'], gameVersions: [MC_VERSION] },
+  { slug: 'figura',                         loaders: ['fabric'], gameVersions: [MC_VERSION] },
+  { slug: 'admiral',                        loaders: ['fabric'], gameVersions: [MC_VERSION] },
+  { slug: 'create-power-loader',            loaders: ['fabric'], gameVersions: [MC_VERSION] },
+  { slug: 'create-fabric',                  loaders: ['fabric'], gameVersions: [MC_VERSION] },
+  { slug: 'wild-battle-api',                loaders: ['fabric'], gameVersions: [MC_VERSION] },
   { slug: 'cloth-config',                   loaders: ['fabric'], gameVersions: [MC_VERSION] }, // player-locator-plus
   { slug: 'farmers-delight',                loaders: ['fabric'], gameVersions: [MC_VERSION] }, // cobblemon-farmers
   { slug: 'expandability',                  loaders: ['fabric'], gameVersions: [MC_VERSION] }, // cobblemon_expeditions

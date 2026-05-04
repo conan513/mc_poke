@@ -57,7 +57,7 @@ function fetchManifest(serverUrl) {
 // List of files that should ALWAYS be removed from the mods folder if they exist.
 // This runs even if the sync server is unreachable.
 const FORCED_REMOVALS = [
-  'custom-splash-screen', 'customsplashscreen', 'mobsbegone', 'soundsbegone', 
+  'custom-splash-screen', 'customsplashscreen', 'soundsbegone', 
   'interactic', 'fancymenu', 'konkrete', 'drippyloadingscreen', 'loadingscreen', 'notenoughcrashes',
   'zombified-player', 'zombifiedplayer', 'squaremap', 'ordered-player-list', 'player-mobs', 'maplink',
   'pneumono_gravestones', 'pneumono_core'
