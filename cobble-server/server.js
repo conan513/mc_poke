@@ -60,8 +60,8 @@ function configureGravestones() {
         json.decay_with_time = false
         modified = true
       }
-      if (json.spawn_gravestones_with_keepinv !== true) {
-        json.spawn_gravestones_with_keepinv = true
+      if (json.spawn_gravestones_with_keepinv !== false) {
+        json.spawn_gravestones_with_keepinv = false
         modified = true
       }
       
@@ -92,7 +92,7 @@ function configureGravestones() {
       "aesthetic_gravestones": true,
       "spawn_gravestone_skeletons": false,
       "spawn_gravestones_in_creative": true,
-      "spawn_gravestones_with_keepinv": true,
+      "spawn_gravestones_with_keepinv": false,
       "show_heads": true,
       "time_format": "MMDDYYYY",
       "console_info": false
@@ -601,10 +601,11 @@ function startMinecraft() {
     for (const line of lines) {
       // Whitelist bekapcsolása amikor a szerver kész
       if (line.includes('Done (') && line.includes('s)! For help, type "help"')) {
-        console.log('[Minecraft] Szerver kész, whitelist bekapcsolása...')
+        console.log('[Minecraft] Szerver kész, whitelist bekapcsolása és gamerule beállítása...')
         isServerReady = true
         serverEvents.emit('ready')
         sendCommand('whitelist on')
+        sendCommand('gamerule keepInventory true')
         // Announce daily pokemon
         if (currentShowcase) {
           sendCommand(`say [Server] A mai nap Pokémonja: ${currentShowcase.name}! Spawn rate BOOST aktív!`)
