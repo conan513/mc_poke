@@ -57,7 +57,8 @@ function fetchManifest(serverUrl) {
 // List of files that should ALWAYS be removed from the mods folder if they exist.
 // This runs even if the sync server is unreachable.
 const FORCED_REMOVALS = [
-  'custom-splash-screen', 'customsplashscreen', 'mobsbegone', 'soundsbegone', 'interactic'
+  'custom-splash-screen', 'customsplashscreen', 'mobsbegone', 'soundsbegone', 
+  'interactic', 'fancymenu', 'konkrete', 'drippyloadingscreen', 'loadingscreen'
 ]
 
 async function syncServerMods(serverUrl, instanceDir, onLog) {
@@ -120,18 +121,11 @@ async function syncServerMods(serverUrl, instanceDir, onLog) {
     return results
   }
 
-  // --- Fancymenu teljes törlés kezdete ---
-  // A felhasználó kérésére teljes törlés történik a tiszta másoláshoz
-  const fmDir = path.join(instanceDir, 'config', 'fancymenu')
-  if (fs.existsSync(fmDir)) {
-    try {
-      fs.rmSync(fmDir, { recursive: true, force: true })
-      onLog('[Sync] Fancymenu mappa teljesen törölve a tiszta cseréhez.')
-    } catch (e) {
-      onLog(`[Sync-Hiba] Nem sikerült törölni a fancymenu mappát: ${e.message}`)
-    }
+  // Helper: Blacklist check
+  function isBlacklisted(folder, filename) {
+    const fullKey = (folder + '/' + filename).toLowerCase()
+    return FORCED_REMOVALS.some(blacklisted => fullKey.includes(blacklisted.toLowerCase()))
   }
-  // --- Fancymenu teljes törlés vége ---
 
   // 1. TÖRLÉS – Fizikai scan alapú szinkronizáció
   // Meghatározzuk, mely mappákban/útvonalakon kötelező a teljes egyezés (törlés)
@@ -145,16 +139,17 @@ async function syncServerMods(serverUrl, instanceDir, onLog) {
       const key = folder + '/' + file.relPath
       
       // Akkor törlünk, ha:
-      // 1. Nincs a szerveren a fájl
-      // ÉS
-      // 2. A mappa a FULL_SYNC_FOLDERS-ben van VAGY speciális kivétel (pl. config/fancymenu)
-      if (!serverFileSet.has(key)) {
-        let shouldDelete = FULL_SYNC_FOLDERS.includes(folder)
+      // 1. Nincs a szerveren a fájl (és a mappa FULL_SYNC-ben van)
+      // VAGY
+      // 2. A fájl feketelistán van
+      const blacklisted = isBlacklisted(folder, file.relPath)
+      if (!serverFileSet.has(key) || blacklisted) {
+        let shouldDelete = FULL_SYNC_FOLDERS.includes(folder) || blacklisted
 
         if (shouldDelete) {
           try {
             fs.unlinkSync(file.fullPath)
-            onLog(`[Sync] Törölve (nincs a szerveren): ${folder}/${file.relPath}`)
+            onLog(`[Sync] Törölve ${blacklisted ? '(feketelista)' : '(nincs a szerveren)'}: ${folder}/${file.relPath}`)
           } catch (e) {
             onLog(`[Sync-Hiba] Nem törölhető: ${folder}/${file.relPath} -> ${e.message}`)
           }
@@ -168,6 +163,12 @@ async function syncServerMods(serverUrl, instanceDir, onLog) {
   const baseUrl = serverUrl.replace(/\/+$/, '')
 
   for (const item of serverItems) {
+    // Feketelista ellenőrzése letöltés előtt
+    if (isBlacklisted(item.type, item.filename)) {
+      // onLog(`[Sync] Kihagyva (feketelista): ${item.type}/${item.filename}`)
+      continue
+    }
+
     const filePath = path.join(instanceDir, item.type, item.filename)
     const fullFolderPath = path.dirname(filePath)
     
