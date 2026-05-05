@@ -313,9 +313,70 @@ function configureCreeperFirework() {
     try {
       fs.writeFileSync(configPath, defaultSettings, 'utf8')
       console.log('[CreeperFirework] creeper_firework.json5 létrehozva (rombolás letiltva).')
-    } catch (e) {
-      console.error('[CreeperFirework] Hiba a konfiguráció létrehozásakor:', e.message)
-    }
+  }
+}
+
+// ── Cobblemon Excitement Auto-Config ──────────────────────────
+function configureCobblemonExcitement() {
+  const mainPath = path.join(DATA_DIR, 'config', 'cobblemon', 'main.json')
+  const fofPath = path.join(DATA_DIR, 'config', 'fightorflight.json5')
+  const fofMovesPath = path.join(DATA_DIR, 'config', 'fightorflight_moves.json5')
+
+  // 1. Cobblemon Main Config
+  if (fs.existsSync(mainPath)) {
+    try {
+      let content = fs.readFileSync(mainPath, 'utf8')
+      let json = JSON.parse(content)
+      if (json.playerDamagePokemon !== true) {
+        json.playerDamagePokemon = true
+        fs.writeFileSync(mainPath, JSON.stringify(json, null, 2), 'utf8')
+        console.log('[Cobblemon] playerDamagePokemon engedélyezve.')
+      }
+    } catch (e) { console.error('[Cobblemon] Hiba a main.json frissítésekor:', e.message) }
+  }
+
+  // 2. Fight or Flight Config (Regex used for JSON5)
+  if (fs.existsSync(fofPath)) {
+    try {
+      let content = fs.readFileSync(fofPath, 'utf8')
+      let modified = false
+      if (content.match(/"light_dependent_unprovoked_attack"\s*:\s*true/)) {
+        content = content.replace(/"light_dependent_unprovoked_attack"\s*:\s*true/g, '"light_dependent_unprovoked_attack": false')
+        modified = true
+      }
+      if (content.match(/"aggressive_threshold"\s*:\s*100\.0/)) {
+        content = content.replace(/"aggressive_threshold"\s*:\s*100\.0/g, '"aggressive_threshold": 60.0')
+        modified = true
+      }
+      if (modified) {
+        fs.writeFileSync(fofPath, content, 'utf8')
+        console.log('[FightOrFlight] Agresszió beállítások frissítve.')
+      }
+    } catch (e) { console.error('[FightOrFlight] Hiba a fightorflight.json5 frissítésekor:', e.message) }
+  }
+
+  // 3. Fight or Flight Moves Config
+  if (fs.existsSync(fofMovesPath)) {
+    try {
+      let content = fs.readFileSync(fofMovesPath, 'utf8')
+      let modified = false
+      if (content.match(/"wild_pokemon_taunt"\s*:\s*false/)) {
+        content = content.replace(/"wild_pokemon_taunt"\s*:\s*false/g, '"wild_pokemon_taunt": true')
+        modified = true
+      }
+      if (content.match(/"pokemon_griefing"\s*:\s*false/)) {
+        content = content.replace(/"pokemon_griefing"\s*:\s*false/g, '"pokemon_griefing": true')
+        modified = true
+      }
+      if (content.match(/"should_create_fire"\s*:\s*false/)) {
+        content = content.replace(/"should_create_fire"\s*:\s*false/g, '"should_create_fire": true')
+        modified = true
+      }
+      if (modified) {
+        fs.writeFileSync(fofMovesPath, content, 'utf8')
+        console.log('[FightOrFlight] Mozgás és rombolás beállítások frissítve.')
+      }
+    } catch (e) { console.error('[FightOrFlight] Hiba a fightorflight_moves.json5 frissítésekor:', e.message) }
   }
 }
 
@@ -327,6 +388,7 @@ async function initDatabase() {
   configureSkinRestorer()
   configureCobbledLevels()
   configureCreeperFirework()
+  configureCobblemonExcitement()
   
   try {
     // Első csatlakozás adatbázis nélkül, hogy létrehozzuk ha nincs
