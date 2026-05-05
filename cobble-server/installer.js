@@ -31,11 +31,12 @@ const STATE_FILE = path.join(SERVER_DIR, '.server-install-state.json')
 const STATE_BAK = path.join(SERVER_DIR, '.server-install-state.json.bak')
 
 const BLACKLISTED_MODS = [
-  'no hunger', 'mobsbegone', 'no ender dragon', 'soundsbegone',
+  'no hunger', 'no ender dragon', 'soundsbegone',
   'interactic', 'custom-splash-screen', 'customsplashscreen', 'battlecam', 'lenientdeath',
   'biome-replacer',
   'fancymenu', 'konkrete', 'drippyloadingscreen', 'loadingscreen', 'notenoughcrashes'
 ];
+
 
 const JAVA_URLS = {
   linux_x64: 'https://github.com/adoptium/temurin21-binaries/releases/download/jdk-21.0.5%2B11/OpenJDK21U-jdk_x64_linux_hotspot_21.0.5_11.tar.gz',
