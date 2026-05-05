@@ -361,8 +361,6 @@ async function updateModsFromModrinth() {
 
     let updatedCount = 0;
     for (const projectId of projectsToCheck) {
-      // Felhasználói kérés: cobblemon-additions (W2pr9jyL) ne legyen frissítve soha
-      if (projectId === 'W2pr9jyL') continue;
       try {
         const query = `loaders=${encodeURIComponent('["fabric"]')}&game_versions=${encodeURIComponent(`["${MC_VERSION}"]`)}`
         const versions = await modrinthRequest(`/v2/project/${projectId}/version?${query}`);
@@ -474,6 +472,7 @@ const EXTRA_MODS = [
   { slug: 'tc-cobble-flight',               loaders: ['fabric'], gameVersions: [MC_VERSION] },
   { slug: 'cobblemon-tents',                loaders: ['fabric'], gameVersions: [MC_VERSION] },
   { slug: 'cobblemon-snap',                 loaders: ['fabric'], gameVersions: [MC_VERSION] },
+  { slug: 'cobblemon-villager-overhaul',    loaders: ['fabric'], gameVersions: [MC_VERSION] },
   // distanthorizons ELTÁVOLÍTVA (felhasználói kérés) — serene-seasons-x-distant-horizons szintén
   // Függőségek (dependencies)
   { slug: 'cobblemore-library',             loaders: ['fabric'], gameVersions: [MC_VERSION] },
