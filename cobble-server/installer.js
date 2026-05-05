@@ -509,7 +509,7 @@ const EXTRA_DATAPACKS = [
  */
 const CURSEFORGE_MODS = [
   { id: '1534055', name: 'cobblemon-nests-dens' },
-  { id: '561868', name: 'no-cubes-reloaded' },
+  { id: '561868', name: 'no-cubes-reloaded', fileId: '7277445' },
 ];
 
 /**
@@ -615,15 +615,21 @@ async function ensureCurseForgeMods() {
   if (!fs.existsSync(MODS_DIR)) fs.mkdirSync(MODS_DIR, { recursive: true });
   logInfo(`[CurseForge] Modok ellenőrzése: ${CURSEFORGE_MODS.map(m => m.name).join(', ')}...`);
 
-  for (const { id, name } of CURSEFORGE_MODS) {
+  for (const { id, name, fileId } of CURSEFORGE_MODS) {
     try {
-      // modLoaderType: 4 is Fabric
-      const response = await curseforgeRequest(id, MC_VERSION, 4);
-      const files = response.data || [];
-      
-      // Filter for Fabric explicitly just in case
-      const fabricFiles = files.filter(f => f.gameVersions.includes('Fabric'));
-      const latest = fabricFiles[0];
+      let latest;
+      if (fileId) {
+        // Use fixed file ID
+        latest = { id: fileId, fileName: `${name}.jar` }; // fileName will be refined if possible or used as fallback
+      } else {
+        // modLoaderType: 4 is Fabric
+        const response = await curseforgeRequest(id, MC_VERSION, 4);
+        const files = response.data || [];
+        
+        // Filter for Fabric explicitly just in case
+        const fabricFiles = files.filter(f => f.gameVersions.includes('Fabric'));
+        latest = fabricFiles[0];
+      }
 
       if (!latest) {
         logInfo(`[CurseForge] Nincs megfelelő Fabric verzió: ${name} (MC ${MC_VERSION})`);
