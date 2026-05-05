@@ -167,9 +167,12 @@ function createWindow() {
   }
 
   if (isDev) {
-    mainWindow.loadURL('http://localhost:5173')
+    const devUrl = 'http://localhost:5173/app/'
+    console.log(`[Electron] Development mode: Loading ${devUrl}`)
+    mainWindow.loadURL(devUrl)
     // mainWindow.webContents.openDevTools()
   } else {
+    console.log(`[Electron] Production mode: Loading ${remoteUrl}`)
     mainWindow.webContents.session.clearCache().then(() => {
       mainWindow.loadURL(remoteUrl).catch(() => loadLocalFallback())
     })
@@ -223,7 +226,64 @@ ipcMain.on('window-close', () => {
 ipcMain.handle('get-app-path', () => app.getPath('userData'))
 ipcMain.handle('get-locale', () => app.getLocale())
 ipcMain.handle('get-hwid', () => getHWID())
-ipcMain.handle('get-total-mem', () => os.totalmem())
+ipcMain.handle('get-total-mem', async () => {
+  // Primary: os.totalmem() works on all platforms under normal conditions
+  const primary = os.totalmem()
+  if (primary && primary > 0) return primary
+
+  // Fallback for Linux: read /proc/meminfo directly
+  if (process.platform === 'linux') {
+    try {
+      const data = fs.readFileSync('/proc/meminfo', 'utf8')
+      const match = data.match(/MemTotal:\s+(\d+)\s+kB/)
+      if (match) {
+        const bytes = parseInt(match[1]) * 1024
+        if (bytes > 0) {
+          console.log('[RAM] Linux fallback via /proc/meminfo:', bytes)
+          return bytes
+        }
+      }
+    } catch (e) {
+      console.warn('[RAM] /proc/meminfo fallback failed:', e.message)
+    }
+  }
+
+  // Fallback for macOS: use sysctl hw.memsize
+  if (process.platform === 'darwin') {
+    try {
+      const { execSync } = require('child_process')
+      const result = execSync('sysctl -n hw.memsize', { timeout: 2000 }).toString().trim()
+      const bytes = parseInt(result)
+      if (!isNaN(bytes) && bytes > 0) {
+        console.log('[RAM] macOS fallback via sysctl:', bytes)
+        return bytes
+      }
+    } catch (e) {
+      console.warn('[RAM] sysctl fallback failed:', e.message)
+    }
+  }
+
+  // Fallback for Windows: use WMIC (os.totalmem should always work on Windows, but just in case)
+  if (process.platform === 'win32') {
+    try {
+      const { execSync } = require('child_process')
+      const result = execSync('wmic OS get TotalVisibleMemorySize /Value', { timeout: 3000 }).toString()
+      const match = result.match(/TotalVisibleMemorySize=(\d+)/)
+      if (match) {
+        const bytes = parseInt(match[1]) * 1024
+        if (bytes > 0) {
+          console.log('[RAM] Windows fallback via WMIC:', bytes)
+          return bytes
+        }
+      }
+    } catch (e) {
+      console.warn('[RAM] WMIC fallback failed:', e.message)
+    }
+  }
+
+  console.error('[RAM] All detection methods failed, returning 0')
+  return 0
+})
 
 
 // Install / First Setup
