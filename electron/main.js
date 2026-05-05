@@ -348,6 +348,39 @@ ipcMain.handle('check-installed', async () => {
 ipcMain.handle('search-skins', async (event, query) => {
   return new Promise((resolve) => {
     const https = require('https');
+    
+    if (!query || query.trim() === '') {
+      // Empty query: load from mineskin.org gallery
+      https.get('https://api.mineskin.org/get/list/1', {
+        headers: {
+          'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/114.0.0.0 Safari/537.36'
+        }
+      }, (res) => {
+        let data = '';
+        res.on('data', chunk => data += chunk);
+        res.on('end', () => {
+          try {
+            const json = JSON.parse(data);
+            const skins = (json.skins || []).slice(0, 24).map(s => ({
+              id: s.id,
+              name: `Skin #${s.id}`,
+              url: s.url,
+              preview: s.url // It will use CSS to extract the face
+            }));
+            resolve(skins);
+          } catch (e) {
+            console.error('[SkinSearch] MineSkin Parse Error:', e);
+            resolve([]);
+          }
+        });
+      }).on('error', (err) => {
+        console.error('[SkinSearch] MineSkin Request Error:', err);
+        resolve([]);
+      });
+      return;
+    }
+
+    // Query provided: search on minecraftskins.net
     const url = `https://www.minecraftskins.net/search/${encodeURIComponent(query)}`;
     
     https.get(url, {

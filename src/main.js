@@ -47,23 +47,20 @@ let skipCinematic = false
 let skinGallery = [];
 let isSearchingSkins = false;
 
-async function loadSkinGallery(query = 'pokemon') {
+async function loadSkinGallery(query = '') {
   if (isSearchingSkins) return;
   isSearchingSkins = true;
   
   const introContainer = $id('intro-skin-gallery-container');
   const modalContainer = $id('skin-gallery-container');
-  const loadingHtml = '<div style="grid-column: 1/-1; text-align: center; color: #ccc;">Keresés...</div>';
+  const loadingHtml = '<div style="grid-column: 1/-1; text-align: center; color: #ccc;">Betöltés...</div>';
   
   if (introContainer) introContainer.innerHTML = loadingHtml;
   if (modalContainer) modalContainer.innerHTML = loadingHtml;
   
   try {
-    if (window.cobble && window.cobble.searchSkins && query.trim()) {
-      skinGallery = await window.cobble.searchSkins(query.trim());
-    } else {
-      const res = await fetch('./skins.json');
-      if (res.ok) skinGallery = await res.json();
+    if (window.cobble && window.cobble.searchSkins) {
+      skinGallery = await window.cobble.searchSkins(query ? query.trim() : '');
     }
     
     if (!skinGallery || skinGallery.length === 0) {
