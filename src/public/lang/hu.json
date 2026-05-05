@@ -58,8 +58,13 @@
     "ui_no_internet": "Nincs Internet",
     "ui_server_offline": "Szerver Offline",
     "change_skin_label": "Skin módosítása",
-    "switch_profile": "Profilváltás"
+    "switch_profile": "Profilváltás",
+    "close_on_launch": "Bezárás indításkor (RAM +)",
+    "power_save": "Energiatakarékos mód (Animációk ki)",
+    "ram_recommended": "(Ajánlott)",
+    "ram_warning": "⚠️ A 4GB feletti beállítás 8GB össz-memória mellett akadozást okozhat!"
   },
+
   "sync": {
     "connecting": "Kapcsolódás a szerverhez: ",
     "deleting": "Régi fájlok törlése...",

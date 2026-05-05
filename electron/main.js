@@ -1,4 +1,6 @@
 const { app, BrowserWindow, ipcMain, shell } = require('electron')
+app.commandLine.appendSwitch('js-flags', '--max-old-space-size=256')
+
 const path = require('path')
 const fs = require('fs')
 const http = require('http')
@@ -181,8 +183,13 @@ function createWindow() {
     }
   })
 
+  // Handle window focus/blur to trigger power saving in renderer
+  mainWindow.on('focus', () => mainWindow.webContents.send('power-state', 'active'))
+  mainWindow.on('blur', () => mainWindow.webContents.send('power-state', 'save'))
+
   // Initialize auto-updater
   setupAutoUpdater(mainWindow)
+
 }
 
 app.whenReady().then(() => {
@@ -216,6 +223,8 @@ ipcMain.on('window-close', () => {
 ipcMain.handle('get-app-path', () => app.getPath('userData'))
 ipcMain.handle('get-locale', () => app.getLocale())
 ipcMain.handle('get-hwid', () => getHWID())
+ipcMain.handle('get-total-mem', () => os.totalmem())
+
 
 // Install / First Setup
 ipcMain.handle('install', async (event, { username, ram, serverUrl }) => {

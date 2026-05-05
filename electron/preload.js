@@ -9,6 +9,8 @@ contextBridge.exposeInMainWorld('cobble', {
   getAppPath: () => ipcRenderer.invoke('get-app-path'),
   getLocale: () => ipcRenderer.invoke('get-locale'),
   getHWID: () => ipcRenderer.invoke('get-hwid'),
+  getTotalMem: () => ipcRenderer.invoke('get-total-mem'),
+
 
   // Installation
   install: (opts) => ipcRenderer.invoke('install', opts),
@@ -42,4 +44,6 @@ contextBridge.exposeInMainWorld('cobble', {
   // External links
   openExternal: (url) => ipcRenderer.send('open-external', url),
   openGameFolder: () => ipcRenderer.send('open-game-folder'),
+  onPowerState: (cb) => ipcRenderer.on('power-state', (_, state) => cb(state)),
 })
+

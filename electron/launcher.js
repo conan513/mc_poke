@@ -1,6 +1,7 @@
 /**
  * CobbleLauncher – Core Launcher Logic
  * Downloads: Java 21, Minecraft 1.21.1 (via MCLC), Fabric Loader, COBBLEVERSE modpack
+
  * Launches the game with offline authentication
  */
 
@@ -22,6 +23,8 @@ const { syncServerMods } = require('./sync')
 
 const MODPACK_PROJECT_ID = 'Jkb29YJU'
 const MC_VERSION = '1.21.1'
+const JAVA_VERSION_TARGET = 21
+
 
 // Modrinth API – latest modpack versions for this MC version & Fabric
 const MODRINTH_VERSIONS_URL =
@@ -36,15 +39,16 @@ const FABRIC_INSTALLER_META_URL = 'https://meta.fabricmc.net/v2/versions/install
 let resolvedFabricLoaderVersion = null
 let resolvedFabricInstallerVersion = null
 
-// Java 23 download URLs per platform
+// Java 21 download URLs per platform
 const JAVA_URLS = {
-  linux_x64: 'https://github.com/adoptium/temurin23-binaries/releases/download/jdk-23.0.1%2B11/OpenJDK23U-jdk_x64_linux_hotspot_23.0.1_11.tar.gz',
-  linux_arm64: 'https://github.com/adoptium/temurin23-binaries/releases/download/jdk-23.0.1%2B11/OpenJDK23U-jdk_aarch64_linux_hotspot_23.0.1_11.tar.gz',
-  win32_x64: 'https://github.com/adoptium/temurin23-binaries/releases/download/jdk-23.0.1%2B11/OpenJDK23U-jdk_x64_windows_hotspot_23.0.1_11.zip',
-  win32_arm64: 'https://github.com/adoptium/temurin23-binaries/releases/download/jdk-23.0.1%2B11/OpenJDK23U-jdk_aarch64_windows_hotspot_23.0.1_11.zip',
-  darwin_x64: 'https://github.com/adoptium/temurin23-binaries/releases/download/jdk-23.0.1%2B11/OpenJDK23U-jdk_x64_mac_hotspot_23.0.1_11.tar.gz',
-  darwin_arm64: 'https://github.com/adoptium/temurin23-binaries/releases/download/jdk-23.0.1%2B11/OpenJDK23U-jdk_aarch64_mac_hotspot_23.0.1_11.tar.gz',
+  linux_x64: 'https://github.com/adoptium/temurin21-binaries/releases/download/jdk-21.0.6%2B7/OpenJDK21U-jdk_x64_linux_hotspot_21.0.6_7.tar.gz',
+  linux_arm64: 'https://github.com/adoptium/temurin21-binaries/releases/download/jdk-21.0.6%2B7/OpenJDK21U-jdk_aarch64_linux_hotspot_21.0.6_7.tar.gz',
+  win32_x64: 'https://github.com/adoptium/temurin21-binaries/releases/download/jdk-21.0.6%2B7/OpenJDK21U-jdk_x64_windows_hotspot_21.0.6_7.zip',
+  win32_arm64: 'https://github.com/adoptium/temurin21-binaries/releases/download/jdk-21.0.6%2B7/OpenJDK21U-jdk_aarch64_windows_hotspot_21.0.6_7.zip',
+  darwin_x64: 'https://github.com/adoptium/temurin21-binaries/releases/download/jdk-21.0.6%2B7/OpenJDK21U-jdk_x64_mac_hotspot_21.0.6_7.tar.gz',
+  darwin_arm64: 'https://github.com/adoptium/temurin21-binaries/releases/download/jdk-21.0.6%2B7/OpenJDK21U-jdk_aarch64_mac_hotspot_21.0.6_7.tar.gz',
 }
+
 
 // State file helpers
 function getStateFile() {
@@ -253,10 +257,19 @@ async function installJava() {
   const javaDir = getJavaDir()
   const javaExe = getJavaExecutable()
 
-  if (fs.existsSync(javaExe)) {
-    sendProgress('java', 100, 'Java 23 már telepítve ✓')
+  const state = readState()
+  const installedJavaVer = state.javaVersion
+
+  if (fs.existsSync(javaExe) && installedJavaVer === JAVA_VERSION_TARGET) {
+    sendProgress('java', 100, `Java ${JAVA_VERSION_TARGET} már telepítve ✓`)
     javaPath = javaExe
     return
+  }
+
+  // If we have a mismatching Java version, clear the directory
+  if (fs.existsSync(javaDir)) {
+    console.log(`[Java] Verzió váltás észlelve (${installedJavaVer} -> ${JAVA_VERSION_TARGET}). Régi Java törlése...`)
+    fse.removeSync(javaDir)
   }
 
   const platform = process.platform
@@ -266,16 +279,17 @@ async function installJava() {
 
   if (!url) throw new Error(`Nem támogatott platform: ${platform} ${arch}`)
 
-  sendProgress('java', 0, 'Java 23 letöltése...')
+  sendProgress('java', 0, `Java ${JAVA_VERSION_TARGET} letöltése...`)
   const ext = url.endsWith('.zip') ? '.zip' : '.tar.gz'
-  const javaDl = path.join(getGameDir(), `java23${ext}`)
+  const javaDl = path.join(getGameDir(), `java_download${ext}`)
 
   await downloadFile(url, javaDl, (p) => {
-    sendProgress('java', Math.round(p * 60), `Java 23 letöltése: ${Math.round(p * 100)}%`)
+    sendProgress('java', Math.round(p * 60), `Java ${JAVA_VERSION_TARGET} letöltése: ${Math.round(p * 100)}%`)
   })
 
-  sendProgress('java', 65, 'Java 23 kicsomagolása...')
+  sendProgress('java', 65, `Java ${JAVA_VERSION_TARGET} kicsomagolása...`)
   fse.ensureDirSync(javaDir)
+
 
   if (ext === '.zip') {
     const zip = new AdmZip(javaDl)
@@ -331,8 +345,14 @@ async function installJava() {
     fs.chmodSync(javaPath, 0o755)
   }
 
-  sendProgress('java', 100, 'Java 21 telepítve ✓')
+  sendProgress('java', 100, `Java ${JAVA_VERSION_TARGET} telepítve ✓`)
+  
+  // Persist installed version
+  writeState({
+    javaVersion: JAVA_VERSION_TARGET
+  })
 }
+
 
 function getJavaExecutable() {
   const javaDir = getJavaDir()
@@ -998,7 +1018,8 @@ async function install({ username, ram, serverUrl }, onProgress) {
   progressCallback = null
 }
 
-async function launch({ username, uuid, ram, serverUrl }, onLog, onClose) {
+async function launch({ username, uuid, ram, serverUrl, closeOnLaunch }, onLog, onClose) {
+
   migrateStructure()
 
   const mcDir = getGameDir()
@@ -1076,8 +1097,9 @@ async function launch({ username, uuid, ram, serverUrl }, onLog, onClose) {
     },
     memory: {
       max: `${ram || 4096}M`,
-      min: '2048M',
+      min: '1024M',
     },
+
     javaPath: java,
     gameDirectory: instanceDir,
     quickPlay: {
@@ -1093,13 +1115,12 @@ async function launch({ username, uuid, ram, serverUrl }, onLog, onClose) {
       port: 25565
     },
     customArgs: [
-      '-XX:+UseG1GC', '-XX:+ParallelRefProcEnabled', '-XX:MaxGCPauseMillis=200',
-      '-XX:+UnlockExperimentalVMOptions', '-XX:+DisableExplicitGC', '-XX:G1NewSizePercent=30',
-      '-XX:G1MaxNewSizePercent=40', '-XX:G1HeapRegionSize=8M', '-XX:G1ReservePercent=20',
-      '-XX:G1HeapWastePercent=5', '-XX:G1MixedGCCountTarget=4', '-XX:InitiatingHeapOccupancyPercent=15',
-      '-XX:G1MixedGCLiveThresholdPercent=90', '-XX:G1RSetUpdatingPauseTimePercent=5',
-      '-XX:SurvivorRatio=32', '-XX:+PerfDisableSharedMem', '-XX:MaxTenuringThreshold=1'
+      '-XX:+UseZGC', '-XX:+ZGenerational',
+      '-XX:+UnlockExperimentalVMOptions', '-XX:+AlwaysPreTouch',
+      '-XX:+DisableExplicitGC', '-XX:+PerfDisableSharedMem',
+      '-XX:SoftMaxHeapSize=4G'
     ],
+
   }
 
   client.on('arguments', (args) => {
@@ -1114,7 +1135,16 @@ async function launch({ username, uuid, ram, serverUrl }, onLog, onClose) {
   })
 
   client.launch(opts)
+
+  // Handle "Close on Launch"
+  if (closeOnLaunch) {
+    onLog?.('[Launcher] Játék elindítva, launcher bezárása...')
+    setTimeout(() => {
+      app.quit()
+    }, 5000) // Give it a few seconds to finish launching
+  }
 }
+
 
 function isInstalled() {
   const state = readState()
@@ -1123,12 +1153,14 @@ function isInstalled() {
   const javaExe = getJavaExecutable()
   const modpackOk = !!state.modpackVersionId && fs.existsSync(modsDir)
   return {
-    java: fs.existsSync(javaExe),
+    java: fs.existsSync(javaExe) && state.javaVersion === JAVA_VERSION_TARGET,
+
     minecraft: fs.existsSync(clientJar),
     modpack: modpackOk,
     modpackVersion: state.modpackVersionNumber || null,
     fabricVersion: state.fabricLoaderVersion || null,
-    allDone: fs.existsSync(javaExe) && fs.existsSync(clientJar) && modpackOk,
+    allDone: fs.existsSync(javaExe) && state.javaVersion === JAVA_VERSION_TARGET && fs.existsSync(clientJar) && modpackOk,
+
   }
 }
 

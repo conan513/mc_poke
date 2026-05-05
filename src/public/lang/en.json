@@ -58,8 +58,13 @@
     "ui_no_internet": "No Internet",
     "ui_server_offline": "Server Offline",
     "change_skin_label": "Change Skin",
-    "switch_profile": "Switch Profile"
+    "switch_profile": "Switch Profile",
+    "close_on_launch": "Close on launch (Save RAM)",
+    "power_save": "Power Saving Mode (No Animations)",
+    "ram_recommended": "(Recommended)",
+    "ram_warning": "⚠️ Settings above 4GB may cause stuttering on 8GB systems!"
   },
+
   "sync": {
     "connecting": "Connecting to server: ",
     "deleting": "Deleting old synced files...",

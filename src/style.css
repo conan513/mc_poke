@@ -2353,3 +2353,127 @@ body::before {
   background: rgba(255, 255, 255, 0.1);
   color: white;
 }
+/* --- Memory & Stutter Optimization --- */
+.ram-warning {
+  margin-top: 12px;
+  font-size: 11px;
+  color: #fbbf24;
+  background: rgba(251, 191, 36, 0.08);
+  padding: 10px 12px;
+  border-radius: var(--radius-sm);
+  border: 1px solid rgba(251, 191, 36, 0.2);
+  line-height: 1.4;
+}
+
+.ram-warning.hidden {
+  display: none;
+}
+
+.ram-btn {
+    position: relative;
+}
+
+.ram-btn .recommended-badge {
+    position: absolute;
+    top: -8px;
+    right: -8px;
+    background: var(--accent-green);
+    color: white;
+    font-size: 8px;
+    padding: 2px 5px;
+    border-radius: 4px;
+    font-weight: 800;
+    text-transform: uppercase;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+    pointer-events: none;
+}
+
+.launch-settings {
+  margin-top: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding-top: 15px;
+  border-top: 1px solid var(--border);
+}
+
+.checkbox-group {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  cursor: pointer;
+  user-select: none;
+}
+
+.checkbox-group input {
+  width: 16px;
+  height: 16px;
+  cursor: pointer;
+  accent-color: var(--accent-blue);
+}
+
+.checkbox-group label {
+  font-size: 13px;
+  color: var(--text-second);
+  cursor: pointer;
+  font-weight: 500;
+}
+
+/* Power Save Overlay */
+.power-save-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(8, 11, 20, 0.9);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  transition: opacity 0.5s ease;
+}
+
+.power-save-overlay.hidden {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.overlay-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+}
+
+.overlay-content h2 {
+  font-size: 24px;
+  font-weight: 800;
+  color: var(--text-primary);
+  margin: 0;
+}
+
+.overlay-content p {
+  color: var(--text-muted);
+  font-size: 15px;
+}
+
+/* Global Power Save Classes */
+body.power-save .canvas-particles {
+  display: none !important;
+}
+
+body.power-save #main-canvas {
+    opacity: 0.1;
+}
+
+body.power-save * {
+  animation-play-state: paused !important;
+  transition: none !important;
+}
+
+/* Keep only the pulse animation for the overlay pokeball */
+body.power-save .power-save-overlay .mini-pokeball {
+    animation: pulse-mini 2s infinite !important;
+    animation-play-state: running !important;
+}

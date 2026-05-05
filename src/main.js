@@ -32,6 +32,9 @@ window.onerror = (m, s, l, c, e) => { console.error(`${m} at ${s}:${l}`); }
 
 // ── State ────────────────────────────────────────────────────
 let selectedRam = localStorage.getItem('cobble_ram') || '4096'
+let totalSystemMem = 8192 // Default fallback
+let closeOnLaunch = localStorage.getItem('cobble_close_launch') === 'true'
+let powerSaveEnabled = localStorage.getItem('cobble_power_save') !== 'false' // Default true
 let username = localStorage.getItem('cobble_username') || ''
 let profiles = JSON.parse(localStorage.getItem('cobble_profiles') || '[]')
 let isGameRunning = false
@@ -1550,8 +1553,10 @@ $id('btn-play').addEventListener('click', async () => {
       username, 
       uuid: verifyData.uuid, 
       ram: selectedRam, 
-      serverUrl 
+      serverUrl,
+      closeOnLaunch
     })
+
   if (!result.success) {
     showToast(t('home.launch_error') + result.error)
     btn.disabled = false
@@ -2100,9 +2105,63 @@ animateParticles()
   })
   document.querySelectorAll('.ram-btn').forEach(btn =>
     btn.addEventListener('click', () => {
+      selectedRam = parseInt(btn.dataset.val)
       try { localStorage.setItem('cobble_ram', btn.dataset.val) } catch(e) {}
+      updateRamWarning()
     })
   )
+
+  // Settings: Close on launch & Power save
+  $id('check-close-launch').checked = closeOnLaunch
+  $id('check-close-launch').addEventListener('change', (e) => {
+    closeOnLaunch = e.target.checked
+    localStorage.setItem('cobble_close_launch', closeOnLaunch)
+  })
+
+  $id('check-power-save').checked = powerSaveEnabled
+  $id('check-power-save').addEventListener('change', (e) => {
+    powerSaveEnabled = e.target.checked
+    localStorage.setItem('cobble_power_save', powerSaveEnabled)
+    if (!powerSaveEnabled) document.body.classList.remove('power-save')
+  })
+
+  // Detect total memory and set recommendations
+  if (window.cobble) {
+    totalSystemMem = await window.cobble.getTotalMem()
+    const totalGB = Math.round(totalSystemMem / (1024 * 1024 * 1024))
+    console.log(`[System] Total RAM detected: ${totalGB} GB`)
+
+    let recommended = 4096
+    if (totalGB > 8) recommended = 6144
+    if (totalGB > 12) recommended = 8192
+
+    document.querySelectorAll('.ram-btn').forEach(btn => {
+      if (parseInt(btn.dataset.val) === recommended) {
+        const badge = document.createElement('span')
+        badge.className = 'recommended-badge'
+        badge.textContent = 'OK' // Short for UI
+        btn.appendChild(badge)
+      }
+    })
+    
+    updateRamWarning()
+  }
+
+  // Power state listener from main process
+  if (window.cobble) {
+    window.cobble.onPowerState((state) => {
+      if (!powerSaveEnabled) return
+      
+      const overlay = $id('power-save-overlay')
+      if (state === 'save') {
+        document.body.classList.add('power-save')
+        if (overlay) overlay.classList.remove('hidden')
+      } else {
+        document.body.classList.remove('power-save')
+        if (overlay) overlay.classList.add('hidden')
+      }
+    })
+  }
   
   // Update UI Status (Online/Offline)
   async function checkConnection() {
@@ -2160,7 +2219,20 @@ animateParticles()
     }
   }
 
+  function updateRamWarning() {
+    const warning = $id('ram-warning')
+    if (!warning) return
+    
+    const totalGB = Math.round(totalSystemMem / (1024 * 1024 * 1024))
+    if (totalGB <= 8 && selectedRam > 4096) {
+      warning.classList.remove('hidden')
+    } else {
+      warning.classList.add('hidden')
+    }
+  }
+
   // Initial check
+
   checkConnection()
 
   // Real-time listeners

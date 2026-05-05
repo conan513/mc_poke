@@ -330,7 +330,20 @@
                 <button class="ram-btn" data-val="6144">6 GB</button>
                 <button class="ram-btn" data-val="8192">8 GB</button>
               </div>
+              <div id="ram-warning" class="ram-warning hidden" data-i18n="home.ram_warning"></div>
+
+              <div class="launch-settings">
+                <div class="checkbox-group">
+                  <input type="checkbox" id="check-close-launch" checked>
+                  <label for="check-close-launch" data-i18n="home.close_on_launch">Bezárás indításkor</label>
+                </div>
+                <div class="checkbox-group">
+                  <input type="checkbox" id="check-power-save" checked>
+                  <label for="check-power-save" data-i18n="home.power_save">Energiatakarékos mód</label>
+                </div>
+              </div>
             </div>
+
 
             <button class="btn-primary" id="btn-install">
               <span class="btn-icon">
@@ -342,6 +355,16 @@
         </div>
       </div>
     </div>
+
+    <!-- Power Save Overlay -->
+    <div id="power-save-overlay" class="power-save-overlay hidden">
+        <div class="overlay-content">
+            <div class="mini-pokeball pulsing"></div>
+            <h2 data-i18n="home.power_save">Energia-takarékos mód aktív</h2>
+            <p>A launcher erőforrás-használata csökkentve.</p>
+        </div>
+    </div>
+
 
     <!-- ── SCREEN 2: Installing ── -->
     <div class="screen" id="screen-install">
