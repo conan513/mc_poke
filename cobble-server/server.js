@@ -481,6 +481,30 @@ try {
 
 let currentShowcase = null
 
+// Fájl ahova a napi showcase-t mentjük (perzisztencia szerver-restart esetén)
+const SHOWCASE_FILE = path.join(DATA_DIR, '.daily-showcase.json')
+
+/**
+ * Visszaadja az aktuális nap string-jét (pl. "2026-05-05") UTC alapján.
+ * Ez a seed a determinisztikus napi választáshoz.
+ */
+function getTodayDateString() {
+  return new Date().toISOString().slice(0, 10) // "YYYY-MM-DD"
+}
+
+/**
+ * Determinisztikus index-kiválasztás a lista hosszából és a dátum-seed alapján.
+ * Azonos napon mindig ugyanazt az indexet adja vissza.
+ */
+function getDailyIndex(listLength, dateStr) {
+  // Egyszerű hash: a dátum karakterkódjai összeadva mod listaméret
+  let hash = 0
+  for (let i = 0; i < dateStr.length; i++) {
+    hash = (hash * 31 + dateStr.charCodeAt(i)) >>> 0
+  }
+  return hash % listLength
+}
+
 function boostSpawnRate(pokemonId) {
   try {
     const dpDir = path.join(DATA_DIR, 'datapacks', 'daily_boost')
@@ -524,10 +548,10 @@ function boostSpawnRate(pokemonId) {
         }
       ]
     }
-    // Note: The specific format for Cobblemon might vary slightly by version, 
-    // but this is a standard approach for adding a pokemon to the common pool.
     fs.writeFileSync(path.join(spawnDir, `${pokemonId}.json`), JSON.stringify(spawnRule, null, 2))
     
+    // Manifest érvénytelenítése, hogy a kliensek szinkronizálják az új datapacket
+    invalidateManifest()
     console.log(`[Showcase] Spawn boost applied for ${pokemonId} via datapack.`)
   } catch (e) {
     console.error(`[Showcase] Failed to apply spawn boost: ${e.message}`)
@@ -536,29 +560,58 @@ function boostSpawnRate(pokemonId) {
 
 async function updateShowcase() {
   if (showcasePokemons.length === 0) return
-  
-  const index = Math.floor(Math.random() * showcasePokemons.length)
-  currentShowcase = { ...showcasePokemons[index] }
-  console.log(`[Showcase] New Pokémon for this session: ${currentShowcase.name}`)
 
-  // Dinamikus leírás lekérése (PokeAPI), ha nincs statikus leírásunk
+  const today = getTodayDateString()
+
+  // 1. Ha már van mentett showcase és az mai napra szól, töltjük be azt
   try {
-    // Csak akkor kérjük le, ha nincs egyedi leírás a lang fájlokban (vagy csak generáltatunk)
-    // Megjegyzés: a kliens oldalon is eldönthetjük, de itt a szerveren eltároljuk az angol alap verziót
+    if (fs.existsSync(SHOWCASE_FILE)) {
+      const saved = JSON.parse(fs.readFileSync(SHOWCASE_FILE, 'utf8'))
+      if (saved.date === today && saved.pokemon) {
+        currentShowcase = saved.pokemon
+        console.log(`[Showcase] Mai Pokémon betöltve mentett állapotból: ${currentShowcase.name} (${today})`)
+        // Datapack szinkronban van-e? Ha nem, regeneráljuk (pl. mappa törölték)
+        const dpDir = path.join(DATA_DIR, 'datapacks', 'daily_boost')
+        if (!fs.existsSync(dpDir)) {
+          console.log(`[Showcase] Datapack hiányzik, újragenerálás: ${currentShowcase.id}`)
+          boostSpawnRate(currentShowcase.id)
+        }
+        return
+      }
+    }
+  } catch (e) {
+    console.warn(`[Showcase] Mentett showcase betöltési hiba, újragenerálás: ${e.message}`)
+  }
+
+  // 2. Új nap (vagy nincs mentett állapot) – determinisztikus választás dátum alapján
+  const index = getDailyIndex(showcasePokemons.length, today)
+  currentShowcase = { ...showcasePokemons[index] }
+  console.log(`[Showcase] Új napi Pokémon (${today}): ${currentShowcase.name} (index: ${index})`)
+
+  // 3. Dinamikus leírás lekérése (PokeAPI)
+  try {
     const res = await fetch(`https://pokeapi.co/api/v2/pokemon-species/${currentShowcase.id}`)
     if (res.ok) {
       const data = await res.json()
       const entry = data.flavor_text_entries.find(e => e.language.name === 'en')
       if (entry) {
         currentShowcase.apiDesc = entry.flavor_text.replace(/[\f\n\r]/g, ' ')
-        console.log(`[Showcase] Description fetched for ${currentShowcase.name}`)
+        console.log(`[Showcase] Leírás lekérve: ${currentShowcase.name}`)
       }
     }
   } catch (e) {
-    console.warn(`[Showcase] Could not fetch description from API: ${e.message}`)
+    console.warn(`[Showcase] Nem sikerült lekérni a leírást: ${e.message}`)
   }
-  
-  // Datapack generálása a boosthoz
+
+  // 4. Mentés lemezre (perzisztencia)
+  try {
+    fs.writeFileSync(SHOWCASE_FILE, JSON.stringify({ date: today, pokemon: currentShowcase }, null, 2))
+    console.log(`[Showcase] Napi showcase mentve: ${SHOWCASE_FILE}`)
+  } catch (e) {
+    console.error(`[Showcase] Mentési hiba: ${e.message}`)
+  }
+
+  // 5. Datapack generálása a boosthoz
   boostSpawnRate(currentShowcase.id)
 }
 // Az updateShowcase() hívását kivesszük innen, és betesszük a start() folyamatba
