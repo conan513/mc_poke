@@ -1097,8 +1097,9 @@ async function launch({ username, uuid, ram, serverUrl, closeOnLaunch }, onLog, 
     },
     memory: {
       max: `${ram || 4096}M`,
-      min: '1024M',
+      min: '512M',
     },
+
 
     javaPath: java,
     gameDirectory: instanceDir,
@@ -1116,10 +1117,14 @@ async function launch({ username, uuid, ram, serverUrl, closeOnLaunch }, onLog, 
     },
     customArgs: [
       '-XX:+UseZGC', '-XX:+ZGenerational',
-      '-XX:+UnlockExperimentalVMOptions', '-XX:+AlwaysPreTouch',
-      '-XX:+DisableExplicitGC', '-XX:+PerfDisableSharedMem',
+      '-XX:+UnlockExperimentalVMOptions',
+      '-XX:+DisableExplicitGC', 
+      '-XX:+PerfDisableSharedMem',
+      '-XX:+UseStringDeduplication',
+      '-XX:ConcGCThreads=1',
       '-XX:SoftMaxHeapSize=4G'
     ],
+
 
   }
 

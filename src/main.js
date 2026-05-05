@@ -1146,6 +1146,7 @@ if (window.cobble) {
 }
 
 async function startInstall() {
+  showScreen('install')
   // Reset steps
   Object.values(stepMap).forEach(id => {
     const el = $id(id)
@@ -1170,20 +1171,35 @@ async function startInstall() {
 }
 
 function goToHome() {
+  showScreen('home')
+  updateUI()
+  
+  // If not all components are installed, change Play button to Update/Install
+  const status = window._lastInstallStatus
+  const playBtn = $id('btn-play')
+  if (playBtn && status && !status.allDone) {
+    playBtn.classList.add('needs-update')
+    playBtn.querySelector('span:last-child').textContent = t('welcome.install_btn')
+    // Change icon to download
+    playBtn.querySelector('.play-icon').innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="width: 20px; height: 20px;"><path d="m12 14 4-4"></path><path d="M3.34 19a10 10 0 1 1 17.32 0"></path></svg>'
+  } else if (playBtn) {
+    playBtn.classList.remove('needs-update')
+    playBtn.querySelector('span:last-child').textContent = t('home.play_btn')
+    playBtn.querySelector('.play-icon').innerHTML = '<svg viewBox="0 0 24 24" fill="currentColor" style="width: 20px; height: 20px;"><path d="m7 4 12 8-12 8V4z"></path></svg>'
+  }
+
   // Update home screen with real version info from state
-  const status = window._lastInstallStatus || {}
+  const statusInfo = window._lastInstallStatus || {}
   $id('player-name-display').textContent = username || 'Trainer'
   $id('player-avatar').textContent = (username && username.length > 0) ? username.charAt(0).toUpperCase() : '?'
   $id('home-ram-display').textContent = `${selectedRam} MB`
 
-  if (status.modpackVersion) {
-    $id('home-modpack-version').textContent = `COBBLEVERSE ${status.modpackVersion}`
+  if (statusInfo.modpackVersion) {
+    $id('home-modpack-version').textContent = `COBBLEVERSE ${statusInfo.modpackVersion}`
   }
-  if (status.fabricVersion) {
-    $id('home-fabric-version').textContent = `Fabric ${status.fabricVersion}`
+  if (statusInfo.fabricVersion) {
+    $id('home-fabric-version').textContent = `Fabric ${statusInfo.fabricVersion}`
   }
-
-  showScreen('home')
 
   // Background update check (non-blocking)
   runUpdateCheck()
@@ -1400,16 +1416,11 @@ async function selectProfile(name) {
   // Ugrás a főképernyőre (ha már telepítve van)
   if (!window.cobble) return
   const status = await window.cobble.checkInstalled()
-  if (status.allDone) {
-    window._lastInstallStatus = status
-    goToHome()
-    applyAvatar()
-  } else {
-    showToast(t('toast.profile_selected').replace('{}', name))
-    renderProfiles()
-    updateUI()
-    applyAvatar()
-  }
+  window._lastInstallStatus = status
+  
+  goToHome()
+  applyAvatar()
+
 }
 
 async function syncSkinFromServer(name) {
@@ -1506,10 +1517,19 @@ $id('btn-update').addEventListener('click', async () => {
   // On success, onProgress 'done' callback will call goToHome()
 })
 const LAUNCHER_SECRET = 'cobble-super-secret-key-2024'
+$id('btn-play').addEventListener('click', handleLaunch)
 
-$id('btn-play').addEventListener('click', async () => {
-  if (isGameRunning) return
+async function handleLaunch() {
   const btn = $id('btn-play')
+  if (btn.disabled) return
+
+  // Check if we need to install first
+  const status = window._lastInstallStatus
+  if (status && !status.allDone) {
+    startInstall()
+    return
+  }
+  
   btn.disabled = true
   btn.querySelector('span:last-child').textContent = t('home.launching')
 
@@ -1571,7 +1591,8 @@ $id('btn-play').addEventListener('click', async () => {
     btn.disabled = false
     btn.querySelector('span:last-child').textContent = t('home.play_btn')
   }
-})
+}
+
 
 if (window.cobble) {
   window.cobble.onGameLog((data) => {
