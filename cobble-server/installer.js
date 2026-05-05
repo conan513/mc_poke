@@ -26,6 +26,7 @@ const FABRIC_INSTALLER_META_URL = 'https://meta.fabricmc.net/v2/versions/install
 
 const SERVER_DIR = path.join(__dirname, 'server-data')
 const MODS_DIR = path.join(SERVER_DIR, 'mods')
+const DATAPACKS_DIR = path.join(SERVER_DIR, 'datapacks')
 const MODS_BACKUP = path.join(SERVER_DIR, 'mods.old')
 const STATE_FILE = path.join(SERVER_DIR, '.server-install-state.json')
 const STATE_BAK = path.join(SERVER_DIR, '.server-install-state.json.bak')
@@ -496,6 +497,21 @@ const EXTRA_MODS = [
 ];
 
 /**
+ * Datapacks to be downloaded from CurseForge.
+ * ID is the project ID from the sidebar.
+ */
+const EXTRA_DATAPACKS = [
+  { id: '1474379', name: 'cobblemoncitytowns' },
+];
+
+/**
+ * Mods to be downloaded from CurseForge.
+ */
+const CURSEFORGE_MODS = [
+  { id: '1534055', name: 'cobblemon-nests-dens' },
+];
+
+/**
  * Ensures specific extra mods are present.
  */
 async function ensureExtraMods() {
@@ -532,6 +548,113 @@ async function ensureExtraMods() {
       }
     } catch (e) {
       logError(`[Modrinth-Hiba] Extra mod hiba (${slug}): ${e.message}`);
+    }
+  }
+}
+
+/**
+ * Generic CurseForge API request helper (uses website internal API).
+ */
+async function curseforgeRequest(projectId, gameVersion, loaderType = null) {
+  let url = `https://www.curseforge.com/api/v1/mods/${projectId}/files?gameVersion=${gameVersion}`;
+  if (loaderType) url += `&modLoaderType=${loaderType}`;
+  return fetchJson(url);
+}
+
+/**
+ * Ensures specific extra datapacks from CurseForge are present.
+ */
+async function ensureExtraDatapacks() {
+  if (!fs.existsSync(DATAPACKS_DIR)) fs.mkdirSync(DATAPACKS_DIR, { recursive: true });
+  logInfo(`[CurseForge] Datapackek ellenőrzése: ${EXTRA_DATAPACKS.map(d => d.name).join(', ')}...`);
+
+  for (const { id, name } of EXTRA_DATAPACKS) {
+    try {
+      const response = await curseforgeRequest(id, MC_VERSION);
+      const files = response.data || [];
+      const latest = files[0]; // Assuming sorted by date descending
+
+      if (!latest) {
+        logInfo(`[CurseForge] Nincs megfelelő verzió: ${name} (MC ${MC_VERSION})`);
+        continue;
+      }
+
+      const latestFilename = latest.fileName || `${name}.zip`;
+      const dest = path.join(DATAPACKS_DIR, latestFilename);
+
+      // Check if we already have this specific file or a file starting with the same name
+      const existingFiles = fs.readdirSync(DATAPACKS_DIR);
+      const isPresent = existingFiles.some(f => f === latestFilename);
+
+      if (!isPresent) {
+        logInfo(`[CurseForge] Datapack letöltése: ${name} -> ${latestFilename}`);
+        // Remove old versions of the same datapack if they exist
+        for (const f of existingFiles) {
+          if (f.toLowerCase().includes(name.toLowerCase()) && f !== latestFilename) {
+             logInfo(`[CurseForge] Régi verzió törlése: ${f}`);
+             fs.unlinkSync(path.join(DATAPACKS_DIR, f));
+          }
+        }
+        
+        const downloadUrl = `https://www.curseforge.com/api/v1/mods/${id}/files/${latest.id}/download`;
+        await downloadFile(downloadUrl, dest);
+      } else {
+        logInfo(`[CurseForge] Datapack már naprakész: ${name}`);
+      }
+    } catch (e) {
+      logError(`[CurseForge-Hiba] Datapack hiba (${name}): ${e.message}`);
+    }
+  }
+}
+
+/**
+ * Ensures specific extra mods from CurseForge are present.
+ */
+async function ensureCurseForgeMods() {
+  if (!fs.existsSync(MODS_DIR)) fs.mkdirSync(MODS_DIR, { recursive: true });
+  logInfo(`[CurseForge] Modok ellenőrzése: ${CURSEFORGE_MODS.map(m => m.name).join(', ')}...`);
+
+  for (const { id, name } of CURSEFORGE_MODS) {
+    try {
+      // modLoaderType: 4 is Fabric
+      const response = await curseforgeRequest(id, MC_VERSION, 4);
+      const files = response.data || [];
+      
+      // Filter for Fabric explicitly just in case
+      const fabricFiles = files.filter(f => f.gameVersions.includes('Fabric'));
+      const latest = fabricFiles[0];
+
+      if (!latest) {
+        logInfo(`[CurseForge] Nincs megfelelő Fabric verzió: ${name} (MC ${MC_VERSION})`);
+        continue;
+      }
+
+      const latestFilename = latest.fileName;
+      const dest = path.join(MODS_DIR, latestFilename);
+
+      const existingFiles = fs.readdirSync(MODS_DIR);
+      const isPresent = existingFiles.some(f => f === latestFilename);
+
+      if (!isPresent) {
+        logInfo(`[CurseForge] Mod letöltése: ${name} -> ${latestFilename}`);
+        // Remove old versions of the same mod
+        // We look for parts of the name or ID if possible, but name is safer for files
+        const searchName = name.toLowerCase().replace(/-/g, '');
+        for (const f of existingFiles) {
+          const lowerF = f.toLowerCase().replace(/-/g, '');
+          if (lowerF.includes(searchName) && f !== latestFilename) {
+             logInfo(`[CurseForge] Régi mod verzió törlése: ${f}`);
+             fs.unlinkSync(path.join(MODS_DIR, f));
+          }
+        }
+        
+        const downloadUrl = `https://www.curseforge.com/api/v1/mods/${id}/files/${latest.id}/download`;
+        await downloadFile(downloadUrl, dest);
+      } else {
+        logInfo(`[CurseForge] Mod már naprakész: ${name}`);
+      }
+    } catch (e) {
+      logError(`[CurseForge-Hiba] Mod hiba (${name}): ${e.message}`);
     }
   }
 }
@@ -869,6 +992,12 @@ async function install() {
 
   // 6. Blacklist Cleanup (Ensure unwanted mods are gone)
   await cleanupBlacklistedMods()
+
+  // 6b. Extra Datapacks (CurseForge)
+  await ensureExtraDatapacks()
+
+  // 6c. Extra Mods (CurseForge)
+  await ensureCurseForgeMods()
 
   // 7. Modrinth Mod Updates
   await updateModsFromModrinth()
