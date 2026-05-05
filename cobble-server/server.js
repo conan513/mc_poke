@@ -176,39 +176,6 @@ function configureSkinRestorer() {
   }
 }
 
-// ── CobbledLevels Auto-Config ────────────────────────────────
-function configureCobbledLevels() {
-  const configPath = path.join(DATA_DIR, 'config', 'cobbledlevels.json')
-  
-  if (fs.existsSync(configPath)) {
-    try {
-      let content = fs.readFileSync(configPath, 'utf8')
-      let json = JSON.parse(content)
-      let modified = false
-      
-      if (json.PartyScaling && json.PartyScaling.Enabled !== true) {
-        json.PartyScaling.Enabled = true
-        modified = true
-      }
-      if (json.DistanceScaling && json.DistanceScaling.POWER_SCALING && json.DistanceScaling.POWER_SCALING.DistanceForMaxLevel !== 10000) {
-        json.DistanceScaling.POWER_SCALING.DistanceForMaxLevel = 10000
-        modified = true
-      }
-      if (json.DistanceScaling && json.DistanceScaling.Influence !== 1.0) {
-        json.DistanceScaling.Influence = 1.0
-        modified = true
-      }
-      
-
-      if (modified) {
-        fs.writeFileSync(configPath, JSON.stringify(json, null, 2), 'utf8')
-        console.log('[CobbledLevels] cobbledlevels.json beállítások frissítve.')
-      }
-    } catch (e) {
-      console.error('[CobbledLevels] Hiba a konfiguráció frissítésekor:', e.message)
-    }
-  }
-}
 
 // ── EasyAuth Auto-Config ─────────────────────────────────────
 function configureEasyAuth() {
@@ -389,7 +356,6 @@ async function initDatabase() {
   configureEasyAuth()
   configureGravestones()
   configureSkinRestorer()
-  configureCobbledLevels()
   configureCreeperFirework()
   configureCobblemonExcitement()
   
