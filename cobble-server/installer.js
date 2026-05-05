@@ -491,6 +491,7 @@ const EXTRA_MODS = [
   { slug: 'collective',                     loaders: ['fabric'], gameVersions: [MC_VERSION] }, // village-spawn-point
   { slug: 'glitchcore',                     loaders: ['fabric'], gameVersions: [MC_VERSION] }, // serene-seasons (kötelező dep)
   { slug: 'forge-config-api-port',          loaders: ['fabric'], gameVersions: [MC_VERSION] }, // seasonhud-fabric
+  { slug: 'fusion',                         loaders: ['fabric'], gameVersions: [MC_VERSION] },
   // Cobblemon TCG
   { slug: 'cobbletcg',                      loaders: ['fabric'], gameVersions: [MC_VERSION] },
 ];
