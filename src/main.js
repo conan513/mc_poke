@@ -42,6 +42,7 @@ let currentLang = 'en'
 let translations = {}
 let isOnlineUI = true
 let skipCinematic = false
+let currentProfile = null
 
 // ── Skin Gallery ──────────────────────────────────────────────
 let skinGallery = [];
@@ -1493,6 +1494,7 @@ async function selectProfile(name) {
   localStorage.setItem('cobble_username', name)
   
   const p = getProfile(name)
+  currentProfile = p
   if (p) {
     currentSkinType = p.skinType || 'mojang'
     currentSkinVal = p.skinVal || name
@@ -1814,7 +1816,7 @@ async function fetchHubLeaderboard(category = 'playtime') {
 
   // Read server URL
   let serverUrl = $id('input-server-url').value.trim()
-  if (!serverUrl) serverUrl = 'http://94.72.100.43:7878'
+  if (!serverUrl) serverUrl = 'http://94.72.100.43:8080'
 
   try {
     const res = await fetch(`${serverUrl}/api/leaderboard?category=${category}`)
@@ -1891,7 +1893,7 @@ $id('btn-hub-claim-reward').addEventListener('click', async () => {
   }
 
   let serverUrl = $id('input-server-url').value.trim()
-  if (!serverUrl) serverUrl = 'http://94.72.100.43:7878'
+  if (!serverUrl) serverUrl = 'http://94.72.100.43:8080'
 
   btn.disabled = true
   btn.innerHTML = '<div class="loading-spinner small" style="margin:0; width:16px; height:16px;"></div>'
@@ -2193,6 +2195,7 @@ animateParticles()
     const saved = localStorage.getItem('cobble_username')
     if (saved) {
       username = saved
+      currentProfile = getProfile(username)
       // Sync skin for initial user
       setTimeout(() => syncSkinFromServer(username), 500)
     }
