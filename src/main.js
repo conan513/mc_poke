@@ -1597,39 +1597,66 @@ $id('console-close').addEventListener('click', () => {
 // Functions now triggered in showScreen('home')
 
 
-// Showcase fetch from server handled in randomizeHubShowcase() below
+// Showcase – lokális cache + szerver szinkronizáció
+const SHOWCASE_CACHE_KEY = 'cobble_showcase_cache'
 
+function getTodayStr() {
+  return new Date().toISOString().slice(0, 10) // "YYYY-MM-DD"
+}
 
-async function randomizeHubShowcase() {
-  const serverUrl = $id('input-server-url')?.value?.trim() || 'http://94.72.100.43:8080'
+function applyShowcaseToUI(p) {
   const img = $id('hub-showcase-sprite')
   const nameEl = $id('hub-showcase-name')
   const descEl = $id('hub-showcase-desc')
-  
+  if (!p) return
+  if (img) {
+    img.src = `https://play.pokemonshowdown.com/sprites/ani/${p.sprite || 'pikachu'}.gif`
+    img.onerror = () => {
+      img.src = `https://play.pokemonshowdown.com/sprites/dex/${p.sprite || 'pikachu'}.png`
+    }
+  }
+  if (nameEl) nameEl.textContent = p.name || '???'
+  if (descEl) {
+    const localized = t(p.descKey)
+    if (localized === p.descKey) {
+      descEl.textContent = p.apiDesc || t('showcase.generic_desc').replace('{}', p.name)
+    } else {
+      descEl.setAttribute('data-i18n', p.descKey)
+      descEl.textContent = localized
+    }
+  }
+}
+
+async function randomizeHubShowcase() {
+  const serverUrl = $id('input-server-url')?.value?.trim() || 'http://94.72.100.43:8080'
+  const today = getTodayStr()
+
+  // 1. Azonnali megjelenítés a cache-ből (ha mai napra szól)
+  try {
+    const cached = JSON.parse(localStorage.getItem(SHOWCASE_CACHE_KEY) || 'null')
+    if (cached && cached.date === today && cached.pokemon) {
+      applyShowcaseToUI(cached.pokemon)
+      console.log(`[Showcase] Megjelenítve cache-ből: ${cached.pokemon.name} (${today})`)
+    }
+  } catch (_) {}
+
+  // 2. Háttérben frissítés a szerverről
   try {
     const res = await fetch(`${serverUrl}/api/showcase`)
-    if (!res.ok) throw new Error('Showcase fetch failed')
+    if (!res.ok) throw new Error(`HTTP ${res.status}`)
     const p = await res.json()
-    
-    if (img) {
-      img.src = `https://play.pokemonshowdown.com/sprites/ani/${p.sprite || 'pikachu'}.gif`
-      img.onerror = () => {
-        img.src = `https://play.pokemonshowdown.com/sprites/dex/${p.sprite || 'pikachu'}.png`
-      }
-    }
-    if (nameEl) nameEl.textContent = p.name || '???'
-    if (descEl) {
-      const localized = t(p.descKey)
-      if (localized === p.descKey) {
-        // Use API description if available, otherwise fallback to generic
-        descEl.textContent = p.apiDesc || t('showcase.generic_desc').replace('{}', p.name)
-      } else {
-        descEl.setAttribute('data-i18n', p.descKey)
-        descEl.textContent = localized
-      }
-    }
+
+    // Ha más Pokémon jött vissza (pl. új nap), frissítjük a UI-t
+    applyShowcaseToUI(p)
+
+    // Cache mentése
+    try {
+      localStorage.setItem(SHOWCASE_CACHE_KEY, JSON.stringify({ date: today, pokemon: p }))
+    } catch (_) {}
+
+    console.log(`[Showcase] Szerver válasz: ${p.name} (${today})`)
   } catch (e) {
-    console.warn('[Showcase] Error:', e)
+    console.warn('[Showcase] Szerver elérhetetlen, cache-ből fut:', e.message)
   }
 }
 randomizeHubShowcase()
