@@ -642,7 +642,33 @@ setInterval(() => {
 function startMinecraft() {
   if (mcStatus === 'running' || !activeJavaPath) return
   console.log('[Minecraft] Szerver indítása (java -jar fabric-server-launch.jar nogui)...')
-  mcProcess = spawn(activeJavaPath, ['-Xmx4G', '-Xms2G', '-jar', 'fabric-server-launch.jar', 'nogui'], {
+  // Optimised JVM args for the Fabric server:
+  //  • ZUncommit   – returns unused heap pages to the OS after 60s idle
+  //  • SoftMaxHeap – keeps resident set at ≤3.5G even with -Xmx4G
+  //  • CompressedOops – 32-bit object pointers save ~10-15% heap
+  //  • Xms lowered to 1G – server grows the heap on demand, freeing
+  //    2G on startup compared to the old fixed 2G minimum
+  const serverJvmArgs = [
+    '-Xmx4G', '-Xms1G',
+    '-XX:+UseZGC',
+    '-XX:+ZGenerational',
+    '-XX:+ZUncommit',
+    '-XX:ZUncommitDelay=60',
+    '-XX:SoftMaxHeapSize=3500M',
+    '-XX:+UseCompressedOops',
+    '-XX:+UseCompressedClassPointers',
+    '-XX:+UseStringDeduplication',
+    '-XX:StringDeduplicationAgeThreshold=1',
+    '-XX:ReservedCodeCacheSize=512m',
+    '-XX:+UseCodeCacheFlushing',
+    '-XX:+UnlockExperimentalVMOptions',
+    '-XX:+DisableExplicitGC',
+    '-XX:+PerfDisableSharedMem',
+    '-XX:ConcGCThreads=2',
+    '-Dfml.ignorePatchDiscrepancies=true',
+    '-jar', 'fabric-server-launch.jar', 'nogui',
+  ]
+  mcProcess = spawn(activeJavaPath, serverJvmArgs, {
     cwd: DATA_DIR,
     stdio: ['pipe', 'pipe', 'inherit'] // stdout 'pipe', hogy tudjuk olvasni a játékos csatlakozásokat
   })
