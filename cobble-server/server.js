@@ -186,12 +186,12 @@ function configureCobbledLevels() {
       let json = JSON.parse(content)
       let modified = false
       
-      if (json.PartyScaling && json.PartyScaling.Enabled !== false) {
-        json.PartyScaling.Enabled = false
+      if (json.PartyScaling && json.PartyScaling.Enabled !== true) {
+        json.PartyScaling.Enabled = true
         modified = true
       }
-      if (json.DifficultyScaling && json.DifficultyScaling.Enabled !== false) {
-        json.DifficultyScaling.Enabled = false
+      if (json.DistanceScaling && json.DistanceScaling.POWER_SCALING && json.DistanceScaling.POWER_SCALING.DistanceForMaxLevel !== 10000) {
+        json.DistanceScaling.POWER_SCALING.DistanceForMaxLevel = 10000
         modified = true
       }
       if (json.DistanceScaling && json.DistanceScaling.Influence !== 1.0) {
