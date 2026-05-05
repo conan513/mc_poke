@@ -34,7 +34,7 @@ const STATE_BAK = path.join(SERVER_DIR, '.server-install-state.json.bak')
 const BLACKLISTED_MODS = [
   'no hunger', 'no ender dragon', 'soundsbegone',
   'interactic', 'custom-splash-screen', 'customsplashscreen', 'battlecam', 'lenientdeath',
-  'biome-replacer',
+  'biome-replacer', 'biomereplacer', 'nocubes',
   'fancymenu', 'konkrete', 'drippyloadingscreen', 'loadingscreen', 'notenoughcrashes',
   'figura', 'admiral', 'cobblemau'
 ];
@@ -509,7 +509,6 @@ const EXTRA_DATAPACKS = [
  */
 const CURSEFORGE_MODS = [
   { id: '1534055', name: 'cobblemon-nests-dens' },
-  { id: '561868', name: 'no-cubes-reloaded', fileId: '7277445' },
 ];
 
 /**
