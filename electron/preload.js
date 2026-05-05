@@ -20,6 +20,9 @@ contextBridge.exposeInMainWorld('cobble', {
   checkForUpdates: () => ipcRenderer.invoke('check-updates'),
   runUpdate: (opts) => ipcRenderer.invoke('run-update', opts),
   
+  // Skins API
+  searchSkins: (query) => ipcRenderer.invoke('search-skins', query),
+  
   // Launcher Self-Updates
   checkLauncherUpdates: () => ipcRenderer.invoke('check-for-launcher-updates'),
   downloadLauncherUpdate: () => ipcRenderer.invoke('download-launcher-update'),

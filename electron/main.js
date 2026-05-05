@@ -345,6 +345,45 @@ ipcMain.handle('check-installed', async () => {
   return launcher.isInstalled()
 })
 
+ipcMain.handle('search-skins', async (event, query) => {
+  return new Promise((resolve) => {
+    const https = require('https');
+    const url = `https://www.minecraftskins.net/search/${encodeURIComponent(query)}`;
+    
+    https.get(url, {
+      headers: {
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/114.0.0.0 Safari/537.36'
+      }
+    }, (res) => {
+      let data = '';
+      res.on('data', chunk => data += chunk);
+      res.on('end', () => {
+        try {
+          const skins = [];
+          const regex = /<div class="card">[\s\S]*?<a class="panel-link" href="([^"]+)">[\s\S]*?<img src="([^"]+)"[\s\S]*?alt="([^"]+)"/gi;
+          let match;
+          while ((match = regex.exec(data)) !== null && skins.length < 24) {
+            const rawId = match[1].replace('/', '');
+            const id = rawId.split('?')[0]; // remove query params
+            const previewUrl = 'https://www.minecraftskins.net' + match[2];
+            const name = match[3].trim();
+            const downloadUrl = 'https://www.minecraftskins.net/' + id + '/download';
+            
+            skins.push({ id, name, url: downloadUrl, preview: previewUrl });
+          }
+          resolve(skins);
+        } catch (e) {
+          console.error('[SkinSearch] Parse Error:', e);
+          resolve([]);
+        }
+      });
+    }).on('error', (err) => {
+      console.error('[SkinSearch] Request Error:', err);
+      resolve([]);
+    });
+  });
+})
+
 ipcMain.on('open-external', (event, url) => {
   shell.openExternal(url)
 })

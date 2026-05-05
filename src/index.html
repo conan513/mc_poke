@@ -158,10 +158,18 @@
             <div class="skin-preview-glow" style="width: 160px; height: 160px; top: 20px;"></div>
             <canvas id="intro-skin-3d-canvas" style="position: relative; z-index: 2; filter: drop-shadow(0 10px 20px rgba(0,0,0,0.5));"></canvas>
           </div>
-          <div style="display: flex; gap: 10px; margin-bottom: 15px;">
-            <button id="btn-intro-skin-mojang" class="btn-secondary active" style="flex: 1; padding: 10px; font-size: 0.9em;" data-i18n="skin.type_mojang">Mojang</button>
-            <button id="btn-intro-skin-url" class="btn-secondary" style="flex: 1; padding: 10px; font-size: 0.9em;" data-i18n="skin.type_url">URL</button>
-            <button id="btn-intro-skin-file" class="btn-secondary" style="flex: 1; padding: 10px; font-size: 0.9em;" data-i18n="skin.type_file">Local File</button>
+          <div style="display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 5px; margin-bottom: 15px;">
+            <button id="btn-intro-skin-mojang" class="btn-secondary active" style="padding: 10px; font-size: 0.9em;" data-i18n="skin.type_mojang">Mojang</button>
+            <button id="btn-intro-skin-url" class="btn-secondary" style="padding: 10px; font-size: 0.9em;" data-i18n="skin.type_url">URL</button>
+            <button id="btn-intro-skin-file" class="btn-secondary" style="padding: 10px; font-size: 0.9em;" data-i18n="skin.type_file">Local File</button>
+            <button id="btn-intro-skin-gallery" class="btn-secondary" style="padding: 10px; font-size: 0.9em;" data-i18n="skin.type_gallery">Katalógus</button>
+          </div>
+          <div id="intro-skin-gallery-wrapper" class="hidden" style="margin-bottom: 15px;">
+            <div style="display: flex; gap: 5px; margin-bottom: 5px;">
+              <input type="text" id="intro-skin-search" class="form-input intro-input" style="flex: 1; padding: 8px;" placeholder="Keresés (minecraftskins.net)...">
+              <button id="btn-intro-skin-search" class="btn-primary" style="padding: 8px 15px;">Keresés</button>
+            </div>
+            <div id="intro-skin-gallery-container" class="skin-gallery-grid"></div>
           </div>
           <input type="text" class="form-input intro-input" id="intro-skin-input" data-i18n-attr="placeholder:skin.type_mojang_placeholder" style="width: 100%; box-sizing: border-box; margin-bottom: 15px;">
           
@@ -621,10 +629,18 @@
           <div class="skin-form">
             <div class="form-group">
               <label class="form-label" data-i18n="skin.source_label">Skin Forrása</label>
-              <div class="tab-selectors">
+              <div class="tab-selectors" style="display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 5px;">
                 <button class="tab-btn active" data-skin-type="mojang" data-i18n="skin.type_mojang">Mojang Név</button>
                 <button class="tab-btn" data-skin-type="url" data-i18n="skin.type_url">Egyedi URL</button>
                 <button class="tab-btn" data-skin-type="file" data-i18n="skin.type_file">Helyi Fájl</button>
+                <button class="tab-btn" data-skin-type="gallery" data-i18n="skin.type_gallery">Katalógus</button>
+              </div>
+              <div id="skin-gallery-wrapper" class="hidden" style="margin-top: 10px;">
+                <div style="display: flex; gap: 5px; margin-bottom: 5px;">
+                  <input type="text" id="modal-skin-search" class="form-input" style="flex: 1; padding: 8px;" placeholder="Keresés (minecraftskins.net)...">
+                  <button id="btn-modal-skin-search" class="btn-primary" style="padding: 8px 15px;">Keresés</button>
+                </div>
+                <div id="skin-gallery-container" class="skin-gallery-grid"></div>
               </div>
               <div id="skin-input-container">
                 <input type="text" id="input-skin-val" class="form-input" data-i18n-attr="placeholder:skin.type_mojang_placeholder" style="margin-top: 10px;" />

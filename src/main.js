@@ -43,6 +43,113 @@ let translations = {}
 let isOnlineUI = true
 let skipCinematic = false
 
+// ── Skin Gallery ──────────────────────────────────────────────
+let skinGallery = [];
+let isSearchingSkins = false;
+
+async function loadSkinGallery(query = '') {
+  if (isSearchingSkins) return;
+  isSearchingSkins = true;
+  
+  const introContainer = $id('intro-skin-gallery-container');
+  const modalContainer = $id('skin-gallery-container');
+  const loadingHtml = '<div style="grid-column: 1/-1; text-align: center; color: #ccc;">Keresés...</div>';
+  
+  if (introContainer) introContainer.innerHTML = loadingHtml;
+  if (modalContainer) modalContainer.innerHTML = loadingHtml;
+  
+  try {
+    if (window.cobble && window.cobble.searchSkins && query.trim()) {
+      skinGallery = await window.cobble.searchSkins(query.trim());
+    } else {
+      const res = await fetch('./skins.json');
+      if (res.ok) skinGallery = await res.json();
+    }
+    
+    if (!skinGallery || skinGallery.length === 0) {
+       const emptyHtml = '<div style="grid-column: 1/-1; text-align: center; color: #ccc;">Nincs találat.</div>';
+       if (introContainer) introContainer.innerHTML = emptyHtml;
+       if (modalContainer) modalContainer.innerHTML = emptyHtml;
+    } else {
+       renderSkinGallery();
+    }
+  } catch (e) {
+    console.error("Failed to load skin gallery", e);
+    const errHtml = '<div style="grid-column: 1/-1; text-align: center; color: #f55;">Hiba a betöltéskor.</div>';
+    if (introContainer) introContainer.innerHTML = errHtml;
+    if (modalContainer) modalContainer.innerHTML = errHtml;
+  }
+  isSearchingSkins = false;
+}
+
+function renderSkinGallery() {
+  const introContainer = $id('intro-skin-gallery-container');
+  const modalContainer = $id('skin-gallery-container');
+  if (!introContainer || !modalContainer) return;
+  
+  introContainer.innerHTML = '';
+  modalContainer.innerHTML = '';
+  
+  skinGallery.forEach(skin => {
+    introContainer.appendChild(createGalleryItem(skin, true));
+    modalContainer.appendChild(createGalleryItem(skin, false));
+  });
+}
+
+function createGalleryItem(skin, isIntro) {
+  const div = document.createElement('div');
+  div.className = 'skin-gallery-item';
+  div.title = skin.name;
+  
+  const preview = skin.preview || skin.url; // Support older skins.json format that lacks 'preview'
+  
+  // If it's a small_preview from namemc/minecraftskins.net, it's already a proper thumbnail!
+  if (preview.includes('small_preview') || preview.includes('namemc.com/i')) {
+    div.innerHTML = `<img src="${preview}" alt="${skin.name}" style="width:100%; height:100%; object-fit:contain;">`;
+  } else {
+    // Extract face for raw textures
+    div.innerHTML = `<div style="width: 48px; height: 48px; background-image: url('${preview}'); background-size: 384px 384px; background-position: -48px -48px;"></div>`;
+  }
+  
+  div.onclick = () => {
+    const parent = isIntro ? $id('intro-skin-gallery-container') : $id('skin-gallery-container');
+    parent.querySelectorAll('.skin-gallery-item').forEach(el => el.classList.remove('selected'));
+    div.classList.add('selected');
+    
+    if (isIntro) {
+      if (typeof introGallerySelectedUrl !== 'undefined') {
+        introGallerySelectedUrl = skin.url;
+      }
+      if (typeof updateIntroSkin3D === 'function') updateIntroSkin3D();
+    } else {
+      if (typeof currentSkinVal !== 'undefined') {
+        currentSkinVal = skin.url;
+      }
+      if (typeof updateSkinPreview === 'function') updateSkinPreview();
+    }
+  };
+  return div;
+}
+
+// Bind search buttons after DOM loads
+document.addEventListener('DOMContentLoaded', () => {
+  $id('btn-intro-skin-search')?.addEventListener('click', () => {
+    loadSkinGallery($id('intro-skin-search')?.value);
+  });
+  $id('intro-skin-search')?.addEventListener('keypress', (e) => {
+    if (e.key === 'Enter') loadSkinGallery(e.target.value);
+  });
+  
+  $id('btn-modal-skin-search')?.addEventListener('click', () => {
+    loadSkinGallery($id('modal-skin-search')?.value);
+  });
+  $id('modal-skin-search')?.addEventListener('keypress', (e) => {
+    if (e.key === 'Enter') loadSkinGallery(e.target.value);
+  });
+});
+
+loadSkinGallery();
+
 function typeWriter(el, text, speed = 36) {
   return new Promise(resolve => {
     el.textContent = ''
@@ -588,16 +695,17 @@ async function startIntro() {
 
     let introSkinType = 'mojang';
     let introSkinFileBase64 = '';
+    let introGallerySelectedUrl = '';
     let introSkinViewer3D = null;
 
     function updateIntroSkin3D() {
       if (!introSkinViewer3D) return;
       let url = 'https://mc-heads.net/skin/Steve';
-      const val = (introSkinType === 'file') ? introSkinFileBase64 : $id('intro-skin-input').value.trim();
+      const val = (introSkinType === 'file') ? introSkinFileBase64 : (introSkinType === 'gallery' ? introGallerySelectedUrl : $id('intro-skin-input').value.trim());
       
       if (introSkinType === 'mojang') {
          url = val ? `https://mc-heads.net/skin/${val}` : `https://mc-heads.net/skin/${username || 'Steve'}`;
-      } else if (introSkinType === 'url') {
+      } else if (introSkinType === 'url' || introSkinType === 'gallery') {
          url = val || 'https://mc-heads.net/skin/Steve';
       } else if (introSkinType === 'file') {
          url = val || 'https://mc-heads.net/skin/Steve';
@@ -650,8 +758,10 @@ async function startIntro() {
       $id('btn-intro-skin-mojang').classList.add('active');
       $id('btn-intro-skin-url').classList.remove('active');
       $id('btn-intro-skin-file').classList.remove('active');
+      $id('btn-intro-skin-gallery').classList.remove('active');
       $id('intro-skin-input').classList.remove('hidden');
       $id('btn-intro-browse-skin').classList.add('hidden');
+      $id('intro-skin-gallery-container').classList.add('hidden');
       $id('intro-skin-input').placeholder = t('skin.type_mojang_placeholder');
       updateIntroSkin3D();
     });
@@ -660,8 +770,10 @@ async function startIntro() {
       $id('btn-intro-skin-url').classList.add('active');
       $id('btn-intro-skin-mojang').classList.remove('active');
       $id('btn-intro-skin-file').classList.remove('active');
+      $id('btn-intro-skin-gallery').classList.remove('active');
       $id('intro-skin-input').classList.remove('hidden');
       $id('btn-intro-browse-skin').classList.add('hidden');
+      $id('intro-skin-gallery-container').classList.add('hidden');
       $id('intro-skin-input').placeholder = t('skin.type_url_placeholder');
       updateIntroSkin3D();
     });
@@ -670,8 +782,21 @@ async function startIntro() {
       $id('btn-intro-skin-file').classList.add('active');
       $id('btn-intro-skin-url').classList.remove('active');
       $id('btn-intro-skin-mojang').classList.remove('active');
+      $id('btn-intro-skin-gallery').classList.remove('active');
       $id('intro-skin-input').classList.add('hidden');
+      $id('intro-skin-gallery-container').classList.add('hidden');
       $id('btn-intro-browse-skin').classList.remove('hidden');
+      updateIntroSkin3D();
+    });
+    $id('btn-intro-skin-gallery')?.addEventListener('click', () => {
+      introSkinType = 'gallery';
+      $id('btn-intro-skin-gallery').classList.add('active');
+      $id('btn-intro-skin-file').classList.remove('active');
+      $id('btn-intro-skin-url').classList.remove('active');
+      $id('btn-intro-skin-mojang').classList.remove('active');
+      $id('intro-skin-input').classList.add('hidden');
+      $id('btn-intro-browse-skin').classList.add('hidden');
+      $id('intro-skin-gallery-container').classList.remove('hidden');
       updateIntroSkin3D();
     });
 
@@ -704,6 +829,8 @@ async function startIntro() {
       let val = '';
       if (introSkinType === 'file') {
         val = introSkinFileBase64;
+      } else if (introSkinType === 'gallery') {
+        val = introGallerySelectedUrl;
       } else {
         val = $id('intro-skin-input').value.trim();
       }
@@ -717,7 +844,7 @@ async function startIntro() {
         
         const p = getProfile(username);
         if (p) {
-          p.skinType = introSkinType;
+          p.skinType = (introSkinType === 'gallery') ? 'url' : introSkinType;
           p.skinVal = val;
           saveProfiles();
           renderProfiles();
@@ -2539,9 +2666,15 @@ $id('btn-change-skin').addEventListener('click', () => {
 
   if (currentSkinType === 'file') {
     $id('skin-input-container').classList.add('hidden')
+    $id('skin-gallery-container').classList.add('hidden')
     $id('btn-browse-skin').classList.remove('hidden')
+  } else if (currentSkinType === 'gallery') {
+    $id('skin-input-container').classList.add('hidden')
+    $id('skin-gallery-container').classList.remove('hidden')
+    $id('btn-browse-skin').classList.add('hidden')
   } else {
     $id('skin-input-container').classList.remove('hidden')
+    $id('skin-gallery-container').classList.add('hidden')
     $id('btn-browse-skin').classList.add('hidden')
     $id('input-skin-val').value = currentSkinVal || ''
     $id('input-skin-val').placeholder = currentSkinType === 'mojang'
@@ -2577,9 +2710,15 @@ document.querySelectorAll('[data-skin-type]').forEach(btn => {
     // UI visibility
     if (currentSkinType === 'file') {
       $id('skin-input-container').classList.add('hidden')
+      $id('skin-gallery-container').classList.add('hidden')
       $id('btn-browse-skin').classList.remove('hidden')
+    } else if (currentSkinType === 'gallery') {
+      $id('skin-input-container').classList.add('hidden')
+      $id('skin-gallery-container').classList.remove('hidden')
+      $id('btn-browse-skin').classList.add('hidden')
     } else {
       $id('skin-input-container').classList.remove('hidden')
+      $id('skin-gallery-container').classList.add('hidden')
       $id('btn-browse-skin').classList.add('hidden')
       $id('input-skin-val').placeholder = currentSkinType === 'mojang'
         ? 'pl. AshKetchum'
@@ -2610,7 +2749,9 @@ $id('input-skin-val').addEventListener('input', () => {
 })
 
 $id('btn-save-skin').addEventListener('click', async () => {
-  if (currentSkinType !== 'file') {
+  if (currentSkinType === 'gallery') {
+    // currentSkinVal is already set when a gallery item is clicked
+  } else if (currentSkinType !== 'file') {
     currentSkinVal = $id('input-skin-val').value.trim()
   }
 
@@ -2619,16 +2760,19 @@ $id('btn-save-skin').addEventListener('click', async () => {
     return
   }
 
+  const savedSkinType = (currentSkinType === 'gallery') ? 'url' : currentSkinType;
+
   try {
     const p = getProfile(username)
     if (p) {
-      p.skinType = currentSkinType
+      p.skinType = savedSkinType
       p.skinVal = currentSkinVal
       saveProfiles()
       renderProfiles()
     }
-    localStorage.setItem('cobble_skin_type', currentSkinType)
+    localStorage.setItem('cobble_skin_type', savedSkinType)
     localStorage.setItem('cobble_skin_val', currentSkinVal)
+    currentSkinType = savedSkinType // So next time it opens as URL instead of gallery, or we can keep it as gallery. It's safer to convert to URL.
   } catch (e) {}
 
   applyAvatar()
