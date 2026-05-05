@@ -71,7 +71,7 @@ function startLocalServer() {
   })
 }
 
-const isDev = process.env.NODE_ENV === 'development' || !app.isPackaged
+const isDev = process.env.NODE_ENV === 'development'
 
 // Suppress punycode deprecation warning from dependencies
 const originalEmit = process.emit;
@@ -167,11 +167,18 @@ function createWindow() {
   }
 
   if (isDev) {
+    // Dev mode: Vite dev server
     const devUrl = 'http://localhost:5173/app/'
     console.log(`[Electron] Development mode: Loading ${devUrl}`)
     mainWindow.loadURL(devUrl)
     // mainWindow.webContents.openDevTools()
+  } else if (!app.isPackaged) {
+    // Unpackaged electron (e.g. `npm run electron` without Vite)
+    // → always use local dist to test local changes
+    console.log('[Electron] Local test mode: Loading from local dist')
+    loadLocalFallback()
   } else {
+    // Packaged production build: try remote, fallback to local dist
     console.log(`[Electron] Production mode: Loading ${remoteUrl}`)
     mainWindow.webContents.session.clearCache().then(() => {
       mainWindow.loadURL(remoteUrl).catch(() => loadLocalFallback())

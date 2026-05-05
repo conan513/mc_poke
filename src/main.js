@@ -31,7 +31,7 @@ console.error = (...args) => { _err(...args); logToScreen(args.join(' '), 'error
 window.onerror = (m, s, l, c, e) => { console.error(`${m} at ${s}:${l}`); }
 
 // ── State ────────────────────────────────────────────────────
-let selectedRam = localStorage.getItem('cobble_ram') || '4096'
+let selectedRam = parseInt(localStorage.getItem('cobble_ram')) || 6144
 let totalSystemMem = 8 * 1024 * 1024 * 1024 // Default fallback: 8GB in bytes
 let closeOnLaunch = localStorage.getItem('cobble_close_launch') === 'true'
 let powerSaveEnabled = localStorage.getItem('cobble_power_save') !== 'false' // Default true
@@ -2058,10 +2058,8 @@ animateParticles()
 
     const savedRam = localStorage.getItem('cobble_ram')
     if (savedRam) {
-      selectedRam = parseInt(savedRam)
-      document.querySelectorAll('.ram-btn').forEach(b => {
-        b.classList.toggle('active', parseInt(b.dataset.val) === selectedRam)
-      })
+      const parsed = parseInt(savedRam)
+      if (!isNaN(parsed) && parsed > 0) selectedRam = parsed
     }
   } catch (e) {}
 
@@ -2100,23 +2098,34 @@ animateParticles()
     }
   })
   const syncRamUI = () => {
+    const ramVal = parseInt(selectedRam)
     document.querySelectorAll('.ram-btn').forEach(btn => {
-      const isActive = parseInt(btn.dataset.val) === parseInt(selectedRam)
-      if (isActive) {
-        btn.classList.add('active')
+      const btnVal = parseInt(btn.dataset.val)
+      const isActive = btnVal === ramVal
+      const isRecommended = !!btn.querySelector('.recommended-badge')
+
+      btn.classList.toggle('active', isActive)
+
+      if (isActive && isRecommended) {
+        // Selected AND recommended: gold border + blue glow blend
+        btn.style.borderColor = 'var(--accent-gold)'
+        btn.style.boxShadow = '0 0 18px rgba(251, 191, 36, 0.55)'
+      } else if (isActive) {
+        // Selected only: blue
         btn.style.borderColor = 'var(--accent-blue)'
+        btn.style.boxShadow = '0 0 12px rgba(96, 165, 250, 0.2)'
+      } else if (isRecommended) {
+        // Recommended but not selected: gold
+        btn.style.borderColor = 'var(--accent-gold)'
+        btn.style.boxShadow = '0 0 18px rgba(251, 191, 36, 0.45)'
       } else {
-        btn.classList.remove('active')
-        const badge = btn.querySelector('.recommended-badge')
-        if (!badge) {
-          btn.style.borderColor = ''
-        } else {
-          btn.style.borderColor = badge.dataset.isFallback === 'true' ? 'var(--accent-gold)' : 'var(--accent-green)'
-        }
+        // Plain
+        btn.style.borderColor = ''
+        btn.style.boxShadow = ''
       }
     })
     const display = $id('home-ram-display')
-    if (display) display.textContent = `${selectedRam} MB`
+    if (display) display.textContent = `${ramVal} MB`
     updateRamWarning()
   }
 
@@ -2148,8 +2157,8 @@ animateParticles()
   // Validation: Ensure selectedRam is one of the available options (4GB, 6GB, 8GB, 12GB)
   const validRamValues = [4096, 6144, 8192, 12288]
   if (!validRamValues.includes(parseInt(selectedRam))) {
-    console.log(`[System] Invalid RAM setting (${selectedRam}), resetting to 4GB`)
-    selectedRam = 4096
+    console.log(`[System] Invalid RAM setting (${selectedRam}), resetting to 6GB`)
+    selectedRam = 6144
     syncRamUI()
   }
 
@@ -2198,10 +2207,11 @@ animateParticles()
     // ── Step 3: Smart RAM auto-select (only on first run or version bump) ──
     const savedRam = localStorage.getItem('cobble_ram')
     const smartCheckVer = localStorage.getItem('cobble_ram_smart_ver') || '0'
-    if (!savedRam || smartCheckVer !== '3') {
+    console.log(`[RAM] savedRam=${savedRam} smartVer=${smartCheckVer} recommended=${recommended} isFallback=${isFallback}`)
+    if (!savedRam || smartCheckVer !== '4') {
       selectedRam = recommended
-      localStorage.setItem('cobble_ram', recommended)
-      localStorage.setItem('cobble_ram_smart_ver', '3')
+      localStorage.setItem('cobble_ram', String(recommended))
+      localStorage.setItem('cobble_ram_smart_ver', '4')
       const msg = `[System] Smart RAM auto-selected: ${recommended} MB (system: ${totalGB.toFixed(1)} GB${isFallback ? ', fallback' : ''})`
       console.log(msg)
       addLog(msg)
