@@ -10,11 +10,11 @@ const AdmZip = require('adm-zip')
 const LOG_FILE = path.join(__dirname, 'server-data', 'updater.log')
 function logInfo(...args) {
   console.log(...args)
-  try { fs.appendFileSync(LOG_FILE, `[${new Date().toISOString()}] ${args.join(' ')}\n`) } catch(e) {}
+  try { fs.appendFileSync(LOG_FILE, `[${new Date().toISOString()}] ${args.join(' ')}\n`) } catch (e) { }
 }
 function logError(...args) {
   console.error(...args)
-  try { fs.appendFileSync(LOG_FILE, `[ERROR] [${new Date().toISOString()}] ${args.join(' ')}\n`) } catch(e) {}
+  try { fs.appendFileSync(LOG_FILE, `[ERROR] [${new Date().toISOString()}] ${args.join(' ')}\n`) } catch (e) { }
 }
 
 
@@ -34,7 +34,7 @@ const STATE_BAK = path.join(SERVER_DIR, '.server-install-state.json.bak')
 const BLACKLISTED_MODS = [
   'no hunger', 'no ender dragon', 'soundsbegone',
   'interactic', 'custom-splash-screen', 'customsplashscreen', 'battlecam', 'lenientdeath',
-  'biome-replacer', 'biomereplacer', 'nocubes',
+  'biome-replacer', 'biomereplacer', 'nocubes', 'mobsbegone',
   'fancymenu', 'konkrete', 'drippyloadingscreen', 'loadingscreen', 'notenoughcrashes',
   'figura', 'admiral', 'cobblemau'
 ];
@@ -161,24 +161,24 @@ function downloadFile(url, dest, options = {}) {
   return new Promise((resolve, reject) => {
     fs.mkdirSync(path.dirname(dest), { recursive: true })
     const tmpDest = dest + '.tmp'
-    
+
     const request = (targetUrl) => {
       const mod = targetUrl.startsWith('https') ? https : http
       mod.get(targetUrl, { headers: { 'User-Agent': 'CobbleServer/1.0' } }, (res) => {
         if ([301, 302, 307, 308].includes(res.statusCode)) return request(res.headers.location)
         if (res.statusCode !== 200) return reject(new Error(`HTTP ${res.statusCode} for ${targetUrl}`))
-        
+
         const total = parseInt(res.headers['content-length'] || '0', 10)
         let downloaded = 0
         const file = fs.createWriteStream(tmpDest)
-        
+
         res.on('data', chunk => {
           downloaded += chunk.length
           if (total > 0 && onProgress) onProgress(downloaded / total)
         })
-        
+
         res.pipe(file)
-        
+
         file.on('finish', async () => {
           file.close(async () => {
             try {
@@ -189,7 +189,7 @@ function downloadFile(url, dest, options = {}) {
                   return reject(new Error(`Hash hiba! Elvárt: ${expectedHash}, Kapott: ${actualHash}`))
                 }
               }
-              
+
               // Siker: átnevezés véglegesre
               if (fs.existsSync(dest)) fs.unlinkSync(dest)
               fs.renameSync(tmpDest, dest)
@@ -200,7 +200,7 @@ function downloadFile(url, dest, options = {}) {
             }
           })
         })
-        
+
         file.on('error', (err) => {
           if (fs.existsSync(tmpDest)) fs.unlinkSync(tmpDest)
           reject(err)
@@ -263,7 +263,7 @@ async function modrinthRequest(path, method = 'GET', body = null) {
  */
 function backup() {
   logInfo('[Installer] Biztonsági mentés készítése frissítés előtt...')
-  
+
   // State backup
   if (fs.existsSync(STATE_FILE)) {
     fs.copyFileSync(STATE_FILE, STATE_BAK)
@@ -325,7 +325,7 @@ async function updateModsFromModrinth() {
   try {
     const files = fs.readdirSync(MODS_DIR).filter(f => f.endsWith('.jar'));
     logInfo(`[Modrinth] ${files.length} .jar fájl találva a mods mappában.`);
-    
+
     const hashes = [];
     const fileToInfo = {};
 
@@ -368,19 +368,19 @@ async function updateModsFromModrinth() {
         const versions = await modrinthRequest(`/v2/project/${projectId}/version?${query}`);
         const releases = versions.filter(v => v.version_type === 'release');
         const latest = releases[0] || versions[0];
-        
+
         if (!latest) {
           logInfo(`[Modrinth] Nincs kompatibilis verzió a projekthez: ${projectId}`);
           continue;
         }
 
         const currentVersionsForProject = Object.values(hashToVersion).filter(v => v.project_id === projectId);
-        
+
         // Find if any local version of this project is older than the latest version
         const needsUpdate = currentVersionsForProject.some(v => {
-            const currentDate = new Date(v.date_published);
-            const latestDate = new Date(latest.date_published);
-            return latestDate > currentDate;
+          const currentDate = new Date(v.date_published);
+          const latestDate = new Date(latest.date_published);
+          return latestDate > currentDate;
         });
 
         if (needsUpdate) {
@@ -392,7 +392,7 @@ async function updateModsFromModrinth() {
           if (oldFileInfo) {
             logInfo(`[Modrinth] FRISSÍTÉS: ${oldFileInfo.file} -> ${newestFile.filename} (${latest.version_number})`);
             const dest = path.join(MODS_DIR, newestFile.filename);
-            
+
             await downloadFile(newestFile.url, dest, { hash: newestFile.hashes.sha1, algorithm: 'sha1' });
             if (fs.existsSync(oldFileInfo.fullPath) && oldFileInfo.fullPath !== dest) {
               fs.unlinkSync(oldFileInfo.fullPath);
@@ -423,77 +423,76 @@ async function updateModsFromModrinth() {
  * SkinsRestorer WITHOUT a loader filter but WITH a game_version constraint.
  */
 const EXTRA_MODS = [
-  { slug: 'chipped',                        loaders: ['fabric'], gameVersions: [MC_VERSION] },
-  { slug: 'creeper-firework',               loaders: ['fabric'], gameVersions: [MC_VERSION] },
-  { slug: 'terrablender',                   loaders: ['fabric'], gameVersions: [MC_VERSION] },
-  { slug: 'skinrestorer',                   loaders: ['fabric'], gameVersions: [MC_VERSION] },
+  { slug: 'chipped', loaders: ['fabric'], gameVersions: [MC_VERSION] },
+  { slug: 'creeper-firework', loaders: ['fabric'], gameVersions: [MC_VERSION] },
+  { slug: 'terrablender', loaders: ['fabric'], gameVersions: [MC_VERSION] },
+  { slug: 'skinrestorer', loaders: ['fabric'], gameVersions: [MC_VERSION] },
   // Cobblemon extra mods
-  { slug: 'player-locator-plus',            loaders: ['fabric'], gameVersions: [MC_VERSION] },
-  { slug: 'cobblemon-mount-mastery',        loaders: ['fabric'], gameVersions: [MC_VERSION] },
-  { slug: 'cobblemon-smartphone',           loaders: ['fabric'], gameVersions: [MC_VERSION] },
-  { slug: 'trainer-accessories',            loaders: ['fabric'], gameVersions: [MC_VERSION] },
-  { slug: 'cobblemon-rankeds',              loaders: ['fabric'], gameVersions: [MC_VERSION] },
-  { slug: 'more-cobblemon-stats',           loaders: ['fabric'], gameVersions: [MC_VERSION] },
-  { slug: 'cobblemon-max-level-catch-cap',  loaders: ['fabric'], gameVersions: [MC_VERSION] },
+  { slug: 'player-locator-plus', loaders: ['fabric'], gameVersions: [MC_VERSION] },
+  { slug: 'cobblemon-mount-mastery', loaders: ['fabric'], gameVersions: [MC_VERSION] },
+  { slug: 'cobblemon-smartphone', loaders: ['fabric'], gameVersions: [MC_VERSION] },
+  { slug: 'trainer-accessories', loaders: ['fabric'], gameVersions: [MC_VERSION] },
+  { slug: 'cobblemon-rankeds', loaders: ['fabric'], gameVersions: [MC_VERSION] },
+  { slug: 'more-cobblemon-stats', loaders: ['fabric'], gameVersions: [MC_VERSION] },
+  { slug: 'cobblemon-max-level-catch-cap', loaders: ['fabric'], gameVersions: [MC_VERSION] },
   { slug: 'cobblemon-capture-notification', loaders: ['fabric'], gameVersions: [MC_VERSION] },
-  { slug: 'cobblemon-rustling-spots',       loaders: ['fabric'], gameVersions: [MC_VERSION] },
-  { slug: 'cobblemon-cobbled-levels',       loaders: ['fabric'], gameVersions: [MC_VERSION] },
-  { slug: 'village-spawn-point',            loaders: ['fabric'], gameVersions: [MC_VERSION] },
-  { slug: 'easyauth',                       loaders: ['fabric'], gameVersions: [MC_VERSION] },
-  { slug: 'serene-seasons',                 loaders: ['fabric'], gameVersions: [MC_VERSION] },
-  { slug: 'seasonhud-fabric',               loaders: ['fabric'], gameVersions: [MC_VERSION] },
-  { slug: 'easywhitelist',                  loaders: ['fabric'], gameVersions: [MC_VERSION] },
+  { slug: 'cobblemon-rustling-spots', loaders: ['fabric'], gameVersions: [MC_VERSION] },
+  { slug: 'cobblemon-cobbled-levels', loaders: ['fabric'], gameVersions: [MC_VERSION] },
+  { slug: 'village-spawn-point', loaders: ['fabric'], gameVersions: [MC_VERSION] },
+  { slug: 'easyauth', loaders: ['fabric'], gameVersions: [MC_VERSION] },
+  { slug: 'serene-seasons', loaders: ['fabric'], gameVersions: [MC_VERSION] },
+  { slug: 'seasonhud-fabric', loaders: ['fabric'], gameVersions: [MC_VERSION] },
+  { slug: 'easywhitelist', loaders: ['fabric'], gameVersions: [MC_VERSION] },
   // Új modok (felhasználói kérés)
-  { slug: 'mobsbegone',                     loaders: ['fabric'], gameVersions: [MC_VERSION] },
-  { slug: 'vmp-fabric',                     loaders: ['fabric'], gameVersions: [MC_VERSION] },
+  { slug: 'vmp-fabric', loaders: ['fabric'], gameVersions: [MC_VERSION] },
   { slug: 'fix-cobblemon-pokemon-experience', loaders: ['fabric'], gameVersions: [MC_VERSION] },
-  { slug: 'cobblemon-pokestops',            loaders: ['fabric'], gameVersions: [MC_VERSION] },
-  { slug: 'cobblemon-pet-a-poke',           loaders: ['fabric'], gameVersions: [MC_VERSION] },
-  { slug: 'pokemon-field-lab',              loaders: ['fabric'], gameVersions: [MC_VERSION] },
-  { slug: 'cobblemon-pokerus',              loaders: ['fabric'], gameVersions: [MC_VERSION] },
-  { slug: 'livelierpokemon',                loaders: ['fabric'], gameVersions: [MC_VERSION] },
-  { slug: 'pokebike',                       loaders: ['fabric'], gameVersions: [MC_VERSION] },
-  { slug: 'cobblemonmovedex',               loaders: ['fabric'], gameVersions: [MC_VERSION] },
-  { slug: 'cobblemon-alpha-project',        loaders: ['fabric'], gameVersions: [MC_VERSION] },
-  { slug: 'cobblemarks+',                   loaders: ['fabric'], gameVersions: [MC_VERSION] },
-  { slug: 'rad-gyms',                       loaders: ['fabric'], gameVersions: [MC_VERSION] },
+  { slug: 'cobblemon-pokestops', loaders: ['fabric'], gameVersions: [MC_VERSION] },
+  { slug: 'cobblemon-pet-a-poke', loaders: ['fabric'], gameVersions: [MC_VERSION] },
+  { slug: 'pokemon-field-lab', loaders: ['fabric'], gameVersions: [MC_VERSION] },
+  { slug: 'cobblemon-pokerus', loaders: ['fabric'], gameVersions: [MC_VERSION] },
+  { slug: 'livelierpokemon', loaders: ['fabric'], gameVersions: [MC_VERSION] },
+  { slug: 'pokebike', loaders: ['fabric'], gameVersions: [MC_VERSION] },
+  { slug: 'cobblemonmovedex', loaders: ['fabric'], gameVersions: [MC_VERSION] },
+  { slug: 'cobblemon-alpha-project', loaders: ['fabric'], gameVersions: [MC_VERSION] },
+  { slug: 'cobblemarks+', loaders: ['fabric'], gameVersions: [MC_VERSION] },
+  { slug: 'rad-gyms', loaders: ['fabric'], gameVersions: [MC_VERSION] },
   { slug: 'cobblemon-underground-mining-minigame', loaders: ['fabric'], gameVersions: [MC_VERSION] },
-  { slug: 'cobble-contests',                loaders: ['fabric'], gameVersions: [MC_VERSION] },
-  { slug: 'cobblemon-trials-edition',       loaders: ['fabric'], gameVersions: [MC_VERSION] },
-  { slug: 'cobblemon-battle-tower',         loaders: ['fabric'], gameVersions: [MC_VERSION] },
-  { slug: 'cobblemon-simple-pokecenters',   loaders: ['fabric'], gameVersions: [MC_VERSION] },
-  { slug: 'cobblemon-integrations',         loaders: ['fabric'], gameVersions: [MC_VERSION] },
-  { slug: 'lootr',                          loaders: ['fabric'], gameVersions: [MC_VERSION] },
-  { slug: 'lootrmon',                       loaders: ['fabric'], gameVersions: [MC_VERSION] },
-  { slug: 'cobblemon-farmers',              loaders: ['fabric'], gameVersions: [MC_VERSION] },
-  { slug: 'cobblemon-auto-battle',          loaders: ['fabric'], gameVersions: [MC_VERSION] },
-  { slug: 'cobblemon_expeditions',          loaders: ['fabric'], gameVersions: [MC_VERSION] },
-  { slug: 'cobblemonoptimizer',             loaders: ['fabric'], gameVersions: [MC_VERSION] },
-  { slug: 'cobblemon-mike-skills',          loaders: ['fabric'], gameVersions: [MC_VERSION] },
-  { slug: 'trainer-pass',                   loaders: ['fabric'], gameVersions: [MC_VERSION] },
-  { slug: 'tc-cobble-flight',               loaders: ['fabric'], gameVersions: [MC_VERSION] },
-  { slug: 'cobblemon-tents',                loaders: ['fabric'], gameVersions: [MC_VERSION] },
-  { slug: 'cobblemon-snap',                 loaders: ['fabric'], gameVersions: [MC_VERSION] },
-  { slug: 'cobblemon-villager-overhaul',    loaders: ['fabric'], gameVersions: [MC_VERSION] },
+  { slug: 'cobble-contests', loaders: ['fabric'], gameVersions: [MC_VERSION] },
+  { slug: 'cobblemon-trials-edition', loaders: ['fabric'], gameVersions: [MC_VERSION] },
+  { slug: 'cobblemon-battle-tower', loaders: ['fabric'], gameVersions: [MC_VERSION] },
+  { slug: 'cobblemon-simple-pokecenters', loaders: ['fabric'], gameVersions: [MC_VERSION] },
+  { slug: 'cobblemon-integrations', loaders: ['fabric'], gameVersions: [MC_VERSION] },
+  { slug: 'lootr', loaders: ['fabric'], gameVersions: [MC_VERSION] },
+  { slug: 'lootrmon', loaders: ['fabric'], gameVersions: [MC_VERSION] },
+  { slug: 'cobblemon-farmers', loaders: ['fabric'], gameVersions: [MC_VERSION] },
+  { slug: 'cobblemon-auto-battle', loaders: ['fabric'], gameVersions: [MC_VERSION] },
+  { slug: 'cobblemon_expeditions', loaders: ['fabric'], gameVersions: [MC_VERSION] },
+  { slug: 'cobblemonoptimizer', loaders: ['fabric'], gameVersions: [MC_VERSION] },
+  { slug: 'cobblemon-mike-skills', loaders: ['fabric'], gameVersions: [MC_VERSION] },
+  { slug: 'trainer-pass', loaders: ['fabric'], gameVersions: [MC_VERSION] },
+  { slug: 'tc-cobble-flight', loaders: ['fabric'], gameVersions: [MC_VERSION] },
+  { slug: 'cobblemon-tents', loaders: ['fabric'], gameVersions: [MC_VERSION] },
+  { slug: 'cobblemon-snap', loaders: ['fabric'], gameVersions: [MC_VERSION] },
+  { slug: 'cobblemon-villager-overhaul', loaders: ['fabric'], gameVersions: [MC_VERSION] },
   // distanthorizons ELTÁVOLÍTVA (felhasználói kérés) — serene-seasons-x-distant-horizons szintén
   // Függőségek (dependencies)
-  { slug: 'cobblemore-library',             loaders: ['fabric'], gameVersions: [MC_VERSION] },
-  { slug: 'pommel-held-item-models',        loaders: ['fabric'], gameVersions: [MC_VERSION] },
-  { slug: 'create-power-loader',            loaders: ['fabric'], gameVersions: [MC_VERSION] },
-  { slug: 'create-fabric',                  loaders: ['fabric'], gameVersions: [MC_VERSION] },
-  { slug: 'wild-battle-api',                loaders: ['fabric'], gameVersions: [MC_VERSION] },
-  { slug: 'cloth-config',                   loaders: ['fabric'], gameVersions: [MC_VERSION] }, // player-locator-plus
-  { slug: 'farmers-delight',                loaders: ['fabric'], gameVersions: [MC_VERSION] }, // cobblemon-farmers
-  { slug: 'expandability',                  loaders: ['fabric'], gameVersions: [MC_VERSION] }, // cobblemon_expeditions
-  { slug: 'trainerattributeslib',           loaders: ['fabric'], gameVersions: [MC_VERSION] }, // trainer-accessories
-  { slug: 'accessories',                    loaders: ['fabric'], gameVersions: [MC_VERSION] }, // trainer-accessories
-  { slug: 'geckolib',                       loaders: ['fabric'], gameVersions: [MC_VERSION] }, // trainer-accessories
-  { slug: 'collective',                     loaders: ['fabric'], gameVersions: [MC_VERSION] }, // village-spawn-point
-  { slug: 'glitchcore',                     loaders: ['fabric'], gameVersions: [MC_VERSION] }, // serene-seasons (kötelező dep)
-  { slug: 'forge-config-api-port',          loaders: ['fabric'], gameVersions: [MC_VERSION] }, // seasonhud-fabric
-  { slug: 'fusion',                         loaders: ['fabric'], gameVersions: [MC_VERSION] },
+  { slug: 'cobblemore-library', loaders: ['fabric'], gameVersions: [MC_VERSION] },
+  { slug: 'pommel-held-item-models', loaders: ['fabric'], gameVersions: [MC_VERSION] },
+  { slug: 'create-power-loader', loaders: ['fabric'], gameVersions: [MC_VERSION] },
+  { slug: 'create-fabric', loaders: ['fabric'], gameVersions: [MC_VERSION] },
+  { slug: 'wild-battle-api', loaders: ['fabric'], gameVersions: [MC_VERSION] },
+  { slug: 'cloth-config', loaders: ['fabric'], gameVersions: [MC_VERSION] }, // player-locator-plus
+  { slug: 'farmers-delight', loaders: ['fabric'], gameVersions: [MC_VERSION] }, // cobblemon-farmers
+  { slug: 'expandability', loaders: ['fabric'], gameVersions: [MC_VERSION] }, // cobblemon_expeditions
+  { slug: 'trainerattributeslib', loaders: ['fabric'], gameVersions: [MC_VERSION] }, // trainer-accessories
+  { slug: 'accessories', loaders: ['fabric'], gameVersions: [MC_VERSION] }, // trainer-accessories
+  { slug: 'geckolib', loaders: ['fabric'], gameVersions: [MC_VERSION] }, // trainer-accessories
+  { slug: 'collective', loaders: ['fabric'], gameVersions: [MC_VERSION] }, // village-spawn-point
+  { slug: 'glitchcore', loaders: ['fabric'], gameVersions: [MC_VERSION] }, // serene-seasons (kötelező dep)
+  { slug: 'forge-config-api-port', loaders: ['fabric'], gameVersions: [MC_VERSION] }, // seasonhud-fabric
+  { slug: 'fusion', loaders: ['fabric'], gameVersions: [MC_VERSION] },
   // Cobblemon TCG
-  { slug: 'cobbletcg',                      loaders: ['fabric'], gameVersions: [MC_VERSION] },
+  { slug: 'cobbletcg', loaders: ['fabric'], gameVersions: [MC_VERSION] },
 ];
 
 /**
@@ -512,6 +511,13 @@ const CURSEFORGE_MODS = [
 ];
 
 /**
+ * Közvetlen letöltésű modok (pl. GitHub release)
+ */
+const CUSTOM_DIRECT_MODS = [
+  { url: 'https://github.com/zlainsama/PeacefulSurface/releases/download/1.21.1-v1c-fabric/peacefulsurface-1.21.1-v1c-fabric.jar', name: 'peacefulsurface-1.21.1-v1c-fabric.jar' }
+];
+
+/**
  * Ensures specific extra mods are present.
  */
 async function ensureExtraMods() {
@@ -520,7 +526,7 @@ async function ensureExtraMods() {
   for (const { slug, loaders, gameVersions } of EXTRA_MODS) {
     try {
       const params = [];
-      if (loaders)      params.push(`loaders=${encodeURIComponent(JSON.stringify(loaders))}`);
+      if (loaders) params.push(`loaders=${encodeURIComponent(JSON.stringify(loaders))}`);
       if (gameVersions) params.push(`game_versions=${encodeURIComponent(JSON.stringify(gameVersions))}`);
       const qs = params.length ? '?' + params.join('&') : '';
 
@@ -591,11 +597,11 @@ async function ensureExtraDatapacks() {
         // Remove old versions of the same datapack if they exist
         for (const f of existingFiles) {
           if (f.toLowerCase().includes(name.toLowerCase()) && f !== latestFilename) {
-             logInfo(`[CurseForge] Régi verzió törlése: ${f}`);
-             fs.unlinkSync(path.join(DATAPACKS_DIR, f));
+            logInfo(`[CurseForge] Régi verzió törlése: ${f}`);
+            fs.unlinkSync(path.join(DATAPACKS_DIR, f));
           }
         }
-        
+
         const downloadUrl = `https://www.curseforge.com/api/v1/mods/${id}/files/${latest.id}/download`;
         await downloadFile(downloadUrl, dest);
       } else {
@@ -624,7 +630,7 @@ async function ensureCurseForgeMods() {
         // modLoaderType: 4 is Fabric
         const response = await curseforgeRequest(id, MC_VERSION, 4);
         const files = response.data || [];
-        
+
         // Filter for Fabric explicitly just in case
         const fabricFiles = files.filter(f => f.gameVersions.includes('Fabric'));
         latest = fabricFiles[0];
@@ -649,11 +655,11 @@ async function ensureCurseForgeMods() {
         for (const f of existingFiles) {
           const lowerF = f.toLowerCase().replace(/-/g, '');
           if (lowerF.includes(searchName) && f !== latestFilename) {
-             logInfo(`[CurseForge] Régi mod verzió törlése: ${f}`);
-             fs.unlinkSync(path.join(MODS_DIR, f));
+            logInfo(`[CurseForge] Régi mod verzió törlése: ${f}`);
+            fs.unlinkSync(path.join(MODS_DIR, f));
           }
         }
-        
+
         const downloadUrl = `https://www.curseforge.com/api/v1/mods/${id}/files/${latest.id}/download`;
         await downloadFile(downloadUrl, dest);
       } else {
@@ -717,7 +723,7 @@ async function getLatestFabric() {
 
 async function verifyIntegrity(state) {
   logInfo('[Installer] Integritás ellenőrzése...')
-  
+
   // 1. Java check
   const javaExe = getJavaExecutable()
   if (!fs.existsSync(javaExe)) {
@@ -841,7 +847,7 @@ async function install() {
         if (BLACKLISTED_MODS.some(b => lowerPath.includes(b))) return false
         return true
       })
-      
+
       logInfo(`[Installer] Szerver modok letöltése (${serverFiles.length} db) a staging mappába...`)
 
       const baseFilenames = []
@@ -855,8 +861,8 @@ async function install() {
           const downloadUrl = f.downloads?.[0]
           if (downloadUrl) {
             await downloadFile(downloadUrl, dest, { hash: f.hashes.sha1 }).catch(e => {
-               logError(`\n[Installer] Hiba a mod letöltésekor (${filename}): ${e.message}`)
-               throw e
+              logError(`\n[Installer] Hiba a mod letöltésekor (${filename}): ${e.message}`)
+              throw e
             })
           }
           done++
@@ -960,7 +966,7 @@ async function install() {
     // A fájl már létezik – beállítások ellenőrzése
     let props = fs.readFileSync(serverPropsPath, 'utf8')
     let modified = false
-    
+
     if (/^online-mode\s*=\s*true/m.test(props)) {
       props = props.replace(/^online-mode\s*=\s*true/m, 'online-mode=false')
       modified = true
@@ -1004,6 +1010,15 @@ async function install() {
 
   // 6c. Extra Mods (CurseForge)
   await ensureCurseForgeMods()
+
+  // 6d. Custom Direct Downloads (GitHub etc.)
+  for (const mod of CUSTOM_DIRECT_MODS) {
+    const dest = path.join(MODS_DIR, mod.name);
+    if (!fs.existsSync(dest)) {
+      logInfo(`[DirectDL] Mod letöltése: ${mod.name}...`);
+      await downloadFile(mod.url, dest);
+    }
+  }
 
   // 7. Modrinth Mod Updates
   await updateModsFromModrinth()
