@@ -447,7 +447,7 @@ const EXTRA_MODS = [
   { slug: 'mobsbegone',                     loaders: ['fabric'], gameVersions: [MC_VERSION] },
   { slug: 'vmp-fabric',                     loaders: ['fabric'], gameVersions: [MC_VERSION] },
   { slug: 'fix-cobblemon-pokemon-experience', loaders: ['fabric'], gameVersions: [MC_VERSION] },
-  { slug: 'cobblemon-poke-stops',           loaders: ['fabric'], gameVersions: [MC_VERSION] },
+  { slug: 'cobblemon-pokestops',            loaders: ['fabric'], gameVersions: [MC_VERSION] },
   { slug: 'cobblemon-pet-a-poke',           loaders: ['fabric'], gameVersions: [MC_VERSION] },
   { slug: 'pokemon-field-lab',              loaders: ['fabric'], gameVersions: [MC_VERSION] },
   { slug: 'cobblemon-pokerus',              loaders: ['fabric'], gameVersions: [MC_VERSION] },
@@ -468,6 +468,12 @@ const EXTRA_MODS = [
   { slug: 'cobblemon-farmers',              loaders: ['fabric'], gameVersions: [MC_VERSION] },
   { slug: 'cobblemon-auto-battle',          loaders: ['fabric'], gameVersions: [MC_VERSION] },
   { slug: 'cobblemon_expeditions',          loaders: ['fabric'], gameVersions: [MC_VERSION] },
+  { slug: 'cobblemonoptimizer',             loaders: ['fabric'], gameVersions: [MC_VERSION] },
+  { slug: 'cobblemon-mike-skills',          loaders: ['fabric'], gameVersions: [MC_VERSION] },
+  { slug: 'trainer-pass',                   loaders: ['fabric'], gameVersions: [MC_VERSION] },
+  { slug: 'tc-cobble-flight',               loaders: ['fabric'], gameVersions: [MC_VERSION] },
+  { slug: 'cobblemon-tents',                loaders: ['fabric'], gameVersions: [MC_VERSION] },
+  { slug: 'cobblemon-snap',                 loaders: ['fabric'], gameVersions: [MC_VERSION] },
   // distanthorizons ELTÁVOLÍTVA (felhasználói kérés) — serene-seasons-x-distant-horizons szintén
   // Függőségek (dependencies)
   { slug: 'cobblemore-library',             loaders: ['fabric'], gameVersions: [MC_VERSION] },
