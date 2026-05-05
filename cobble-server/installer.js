@@ -35,7 +35,8 @@ const BLACKLISTED_MODS = [
   'no hunger', 'no ender dragon', 'soundsbegone',
   'interactic', 'custom-splash-screen', 'customsplashscreen', 'battlecam', 'lenientdeath',
   'biome-replacer',
-  'fancymenu', 'konkrete', 'drippyloadingscreen', 'loadingscreen', 'notenoughcrashes'
+  'fancymenu', 'konkrete', 'drippyloadingscreen', 'loadingscreen', 'notenoughcrashes',
+  'figura'
 ];
 
 
@@ -478,7 +479,6 @@ const EXTRA_MODS = [
   // Függőségek (dependencies)
   { slug: 'cobblemore-library',             loaders: ['fabric'], gameVersions: [MC_VERSION] },
   { slug: 'pommel-held-item-models',        loaders: ['fabric'], gameVersions: [MC_VERSION] },
-  { slug: 'figura',                         loaders: ['fabric'], gameVersions: [MC_VERSION] },
   { slug: 'admiral',                        loaders: ['fabric'], gameVersions: [MC_VERSION] },
   { slug: 'create-power-loader',            loaders: ['fabric'], gameVersions: [MC_VERSION] },
   { slug: 'create-fabric',                  loaders: ['fabric'], gameVersions: [MC_VERSION] },
