@@ -348,13 +348,14 @@ ipcMain.handle('check-installed', async () => {
 ipcMain.handle('search-skins', async (event, query) => {
   return new Promise((resolve) => {
     const https = require('https');
+    const fs = require('fs');
+    
+    fs.appendFileSync('/tmp/skin-search-debug.txt', `\n[${new Date().toISOString()}] searchSkins called with: "${query}"\n`);
     
     if (!query || query.trim() === '') {
-      // Empty query: load from mineskin.org gallery
+      fs.appendFileSync('/tmp/skin-search-debug.txt', `Loading from MineSkin API...\n`);
       https.get('https://api.mineskin.org/get/list/1', {
-        headers: {
-          'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/114.0.0.0 Safari/537.36'
-        }
+        headers: { 'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36' }
       }, (res) => {
         let data = '';
         res.on('data', chunk => data += chunk);
@@ -365,28 +366,27 @@ ipcMain.handle('search-skins', async (event, query) => {
               id: s.id,
               name: `Skin #${s.id}`,
               url: s.url,
-              preview: s.url // It will use CSS to extract the face
+              preview: s.url
             }));
+            fs.appendFileSync('/tmp/skin-search-debug.txt', `MineSkin success, found ${skins.length} items.\n`);
             resolve(skins);
           } catch (e) {
-            console.error('[SkinSearch] MineSkin Parse Error:', e);
+            fs.appendFileSync('/tmp/skin-search-debug.txt', `MineSkin parse error: ${e.message}\n`);
             resolve([]);
           }
         });
       }).on('error', (err) => {
-        console.error('[SkinSearch] MineSkin Request Error:', err);
+        fs.appendFileSync('/tmp/skin-search-debug.txt', `MineSkin request error: ${err.message}\n`);
         resolve([]);
       });
       return;
     }
 
-    // Query provided: search on minecraftskins.net
     const url = `https://www.minecraftskins.net/search/${encodeURIComponent(query)}`;
+    fs.appendFileSync('/tmp/skin-search-debug.txt', `Searching URL: ${url}\n`);
     
     https.get(url, {
-      headers: {
-        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/114.0.0.0 Safari/537.36'
-      }
+      headers: { 'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36' }
     }, (res) => {
       let data = '';
       res.on('data', chunk => data += chunk);
@@ -397,21 +397,21 @@ ipcMain.handle('search-skins', async (event, query) => {
           let match;
           while ((match = regex.exec(data)) !== null && skins.length < 24) {
             const rawId = match[1].replace('/', '');
-            const id = rawId.split('?')[0]; // remove query params
+            const id = rawId.split('?')[0];
             const previewUrl = 'https://www.minecraftskins.net' + match[2];
             const name = match[3].trim();
             const downloadUrl = 'https://www.minecraftskins.net/' + id + '/download';
-            
             skins.push({ id, name, url: downloadUrl, preview: previewUrl });
           }
+          fs.appendFileSync('/tmp/skin-search-debug.txt', `Search success, found ${skins.length} items.\n`);
           resolve(skins);
         } catch (e) {
-          console.error('[SkinSearch] Parse Error:', e);
+          fs.appendFileSync('/tmp/skin-search-debug.txt', `Search parse error: ${e.message}\n`);
           resolve([]);
         }
       });
     }).on('error', (err) => {
-      console.error('[SkinSearch] Request Error:', err);
+      fs.appendFileSync('/tmp/skin-search-debug.txt', `Search request error: ${err.message}\n`);
       resolve([]);
     });
   });
