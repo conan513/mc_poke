@@ -47,7 +47,7 @@ let skipCinematic = false
 let skinGallery = [];
 let isSearchingSkins = false;
 
-async function loadSkinGallery(query = '') {
+async function loadSkinGallery(query = 'pokemon') {
   if (isSearchingSkins) return;
   isSearchingSkins = true;
   

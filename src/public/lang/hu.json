@@ -104,6 +104,7 @@
     "type_mojang": "Mojang Név",
     "type_url": "Egyedi URL",
     "type_file": "Helyi Fájl",
+    "type_gallery": "Katalógus",
     "browse_btn": "Fájl kiválasztása...",
     "save_btn": "Mentés és Alkalmazás",
     "toast_empty": "Kérlek adj meg egy nevet, linket vagy válassz fájlt!",

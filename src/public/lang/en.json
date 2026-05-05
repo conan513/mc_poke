@@ -104,6 +104,7 @@
     "type_mojang": "Mojang Name",
     "type_url": "Custom URL",
     "type_file": "Local File",
+    "type_gallery": "Gallery",
     "browse_btn": "Select file...",
     "save_btn": "Save & Apply",
     "toast_empty": "Please provide a name, link or select a file!",
