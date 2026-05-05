@@ -497,10 +497,16 @@ let currentShowcase = null
 
 function boostSpawnRate(pokemonId) {
   try {
-    const dpDir = path.join(DATA_DIR, 'world', 'datapacks', 'daily_boost')
+    const dpDir = path.join(DATA_DIR, 'datapacks', 'daily_boost')
     const spawnDir = path.join(dpDir, 'data', 'cobblemon', 'spawn_pool_world')
     
-    // Remove old boost if exists
+    // Cleanup old location if it exists (moved from world/datapacks to datapacks)
+    const oldDpDir = path.join(DATA_DIR, 'world', 'datapacks', 'daily_boost')
+    if (fs.existsSync(oldDpDir)) {
+      fs.rmSync(oldDpDir, { recursive: true, force: true })
+    }
+
+    // Remove old boost if exists in new location
     if (fs.existsSync(dpDir)) {
       fs.rmSync(dpDir, { recursive: true, force: true })
     }
