@@ -36,7 +36,7 @@ const BLACKLISTED_MODS = [
   'interactic', 'custom-splash-screen', 'customsplashscreen', 'battlecam', 'lenientdeath',
   'biome-replacer',
   'fancymenu', 'konkrete', 'drippyloadingscreen', 'loadingscreen', 'notenoughcrashes',
-  'figura', 'admiral'
+  'figura', 'admiral', 'cobblemau'
 ];
 
 
@@ -508,6 +508,7 @@ const EXTRA_DATAPACKS = [
  */
 const CURSEFORGE_MODS = [
   { id: '1534055', name: 'cobblemon-nests-dens' },
+  { id: '561868', name: 'no-cubes-reloaded' },
 ];
 
 /**
