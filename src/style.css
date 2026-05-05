@@ -2375,17 +2375,19 @@ body::before {
 
 .ram-btn .recommended-badge {
     position: absolute;
-    top: -8px;
-    right: -8px;
+    top: -10px;
+    right: -6px;
     background: var(--accent-green);
     color: white;
-    font-size: 8px;
-    padding: 2px 5px;
+    font-size: 9px;
+    padding: 3px 6px;
     border-radius: 4px;
     font-weight: 800;
     text-transform: uppercase;
-    box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+    box-shadow: 0 2px 8px rgba(74, 222, 128, 0.4);
     pointer-events: none;
+    letter-spacing: 0.5px;
+    white-space: nowrap;
 }
 
 .launch-settings {
@@ -2403,6 +2405,7 @@ body::before {
   gap: 12px;
   cursor: pointer;
   user-select: none;
+  pointer-events: auto !important;
 }
 
 .checkbox-group input {
@@ -2410,6 +2413,7 @@ body::before {
   height: 16px;
   cursor: pointer;
   accent-color: var(--accent-blue);
+  pointer-events: auto !important;
 }
 
 .checkbox-group label {
@@ -2417,6 +2421,7 @@ body::before {
   color: var(--text-second);
   cursor: pointer;
   font-weight: 500;
+  pointer-events: auto !important;
 }
 
 /* Power Save Overlay */

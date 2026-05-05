@@ -260,9 +260,9 @@ ipcMain.handle('run-update', async (event, { username, ram, serverUrl }) => {
 })
 
 // Launch game
-ipcMain.handle('launch', async (event, { username, uuid, ram, serverUrl }) => {
+ipcMain.handle('launch', async (event, { username, uuid, ram, serverUrl, closeOnLaunch }) => {
   try {
-    await launcher.launch({ username, uuid, ram, serverUrl }, (data) => {
+    await launcher.launch({ username, uuid, ram, serverUrl, closeOnLaunch }, (data) => {
       mainWindow.webContents.send('game-log', data)
     }, () => {
       mainWindow.webContents.send('game-closed')

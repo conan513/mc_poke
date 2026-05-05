@@ -32,7 +32,7 @@ window.onerror = (m, s, l, c, e) => { console.error(`${m} at ${s}:${l}`); }
 
 // ── State ────────────────────────────────────────────────────
 let selectedRam = localStorage.getItem('cobble_ram') || '4096'
-let totalSystemMem = 8192 // Default fallback
+let totalSystemMem = 8 * 1024 * 1024 * 1024 // Default fallback: 8GB in bytes
 let closeOnLaunch = localStorage.getItem('cobble_close_launch') === 'true'
 let powerSaveEnabled = localStorage.getItem('cobble_power_save') !== 'false' // Default true
 let username = localStorage.getItem('cobble_username') || ''
@@ -2088,11 +2088,32 @@ animateParticles()
       window.cobble.setUpdateServerUrl(url)
     }
   })
+  const syncRamUI = () => {
+    document.querySelectorAll('.ram-btn').forEach(btn => {
+      const isActive = parseInt(btn.dataset.val) === parseInt(selectedRam)
+      if (isActive) {
+        btn.classList.add('active')
+        btn.style.borderColor = 'var(--accent-blue)'
+      } else {
+        btn.classList.remove('active')
+        const badge = btn.querySelector('.recommended-badge')
+        if (!badge) {
+          btn.style.borderColor = ''
+        } else {
+          btn.style.borderColor = badge.dataset.isFallback === 'true' ? 'var(--accent-gold)' : 'var(--accent-green)'
+        }
+      }
+    })
+    const display = $id('home-ram-display')
+    if (display) display.textContent = `${selectedRam} MB`
+    updateRamWarning()
+  }
+
   document.querySelectorAll('.ram-btn').forEach(btn =>
     btn.addEventListener('click', () => {
       selectedRam = parseInt(btn.dataset.val)
       try { localStorage.setItem('cobble_ram', btn.dataset.val) } catch(e) {}
-      updateRamWarning()
+      syncRamUI()
     })
   )
 
@@ -2113,38 +2134,97 @@ animateParticles()
   // Detect total memory and set recommendations
   if (window.cobble) {
     totalSystemMem = await window.cobble.getTotalMem()
-    const totalGB = Math.round(totalSystemMem / (1024 * 1024 * 1024))
-    console.log(`[System] Total RAM detected: ${totalGB} GB`)
+    const totalGB = totalSystemMem / (1024 * 1024 * 1024)
+    console.log(`[System] Total RAM detected: ${totalGB.toFixed(2)} GB`)
 
+    // Thresholds:
+    // 16GB+ system -> 8GB recommended (or 12GB if 24GB+)
+    // 12GB system  -> 6GB recommended
+    // 8GB system   -> 4GB recommended
     let recommended = 4096
-    if (totalGB > 8) recommended = 6144
-    if (totalGB > 12) recommended = 8192
+    if (totalGB > 20) recommended = 12288
+    else if (totalGB > 14) recommended = 8192
+    else if (totalGB > 10) recommended = 6144
+    else recommended = 4096
+
+    // Migration logic
+    const savedRam = localStorage.getItem('cobble_ram')
+    // Reset smart check if we changed the recommended values significantly
+    const smartCheckVer = localStorage.getItem('cobble_ram_smart_ver') || '0'
+    
+    if (!savedRam || smartCheckVer !== '2') {
+      selectedRam = recommended
+      localStorage.setItem('cobble_ram', recommended)
+      localStorage.setItem('cobble_ram_smart_ver', '2')
+      console.log(`[System] Smart RAM selection applied: ${recommended} MB`)
+    }
+
+    let isFallback = false
+    if (isNaN(totalGB) || totalGB <= 0) {
+      console.warn('[System] RAM detection failed, using 6GB fallback')
+      recommended = 6144
+      isFallback = true
+    }
+
+    const isHU = currentLang === 'hu'
+    const recText = isHU ? 'AJÁNLOTT' : 'RECOMMENDED'
 
     document.querySelectorAll('.ram-btn').forEach(btn => {
-      if (parseInt(btn.dataset.val) === recommended) {
+      const btnVal = parseInt(btn.dataset.val)
+      if (btnVal === recommended) {
+        // Clean up any existing badges first
+        btn.querySelectorAll('.recommended-badge').forEach(b => b.remove())
         const badge = document.createElement('span')
         badge.className = 'recommended-badge'
-        badge.textContent = 'OK' // Short for UI
+        badge.textContent = recText
+        badge.dataset.isFallback = isFallback
+        
+        // Fallback color logic
+        if (isFallback) {
+          badge.style.background = 'var(--accent-gold)'
+          btn.style.boxShadow = '0 0 15px rgba(251, 191, 36, 0.4)'
+          btn.style.borderColor = 'var(--accent-gold)'
+        } else {
+          badge.style.background = 'var(--accent-green)'
+          btn.style.boxShadow = '0 0 15px rgba(74, 222, 128, 0.4)'
+          btn.style.borderColor = 'var(--accent-green)'
+        }
+        
         btn.appendChild(badge)
+      } else {
+        btn.style.boxShadow = ''
+        if (!btn.classList.contains('active')) {
+            btn.style.borderColor = ''
+        }
       }
     })
     
-    updateRamWarning()
+    syncRamUI()
   }
 
   // Power state listener from main process
   if (window.cobble) {
-    window.cobble.onPowerState((state) => {
+    const setPowerSave = (active) => {
       if (!powerSaveEnabled) return
-      
       const overlay = $id('power-save-overlay')
-      if (state === 'save') {
-        document.body.classList.add('power-save')
-        if (overlay) overlay.classList.remove('hidden')
-      } else {
+      if (active) {
         document.body.classList.remove('power-save')
         if (overlay) overlay.classList.add('hidden')
+      } else {
+        document.body.classList.add('power-save')
+        if (overlay) overlay.classList.remove('hidden')
       }
+    }
+
+    window.cobble.onPowerState((state) => {
+      setPowerSave(state === 'active')
+    })
+
+    // Fallback for Linux/other platforms where blur events might be missed
+    window.addEventListener('focus', () => setPowerSave(true))
+    window.addEventListener('blur', () => setPowerSave(false))
+    document.addEventListener('visibilitychange', () => {
+      setPowerSave(document.visibilityState === 'visible')
     })
   }
   
