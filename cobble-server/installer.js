@@ -428,71 +428,71 @@ const EXTRA_MODS = [
   { slug: 'terrablender', loaders: ['fabric'], gameVersions: [MC_VERSION] },
   { slug: 'skinrestorer', loaders: ['fabric'], gameVersions: [MC_VERSION] },
   // Cobblemon extra mods
-  { slug: 'player-locator-plus', loaders: ['fabric'], gameVersions: [MC_VERSION] },
-  { slug: 'cobblemon-mount-mastery', loaders: ['fabric'], gameVersions: [MC_VERSION] },
-  { slug: 'cobblemon-smartphone', loaders: ['fabric'], gameVersions: [MC_VERSION] },
-  { slug: 'trainer-accessories', loaders: ['fabric'], gameVersions: [MC_VERSION] },
-  { slug: 'cobblemon-rankeds', loaders: ['fabric'], gameVersions: [MC_VERSION] },
-  { slug: 'more-cobblemon-stats', loaders: ['fabric'], gameVersions: [MC_VERSION] },
-  { slug: 'cobblemon-max-level-catch-cap', loaders: ['fabric'], gameVersions: [MC_VERSION] },
+  { slug: 'player-locator-plus',            loaders: ['fabric'], gameVersions: [MC_VERSION] },
+  { slug: 'cobblemon-mount-mastery',        loaders: ['fabric'], gameVersions: [MC_VERSION] },
+  { slug: 'cobblemon-smartphone',           loaders: ['fabric'], gameVersions: [MC_VERSION] },
+  { slug: 'trainer-accessories',            loaders: ['fabric'], gameVersions: [MC_VERSION] },
+  { slug: 'cobblemon-rankeds',              loaders: ['fabric'], gameVersions: [MC_VERSION] },
+  { slug: 'more-cobblemon-stats',           loaders: ['fabric'], gameVersions: [MC_VERSION] },
+  { slug: 'cobblemon-max-level-catch-cap',  loaders: ['fabric'], gameVersions: [MC_VERSION] },
   { slug: 'cobblemon-capture-notification', loaders: ['fabric'], gameVersions: [MC_VERSION] },
-  { slug: 'cobblemon-rustling-spots', loaders: ['fabric'], gameVersions: [MC_VERSION] },
-  { slug: 'cobblemon-cobbled-levels', loaders: ['fabric'], gameVersions: [MC_VERSION] },
-  { slug: 'village-spawn-point', loaders: ['fabric'], gameVersions: [MC_VERSION] },
-  { slug: 'easyauth', loaders: ['fabric'], gameVersions: [MC_VERSION] },
-  { slug: 'serene-seasons', loaders: ['fabric'], gameVersions: [MC_VERSION] },
-  { slug: 'seasonhud-fabric', loaders: ['fabric'], gameVersions: [MC_VERSION] },
-  { slug: 'easywhitelist', loaders: ['fabric'], gameVersions: [MC_VERSION] },
+  { slug: 'cobblemon-rustling-spots',       loaders: ['fabric'], gameVersions: [MC_VERSION] },
+  { slug: 'cobblemon-cobbled-levels',       loaders: ['fabric'], gameVersions: [MC_VERSION] },
+  { slug: 'village-spawn-point',            loaders: ['fabric'], gameVersions: [MC_VERSION] },
+  { slug: 'easyauth',                       loaders: ['fabric'], gameVersions: [MC_VERSION] },
+  { slug: 'serene-seasons',                 loaders: ['fabric'], gameVersions: [MC_VERSION] },
+  { slug: 'seasonhud-fabric',               loaders: ['fabric'], gameVersions: [MC_VERSION] },
+  { slug: 'easywhitelist',                  loaders: ['fabric'], gameVersions: [MC_VERSION] },
   // Új modok (felhasználói kérés)
-  { slug: 'vmp-fabric', loaders: ['fabric'], gameVersions: [MC_VERSION] },
+  { slug: 'vmp-fabric',                     loaders: ['fabric'], gameVersions: [MC_VERSION] },
   { slug: 'fix-cobblemon-pokemon-experience', loaders: ['fabric'], gameVersions: [MC_VERSION] },
-  { slug: 'cobblemon-pokestops', loaders: ['fabric'], gameVersions: [MC_VERSION] },
-  { slug: 'cobblemon-pet-a-poke', loaders: ['fabric'], gameVersions: [MC_VERSION] },
-  { slug: 'pokemon-field-lab', loaders: ['fabric'], gameVersions: [MC_VERSION] },
-  { slug: 'cobblemon-pokerus', loaders: ['fabric'], gameVersions: [MC_VERSION] },
-  { slug: 'livelierpokemon', loaders: ['fabric'], gameVersions: [MC_VERSION] },
-  { slug: 'pokebike', loaders: ['fabric'], gameVersions: [MC_VERSION] },
-  { slug: 'cobblemonmovedex', loaders: ['fabric'], gameVersions: [MC_VERSION] },
-  { slug: 'cobblemon-alpha-project', loaders: ['fabric'], gameVersions: [MC_VERSION] },
-  { slug: 'cobblemarks+', loaders: ['fabric'], gameVersions: [MC_VERSION] },
-  { slug: 'rad-gyms', loaders: ['fabric'], gameVersions: [MC_VERSION] },
+  { slug: 'cobblemon-pokestops',            loaders: ['fabric'], gameVersions: [MC_VERSION] },
+  { slug: 'cobblemon-pet-a-poke',           loaders: ['fabric'], gameVersions: [MC_VERSION] },
+  { slug: 'pokemon-field-lab',              loaders: ['fabric'], gameVersions: [MC_VERSION] },
+  { slug: 'cobblemon-pokerus',              loaders: ['fabric'], gameVersions: [MC_VERSION] },
+  { slug: 'livelierpokemon',                loaders: ['fabric'], gameVersions: [MC_VERSION] },
+  { slug: 'pokebike',                       loaders: ['fabric'], gameVersions: [MC_VERSION] },
+  { slug: 'cobblemonmovedex',               loaders: ['fabric'], gameVersions: [MC_VERSION] },
+  { slug: 'cobblemon-alpha-project',        loaders: ['fabric'], gameVersions: [MC_VERSION] },
+  { slug: 'cobblemarks+',                   loaders: ['fabric'], gameVersions: [MC_VERSION] },
+  { slug: 'rad-gyms',                       loaders: ['fabric'], gameVersions: [MC_VERSION] },
   { slug: 'cobblemon-underground-mining-minigame', loaders: ['fabric'], gameVersions: [MC_VERSION] },
-  { slug: 'cobble-contests', loaders: ['fabric'], gameVersions: [MC_VERSION] },
-  { slug: 'cobblemon-trials-edition', loaders: ['fabric'], gameVersions: [MC_VERSION] },
-  { slug: 'cobblemon-battle-tower', loaders: ['fabric'], gameVersions: [MC_VERSION] },
-  { slug: 'cobblemon-simple-pokecenters', loaders: ['fabric'], gameVersions: [MC_VERSION] },
-  { slug: 'cobblemon-integrations', loaders: ['fabric'], gameVersions: [MC_VERSION] },
-  { slug: 'lootr', loaders: ['fabric'], gameVersions: [MC_VERSION] },
-  { slug: 'lootrmon', loaders: ['fabric'], gameVersions: [MC_VERSION] },
-  { slug: 'cobblemon-farmers', loaders: ['fabric'], gameVersions: [MC_VERSION] },
-  { slug: 'cobblemon-auto-battle', loaders: ['fabric'], gameVersions: [MC_VERSION] },
-  { slug: 'cobblemon_expeditions', loaders: ['fabric'], gameVersions: [MC_VERSION] },
-  { slug: 'cobblemonoptimizer', loaders: ['fabric'], gameVersions: [MC_VERSION] },
-  { slug: 'cobblemon-mike-skills', loaders: ['fabric'], gameVersions: [MC_VERSION] },
-  { slug: 'trainer-pass', loaders: ['fabric'], gameVersions: [MC_VERSION] },
-  { slug: 'tc-cobble-flight', loaders: ['fabric'], gameVersions: [MC_VERSION] },
-  { slug: 'cobblemon-tents', loaders: ['fabric'], gameVersions: [MC_VERSION] },
-  { slug: 'cobblemon-snap', loaders: ['fabric'], gameVersions: [MC_VERSION] },
-  { slug: 'cobblemon-villager-overhaul', loaders: ['fabric'], gameVersions: [MC_VERSION] },
+  { slug: 'cobble-contests',                loaders: ['fabric'], gameVersions: [MC_VERSION] },
+  { slug: 'cobblemon-trials-edition',       loaders: ['fabric'], gameVersions: [MC_VERSION] },
+  { slug: 'cobblemon-battle-tower',         loaders: ['fabric'], gameVersions: [MC_VERSION] },
+  { slug: 'cobblemon-simple-pokecenters',   loaders: ['fabric'], gameVersions: [MC_VERSION] },
+  { slug: 'cobblemon-integrations',         loaders: ['fabric'], gameVersions: [MC_VERSION] },
+  { slug: 'lootr',                          loaders: ['fabric'], gameVersions: [MC_VERSION] },
+  { slug: 'lootrmon',                       loaders: ['fabric'], gameVersions: [MC_VERSION] },
+  { slug: 'cobblemon-farmers',              loaders: ['fabric'], gameVersions: [MC_VERSION] },
+  { slug: 'cobblemon-auto-battle',          loaders: ['fabric'], gameVersions: [MC_VERSION] },
+  { slug: 'cobblemon_expeditions',          loaders: ['fabric'], gameVersions: [MC_VERSION] },
+  { slug: 'cobblemonoptimizer',             loaders: ['fabric'], gameVersions: [MC_VERSION] },
+  { slug: 'cobblemon-mike-skills',          loaders: ['fabric'], gameVersions: [MC_VERSION] },
+  { slug: 'trainer-pass',                   loaders: ['fabric'], gameVersions: [MC_VERSION] },
+  { slug: 'tc-cobble-flight',               loaders: ['fabric'], gameVersions: [MC_VERSION] },
+  { slug: 'cobblemon-tents',                loaders: ['fabric'], gameVersions: [MC_VERSION] },
+  { slug: 'cobblemon-snap',                 loaders: ['fabric'], gameVersions: [MC_VERSION] },
+  { slug: 'cobblemon-villager-overhaul',    loaders: ['fabric'], gameVersions: [MC_VERSION] },
   // distanthorizons ELTÁVOLÍTVA (felhasználói kérés) — serene-seasons-x-distant-horizons szintén
   // Függőségek (dependencies)
-  { slug: 'cobblemore-library', loaders: ['fabric'], gameVersions: [MC_VERSION] },
-  { slug: 'pommel-held-item-models', loaders: ['fabric'], gameVersions: [MC_VERSION] },
-  { slug: 'create-power-loader', loaders: ['fabric'], gameVersions: [MC_VERSION] },
-  { slug: 'create-fabric', loaders: ['fabric'], gameVersions: [MC_VERSION] },
-  { slug: 'wild-battle-api', loaders: ['fabric'], gameVersions: [MC_VERSION] },
-  { slug: 'cloth-config', loaders: ['fabric'], gameVersions: [MC_VERSION] }, // player-locator-plus
-  { slug: 'farmers-delight', loaders: ['fabric'], gameVersions: [MC_VERSION] }, // cobblemon-farmers
-  { slug: 'expandability', loaders: ['fabric'], gameVersions: [MC_VERSION] }, // cobblemon_expeditions
-  { slug: 'trainerattributeslib', loaders: ['fabric'], gameVersions: [MC_VERSION] }, // trainer-accessories
-  { slug: 'accessories', loaders: ['fabric'], gameVersions: [MC_VERSION] }, // trainer-accessories
-  { slug: 'geckolib', loaders: ['fabric'], gameVersions: [MC_VERSION] }, // trainer-accessories
-  { slug: 'collective', loaders: ['fabric'], gameVersions: [MC_VERSION] }, // village-spawn-point
-  { slug: 'glitchcore', loaders: ['fabric'], gameVersions: [MC_VERSION] }, // serene-seasons (kötelező dep)
-  { slug: 'forge-config-api-port', loaders: ['fabric'], gameVersions: [MC_VERSION] }, // seasonhud-fabric
-  { slug: 'fusion', loaders: ['fabric'], gameVersions: [MC_VERSION] },
+  { slug: 'cobblemore-library',             loaders: ['fabric'], gameVersions: [MC_VERSION] },
+  { slug: 'pommel-held-item-models',        loaders: ['fabric'], gameVersions: [MC_VERSION] },
+  { slug: 'create-power-loader',            loaders: ['fabric'], gameVersions: [MC_VERSION] },
+  { slug: 'create-fabric',                  loaders: ['fabric'], gameVersions: [MC_VERSION] },
+  { slug: 'wild-battle-api',                loaders: ['fabric'], gameVersions: [MC_VERSION] },
+  { slug: 'cloth-config',                   loaders: ['fabric'], gameVersions: [MC_VERSION] }, // player-locator-plus
+  { slug: 'farmers-delight',                loaders: ['fabric'], gameVersions: [MC_VERSION] }, // cobblemon-farmers
+  { slug: 'expandability',                  loaders: ['fabric'], gameVersions: [MC_VERSION] }, // cobblemon_expeditions
+  { slug: 'trainerattributeslib',           loaders: ['fabric'], gameVersions: [MC_VERSION] }, // trainer-accessories
+  { slug: 'accessories',                    loaders: ['fabric'], gameVersions: [MC_VERSION] }, // trainer-accessories
+  { slug: 'geckolib',                       loaders: ['fabric'], gameVersions: [MC_VERSION] }, // trainer-accessories
+  { slug: 'collective',                     loaders: ['fabric'], gameVersions: [MC_VERSION] }, // village-spawn-point
+  { slug: 'glitchcore',                     loaders: ['fabric'], gameVersions: [MC_VERSION] }, // serene-seasons (kötelező dep)
+  { slug: 'forge-config-api-port',          loaders: ['fabric'], gameVersions: [MC_VERSION] }, // seasonhud-fabric
+  { slug: 'fusion',                         loaders: ['fabric'], gameVersions: [MC_VERSION] },
   // Cobblemon TCG
-  { slug: 'cobbletcg', loaders: ['fabric'], gameVersions: [MC_VERSION] },
+  { slug: 'cobbletcg',                      loaders: ['fabric'], gameVersions: [MC_VERSION] },
 ];
 
 /**
