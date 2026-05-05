@@ -1034,41 +1034,6 @@ document.querySelectorAll('.ram-btn').forEach(btn => {
 })
 
 // ── Install / Launch flow ─────────────────────────────────────
-$id('btn-install').addEventListener('click', async () => {
-  const input = $id('input-username')
-  username = input.value.trim()
-
-  if (!username || username.length < 3) {
-    showToast(t('toast.username_short'))
-    input.focus()
-    return
-  }
-  if (!/^[a-zA-Z0-9_]+$/.test(username)) {
-    showToast(t('toast.username_chars'))
-    input.focus()
-    return
-  }
-
-  // Automatikus mentés a profilok közé, ha új név
-  if (!profiles.find(p => p.name === username)) {
-    profiles.push({ name: username, skinUrl: null, skinType: 'mojang', skinVal: username, profileId: generateUUID() })
-    saveProfiles()
-    renderProfiles()
-  }
-
-  // Check if already installed
-  if (!window.cobble) return
-  const status = await window.cobble.checkInstalled()
-  window._lastInstallStatus = status
-  if (status.allDone) {
-    goToHome()
-    return
-  }
-
-  showScreen('install')
-  startInstall()
-})
-
 // ── Progress handler ──────────────────────────────────────────
 const stepMap = {
   java:      'step-java',
@@ -2113,7 +2078,6 @@ animateParticles()
           saveProfiles()
           renderProfiles()
         }
-        $id('btn-install').click() 
       }
     }
   })
