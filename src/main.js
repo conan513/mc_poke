@@ -761,7 +761,7 @@ async function startIntro() {
       $id('btn-intro-skin-gallery').classList.remove('active');
       $id('intro-skin-input').classList.remove('hidden');
       $id('btn-intro-browse-skin').classList.add('hidden');
-      $id('intro-skin-gallery-container').classList.add('hidden');
+      $id('intro-skin-gallery-wrapper').classList.add('hidden');
       $id('intro-skin-input').placeholder = t('skin.type_mojang_placeholder');
       updateIntroSkin3D();
     });
@@ -773,7 +773,7 @@ async function startIntro() {
       $id('btn-intro-skin-gallery').classList.remove('active');
       $id('intro-skin-input').classList.remove('hidden');
       $id('btn-intro-browse-skin').classList.add('hidden');
-      $id('intro-skin-gallery-container').classList.add('hidden');
+      $id('intro-skin-gallery-wrapper').classList.add('hidden');
       $id('intro-skin-input').placeholder = t('skin.type_url_placeholder');
       updateIntroSkin3D();
     });
@@ -784,7 +784,7 @@ async function startIntro() {
       $id('btn-intro-skin-mojang').classList.remove('active');
       $id('btn-intro-skin-gallery').classList.remove('active');
       $id('intro-skin-input').classList.add('hidden');
-      $id('intro-skin-gallery-container').classList.add('hidden');
+      $id('intro-skin-gallery-wrapper').classList.add('hidden');
       $id('btn-intro-browse-skin').classList.remove('hidden');
       updateIntroSkin3D();
     });
@@ -796,7 +796,7 @@ async function startIntro() {
       $id('btn-intro-skin-mojang').classList.remove('active');
       $id('intro-skin-input').classList.add('hidden');
       $id('btn-intro-browse-skin').classList.add('hidden');
-      $id('intro-skin-gallery-container').classList.remove('hidden');
+      $id('intro-skin-gallery-wrapper').classList.remove('hidden');
       updateIntroSkin3D();
     });
 
@@ -2666,15 +2666,15 @@ $id('btn-change-skin').addEventListener('click', () => {
 
   if (currentSkinType === 'file') {
     $id('skin-input-container').classList.add('hidden')
-    $id('skin-gallery-container').classList.add('hidden')
+    $id('skin-gallery-wrapper').classList.add('hidden')
     $id('btn-browse-skin').classList.remove('hidden')
   } else if (currentSkinType === 'gallery') {
     $id('skin-input-container').classList.add('hidden')
-    $id('skin-gallery-container').classList.remove('hidden')
+    $id('skin-gallery-wrapper').classList.remove('hidden')
     $id('btn-browse-skin').classList.add('hidden')
   } else {
     $id('skin-input-container').classList.remove('hidden')
-    $id('skin-gallery-container').classList.add('hidden')
+    $id('skin-gallery-wrapper').classList.add('hidden')
     $id('btn-browse-skin').classList.add('hidden')
     $id('input-skin-val').value = currentSkinVal || ''
     $id('input-skin-val').placeholder = currentSkinType === 'mojang'
@@ -2710,15 +2710,15 @@ document.querySelectorAll('[data-skin-type]').forEach(btn => {
     // UI visibility
     if (currentSkinType === 'file') {
       $id('skin-input-container').classList.add('hidden')
-      $id('skin-gallery-container').classList.add('hidden')
+      $id('skin-gallery-wrapper').classList.add('hidden')
       $id('btn-browse-skin').classList.remove('hidden')
     } else if (currentSkinType === 'gallery') {
       $id('skin-input-container').classList.add('hidden')
-      $id('skin-gallery-container').classList.remove('hidden')
+      $id('skin-gallery-wrapper').classList.remove('hidden')
       $id('btn-browse-skin').classList.add('hidden')
     } else {
       $id('skin-input-container').classList.remove('hidden')
-      $id('skin-gallery-container').classList.add('hidden')
+      $id('skin-gallery-wrapper').classList.add('hidden')
       $id('btn-browse-skin').classList.add('hidden')
       $id('input-skin-val').placeholder = currentSkinType === 'mojang'
         ? 'pl. AshKetchum'
