@@ -199,20 +199,6 @@ function configureCobbledLevels() {
         modified = true
       }
       
-      // Clear override lists if they are not empty
-      const lists = [
-        "DimensionMinLevel", "DimensionMaxLevel", 
-        "BiomeMinLevel", "BiomeMaxLevel", 
-        "StructureMinLevel", "StructureMaxLevel", 
-        "SpeciesLevelRanges"
-      ]
-      
-      lists.forEach(list => {
-        if (json[list] && json[list].length > 0) {
-          json[list] = []
-          modified = true
-        }
-      })
 
       if (modified) {
         fs.writeFileSync(configPath, JSON.stringify(json, null, 2), 'utf8')
