@@ -313,6 +313,9 @@ function configureCreeperFirework() {
     try {
       fs.writeFileSync(configPath, defaultSettings, 'utf8')
       console.log('[CreeperFirework] creeper_firework.json5 létrehozva (rombolás letiltva).')
+    } catch (e) {
+      console.error('[CreeperFirework] Hiba a konfiguráció létrehozásakor:', e.message)
+    }
   }
 }
 
