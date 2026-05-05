@@ -36,7 +36,8 @@ const BLACKLISTED_MODS = [
   'interactic', 'custom-splash-screen', 'customsplashscreen', 'battlecam', 'lenientdeath',
   'biome-replacer', 'biomereplacer', 'nocubes', 'mobsbegone',
   'fancymenu', 'konkrete', 'drippyloadingscreen', 'loadingscreen', 'notenoughcrashes',
-  'figura', 'admiral', 'cobblemau'
+  'figura', 'admiral', 'cobblemau',
+  'vmp-fabric', // Very Many Players – eltávolítva (kérésre)
 ];
 
 
@@ -444,7 +445,7 @@ const EXTRA_MODS = [
   { slug: 'seasonhud-fabric',               loaders: ['fabric'], gameVersions: [MC_VERSION] },
   { slug: 'easywhitelist',                  loaders: ['fabric'], gameVersions: [MC_VERSION] },
   // Új modok (felhasználói kérés)
-  { slug: 'vmp-fabric',                     loaders: ['fabric'], gameVersions: [MC_VERSION] },
+  // vmp-fabric eltávolítva (kérésre) – a blacklist törli a mods mappából is
   { slug: 'fix-cobblemon-pokemon-experience', loaders: ['fabric'], gameVersions: [MC_VERSION] },
   { slug: 'cobblemon-pokestops',            loaders: ['fabric'], gameVersions: [MC_VERSION] },
   { slug: 'cobblemon-pet-a-poke',           loaders: ['fabric'], gameVersions: [MC_VERSION] },

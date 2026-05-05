@@ -24,6 +24,7 @@ const os = require('os')
 const { spawn, execFile } = require('child_process')
 const { install, downloadFile, rollback, commitUpdate, logInfo, logError } = require('./installer')
 const https = require('https')
+const { Worker } = require('worker_threads')
 const EventEmitter = require('events')
 const serverEvents = new EventEmitter()
 
@@ -869,63 +870,120 @@ function stopMinecraft() {
   }
 }
 
-// ── Manifest builder ─────────────────────────────────────────
+// ── Worker Thread Management ──────────────────────────────────
+// A CPU/IO intenzív feladatok (manifest hash, leaderboard sync) külön
+// worker thread-eken futnak, hogy a főszál event loop-ja szabad maradjon.
+// Ez biztosítja, hogy az MC STDIN/STDOUT mindig időben kiszolgált legyen.
+
+let _manifestWorker = null
+let _leaderboardWorker = null
+
+/**
+ * Visszaadja (vagy létrehozza) a manifest worker thread-et.
+ * Crash esetén null-ra állítja, hogy a következő hívásnál újra létrejöjjön.
+ */
+function getManifestWorker() {
+  if (!_manifestWorker) {
+    _manifestWorker = new Worker(path.join(__dirname, 'manifest-worker.js'))
+    _manifestWorker.on('error', err => {
+      console.error('[ManifestWorker] Hiba:', err.message)
+      _manifestWorker = null
+    })
+    _manifestWorker.on('exit', code => {
+      if (code !== 0) {
+        console.warn(`[ManifestWorker] Leállt (kód: ${code}), újraindítás következő hívásnál.`)
+        _manifestWorker = null
+      }
+    })
+    console.log('[ManifestWorker] Worker thread elindítva.')
+  }
+  return _manifestWorker
+}
+
+/**
+ * Visszaadja (vagy létrehozza) a leaderboard worker thread-et.
+ */
+function getLeaderboardWorker() {
+  if (!_leaderboardWorker) {
+    _leaderboardWorker = new Worker(path.join(__dirname, 'leaderboard-worker.js'))
+    _leaderboardWorker.on('error', err => {
+      console.error('[LeaderboardWorker] Hiba:', err.message)
+      _leaderboardWorker = null
+    })
+    _leaderboardWorker.on('exit', code => {
+      if (code !== 0) {
+        console.warn(`[LeaderboardWorker] Leállt (kód: ${code}), újraindítás következő hívásnál.`)
+        _leaderboardWorker = null
+      }
+    })
+    console.log('[LeaderboardWorker] Worker thread elindítva.')
+  }
+  return _leaderboardWorker
+}
+
+/** Leállítja mindkét worker thread-et (graceful shutdown esetén). */
+function terminateWorkers() {
+  if (_manifestWorker)   { _manifestWorker.terminate();   _manifestWorker = null }
+  if (_leaderboardWorker){ _leaderboardWorker.terminate(); _leaderboardWorker = null }
+}
+
+// ── Manifest builder ──────────────────────────────────────────
 
 let cachedManifest = null
+let manifestBuildPromise = null // Megakadályozza a párhuzamos újraépítést
 
-function getManifest() {
-  if (!cachedManifest) {
-    console.log('[Manifest] Új manifest generálása és gyorsítótárazása...')
-    cachedManifest = buildManifest()
-  }
-  return cachedManifest
+/**
+ * Async manifest getter – ha nincs cache, a worker thread-en újraépíti.
+ * Ha már folyamatban van egy újraépítés, ugyanazt a Promise-t adja vissza.
+ */
+async function getManifest() {
+  if (cachedManifest) return cachedManifest
+  if (manifestBuildPromise) return manifestBuildPromise
+
+  console.log('[ManifestWorker] Új manifest generálása (worker thread)...')
+  manifestBuildPromise = buildManifest().then(m => {
+    cachedManifest = m
+    manifestBuildPromise = null
+    return m
+  }).catch(err => {
+    manifestBuildPromise = null
+    throw err
+  })
+  return manifestBuildPromise
 }
 
 function invalidateManifest() {
   cachedManifest = null
 }
 
+/**
+ * Worker thread-en futtatja a manifest építést.
+ * A főszál event loop-ja teljesen szabad marad a SHA256 hash számítás alatt.
+ */
 function buildManifest() {
-  const getFilesRecursive = (dir, baseDir = dir) => {
-    let results = []
-    try {
-      const list = fs.readdirSync(dir)
-      list.forEach(file => {
-        const fullPath = path.join(dir, file)
-        const stat = fs.statSync(fullPath)
-        if (stat && stat.isDirectory()) {
-          results = results.concat(getFilesRecursive(fullPath, baseDir))
-        } else {
-          results.push(path.relative(baseDir, fullPath))
-        }
-      })
-    } catch { return [] }
-    return results
-  }
+  return new Promise((resolve, reject) => {
+    const worker = getManifestWorker()
 
-  const mapFiles = (files, dir) => files.map(relPath => {
-    const filePath = path.join(dir, relPath)
-    const buf = fs.readFileSync(filePath)
-    const hash = crypto.createHash('sha256').update(buf).digest('hex')
-    return { filename: relPath, hash, size: buf.length }
+    const onMessage = (msg) => {
+      worker.off('message', onMessage)
+      worker.off('error', onError)
+      if (msg.type === 'result') {
+        console.log(`[ManifestWorker] Kész: ${msg.manifest.modCount} mod, ${Object.values(msg.manifest.folders).reduce((a, b) => a + b, 0)} fájl.`)
+        resolve(msg.manifest)
+      } else {
+        reject(new Error(msg.message))
+      }
+    }
+
+    const onError = (err) => {
+      worker.off('message', onMessage)
+      reject(err)
+    }
+
+    worker.on('message', onMessage)
+    worker.once('error', onError)
+    worker.postMessage({ type: 'build', dirs: DIRS, syncFolders: SYNC_FOLDERS })
   })
-
-  const manifest = {
-    generatedAt: new Date().toISOString(),
-    serverVersion: '1.3',
-    folders: {}
-  }
-
-  SYNC_FOLDERS.forEach(f => {
-    manifest[f] = mapFiles(getFilesRecursive(DIRS[f]), DIRS[f])
-    manifest.folders[f] = manifest[f].length
-  })
-
-  // Provide a convenient modCount property (number of .jar files in the 'mods' folder)
-  const allMods = manifest['mods'] || []
-  manifest.modCount = allMods.filter(f => f.filename.endsWith('.jar')).length
-
-  return manifest
 }
 
 /**
@@ -965,107 +1023,36 @@ function applySkinFromLocal(req, username, res) {
   }
 }
 
-async function syncLeaderboardFromFiles() {
-  if (!pool) return
-  console.log('[MariaDB] Szinkronizálás indítása...')
-  
-  try {
-    const usercachePath = path.join(DATA_DIR, 'usercache.json')
-    const statsDir = path.join(DATA_DIR, 'world', 'stats')
-    const cobbleDir = path.join(DATA_DIR, 'world', 'cobblemonplayerdata')
-    
-    let usercache = []
-    if (fs.existsSync(usercachePath)) {
-      try { usercache = JSON.parse(fs.readFileSync(usercachePath, 'utf8')) } catch (e) { }
-    }
+/**
+ * Leaderboard szinkronizálás – worker thread-en fut.
+ * A fájlolvasás és DB upsert teljesen izolált a főszál event loop-jától.
+ */
+function syncLeaderboardFromFiles() {
+  if (!pool) return Promise.resolve()
 
-    const players = new Map() // uuid -> data
+  return new Promise((resolve) => {
+    console.log('[LeaderboardWorker] Szinkronizálás indítása (worker thread)...')
+    const worker = getLeaderboardWorker()
 
-    // 1. Minecraft alap statisztikák (playtime, pokedex)
-    if (fs.existsSync(statsDir)) {
-      const files = fs.readdirSync(statsDir).filter(f => f.endsWith('.json'))
-      for (const file of files) {
-        const uuid = file.replace('.json', '')
-        try {
-          const stats = JSON.parse(fs.readFileSync(path.join(statsDir, file), 'utf8'))
-          const s = stats.stats || {}
-          const custom = s['minecraft:custom'] || {}
-          
-          const ticks = custom['minecraft:play_time'] || 0
-          const playtime = Math.round((ticks / 20 / 60 / 60) * 100) / 100
-          const pokedex = custom['cobblemon:dex_entries'] || custom['cobblemon:pokedex_count'] || custom['cobblemon:pokedex_captured'] || custom['cobblemon:pokedex_total'] || 0
-          
-          const user = usercache.find(u => u.uuid === uuid)
-          const username = user ? user.name : 'Ismeretlen'
-          
-          players.set(uuid, { uuid, username, playtime, pokedex, caught: 0, shiny: 0 })
-        } catch (e) { }
+    const onMessage = (msg) => {
+      worker.off('message', onMessage)
+      if (msg.type === 'done') {
+        console.log(`[LeaderboardWorker] Szinkronizálás kész. (${msg.count} játékos)`)
+      } else if (msg.type === 'error') {
+        console.error('[LeaderboardWorker] Hiba:', msg.message)
       }
+      resolve()
     }
 
-    // 2. Cobblemon specifikus adatok (caught, shiny)
-    if (fs.existsSync(cobbleDir)) {
-      // Replay recursive walk for partitioned folders
-      const walk = (dir) => {
-        const files = fs.readdirSync(dir)
-        for (const file of files) {
-          const fullPath = path.join(dir, file)
-          if (fs.statSync(fullPath).isDirectory()) {
-            walk(fullPath)
-          } else if (file.endsWith('.json') && !file.endsWith('.old')) {
-            const uuid = file.replace('.json', '')
-            try {
-              const data = JSON.parse(fs.readFileSync(fullPath, 'utf8'))
-              const adv = data.advancementData || {}
-              
-              if (players.has(uuid)) {
-                const p = players.get(uuid)
-                // Try multiple paths for capture counts (different Cobblemon versions)
-                p.caught = data.totalCaptureCount || (data.advancementData && data.advancementData.totalCaptureCount) || (data.extraData && data.extraData['cobblemon:total_captured']) || 0
-                p.shiny = data.totalShinyCaptureCount || (data.advancementData && data.advancementData.totalShinyCaptureCount) || (data.extraData && data.extraData['cobblemon:total_shiny_captured']) || 0
-              } else {
-                // If not in stats yet, still add
-                const user = usercache.find(u => u.uuid === uuid)
-                const caught = data.totalCaptureCount || (data.advancementData && data.advancementData.totalCaptureCount) || (data.extraData && data.extraData['cobblemon:total_captured']) || 0
-                const shiny = data.totalShinyCaptureCount || (data.advancementData && data.advancementData.totalShinyCaptureCount) || (data.extraData && data.extraData['cobblemon:total_shiny_captured']) || 0
-                
-                players.set(uuid, {
-                  uuid,
-                  username: user ? user.name : 'Ismeretlen',
-                  playtime: 0,
-                  pokedex: 0,
-                  caught: caught,
-                  shiny: shiny
-                })
-              }
-            } catch (e) { }
-          }
-        }
-      }
-      walk(cobbleDir)
-    }
-
-    // 3. Upsert az adatbázisba
-    for (const p of players.values()) {
-      if (p.playtime === 0 && p.caught === 0) continue // Skip empty players
-      
-      const query = `
-        INSERT INTO leaderboard (uuid, username, playtime, caught, pokedex, shiny)
-        VALUES (?, ?, ?, ?, ?, ?)
-        ON DUPLICATE KEY UPDATE 
-          username = VALUES(username),
-          playtime = VALUES(playtime),
-          caught = VALUES(caught),
-          pokedex = VALUES(pokedex),
-          shiny = VALUES(shiny)
-      `
-      await pool.execute(query, [p.uuid, p.username, p.playtime, p.caught, p.pokedex, p.shiny])
-    }
-    
-    console.log(`[MariaDB] Szinkronizálás kész. (${players.size} játékos frissítve)`)
-  } catch (e) {
-    console.error('[MariaDB] Hiba a szinkronizáláskor:', e.message)
-  }
+    worker.on('message', onMessage)
+    worker.postMessage({
+      type: 'sync',
+      statsDir:      path.join(DATA_DIR, 'world', 'stats'),
+      cobbleDir:     path.join(DATA_DIR, 'world', 'cobblemonplayerdata'),
+      usercachePath: path.join(DATA_DIR, 'usercache.json'),
+      dbConfig
+    })
+  })
 }
 
 // Szinkronizálás 15 percenként
@@ -1075,7 +1062,10 @@ setInterval(syncLeaderboardFromFiles, 15 * 60 * 1000)
 
 async function handleRequest(req, res) {
   const url = req.url.split('?')[0].replace(/\/+/g, '/')
-  console.log(`[Request] ${req.method} ${url}`)
+  // Csak az érdekes végpontokat logoljuk (polling végpontok spam-et okoznának)
+  if (!url.startsWith('/api/status') && !url.startsWith('/api/showcase')) {
+    console.log(`[Request] ${req.method} ${url}`)
+  }
 
   // CORS – allow the Electron renderer / LAN clients
   res.setHeader('Access-Control-Allow-Origin', '*')
@@ -1353,7 +1343,7 @@ async function handleRequest(req, res) {
     }
 
     // Egyébként marad a JSON manifest (kompatibilitás miatt)
-    const manifest = getManifest()
+    const manifest = await getManifest()
     const info = {
       server: 'CobbleServer',
       status: mcStatus,
@@ -1696,7 +1686,7 @@ async function handleRequest(req, res) {
   if (url === '/manifest') {
     let manifest
     try {
-      manifest = getManifest()
+      manifest = await getManifest()
     } catch (err) {
       res.writeHead(500, { 'Content-Type': 'application/json' })
       res.end(JSON.stringify({ error: err.message }))
@@ -1746,7 +1736,7 @@ async function handleRequest(req, res) {
 
   // ── Admin API ─────────────────────────────────────────────
   if (url === '/admin/api/mods') {
-    const manifest = getManifest()
+    const manifest = await getManifest()
     let baseFiles = []
     try {
       baseFiles = JSON.parse(fs.readFileSync(path.join(DATA_DIR, '.modpack-files.json'), 'utf8'))
@@ -2193,6 +2183,7 @@ async function start() {
     // Graceful shutdown
     process.on('SIGINT', () => {
       console.log('\n[Szerver] SIGINT (Ctrl+C) jelzés érkezett. Leállítás...')
+      terminateWorkers()
       stopMinecraft()
       server.close()
       setTimeout(() => {
