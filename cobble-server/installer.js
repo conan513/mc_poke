@@ -38,7 +38,8 @@ const BLACKLISTED_MODS = [
   'fancymenu', 'konkrete', 'drippyloadingscreen', 'loadingscreen', 'notenoughcrashes',
   'figura', 'admiral', 'cobblemau',
   'vmp-fabric', // Very Many Players – eltávolítva (kérésre)
-  'cobbleoptimizer' // Kérésre eltávolítva
+  'cobbleoptimizer', // Kérésre eltávolítva
+  'lag-protection', 'lag_protection'
 ];
 
 
@@ -497,7 +498,6 @@ const EXTRA_MODS = [
   { slug: 'cobbletcg',                      loaders: ['fabric'], gameVersions: [MC_VERSION] },
   // Lag & Performance mods
   { slug: 'cobblelagclear',                 loaders: ['fabric'], gameVersions: [MC_VERSION] },
-  { slug: 'lag-protection',                 loaders: ['fabric'], gameVersions: [MC_VERSION] },
   { slug: 'itemclearlag',                   loaders: ['fabric'], gameVersions: [MC_VERSION] },
   { slug: 'fix-attack-lag',                 loaders: ['fabric'], gameVersions: [MC_VERSION] },
   { slug: 'no-entity-lag',                  loaders: ['datapack'], gameVersions: [MC_VERSION], isDatapack: true },
