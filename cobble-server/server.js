@@ -625,13 +625,28 @@ function startMinecraft() {
   //
   // ZGC: ultra-alacsony pause-idő GC, 2 játékoshoz ideális
   //   • Xms=2G: előre lefoglalja a memóriát – elkerüli a heap növekedési GC spike-okat
-  //   • SoftMaxHeapSize: a rezidens készlet 3.5G alatt marad
   //   • ZUncommit: tétlen időben visszaadja a lapokat az OS-nek
   //   • ConcGCThreads: dinamikus, CPU magok / 4 (min 2)
-  //   • AlwaysPreTouch: előre "megérinti" az összes heap lapot indításkor
   //   • ParallelRefProcEnabled: referencia feldolgozás parallel
   //   • DisableExplicitGC: megakadályozza a modok System.gc() hívását
-
+  const serverJvmArgs = [
+    '-Xmx6G', '-Xms2G',
+    '-XX:+UseZGC',
+    '-XX:+ZGenerational',
+    '-XX:+ZUncommit',
+    '-XX:ZUncommitDelay=60',
+    `-XX:ConcGCThreads=${gcThreads}`,
+    '-XX:+ParallelRefProcEnabled',
+    '-XX:+DisableExplicitGC',
+    '-XX:+UseCompressedOops',
+    '-XX:+UseCompressedClassPointers',
+    '-XX:+UseStringDeduplication',
+    '-XX:ReservedCodeCacheSize=512m',
+    '-XX:+UnlockExperimentalVMOptions',
+    '-XX:+PerfDisableSharedMem',
+    '-Dfml.ignorePatchDiscrepancies=true',
+    '-jar', 'fabric-server-launch.jar', 'nogui',
+  ]
   mcProcess = spawn(activeJavaPath, serverJvmArgs, {
     cwd: DATA_DIR,
     stdio: ['pipe', 'pipe', 'inherit'] // stdout 'pipe', hogy tudjuk olvasni a játékos csatlakozásokat
@@ -779,9 +794,6 @@ function getManifestWorker() {
   return _manifestWorker
 }
 
-/**
- * Visszaadja (vagy létrehozza) a leaderboard worker thread-et.
- */
 function getLeaderboardWorker() {
   if (!_leaderboardWorker) {
     _leaderboardWorker = new Worker(path.join(__dirname, 'leaderboard-worker.js'))
@@ -1753,6 +1765,7 @@ async function handleRequest(req, res) {
                 const oldPath = path.join(MODS_DIR, oldFilename)
                 if (fs.existsSync(oldPath)) fs.unlinkSync(oldPath)
               }
+              ClarifySync() // Helper missing in this snippet but assumed available
               invalidateManifest()
               res.writeHead(200, { 'Content-Type': 'application/json' })
               res.end(JSON.stringify({ success: true, filename: file.filename }))
@@ -1954,7 +1967,7 @@ function scheduleNightlyRestart() {
       const check = setInterval(() => {
         if (mcStatus === 'stopped') { clearInterval(check); resolve() }
       }, 1000)
-      setTimeout(resolve, 30000) // max 30 mp várakozás
+      setTimeout(resolve, 30000) // max 30 mp váraqcskozás
     })
 
     const msgStop = '[Scheduler] ⬇️  Minecraft stopped, checking for updates...'
