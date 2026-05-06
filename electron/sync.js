@@ -41,16 +41,23 @@ function downloadFile(url, dest, onProgress) {
 
 function fetchManifest(serverUrl) {
   return new Promise((resolve, reject) => {
-    const manifestUrl = `${serverUrl.replace(/\/+$/, '')}/manifest`
-    const mod = manifestUrl.startsWith('https') ? https : http
-    mod.get(manifestUrl, (res) => {
-      if (res.statusCode !== 200) return reject(new Error(`Szerver hiba: ${res.statusCode}`))
-      let data = ''
-      res.on('data', c => data += c)
-      res.on('end', () => {
-        try { resolve(JSON.parse(data)) } catch(e) { reject(e) }
-      })
-    }).on('error', reject)
+    const request = (targetUrl) => {
+      const mod = targetUrl.startsWith('https') ? https : http
+      mod.get(targetUrl, { headers: { 'User-Agent': 'CobbleLauncher/1.0' } }, (res) => {
+        // Follow redirects (301, 302, 307, 308)
+        if ([301, 302, 307, 308].includes(res.statusCode) && res.headers.location) {
+          return request(res.headers.location)
+        }
+        if (res.statusCode !== 200) return reject(new Error(`Szerver hiba: ${res.statusCode}`))
+        let data = ''
+        res.on('data', c => data += c)
+        res.on('end', () => {
+          try { resolve(JSON.parse(data)) } catch(e) { reject(e) }
+        })
+        res.on('error', reject)
+      }).on('error', reject)
+    }
+    request(`${serverUrl.replace(/\/+$/, '')}/manifest`)
   })
 }
 
@@ -132,6 +139,20 @@ async function syncServerMods(serverUrl, instanceDir, onLog) {
   // 1. TÖRLÉS – Fizikai scan alapú szinkronizáció
   // Meghatározzuk, mely mappákban/útvonalakon kötelező a teljes egyezés (törlés)
   const FULL_SYNC_FOLDERS = ['mods', 'datapacks']
+
+  // Előző sync-ből maradt .disabled fájlok takarítása (Windows zárolási fallback)
+  for (const folder of FULL_SYNC_FOLDERS) {
+    const folderPath = path.join(instanceDir, folder)
+    const allFiles = listFilesRecursive(folderPath)
+    for (const file of allFiles) {
+      if (file.relPath.endsWith('.disabled')) {
+        try {
+          fs.unlinkSync(file.fullPath)
+          onLog(`[Sync] Régi .disabled fájl törölve: ${folder}/${file.relPath}`)
+        } catch (_) {}
+      }
+    }
+  }
   
   for (const folder of SYNC_FOLDERS) {
     const folderPath = path.join(instanceDir, folder)
@@ -153,7 +174,19 @@ async function syncServerMods(serverUrl, instanceDir, onLog) {
             fs.unlinkSync(file.fullPath)
             onLog(`[Sync] Törölve ${blacklisted ? '(feketelista)' : '(nincs a szerveren)'}: ${folder}/${file.relPath}`)
           } catch (e) {
-            onLog(`[Sync-Hiba] Nem törölhető: ${folder}/${file.relPath} -> ${e.message}`)
+            // Windows: EPERM/EBUSY = fájl zárolt (antivírus, Minecraft process stb.)
+            // Átnevezzük .del kiterjesztésre, így legalább nem töltődik be a játékba
+            if (e.code === 'EPERM' || e.code === 'EBUSY') {
+              try {
+                const disabledPath = file.fullPath + '.disabled'
+                fs.renameSync(file.fullPath, disabledPath)
+                onLog(`[Sync] Átnevezve (fájl zárolt, törlés helyett): ${folder}/${file.relPath} -> .disabled`)
+              } catch (renameErr) {
+                onLog(`[Sync-Hiba] Nem törölhető és nem nevezhető át (fájl zárolt): ${folder}/${file.relPath} -> ${e.message}`)
+              }
+            } else {
+              onLog(`[Sync-Hiba] Nem törölhető: ${folder}/${file.relPath} -> ${e.message}`)
+            }
           }
         }
       }
