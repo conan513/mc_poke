@@ -631,26 +631,7 @@ function startMinecraft() {
   //   • AlwaysPreTouch: előre "megérinti" az összes heap lapot indításkor
   //   • ParallelRefProcEnabled: referencia feldolgozás parallel
   //   • DisableExplicitGC: megakadályozza a modok System.gc() hívását
-  const serverJvmArgs = [
-    '-Xmx8G', '-Xms4G',
-    '-XX:SoftMaxHeapSize=7000M',
-    '-XX:+UseZGC',
-    '-XX:+ZGenerational',
-    '-XX:+ZUncommit',
-    '-XX:ZUncommitDelay=60',
-    `-XX:ConcGCThreads=${gcThreads}`,
-    '-XX:+AlwaysPreTouch',
-    '-XX:+ParallelRefProcEnabled',
-    '-XX:+DisableExplicitGC',
-    '-XX:+UseCompressedOops',
-    '-XX:+UseCompressedClassPointers',
-    '-XX:+UseStringDeduplication',
-    '-XX:ReservedCodeCacheSize=512m',
-    '-XX:+UnlockExperimentalVMOptions',
-    '-XX:+PerfDisableSharedMem',
-    '-Dfml.ignorePatchDiscrepancies=true',
-    '-jar', 'fabric-server-launch.jar', 'nogui',
-  ]
+
   mcProcess = spawn(activeJavaPath, serverJvmArgs, {
     cwd: DATA_DIR,
     stdio: ['pipe', 'pipe', 'inherit'] // stdout 'pipe', hogy tudjuk olvasni a játékos csatlakozásokat
