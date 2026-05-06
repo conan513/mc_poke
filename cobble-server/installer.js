@@ -36,10 +36,9 @@ const BLACKLISTED_MODS = [
   'interactic', 'custom-splash-screen', 'customsplashscreen', 'battlecam', 'lenientdeath',
   'biome-replacer', 'biomereplacer', 'nocubes', 'mobsbegone',
   'fancymenu', 'konkrete', 'drippyloadingscreen', 'loadingscreen', 'notenoughcrashes',
-  'figura', 'admiral', 'cobblemau',
-  'vmp-fabric', // Very Many Players – eltávolítva (kérésre)
-  'cobbleoptimizer', // Kérésre eltávolítva
-  'lag-protection', 'lag_protection'
+  'figura', 'admiral',
+  'vmp-fabric', 'cobbleoptimizer', 'lag-protection', 'lag_protection',
+  'cobblelagclear', 'itemclearlag', 'fix-attack-lag', 'no-entity-lag'
 ];
 
 
@@ -420,10 +419,6 @@ async function updateModsFromModrinth() {
 
 /**
  * Ensures specific extra mods are present.
- * NOTE: SkinsRestorer is NOT a Fabric mod – on Modrinth its loaders are
- * listed as "bungee", "velocity", "bukkit" etc. Filtering by loader=["fabric"]
- * returns no results and a wrong version is downloaded. We therefore query
- * SkinsRestorer WITHOUT a loader filter but WITH a game_version constraint.
  */
 const EXTRA_MODS = [
   { slug: 'chipped', loaders: ['fabric'], gameVersions: [MC_VERSION] },
@@ -446,8 +441,8 @@ const EXTRA_MODS = [
   { slug: 'serene-seasons',                 loaders: ['fabric'], gameVersions: [MC_VERSION] },
   { slug: 'seasonhud-fabric',               loaders: ['fabric'], gameVersions: [MC_VERSION] },
   { slug: 'easywhitelist',                  loaders: ['fabric'], gameVersions: [MC_VERSION] },
+  { slug: 'cobbletcg',                      loaders: ['fabric'], gameVersions: [MC_VERSION] },
   // Új modok (felhasználói kérés)
-  // vmp-fabric eltávolítva (kérésre) – a blacklist törli a mods mappából is
   { slug: 'fix-cobblemon-pokemon-experience', loaders: ['fabric'], gameVersions: [MC_VERSION] },
   { slug: 'cobblemon-pokestops',            loaders: ['fabric'], gameVersions: [MC_VERSION] },
   { slug: 'cobblemon-pet-a-poke',           loaders: ['fabric'], gameVersions: [MC_VERSION] },
@@ -477,30 +472,22 @@ const EXTRA_MODS = [
   { slug: 'cobblemon-tents',                loaders: ['fabric'], gameVersions: [MC_VERSION] },
   { slug: 'cobblemon-snap',                 loaders: ['fabric'], gameVersions: [MC_VERSION] },
   { slug: 'cobblemon-villager-overhaul',    loaders: ['fabric'], gameVersions: [MC_VERSION] },
-  // distanthorizons ELTÁVOLÍTVA (felhasználói kérés) — serene-seasons-x-distant-horizons szintén
-  // Függőségek (dependencies)
+  // Függőségek
   { slug: 'cobblemore-library',             loaders: ['fabric'], gameVersions: [MC_VERSION] },
   { slug: 'pommel-held-item-models',        loaders: ['fabric'], gameVersions: [MC_VERSION] },
   { slug: 'create-power-loader',            loaders: ['fabric'], gameVersions: [MC_VERSION] },
   { slug: 'create-fabric',                  loaders: ['fabric'], gameVersions: [MC_VERSION] },
   { slug: 'wild-battle-api',                loaders: ['fabric'], gameVersions: [MC_VERSION] },
-  { slug: 'cloth-config',                   loaders: ['fabric'], gameVersions: [MC_VERSION] }, // player-locator-plus
-  { slug: 'farmers-delight',                loaders: ['fabric'], gameVersions: [MC_VERSION] }, // cobblemon-farmers
-  { slug: 'expandability',                  loaders: ['fabric'], gameVersions: [MC_VERSION] }, // cobblemon_expeditions
-  { slug: 'trainerattributeslib',           loaders: ['fabric'], gameVersions: [MC_VERSION] }, // trainer-accessories
-  { slug: 'accessories',                    loaders: ['fabric'], gameVersions: [MC_VERSION] }, // trainer-accessories
-  { slug: 'geckolib',                       loaders: ['fabric'], gameVersions: [MC_VERSION] }, // trainer-accessories
-  { slug: 'collective',                     loaders: ['fabric'], gameVersions: [MC_VERSION] }, // village-spawn-point
-  { slug: 'glitchcore',                     loaders: ['fabric'], gameVersions: [MC_VERSION] }, // serene-seasons (kötelező dep)
-  { slug: 'forge-config-api-port',          loaders: ['fabric'], gameVersions: [MC_VERSION] }, // seasonhud-fabric
+  { slug: 'cloth-config',                   loaders: ['fabric'], gameVersions: [MC_VERSION] },
+  { slug: 'farmers-delight',                loaders: ['fabric'], gameVersions: [MC_VERSION] },
+  { slug: 'expandability',                  loaders: ['fabric'], gameVersions: [MC_VERSION] },
+  { slug: 'trainerattributeslib',           loaders: ['fabric'], gameVersions: [MC_VERSION] },
+  { slug: 'accessories',                    loaders: ['fabric'], gameVersions: [MC_VERSION] },
+  { slug: 'geckolib',                       loaders: ['fabric'], gameVersions: [MC_VERSION] },
+  { slug: 'collective',                     loaders: ['fabric'], gameVersions: [MC_VERSION] },
+  { slug: 'glitchcore',                     loaders: ['fabric'], gameVersions: [MC_VERSION] },
+  { slug: 'forge-config-api-port',          loaders: ['fabric'], gameVersions: [MC_VERSION] },
   { slug: 'fusion',                         loaders: ['fabric'], gameVersions: [MC_VERSION] },
-  // Cobblemon TCG
-  { slug: 'cobbletcg',                      loaders: ['fabric'], gameVersions: [MC_VERSION] },
-  // Lag & Performance mods
-  { slug: 'cobblelagclear',                 loaders: ['fabric'], gameVersions: [MC_VERSION] },
-  { slug: 'itemclearlag',                   loaders: ['fabric'], gameVersions: [MC_VERSION] },
-  { slug: 'fix-attack-lag',                 loaders: ['fabric'], gameVersions: [MC_VERSION] },
-  { slug: 'no-entity-lag',                  loaders: ['datapack'], gameVersions: [MC_VERSION], isDatapack: true },
 ];
 
 /**
@@ -1042,9 +1029,6 @@ async function install() {
   await updateModsFromModrinth()
 
   // Regenerate .modpack-files.json from the actual current mods folder.
-  // updateModsFromModrinth() may have replaced jars (e.g. 4.0.2 → 4.0.3),
-  // so the old filenames in .modpack-files.json would be stale, causing a
-  // false integrity failure and a full reinstall on every subsequent startup.
   if (fs.existsSync(MODS_DIR)) {
     const currentJars = fs.readdirSync(MODS_DIR).filter(f => f.endsWith('.jar'))
     fs.writeFileSync(
