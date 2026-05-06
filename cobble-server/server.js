@@ -163,7 +163,9 @@ mysql {
     // Ha létezik, csak frissítjük az értékeket
     try {
       let content = fs.readFileSync(easyAuthPath, 'utf8')
-      content = content.replace(/database-type=.*/, 'database-type=mysql')
+      if (!content.includes('database-type=sqlite')) {
+        content = content.replace(/database-type=.*/, 'database-type=mysql')
+      }
       content = content.replace(/mysql-host=.*/, `mysql-host=${dbConfig.host}`)
       content = content.replace(/mysql-user=.*/, `mysql-user=${dbConfig.user}`)
       content = content.replace(/mysql-password=.*/, `mysql-password="${dbConfig.password}"`)
@@ -176,6 +178,7 @@ mysql {
     }
   }
 }
+
 
 // ── Creeper Firework Auto-Config ─────────────────────────────
 
@@ -638,13 +641,7 @@ function startMinecraft() {
     `-XX:ConcGCThreads=${gcThreads}`,
     '-XX:+ParallelRefProcEnabled',
     '-XX:+DisableExplicitGC',
-    '-XX:+UseCompressedOops',
-    '-XX:+UseCompressedClassPointers',
-    '-XX:+UseStringDeduplication',
-    '-XX:ReservedCodeCacheSize=512m',
-    '-XX:+UnlockExperimentalVMOptions',
-    '-XX:+PerfDisableSharedMem',
-    '-Dfml.ignorePatchDiscrepancies=true',
+    '-Xshare:auto',
     '-jar', 'fabric-server-launch.jar', 'nogui',
   ]
   mcProcess = spawn(activeJavaPath, serverJvmArgs, {
@@ -1765,7 +1762,6 @@ async function handleRequest(req, res) {
                 const oldPath = path.join(MODS_DIR, oldFilename)
                 if (fs.existsSync(oldPath)) fs.unlinkSync(oldPath)
               }
-              ClarifySync() // Helper missing in this snippet but assumed available
               invalidateManifest()
               res.writeHead(200, { 'Content-Type': 'application/json' })
               res.end(JSON.stringify({ success: true, filename: file.filename }))
