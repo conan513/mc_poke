@@ -495,6 +495,12 @@ const EXTRA_MODS = [
   { slug: 'fusion',                         loaders: ['fabric'], gameVersions: [MC_VERSION] },
   // Cobblemon TCG
   { slug: 'cobbletcg',                      loaders: ['fabric'], gameVersions: [MC_VERSION] },
+  // Lag & Performance mods
+  { slug: 'cobblelagclear',                 loaders: ['fabric'], gameVersions: [MC_VERSION] },
+  { slug: 'lag-protection',                 loaders: ['fabric'], gameVersions: [MC_VERSION] },
+  { slug: 'itemclearlag',                   loaders: ['fabric'], gameVersions: [MC_VERSION] },
+  { slug: 'fix-attack-lag',                 loaders: ['fabric'], gameVersions: [MC_VERSION] },
+  { slug: 'no-entity-lag',                  loaders: ['datapack'], gameVersions: [MC_VERSION], isDatapack: true },
 ];
 
 /**
@@ -525,7 +531,7 @@ const CUSTOM_DIRECT_MODS = [
 async function ensureExtraMods() {
   logInfo(`[Modrinth] Extra modok ellenőrzése: ${EXTRA_MODS.map(m => m.slug).join(', ')}...`);
 
-  for (const { slug, loaders, gameVersions } of EXTRA_MODS) {
+  for (const { slug, loaders, gameVersions, isDatapack } of EXTRA_MODS) {
     try {
       const params = [];
       if (loaders) params.push(`loaders=${encodeURIComponent(JSON.stringify(loaders))}`);
@@ -543,16 +549,17 @@ async function ensureExtraMods() {
       logInfo(`[Modrinth] ${slug} → ${latest.version_number}`);
 
       const file = latest.files.find(f => f.primary) || latest.files[0];
-      const dest = path.join(MODS_DIR, file.filename);
+      const targetDir = isDatapack ? DATAPACKS_DIR : MODS_DIR;
+      const dest = path.join(targetDir, file.filename);
 
-      const existingFiles = fs.readdirSync(MODS_DIR);
+      const existingFiles = fs.readdirSync(targetDir);
       const isPresent = existingFiles.some(f => f.toLowerCase().includes(slug.toLowerCase()));
 
       if (!isPresent) {
-        logInfo(`[Modrinth] Extra mod letöltése: ${slug} -> ${file.filename}`);
+        logInfo(`[Modrinth] Extra ${isDatapack ? 'datapack' : 'mod'} letöltése: ${slug} -> ${file.filename}`);
         await downloadFile(file.url, dest, { hash: file.hashes.sha1, algorithm: 'sha1' });
       } else {
-        logInfo(`[Modrinth] Extra mod már jelen van: ${slug}`);
+        logInfo(`[Modrinth] Extra ${isDatapack ? 'datapack' : 'mod'} már jelen van: ${slug}`);
       }
     } catch (e) {
       logError(`[Modrinth-Hiba] Extra mod hiba (${slug}): ${e.message}`);
