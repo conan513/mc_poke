@@ -38,6 +38,7 @@ const BLACKLISTED_MODS = [
   'fancymenu', 'konkrete', 'drippyloadingscreen', 'loadingscreen', 'notenoughcrashes',
   'figura', 'admiral', 'cobblemau',
   'vmp-fabric', // Very Many Players – eltávolítva (kérésre)
+  'cobbleoptimizer' // Kérésre eltávolítva
 ];
 
 
@@ -960,9 +961,10 @@ async function install() {
       'motd=CobbleVerse Server',
       'spawn-protection=0',
       'view-distance=8',
-      'simulation-distance=6'
+      'simulation-distance=6',
+      'sync-chunk-writes=false'
     ].join('\n') + '\n')
-    logInfo('[Installer] server.properties létrehozva (online-mode=false, DH optimalizált).')
+    logInfo('[Installer] server.properties létrehozva (online-mode=false, sync-chunk-writes=false, DH optimalizált).')
   } else {
     // A fájl már létezik – beállítások ellenőrzése
     let props = fs.readFileSync(serverPropsPath, 'utf8')
@@ -976,19 +978,27 @@ async function install() {
       modified = true
     }
 
-    if (/^view-distance\s*=\s*(?!8$).*/m.test(props)) {
-      props = props.replace(/^view-distance\s*=.*/m, 'view-distance=8')
+    if (/^view-distance\s*=\s*(?!6$).*/m.test(props)) {
+      props = props.replace(/^view-distance\s*=.*/m, 'view-distance=6')
       modified = true
     } else if (!/^view-distance\s*=/m.test(props)) {
-      props = props.trimEnd() + '\nview-distance=8\n'
+      props = props.trimEnd() + '\nview-distance=6\n'
       modified = true
     }
 
-    if (/^simulation-distance\s*=\s*(?!6$).*/m.test(props)) {
-      props = props.replace(/^simulation-distance\s*=.*/m, 'simulation-distance=6')
+    if (/^simulation-distance\s*=\s*(?!5$).*/m.test(props)) {
+      props = props.replace(/^simulation-distance\s*=.*/m, 'simulation-distance=5')
       modified = true
     } else if (!/^simulation-distance\s*=/m.test(props)) {
-      props = props.trimEnd() + '\nsimulation-distance=6\n'
+      props = props.trimEnd() + '\nsimulation-distance=5\n'
+      modified = true
+    }
+
+    if (/^sync-chunk-writes\s*=\s*(?!false$).*/m.test(props)) {
+      props = props.replace(/^sync-chunk-writes\s*=.*/m, 'sync-chunk-writes=false')
+      modified = true
+    } else if (!/^sync-chunk-writes\s*=/m.test(props)) {
+      props = props.trimEnd() + '\nsync-chunk-writes=false\n'
       modified = true
     }
 

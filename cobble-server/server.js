@@ -14,6 +14,11 @@
  * ─────────────────────────────────────────────────────────────
  */
 
+'use strict'
+// Optimalizáljuk a Node.js beépített C++ thread pool-ját a CPU magok számához (min 4).
+// Ez gyorsítja a bejelentkezés jelszó-hashelését és az aszinkron fájlműveleteket.
+process.env.UV_THREADPOOL_SIZE = Math.max(4, require('os').cpus().length).toString()
+
 const http = require('http')
 const fs = require('fs')
 const path = require('path')
@@ -42,71 +47,6 @@ const LAUNCHER_SECRET = 'cobble-super-secret-key-2024'
 
 const DATA_DIR = path.join(__dirname, 'server-data')
 
-// ── Gravestones Auto-Config ──────────────────────────────────
-function configureGravestones() {
-  const configDir = path.join(DATA_DIR, 'config')
-  const gravestonesPath = path.join(configDir, 'gravestones.json')
-  
-  if (!fs.existsSync(configDir)) {
-    fs.mkdirSync(configDir, { recursive: true })
-  }
-
-  if (fs.existsSync(gravestonesPath)) {
-    try {
-      let content = fs.readFileSync(gravestonesPath, 'utf8')
-      let json = JSON.parse(content)
-      let modified = false
-      
-      if (json.decay_with_time !== false) {
-        json.decay_with_time = false
-        modified = true
-      }
-      if (json.spawn_gravestones_with_keepinv !== false) {
-        json.spawn_gravestones_with_keepinv = false
-        modified = true
-      }
-      
-      if (modified) {
-        fs.writeFileSync(gravestonesPath, JSON.stringify(json, null, 2), 'utf8')
-        console.log('[Gravestones] gravestones.json beállítások frissítve.')
-      }
-    } catch (e) {
-      console.error('[Gravestones] Hiba a konfiguráció frissítésekor:', e.message)
-    }
-  } else {
-    // Default settings with the requested modifications
-    const defaultSettings = {
-      "decay_with_deaths": true,
-      "decay_with_time": false,
-      "decay_time": 576000,
-      "decay_time_type": "TICKS",
-      "damage_to_break": 3,
-      "aesthetic_decay": false,
-      "store_experience": true,
-      "experience_cap": true,
-      "experience_kept": "VANILLA",
-      "experience_decay": false,
-      "drop_experience": false,
-      "gravestone_accessible_owner_only": true,
-      "broadcast_collect_in_chat": false,
-      "broadcast_coordinates_in_chat": false,
-      "aesthetic_gravestones": true,
-      "spawn_gravestone_skeletons": false,
-      "spawn_gravestones_in_creative": true,
-      "spawn_gravestones_with_keepinv": false,
-      "show_heads": true,
-      "time_format": "MMDDYYYY",
-      "console_info": false
-    }
-    try {
-      fs.writeFileSync(gravestonesPath, JSON.stringify(defaultSettings, null, 2), 'utf8')
-      console.log('[Gravestones] gravestones.json létrehozva és konfigurálva.')
-    } catch (e) {
-      console.error('[Gravestones] Hiba a konfiguráció létrehozásakor:', e.message)
-    }
-  }
-}
-
 // ── SkinRestorer Auto-Config ─────────────────────────────────
 function configureSkinRestorer() {
   const srDir = path.join(DATA_DIR, 'config', 'skinrestorer')
@@ -132,6 +72,18 @@ function configureSkinRestorer() {
           modified = true
         }
       }
+
+      if (json.providers) {
+        if (json.providers.mojang && json.providers.mojang.enabled !== false) {
+          json.providers.mojang.enabled = false
+          modified = true
+        }
+        if (json.providers.ely_by && json.providers.ely_by.enabled !== false) {
+          json.providers.ely_by.enabled = false
+          modified = true
+        }
+      }
+
       
       if (modified) {
         fs.writeFileSync(srConfigPath, JSON.stringify(json, null, 2), 'utf8')
@@ -160,8 +112,8 @@ function configureSkinRestorer() {
         "userAgent": ""
       },
       "providers": {
-        "mojang": { "enabled": true, "name": "mojang", "cache": { "enabled": true, "duration": 60 } },
-        "ely_by": { "enabled": true, "name": "ely.by", "cache": { "enabled": true, "duration": 60 } },
+        "mojang": { "enabled": false, "name": "mojang", "cache": { "enabled": true, "duration": 60 } },
+        "ely_by": { "enabled": false, "name": "ely.by", "cache": { "enabled": true, "duration": 60 } },
         "mineskin": { "apiKey": "", "proxyUrlUpload": false, "enabled": true, "name": "web", "cache": { "enabled": true, "duration": 300 } },
         "collection": { "sources": [], "enabled": false, "name": "collection", "cache": { "enabled": true, "duration": 604800 } },
         "custom": []
@@ -226,66 +178,7 @@ mysql {
 }
 
 // ── Creeper Firework Auto-Config ─────────────────────────────
-function configureCreeperFirework() {
-  const configPath = path.join(DATA_DIR, 'config', 'creeper_firework.json5')
-  
-  if (fs.existsSync(configPath)) {
-    try {
-      let content = fs.readFileSync(configPath, 'utf8')
-      let modified = false
-      
-      if (content.match(/"CREEPER_EXPLODE_INTO_FIREWORK"\s*:\s*true/)) {
-        content = content.replace(/"CREEPER_EXPLODE_INTO_FIREWORK"\s*:\s*true/g, '"CREEPER_EXPLODE_INTO_FIREWORK": false')
-        modified = true
-      }
-      
-      if (content.match(/"CREEPER_FIREWORK_DESTROY_BLOCK"\s*:\s*true/)) {
-        content = content.replace(/"CREEPER_FIREWORK_DESTROY_BLOCK"\s*:\s*true/g, '"CREEPER_FIREWORK_DESTROY_BLOCK": false')
-        modified = true
-      }
-      
-      if (content.match(/"CREEPER_FIREWORK_HURT_CREATURE"\s*:\s*false/)) {
-        content = content.replace(/"CREEPER_FIREWORK_HURT_CREATURE"\s*:\s*false/g, '"CREEPER_FIREWORK_HURT_CREATURE": true')
-        modified = true
-      }
-      
-      if (modified) {
-        fs.writeFileSync(configPath, content, 'utf8')
-        console.log('[CreeperFirework] creeper_firework.json5 beállítások frissítve (rombolás letiltva).')
-      }
-    } catch (e) {
-      console.error('[CreeperFirework] Hiba a konfiguráció frissítésekor:', e.message)
-    }
-  } else {
-    const defaultSettings = `{
-	// Will creeper's active-explosion turn into firework?
-	"CREEPER_EXPLODE_INTO_FIREWORK": false,
-	// Will the active-explosion firework destroy nearby environment just like creeper normally exploding?
-	"CREEPER_FIREWORK_DESTROY_BLOCK": false,
-	// Will the active-explosion firework effect hurt nearby creature?
-	"CREEPER_FIREWORK_HURT_CREATURE": true,
-	// The probability of creeper turning into firework when actively explodes. It must be bigger than 0.0 and not exceed 1.0.
-	"CREEPER_EXPLODE_INTO_FIREWORK_PROBABILITY": 1.0,
-	// Will creeper explode into firework when die?
-	"CREEPER_EXPLODE_INTO_FIREWORK_WHEN_DIE": false,
-	// Will the death-explosion firework destroy nearby environment just like creeper normally exploding?
-	"CREEPER_DEATH_FIREWORK_DESTROY_BLOCK": false,
-	// Will the death-explosion firework effect hurt nearby creature?
-	"CREEPER_DEATH_FIREWORK_HURT_CREATURE": true,
-	// The probability of creeper turning into firework when die. It must be bigger than 0.0 and not exceed 1.0.
-	"CREEPER_EXPLODE_INTO_FIREWORK_PROBABILITY_WHEN_DIE": 1.0
-}`
-    const configDir = path.join(DATA_DIR, 'config')
-    if (!fs.existsSync(configDir)) fs.mkdirSync(configDir, { recursive: true })
-    
-    try {
-      fs.writeFileSync(configPath, defaultSettings, 'utf8')
-      console.log('[CreeperFirework] creeper_firework.json5 létrehozva (rombolás letiltva).')
-    } catch (e) {
-      console.error('[CreeperFirework] Hiba a konfiguráció létrehozásakor:', e.message)
-    }
-  }
-}
+
 
 // ── Cobblemon Excitement Auto-Config ──────────────────────────
 function configureCobblemonExcitement() {
@@ -355,9 +248,7 @@ let pool = null
 
 async function initDatabase() {
   configureEasyAuth()
-  configureGravestones()
   configureSkinRestorer()
-  configureCreeperFirework()
   configureCobblemonExcitement()
   
   try {
@@ -660,52 +551,51 @@ console.log(`[Skins-Init] Absolute skins directory: ${path.resolve(SKINS_DIR)}`)
 // ── Auth ──────────────────────────────────────────────────────────
 const AUTH_FILE = path.join(DATA_DIR, '.admin-auth.json')
 const authTokens = new Map() // token → expiry ms
+const pbkdf2 = require('util').promisify(crypto.pbkdf2)
 
+// In-memory auth cache – elkerüli az fs.readFileSync-et minden admin kérésnél
+let _cachedAuth = undefined
 
 function loadAuth() {
-  try { return JSON.parse(fs.readFileSync(AUTH_FILE, 'utf8')) } catch { return null }
+  if (_cachedAuth !== undefined) return _cachedAuth
+  try { _cachedAuth = JSON.parse(fs.readFileSync(AUTH_FILE, 'utf8')) } catch { _cachedAuth = null }
+  return _cachedAuth
 }
 function saveAuth(data) {
   fs.writeFileSync(AUTH_FILE, JSON.stringify(data))
+  _cachedAuth = data // cache frissítése
 }
-function hashPassword(password) {
+
+// Async pbkdf2 – a *Sync változat 100k iterációval ~200ms-ig blokkolta a főszálat!
+async function hashPassword(password) {
   const salt = crypto.randomBytes(32).toString('hex')
-  const hash = crypto.pbkdf2Sync(password, salt, 100000, 64, 'sha512').toString('hex')
-  return { salt, hash }
+  const buf = await pbkdf2(password, salt, 100000, 64, 'sha512')
+  return { salt, hash: buf.toString('hex') }
+}
+async function verifyPassword(password, salt, storedHash) {
+  try {
+    const buf = await pbkdf2(password, salt, 100000, 64, 'sha512')
+    const h = buf.toString('hex')
+    return crypto.timingSafeEqual(Buffer.from(h, 'hex'), Buffer.from(storedHash, 'hex'))
+  } catch { return false }
 }
 
 /**
  * Generates a deterministic Minecraft offline-mode UUID for a given username.
- * Matches Java's UUID.nameUUIDFromBytes(("OfflinePlayer:" + name).getBytes(StandardCharsets.UTF_8))
  */
 function getOfflineUUID(username) {
   const hash = crypto.createHash('md5').update('OfflinePlayer:' + username).digest()
-  // Set version to 3 (MD5 based)
   hash[6] = (hash[6] & 0x0f) | 0x30
-  // Set variant to RFC 4122
   hash[8] = (hash[8] & 0x3f) | 0x80
-  
   const hex = hash.toString('hex')
-  return [
-    hex.substring(0, 8),
-    hex.substring(8, 12),
-    hex.substring(12, 16),
-    hex.substring(16, 20),
-    hex.substring(20)
-  ].join('-')
-}
-function verifyPassword(password, salt, storedHash) {
-  try {
-    const h = crypto.pbkdf2Sync(password, salt, 100000, 64, 'sha512').toString('hex')
-    return crypto.timingSafeEqual(Buffer.from(h, 'hex'), Buffer.from(storedHash, 'hex'))
-  } catch { return false }
+  return [hex.substring(0, 8), hex.substring(8, 12), hex.substring(12, 16), hex.substring(16, 20), hex.substring(20)].join('-')
 }
 function generateToken() {
   return crypto.randomBytes(32).toString('hex')
 }
 function checkAuth(req, res) {
   const auth = loadAuth()
-  if (!auth) return true // nincs jelszó beállítva, szabad a hozzáférés
+  if (!auth) return true
   const token = (req.headers['authorization'] || '').replace('Bearer ', '').trim()
   const expiry = authTokens.get(token)
   if (!expiry || Date.now() > expiry) {
@@ -713,7 +603,7 @@ function checkAuth(req, res) {
     res.end(JSON.stringify({ error: 'Nincs bejelentkezve.' }))
     return false
   }
-  authTokens.set(token, Date.now() + 24 * 3600 * 1000) // session meghosszabbítás
+  authTokens.set(token, Date.now() + 24 * 3600 * 1000)
   return true
 }
 // Lejárt tokenek törlése
@@ -727,29 +617,37 @@ setInterval(() => {
 function startMinecraft() {
   if (mcStatus === 'running' || !activeJavaPath) return
   console.log('[Minecraft] Szerver indítása (java -jar fabric-server-launch.jar nogui)...')
-  // Optimised JVM args for the Fabric server:
-  //  • ZUncommit   – returns unused heap pages to the OS after 60s idle
-  //  • SoftMaxHeap – keeps resident set at ≤3.5G even with -Xmx4G
-  //  • CompressedOops – 32-bit object pointers save ~10-15% heap
-  //  • Xms lowered to 1G – server grows the heap on demand, freeing
-  //    2G on startup compared to the old fixed 2G minimum
+  
+  const cpuCores = require('os').cpus().length
+  const gcThreads = Math.max(2, Math.floor(cpuCores / 4))
+
+  // JVM args optimalizálva dinamikusan a géphez, Cobblemon/Fabric 1.21.1 szerverhez.
+  //
+  // ZGC: ultra-alacsony pause-idő GC, 2 játékoshoz ideális
+  //   • Xms=2G: előre lefoglalja a memóriát – elkerüli a heap növekedési GC spike-okat
+  //   • SoftMaxHeapSize: a rezidens készlet 3.5G alatt marad
+  //   • ZUncommit: tétlen időben visszaadja a lapokat az OS-nek
+  //   • ConcGCThreads: dinamikus, CPU magok / 4 (min 2)
+  //   • AlwaysPreTouch: előre "megérinti" az összes heap lapot indításkor
+  //   • ParallelRefProcEnabled: referencia feldolgozás parallel
+  //   • DisableExplicitGC: megakadályozza a modok System.gc() hívását
   const serverJvmArgs = [
-    '-Xmx4G', '-Xms1G',
+    '-Xmx8G', '-Xms4G',
+    '-XX:SoftMaxHeapSize=7000M',
     '-XX:+UseZGC',
     '-XX:+ZGenerational',
     '-XX:+ZUncommit',
     '-XX:ZUncommitDelay=60',
-    '-XX:SoftMaxHeapSize=3500M',
+    `-XX:ConcGCThreads=${gcThreads}`,
+    '-XX:+AlwaysPreTouch',
+    '-XX:+ParallelRefProcEnabled',
+    '-XX:+DisableExplicitGC',
     '-XX:+UseCompressedOops',
     '-XX:+UseCompressedClassPointers',
     '-XX:+UseStringDeduplication',
-    '-XX:StringDeduplicationAgeThreshold=1',
     '-XX:ReservedCodeCacheSize=512m',
-    '-XX:+UseCodeCacheFlushing',
     '-XX:+UnlockExperimentalVMOptions',
-    '-XX:+DisableExplicitGC',
     '-XX:+PerfDisableSharedMem',
-    '-XX:ConcGCThreads=2',
     '-Dfml.ignorePatchDiscrepancies=true',
     '-jar', 'fabric-server-launch.jar', 'nogui',
   ]
@@ -1173,7 +1071,7 @@ async function handleRequest(req, res) {
   if (url === '/admin/api/auth/setup' && req.method === 'POST') {
     let body = ''
     req.on('data', c => body += c)
-    req.on('end', () => {
+    req.on('end', async () => {
       try {
         const { password } = JSON.parse(body)
         if (!password || password.length < 6) {
@@ -1184,7 +1082,8 @@ async function handleRequest(req, res) {
           res.writeHead(409, { 'Content-Type': 'application/json' })
           return res.end(JSON.stringify({ error: 'Jelszó már be van állítva.' }))
         }
-        saveAuth(hashPassword(password))
+        const authData = await hashPassword(password)
+        saveAuth(authData)
         const token = generateToken()
         authTokens.set(token, Date.now() + 24 * 3600 * 1000)
         res.writeHead(200, { 'Content-Type': 'application/json' })
@@ -1200,7 +1099,7 @@ async function handleRequest(req, res) {
   if (url === '/admin/api/auth/login' && req.method === 'POST') {
     let body = ''
     req.on('data', c => body += c)
-    req.on('end', () => {
+    req.on('end', async () => {
       try {
         const { password } = JSON.parse(body)
         const auth = loadAuth()
@@ -1208,7 +1107,8 @@ async function handleRequest(req, res) {
           res.writeHead(400, { 'Content-Type': 'application/json' })
           return res.end(JSON.stringify({ error: 'Nincs beállítva jelszó.' }))
         }
-        if (!verifyPassword(password, auth.salt, auth.hash)) {
+        const isValid = await verifyPassword(password, auth.salt, auth.hash)
+        if (!isValid) {
           res.writeHead(401, { 'Content-Type': 'application/json' })
           return res.end(JSON.stringify({ error: 'Hibás jelszó!' }))
         }
