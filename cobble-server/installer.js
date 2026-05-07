@@ -489,6 +489,8 @@ const EXTRA_MODS = [
   { slug: 'glitchcore',                     loaders: ['fabric'], gameVersions: [MC_VERSION] },
   { slug: 'forge-config-api-port',          loaders: ['fabric'], gameVersions: [MC_VERSION] },
   { slug: 'fusion',                         loaders: ['fabric'], gameVersions: [MC_VERSION] },
+  { slug: 'servercore',                    loaders: ['fabric'], gameVersions: [MC_VERSION] },
+  { slug: 'spark',                         loaders: ['fabric'], gameVersions: [MC_VERSION] },
 ];
 
 /**
