@@ -37,7 +37,7 @@ const BLACKLISTED_MODS = [
   'biome-replacer', 'biomereplacer', 'nocubes', 'mobsbegone',
   'fancymenu', 'konkrete', 'drippyloadingscreen', 'loadingscreen', 'notenoughcrashes',
   'figura', 'admiral',
-  'vmp-fabric', 'cobbleoptimizer', 'lag-protection', 'lag_protection',
+  'vmp-fabric', 'lag-protection', 'lag_protection',
   'cobblelagclear', 'itemclearlag', 'fix-attack-lag', 'no-entity-lag'
 ];
 

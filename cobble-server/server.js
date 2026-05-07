@@ -621,28 +621,11 @@ function startMinecraft() {
   if (mcStatus === 'running' || !activeJavaPath) return
   console.log('[Minecraft] Szerver indítása (java -jar fabric-server-launch.jar nogui)...')
   
-  const cpuCores = require('os').cpus().length
-  const gcThreads = Math.max(2, Math.floor(cpuCores / 4))
-
-  // JVM args optimalizálva dinamikusan a géphez, Cobblemon/Fabric 1.21.1 szerverhez.
-  //
-  // ZGC: ultra-alacsony pause-idő GC, 2 játékoshoz ideális
-  //   • Xms=2G: előre lefoglalja a memóriát – elkerüli a heap növekedési GC spike-okat
-  //   • ZUncommit: tétlen időben visszaadja a lapokat az OS-nek
-  //   • ConcGCThreads: dinamikus, CPU magok / 4 (min 2)
-  //   • ParallelRefProcEnabled: referencia feldolgozás parallel
-  //   • DisableExplicitGC: megakadályozza a modok System.gc() hívását
   const serverJvmArgs = [
-    '-Xmx6G', '-Xms2G',
-    '-XX:+UseZGC',
-    '-XX:+ZGenerational',
-    '-XX:+ZUncommit',
-    '-XX:ZUncommitDelay=60',
-    `-XX:ConcGCThreads=${gcThreads}`,
-    '-XX:+ParallelRefProcEnabled',
-    '-XX:+DisableExplicitGC',
-    '-Xshare:auto',
-    '-jar', 'fabric-server-launch.jar', 'nogui',
+    '-Xmx12G',
+    '-Xms6G',
+    '-jar', 'fabric-server-launch.jar',
+    'nogui'
   ]
   mcProcess = spawn(activeJavaPath, serverJvmArgs, {
     cwd: DATA_DIR,
