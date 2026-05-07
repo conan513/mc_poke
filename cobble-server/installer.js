@@ -37,6 +37,7 @@ const BLACKLISTED_MODS = [
   'biome-replacer', 'biomereplacer', 'nocubes', 'mobsbegone',
   'fancymenu', 'konkrete', 'drippyloadingscreen', 'loadingscreen', 'notenoughcrashes',
   'figura', 'admiral',
+  'cobblemon-rankeds', 'cobblemau',
   'vmp-fabric', 'lag-protection', 'lag_protection',
   'cobblelagclear', 'itemclearlag', 'fix-attack-lag', 'no-entity-lag'
 ];
@@ -430,7 +431,6 @@ const EXTRA_MODS = [
   { slug: 'cobblemon-mount-mastery',        loaders: ['fabric'], gameVersions: [MC_VERSION] },
   { slug: 'cobblemon-smartphone',           loaders: ['fabric'], gameVersions: [MC_VERSION] },
   { slug: 'trainer-accessories',            loaders: ['fabric'], gameVersions: [MC_VERSION] },
-  { slug: 'cobblemon-rankeds',              loaders: ['fabric'], gameVersions: [MC_VERSION] },
   { slug: 'more-cobblemon-stats',           loaders: ['fabric'], gameVersions: [MC_VERSION] },
   { slug: 'cobblemon-max-level-catch-cap',  loaders: ['fabric'], gameVersions: [MC_VERSION] },
   { slug: 'cobblemon-capture-notification', loaders: ['fabric'], gameVersions: [MC_VERSION] },
