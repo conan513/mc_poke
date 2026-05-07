@@ -39,7 +39,8 @@ const BLACKLISTED_MODS = [
   'figura', 'admiral',
   'cobblemon-rankeds', 'cobblemau',
   'vmp-fabric', 'lag-protection', 'lag_protection',
-  'cobblelagclear', 'itemclearlag', 'fix-attack-lag', 'no-entity-lag'
+  'cobblelagclear', 'itemclearlag', 'fix-attack-lag', 'no-entity-lag',
+  'rustlingspot', 'mikeskills'
 ];
 
 
@@ -434,7 +435,6 @@ const EXTRA_MODS = [
   { slug: 'more-cobblemon-stats',           loaders: ['fabric'], gameVersions: [MC_VERSION] },
   { slug: 'cobblemon-max-level-catch-cap',  loaders: ['fabric'], gameVersions: [MC_VERSION] },
   { slug: 'cobblemon-capture-notification', loaders: ['fabric'], gameVersions: [MC_VERSION] },
-  { slug: 'cobblemon-rustling-spots',       loaders: ['fabric'], gameVersions: [MC_VERSION] },
   { slug: 'cobblemon-cobbled-levels',       loaders: ['fabric'], gameVersions: [MC_VERSION] },
   { slug: 'village-spawn-point',            loaders: ['fabric'], gameVersions: [MC_VERSION] },
   { slug: 'easyauth',                       loaders: ['fabric'], gameVersions: [MC_VERSION] },
@@ -466,7 +466,6 @@ const EXTRA_MODS = [
   { slug: 'cobblemon-auto-battle',          loaders: ['fabric'], gameVersions: [MC_VERSION] },
   { slug: 'cobblemon_expeditions',          loaders: ['fabric'], gameVersions: [MC_VERSION] },
   { slug: 'cobblemonoptimizer',             loaders: ['fabric'], gameVersions: [MC_VERSION] },
-  { slug: 'cobblemon-mike-skills',          loaders: ['fabric'], gameVersions: [MC_VERSION] },
   { slug: 'trainer-pass',                   loaders: ['fabric'], gameVersions: [MC_VERSION] },
   { slug: 'tc-cobble-flight',               loaders: ['fabric'], gameVersions: [MC_VERSION] },
   { slug: 'cobblemon-tents',                loaders: ['fabric'], gameVersions: [MC_VERSION] },
