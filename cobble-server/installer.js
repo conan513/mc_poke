@@ -497,6 +497,7 @@ const EXTRA_MODS = [
   { slug: 'scalablelux',                   loaders: ['fabric'], gameVersions: [MC_VERSION] },
   { slug: 'lmd',                           loaders: ['fabric'], gameVersions: [MC_VERSION] },
   { slug: 'packet-fixer',                  loaders: ['fabric'], gameVersions: [MC_VERSION] },
+  { slug: 'almanac',                       loaders: ['fabric'], gameVersions: [MC_VERSION] },
 ];
 
 /**
