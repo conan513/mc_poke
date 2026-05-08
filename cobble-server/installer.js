@@ -491,6 +491,12 @@ const EXTRA_MODS = [
   { slug: 'fusion',                         loaders: ['fabric'], gameVersions: [MC_VERSION] },
   { slug: 'servercore',                    loaders: ['fabric'], gameVersions: [MC_VERSION] },
   { slug: 'spark',                         loaders: ['fabric'], gameVersions: [MC_VERSION] },
+  // Teljesítmény optimalizáló modok
+  { slug: 'krypton',                       loaders: ['fabric'], gameVersions: [MC_VERSION] },
+  { slug: 'ksyxis',                        loaders: ['fabric'], gameVersions: [MC_VERSION] },
+  { slug: 'scalablelux',                   loaders: ['fabric'], gameVersions: [MC_VERSION] },
+  { slug: 'lmd',                           loaders: ['fabric'], gameVersions: [MC_VERSION] },
+  { slug: 'packet-fixer',                  loaders: ['fabric'], gameVersions: [MC_VERSION] },
 ];
 
 /**
