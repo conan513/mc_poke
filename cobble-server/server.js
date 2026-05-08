@@ -182,6 +182,66 @@ mysql {
 
 // ── Creeper Firework Auto-Config ─────────────────────────────
 
+// ── ServerCore Auto-Config ───────────────────────────────────
+/**
+ * ServerCore telepítve van, de config nélkül alapértelmezetten fut.
+ * Ez a függvény optimált beállításokat ír ki indításkor:
+ *  - entity tick throttling (a legtöbb lag-spike forrása Cobblemon szervereken)
+ *  - chunk load limit (megakadályozza a hirtelen chunk-burst-öket)
+ *  - max entity cap per chunk
+ */
+function configureServerCore() {
+  const scDir  = path.join(DATA_DIR, 'config', 'servercore')
+  const scPath = path.join(scDir, 'config.toml')
+
+  if (!fs.existsSync(scDir)) fs.mkdirSync(scDir, { recursive: true })
+
+  // Mindig felülírjuk, hogy a kód legyen az igazság forrása
+  const config = `# ServerCore – auto-generált konfig (cobble-server/server.js)
+# Részletes dokumentáció: https://modrinth.com/mod/servercore
+
+[optimizations]
+  # Throttle entities that haven't been near a player for a while.
+  # Ez az egyetlen legnagyobb hatású beállítás Cobblemon modpackokon.
+  enable_entity_slowdown = true
+
+  # Milliseconds per tick budget for inactive entities (default: 40 = 2 ticks/s).
+  # 50 = max 1 tick per 50ms for inactive mobs → drasztikusan csökkenti a Pokémon AI overhead-et.
+  inactive_entity_slowdown = 50
+
+  # Aggressively limit the number of entities loaded per chunk.
+  # Cobblemon alapból nagyon sok entity-t spawn-ol.
+  enable_entity_cramming = false
+
+[chunk_loading]
+  # Max chunks loaded per tick by a single player during exploration.
+  # Alapértelmezés nincs korlátozva – ez okozza a felfedezési lag spike-okat.
+  max_chunk_loads_per_tick = 8
+
+  # Disable simulation of chunks that have no nearby players.
+  disable_unloaded_chunk_simulation = true
+
+[entity_limits]
+  # Global entity cap per chunk (minden entity típusra összesen).
+  # Alapértelmezés: végtelen. Cobblemonnal ez gyorsan 200+ entity/chunk-hoz vezet.
+  global_cap = 80
+
+  # Mob-specifikus korlátok
+  [entity_limits.limits]
+    "minecraft:bat" = 4
+    "minecraft:cod" = 8
+    "minecraft:salmon" = 8
+    "minecraft:tropical_fish" = 8
+`
+
+  try {
+    fs.writeFileSync(scPath, config, 'utf8')
+    console.log('[ServerCore] config.toml kiírva.')
+  } catch (e) {
+    console.error('[ServerCore] Hiba a konfiguráció írása közben:', e.message)
+  }
+}
+
 
 // ── Cobblemon Excitement Auto-Config ──────────────────────────
 function configureCobblemonExcitement() {
@@ -253,6 +313,7 @@ async function initDatabase() {
   configureEasyAuth()
   configureSkinRestorer()
   configureCobblemonExcitement()
+  configureServerCore()
   
   try {
     // Első csatlakozás adatbázis nélkül, hogy létrehozzuk ha nincs
@@ -624,9 +685,12 @@ function startMinecraft() {
   const serverJvmArgs = [
     '-Xmx8G',
     '-Xms8G',
+    // G1GC – Aikar-féle alap, finomhangolva a spike-ok csökkentésére
     '-XX:+UseG1GC',
     '-XX:+ParallelRefProcEnabled',
-    '-XX:MaxGCPauseMillis=200',
+    // MaxGCPauseMillis: 200ms → 50ms. Régen 200ms-t is megállhatott a tick thread
+    // GC közben – ez okozta a látható 1-2 mp-es fagyásokat.
+    '-XX:MaxGCPauseMillis=50',
     '-XX:+UnlockExperimentalVMOptions',
     '-XX:+DisableExplicitGC',
     '-XX:+AlwaysPreTouch',
@@ -636,12 +700,17 @@ function startMinecraft() {
     '-XX:G1ReservePercent=20',
     '-XX:G1HeapWastePercent=5',
     '-XX:G1MixedGCCountTarget=4',
-    '-XX:InitiatingHeapOccupancyPercent=15',
+    // IHOP: 15% → 25%. 8GB heap-nél 15% = 1.2GB-nál már GC indult → túl agresszív,
+    // ezért volt folyamatos GC overhead annak ellenére hogy a hardver látszólag szabad volt.
+    // 25% = kb. 2GB-nál indul, kevesebb de hosszabb ciklus, kisebb zaj a tick threaden.
+    '-XX:InitiatingHeapOccupancyPercent=25',
     '-XX:G1MixedGCLiveThresholdPercent=90',
     '-XX:G1RSetUpdatingPauseTimePercent=5',
     '-XX:SurvivorRatio=32',
     '-XX:+PerfDisableSharedMem',
     '-XX:MaxTenuringThreshold=1',
+    // GC naplózás – a jövőbeli spike-okat korrelálni lehet a GC eseményekkel
+    '-Xlog:gc:file=logs/gc.log:time,uptime,level,tags:filecount=5,filesize=20m',
     '-jar', 'fabric-server-launch.jar',
     'nogui'
   ]
@@ -652,49 +721,61 @@ function startMinecraft() {
   mcStatus = 'running'
   isServerReady = false
 
+  // Előre fordított regex-ek – egyszer fordulnak le, nem minden data event-nél
+  const RE_DONE  = /Done \(.*s\)! For help, type "help"/
+  const RE_JOIN  = /:\s+([a-zA-Z0-9_]{3,16})\s+joined the game/
+  const RE_LEAVE = /:\s+([a-zA-Z0-9_]{3,16})\s+left the game/
+
   mcProcess.stdout.on('data', (data) => {
     process.stdout.write(data) // Továbbítjuk a konzolra
 
-    const lines = data.toString().split('\n')
+    const text = data.toString()
+
+    // Gyors pre-filter: ha a chunk nem tartalmaz kulcsszavakat, ne parse-oljuk soronként.
+    // Ez csökkenti a regex overhead-et nagy log volumennél (pl. Cobblemon debug spam).
+    const hasDone  = text.includes('For help, type "help"')
+    const hasJoin  = text.includes('joined the game')
+    const hasLeave = text.includes('left the game')
+    if (!hasDone && !hasJoin && !hasLeave) return
+
+    const lines = text.split('\n')
     for (const line of lines) {
       // Whitelist bekapcsolása amikor a szerver kész
-      if (line.includes('Done (') && line.includes('s)! For help, type "help"')) {
+      if (hasDone && RE_DONE.test(line)) {
         console.log('[Minecraft] Szerver kész, whitelist bekapcsolása és gamerule beállítása...')
         isServerReady = true
         serverEvents.emit('ready')
         sendCommand('whitelist on')
         sendCommand('gamerule keepInventory true')
-        // Announce daily pokemon
         if (currentShowcase) {
           sendCommand(`say [Server] A mai nap Pokémonja: ${currentShowcase.name}! Spawn rate BOOST aktív!`)
         }
       }
 
       // "Herobrine joined the game"
-      const joinMatch = line.match(/:\s+([a-zA-Z0-9_]{3,16})\s+joined the game/)
-      if (joinMatch) {
-        onlinePlayers.add(joinMatch[1])
-        // Ha bent van, levehetjük a whitelistről? Nem, jobb ha rajta marad amíg online.
+      if (hasJoin) {
+        const joinMatch = line.match(RE_JOIN)
+        if (joinMatch) onlinePlayers.add(joinMatch[1])
       }
 
       // "Herobrine left the game"
-      const leaveMatch = line.match(/:\s+([a-zA-Z0-9_]{3,16})\s+left the game/)
-      if (leaveMatch) {
-        const user = leaveMatch[1]
-        onlinePlayers.delete(user)
-        console.log(`[Minecraft] ${user} kilépett. Whitelist eltávolítás 5 perc múlva (grace period)...`)
-        
-        // Várjunk 5 percet mielőtt levesszük, hogy legyen idő újracsatlakozni crash esetén
-        setTimeout(() => {
-          if (!onlinePlayers.has(user)) {
-            console.log(`[Minecraft] ${user} grace period lejárt, eltávolítás a whitelistről.`)
-            sendCommand(`easywhitelist remove ${user}`)
-            sendCommand(`whitelist remove ${user}`)
-            verifiedLaunchers.delete(user)
-          } else {
-            console.log(`[Minecraft] ${user} visszalépett a grace period alatt, whitelist megtartva.`)
-          }
-        }, 5 * 60 * 1000)
+      if (hasLeave) {
+        const leaveMatch = line.match(RE_LEAVE)
+        if (leaveMatch) {
+          const user = leaveMatch[1]
+          onlinePlayers.delete(user)
+          console.log(`[Minecraft] ${user} kilépett. Whitelist eltávolítás 5 perc múlva (grace period)...`)
+          setTimeout(() => {
+            if (!onlinePlayers.has(user)) {
+              console.log(`[Minecraft] ${user} grace period lejárt, eltávolítás a whitelistről.`)
+              sendCommand(`easywhitelist remove ${user}`)
+              sendCommand(`whitelist remove ${user}`)
+              verifiedLaunchers.delete(user)
+            } else {
+              console.log(`[Minecraft] ${user} visszalépett a grace period alatt, whitelist megtartva.`)
+            }
+          }, 5 * 60 * 1000)
+        }
       }
     }
   })
