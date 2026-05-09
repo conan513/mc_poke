@@ -214,10 +214,12 @@ function configureServerCore() {
 
 [chunk_loading]
   # Max chunks loaded per tick by a single player during exploration.
-  # 6 = mérsékelt chunk burst limit (alapértelmezés: nincs határ).
-  max_chunk_loads_per_tick = 6
+  # RUBBER BANDING FIX: 6 → 32. PokeBike és más gyors járművek lónál 2-3x gyorsabbak,
+  # ezért 20 is kevés lehet. 32 fedezi a gyors járműveket is rubber band nélkül.
+  max_chunk_loads_per_tick = 32
 
-  # Disable simulation of chunks that have no nearby players.
+  # true = CPU megtakarítás: játékosoktól messze lévő chunkok nem tickelnek.
+  # Ez NEM okoz rubber bandingot – a visszadobás oka a GC szünet volt, nem ez.
   disable_unloaded_chunk_simulation = true
 
 [entity_limits]
@@ -313,11 +315,72 @@ function configureCobblemonExcitement() {
 
 let pool = null
 
+// ── server.properties Auto-Config ──────────────────────────
+/**
+ * Beállítja a kritikus server.properties értékeket:
+ *  - simulation-distance: csökkenti a Pokémon AI terhelését messze lévő chunkokban
+ *  - network-compression-threshold: csökkenti a tömörítési overhead-et helyi hálón
+ *  - view-distance: optimalizált látótávolság
+ */
+function configureServerProperties() {
+  const propsPath = path.join(DATA_DIR, 'server.properties')
+  if (!fs.existsSync(propsPath)) {
+    console.log('[server.properties] Fájl nem létezik még, szerver első indításkor hozza létre. Kihagyás.')
+    return
+  }
+
+  const PROPS_TO_SET = {
+    // Szimuláció távolság: a szerver ennyi chunkban futtatja a játéklogikát (entity AI, növény növekedés, stb.).
+    // 6 = ~96 blokk. Csökkenti a Cobblemon Pokémon AI overhead-et messze lévő chunkokban.
+    // Hatás: kevesebb TPS-tolvaj entitás → egyenletesebb tick → kevesebb rubber band.
+    'simulation-distance': '6',
+    // Látótávolság: a kliens ennyi chunkot lát vizuálisan (nem kell szimulálni mind).
+    // 10 = jó kompromisszum teljesítmény és élmény között.
+    'view-distance': '10',
+    // Hálózati tömörítési küszöb bájtban. 256 = minden packetet tömörít.
+    // Internet-en ez JOBB: csökkenti a sávszélességet és a ping-et távolról csatlakozó játékosoknál.
+    'network-compression-threshold': '256',
+    // Online mód kikapcsolva marad (saját auth van EasyAuth-on keresztül)
+    'online-mode': 'false',
+  }
+
+  try {
+    let content = fs.readFileSync(propsPath, 'utf8')
+    let modified = false
+
+    for (const [key, value] of Object.entries(PROPS_TO_SET)) {
+      const regex = new RegExp(`^${key}=.*`, 'm')
+      if (regex.test(content)) {
+        const currentVal = content.match(regex)[0].split('=')[1]
+        if (currentVal !== value) {
+          content = content.replace(regex, `${key}=${value}`)
+          modified = true
+          console.log(`[server.properties] ${key}: ${currentVal} → ${value}`)
+        }
+      } else {
+        content += `\n${key}=${value}`
+        modified = true
+        console.log(`[server.properties] ${key}=${value} hozzáadva`)
+      }
+    }
+
+    if (modified) {
+      fs.writeFileSync(propsPath, content, 'utf8')
+      console.log('[server.properties] Frissítve.')
+    } else {
+      console.log('[server.properties] Minden beállítás naprakész.')
+    }
+  } catch (e) {
+    console.error('[server.properties] Hiba:', e.message)
+  }
+}
+
 async function initDatabase() {
   configureEasyAuth()
   configureSkinRestorer()
   configureCobblemonExcitement()
   configureServerCore()
+  configureServerProperties()
   
   try {
     // Első csatlakozás adatbázis nélkül, hogy létrehozzuk ha nincs
@@ -372,10 +435,30 @@ async function initDatabase() {
         last_claim TIMESTAMP DEFAULT CURRENT_TIMESTAMP
       )
     `
+    const campaignTableQuery = `
+      CREATE TABLE IF NOT EXISTS campaign_progress (
+        username VARCHAR(100) PRIMARY KEY,
+        defeated_ids JSON DEFAULT '[]',
+        claimed_ids  JSON DEFAULT '[]',
+        started_at   TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        last_updated TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+      )
+    `
     await pool.query(tableQuery)
     await pool.query(playersTableQuery)
     await pool.query(usersTableQuery)
     await pool.query(rewardsTableQuery)
+    await pool.query(campaignTableQuery)
+
+    // Migrate campaign_progress: add claimed_ids if old schema (defeated_count column)
+    try {
+      await pool.query('ALTER TABLE campaign_progress ADD COLUMN claimed_ids JSON DEFAULT \'[]\'')
+      console.log('[Campaign] claimed_ids oszlop hozzáadva a campaign_progress táblához.')
+    } catch (_) { /* már létezik */ }
+    try {
+      await pool.query('ALTER TABLE campaign_progress DROP COLUMN defeated_count')
+    } catch (_) { /* nem létezik */ }
+
 
     // Ha a tábla korábban jött létre a data oszlop nélkül, ezzel hozzáadjuk
     try {
@@ -718,12 +801,14 @@ function startMinecraft() {
     '-Dgraal.CompilerConfiguration=enterprise', // Oracle EE compiler konfig
     // ── G1GC (kötelező GraalVM-mel) ──────────
     '-XX:+UseG1GC',
-    '-XX:MaxGCPauseMillis=80',         // 130→80ms: rövidebb GC szünet → kevesebb TPS drop
+    '-XX:MaxGCPauseMillis=37',         // RUBBER BAND FIX: 80→37ms. 1 tick = 50ms, tehát 80ms
+                                       // szünet = 1.6 tick kiesés → szerver visszadobja a játékost.
+                                       // 37ms < 50ms (1 tick), így GC befér egy tick résbe.
     '-XX:G1HeapRegionSize=16M',
     '-XX:G1NewSizePercent=28',
     '-XX:G1ReservePercent=20',
     '-XX:G1MixedGCCountTarget=3',
-    '-XX:InitiatingHeapOccupancyPercent=15', // 10→15%: kevesebb idő előre GC, jobb throughput
+    '-XX:InitiatingHeapOccupancyPercent=20', // 15→20%: ritkábban triggerel GC → kevesebb szünet
     '-XX:G1MixedGCLiveThresholdPercent=90',
     '-XX:G1RSetUpdatingPauseTimePercent=0',
     '-XX:SurvivorRatio=32',
@@ -746,6 +831,29 @@ function startMinecraft() {
   const RE_DONE  = /Done \(.*s\)! For help, type "help"/
   const RE_JOIN  = /:\s+([a-zA-Z0-9_]{3,16})\s+joined the game/
   const RE_LEAVE = /:\s+([a-zA-Z0-9_]{3,16})\s+left the game/
+  const RE_CAMPAIGN = /\[CAMPAIGN_DEFEAT\]\s+([a-zA-Z0-9_]{3,16})\s+([a-zA-Z0-9_]+)/
+
+  // Segédfüggvény a győzelem adatbázisba mentéséhez
+  const triggerCampaignDefeat = (pName, stageId) => {
+    console.log(`[Campaign] Játékbeli győzelem észlelve: ${pName} legyőzte: ${stageId}`)
+    if (pool) {
+      pool.query('SELECT defeated_ids FROM campaign_progress WHERE username = ?', [pName]).then(([rows]) => {
+        let defIds = []
+        if (rows.length > 0) {
+          try { defIds = JSON.parse(rows[0].defeated_ids || '[]') } catch(_) {}
+        }
+        if (!defIds.includes(stageId)) {
+          defIds.push(stageId)
+          if (rows.length > 0) {
+            pool.query('UPDATE campaign_progress SET defeated_ids = ? WHERE username = ?', [JSON.stringify(defIds), pName])
+          } else {
+            pool.query('INSERT INTO campaign_progress (username, defeated_ids) VALUES (?, ?)', [pName, JSON.stringify(defIds)])
+          }
+          sendCommand(`tellraw ${pName} {"text":"[Kampány] Új kihívót győztél le! Nyisd meg a Launchert a jutalom átvételéhez!","color":"green","bold":true}`)
+        }
+      }).catch(e => console.error('[Campaign] DB hiba defeat update-nél:', e.message))
+    }
+  }
 
   mcProcess.stdout.on('data', (data) => {
     process.stdout.write(data) // Továbbítjuk a konzolra
@@ -757,7 +865,8 @@ function startMinecraft() {
     const hasDone  = text.includes('For help, type "help"')
     const hasJoin  = text.includes('joined the game')
     const hasLeave = text.includes('left the game')
-    if (!hasDone && !hasJoin && !hasLeave) return
+    const hasCamp  = text.includes('[CAMPAIGN_DEFEAT]')
+    if (!hasDone && !hasJoin && !hasLeave && !hasCamp) return
 
     const lines = text.split('\n')
     for (const line of lines) {
@@ -773,7 +882,47 @@ function startMinecraft() {
         }
       }
 
+      // Campaign Defeat parser (Saját [CAMPAIGN_DEFEAT] tag alapján)
+      if (hasCamp && RE_CAMPAIGN.test(line)) {
+        const campMatch = line.match(RE_CAMPAIGN)
+        if (campMatch) {
+          triggerCampaignDefeat(campMatch[1], campMatch[2])
+        }
+      }
+
+      // Advancement parser (Kihívások figyelése)
+      const hasAdv = text.includes('has made the advancement')
+      if (hasAdv) {
+        const RE_ADV = /:\s+([a-zA-Z0-9_]{3,16})\s+has made the advancement\s+\[(.*?)\]/
+        const advMatch = line.match(RE_ADV)
+        if (advMatch) {
+          const pName = advMatch[1]
+          const advName = advMatch[2]
+          
+          // Badge mapping
+          const BADGE_MAP = {
+            'Boulder Badge': 'brock',
+            'Cascade Badge': 'misty',
+            'Thunder Badge': 'lt_surge',
+            'Rainbow Badge': 'erika',
+            'Soul Badge': 'koga',
+            'Marsh Badge': 'sabrina',
+            'Volcano Badge': 'blaine',
+            'Earth Badge': 'giovanni'
+          }
+          
+          // Ha a megszerzett advancement neve szerepel a listánkban
+          for (const [badgeText, stageId] of Object.entries(BADGE_MAP)) {
+            if (advName.includes(badgeText)) {
+              triggerCampaignDefeat(pName, stageId)
+              break
+            }
+          }
+        }
+      }
+
       // "Herobrine joined the game"
+
       if (hasJoin) {
         const joinMatch = line.match(RE_JOIN)
         if (joinMatch) onlinePlayers.add(joinMatch[1])
@@ -799,6 +948,7 @@ function startMinecraft() {
         }
       }
     }
+
   })
 
   mcProcess.on('close', (code) => {
@@ -1449,6 +1599,316 @@ async function handleRequest(req, res) {
         console.error('[Rewards] Hiba:', e.message)
         res.writeHead(500, { 'Content-Type': 'application/json' })
         res.end(JSON.stringify({ error: 'Hiba a jutalom begyűjtésekor.' }))
+      }
+    })
+    return
+  }
+
+  // ── Campaign API ───────────────────────────────────────────
+  /**
+   * A Kanto Gym → Elite 4 → Champion haladás rendszer.
+   * Sorrend: Brock → Misty → Lt. Surge → Erika → Koga → Sabrina → Blaine → Giovanni
+   *          → Lorelei → Bruno → Agatha → Lance → Blue (Champion)
+   */
+  const CAMPAIGN_STAGES = [
+    // === GYM LEADERS ===
+    {
+      id: 'brock', stageIndex: 0, type: 'gym',
+      name: 'Brock', title: 'Pewter City Gym Leader',
+      badge: 'Boulder Badge', badgeIcon: '🪨',
+      type2: 'Rock', specialty: 'Kő típusú Pokémonok',
+      pokemon: ['Geodude (Lv 12)', 'Onix (Lv 14)'],
+      levelCap: 14,
+      hint: 'Keress meg egy kőhegyi területen (Mountain / Stony Peaks biom). Víz vagy Fű típusú Pokémon ajánlott!',
+      reward: { cobbledollars: 300, items: ['cobblemon:poke_ball 5'] },
+      rewardText: '300 CobbleDollar + 5 Pokéball',
+      sprite: 'brock'
+    },
+    {
+      id: 'misty', stageIndex: 1, type: 'gym',
+      name: 'Misty', title: 'Cerulean City Gym Leader',
+      badge: 'Cascade Badge', badgeIcon: '💧',
+      type2: 'Water', specialty: 'Víz típusú Pokémonok',
+      pokemon: ['Staryu (Lv 18)', 'Starmie (Lv 21)'],
+      levelCap: 21,
+      hint: 'Tengerpart vagy folyóparti területen (Beach / River biom) találod. Elektromos vagy Fű típus hatékony!',
+      reward: { cobbledollars: 500, items: ['cobblemon:great_ball 5'] },
+      rewardText: '500 CobbleDollar + 5 Great Ball',
+      sprite: 'misty'
+    },
+    {
+      id: 'lt_surge', stageIndex: 2, type: 'gym',
+      name: 'Lt. Surge', title: 'Vermilion City Gym Leader',
+      badge: 'Thunder Badge', badgeIcon: '⚡',
+      type2: 'Electric', specialty: 'Elektromos Pokémonok',
+      pokemon: ['Voltorb (Lv 21)', 'Pikachu (Lv 18)', 'Raichu (Lv 24)'],
+      levelCap: 24,
+      hint: 'Síkságon (Plains / Savanna biom) keresd. Föld típusú Pokémon immunis az elektromosra!',
+      reward: { cobbledollars: 700, items: ['cobblemon:great_ball 10'] },
+      rewardText: '700 CobbleDollar + 10 Great Ball',
+      sprite: 'lt_surge'
+    },
+    {
+      id: 'erika', stageIndex: 3, type: 'gym',
+      name: 'Erika', title: 'Celadon City Gym Leader',
+      badge: 'Rainbow Badge', badgeIcon: '🌿',
+      type2: 'Grass', specialty: 'Fű típusú Pokémonok',
+      pokemon: ['Victreebel (Lv 29)', 'Tangela (Lv 24)', 'Vileplume (Lv 29)'],
+      levelCap: 29,
+      hint: 'Erdős területen (Forest / Jungle biom) jelenik meg. Tűz, Repülő vagy Méh típus ellen gyenge!',
+      reward: { cobbledollars: 1000, items: ['cobblemon:ultra_ball 3'] },
+      rewardText: '1000 CobbleDollar + 3 Ultra Ball',
+      sprite: 'erika'
+    },
+    {
+      id: 'koga', stageIndex: 4, type: 'gym',
+      name: 'Koga', title: 'Fuchsia City Gym Leader',
+      badge: 'Soul Badge', badgeIcon: '💜',
+      type2: 'Poison', specialty: 'Méreg típusú Pokémonok',
+      pokemon: ['Koffing (Lv 37)', 'Muk (Lv 39)', 'Koffing (Lv 37)', 'Weezing (Lv 43)'],
+      levelCap: 43,
+      hint: 'Mocsaras területen (Swamp / Mangrove biom) bujkál. Föld vagy Pszichikus típus megveri!',
+      reward: { cobbledollars: 1500, items: ['cobblemon:ultra_ball 5'] },
+      rewardText: '1500 CobbleDollar + 5 Ultra Ball',
+      sprite: 'koga'
+    },
+    {
+      id: 'sabrina', stageIndex: 5, type: 'gym',
+      name: 'Sabrina', title: 'Saffron City Gym Leader',
+      badge: 'Marsh Badge', badgeIcon: '🔮',
+      type2: 'Psychic', specialty: 'Pszichikus Pokémonok',
+      pokemon: ['Kadabra (Lv 38)', 'Mr. Mime (Lv 37)', 'Venomoth (Lv 38)', 'Alakazam (Lv 43)'],
+      levelCap: 46,
+      hint: 'Misztikus helyen (Mystical Grove / Dark Forest biom) található. Sötét vagy Szellem típus hatékony!',
+      reward: { cobbledollars: 2000, items: ['cobblemon:ultra_ball 8'] },
+      rewardText: '2000 CobbleDollar + 8 Ultra Ball',
+      sprite: 'sabrina'
+    },
+    {
+      id: 'blaine', stageIndex: 6, type: 'gym',
+      name: 'Blaine', title: 'Cinnabar Island Gym Leader',
+      badge: 'Volcano Badge', badgeIcon: '🔥',
+      type2: 'Fire', specialty: 'Tűz típusú Pokémonok',
+      pokemon: ['Growlithe (Lv 42)', 'Ponyta (Lv 40)', 'Rapidash (Lv 42)', 'Arcanine (Lv 47)'],
+      levelCap: 50,
+      hint: 'Vulkáni / sziklás területen (Basalt Deltas / Volcanic biom) él. Víz típus könnyedén legyőzi!',
+      reward: { cobbledollars: 2500, items: ['cobblemon:ultra_ball 10'] },
+      rewardText: '2500 CobbleDollar + 10 Ultra Ball',
+      sprite: 'blaine'
+    },
+    {
+      id: 'giovanni', stageIndex: 7, type: 'gym',
+      name: 'Giovanni', title: 'Viridian City Gym Leader',
+      badge: 'Earth Badge', badgeIcon: '🌍',
+      type2: 'Ground', specialty: 'Föld típusú Pokémonok',
+      pokemon: ['Rhyhorn (Lv 45)', 'Dugtrio (Lv 42)', 'Nidoqueen (Lv 44)', 'Nidoking (Lv 45)', 'Rhydon (Lv 50)'],
+      levelCap: 55,
+      hint: 'A Sivatagban (Desert / Mesa biom) találod a Rocket Boss t. Víz vagy Fű típus a legjobb választás!',
+      reward: { cobbledollars: 3000, items: ['cobblemon:master_ball 1'] },
+      rewardText: '3000 CobbleDollar + 1 Master Ball 🎉',
+      sprite: 'giovanni'
+    },
+    // === ELITE 4 ===
+    {
+      id: 'lorelei', stageIndex: 8, type: 'elite4',
+      name: 'Lorelei', title: 'Elit 4 – 1. tag',
+      badge: 'Elite Badge I', badgeIcon: '🏅',
+      type2: 'Ice', specialty: 'Jég típusú Pokémonok',
+      pokemon: ['Dewgong (Lv 54)', 'Cloyster (Lv 53)', 'Slowbro (Lv 54)', 'Jynx (Lv 56)', 'Lapras (Lv 60)'],
+      levelCap: 60,
+      hint: 'A fagyos hegycsúcsokon (Frozen Peaks / Snowy Slopes biom) vár. Harc vagy Kő típus ellen gyenge!',
+      reward: { cobbledollars: 4000, items: ['cobblemon:ultra_ball 15'] },
+      rewardText: '4000 CobbleDollar + 15 Ultra Ball',
+      sprite: 'lorelei'
+    },
+    {
+      id: 'bruno', stageIndex: 9, type: 'elite4',
+      name: 'Bruno', title: 'Elit 4 – 2. tag',
+      badge: 'Elite Badge II', badgeIcon: '🏅',
+      type2: 'Fighting', specialty: 'Harc típusú Pokémonok',
+      pokemon: ['Onix (Lv 53)', 'Hitmonchan (Lv 55)', 'Hitmonlee (Lv 55)', 'Onix (Lv 56)', 'Machamp (Lv 58)'],
+      levelCap: 60,
+      hint: 'A hegyi harcos területen (Stone Shore / Rocky biom) edzett bajnok. Pszichikus vagy Repülő típus ellen gyenge!',
+      reward: { cobbledollars: 4000, items: ['cobblemon:ultra_ball 15'] },
+      rewardText: '4000 CobbleDollar + 15 Ultra Ball',
+      sprite: 'bruno'
+    },
+    {
+      id: 'agatha', stageIndex: 10, type: 'elite4',
+      name: 'Agatha', title: 'Elit 4 – 3. tag',
+      badge: 'Elite Badge III', badgeIcon: '🏅',
+      type2: 'Ghost', specialty: 'Szellem típusú Pokémonok',
+      pokemon: ['Gengar (Lv 54)', 'Haunter (Lv 53)', 'Gengar (Lv 58)', 'Arbok (Lv 58)', 'Gengar (Lv 60)'],
+      levelCap: 60,
+      hint: 'A sötét erdőmélyen (Dark Forest / Soul Sand Valley biom) rejtőzik. Sötét típus immunis a Szellemre!',
+      reward: { cobbledollars: 4000, items: ['cobblemon:ultra_ball 15'] },
+      rewardText: '4000 CobbleDollar + 15 Ultra Ball',
+      sprite: 'agatha'
+    },
+    {
+      id: 'lance', stageIndex: 11, type: 'elite4',
+      name: 'Lance', title: 'Elit 4 – 4. tag (Sárkány mester)',
+      badge: 'Elite Badge IV', badgeIcon: '🏅',
+      type2: 'Dragon', specialty: 'Sárkány típusú Pokémonok',
+      pokemon: ['Gyarados (Lv 56)', 'Dragonair (Lv 54)', 'Dragonair (Lv 54)', 'Aerodactyl (Lv 58)', 'Dragonite (Lv 60)'],
+      levelCap: 62,
+      hint: 'A sárkányok barlangjában (Dragon biom / Extreme Hills) lakik. Jég típus NÉGYSZERESEN hatékony Sárkány ellen!',
+      reward: { cobbledollars: 5000, items: ['cobblemon:ultra_ball 20'] },
+      rewardText: '5000 CobbleDollar + 20 Ultra Ball',
+      sprite: 'lance'
+    },
+    // === CHAMPION ===
+    {
+      id: 'blue', stageIndex: 12, type: 'champion',
+      name: 'Blue', title: '👑 Bajnok',
+      badge: 'Champion', badgeIcon: '👑',
+      type2: 'Mixed', specialty: 'Vegyes típusú csapat',
+      pokemon: ['Pidgeot (Lv 59)', 'Alakazam (Lv 57)', 'Rhydon (Lv 59)', 'Arcanine (Lv 59)', 'Exeggutor (Lv 57)', 'Blastoise/Charizard/Venusaur (Lv 63)'],
+      levelCap: 65,
+      hint: 'Az utolsó kihívó – a Bajnoki Csarnokban vár. Kiegyensúlyozott, erős csapattal állj szembe!',
+      reward: { cobbledollars: 10000, items: ['cobblemon:master_ball 3'] },
+      rewardText: '10000 CobbleDollar + 3 Master Ball 🏆',
+      sprite: 'blue'
+    }
+  ]
+
+  if (url === '/api/campaign/stages' && req.method === 'GET') {
+    // Csak a publikus (nem-spoiler) adat: id, stageIndex, type, badgeIcon, name, badge – semmi más
+    const publicStages = CAMPAIGN_STAGES.map(s => ({
+      id: s.id, stageIndex: s.stageIndex, type: s.type,
+      name: s.name, badge: s.badge, badgeIcon: s.badgeIcon, type2: s.type2
+    }))
+    res.writeHead(200, { 'Content-Type': 'application/json' })
+    return res.end(JSON.stringify(publicStages))
+  }
+
+  if (url.startsWith('/api/campaign/status') && req.method === 'GET') {
+    const parsedUrl = new URL(req.url, `http://${req.headers.host}`)
+    const uname = parsedUrl.searchParams.get('username')
+    if (!uname) {
+      res.writeHead(400, { 'Content-Type': 'application/json' })
+      return res.end(JSON.stringify({ error: 'Hiányzó username.' }))
+    }
+    if (!pool) {
+      res.writeHead(503, { 'Content-Type': 'application/json' })
+      return res.end(JSON.stringify({ error: 'Adatbázis nem elérhető.' }))
+    }
+    try {
+      const [rows] = await pool.query('SELECT defeated_ids, claimed_ids FROM campaign_progress WHERE username = ?', [uname])
+      let defeated_ids = []
+      let claimed_ids = []
+      if (rows.length > 0) {
+        try { defeated_ids = JSON.parse(rows[0].defeated_ids || '[]') } catch(_) {}
+        try { claimed_ids = JSON.parse(rows[0].claimed_ids || '[]') } catch(_) {}
+      }
+      
+      // Az aktuális kihívó a claimed listából határozható meg
+      // Mert amíg nem claimelted a jutalmat, addig annál a stádiumnál vagy.
+      const currentStageIndex = claimed_ids.length
+      const currentStage = CAMPAIGN_STAGES[currentStageIndex] || null
+      
+      res.writeHead(200, { 'Content-Type': 'application/json' })
+      return res.end(JSON.stringify({ defeated_ids, claimed_ids, currentStageIndex, currentStage, total: CAMPAIGN_STAGES.length }))
+    } catch (e) {
+      res.writeHead(500, { 'Content-Type': 'application/json' })
+      return res.end(JSON.stringify({ error: 'Adatbázis hiba.' }))
+    }
+  }
+
+  // Meglévő complete végpont módosítása "claim" végponttá (kliens oldalon a gomb használja)
+  if (url === '/api/campaign/complete' && req.method === 'POST') {
+    let body = ''
+    req.on('data', c => body += c)
+    req.on('end', async () => {
+      try {
+        const { username: uname, stageId } = JSON.parse(body)
+        if (!uname || !stageId) {
+          res.writeHead(400, { 'Content-Type': 'application/json' })
+          return res.end(JSON.stringify({ error: 'Hiányzó adatok.' }))
+        }
+        if (!pool) {
+          res.writeHead(503, { 'Content-Type': 'application/json' })
+          return res.end(JSON.stringify({ error: 'Adatbázis nem elérhető.' }))
+        }
+
+        // Jelenlegi haladás lekérése
+        const [rows] = await pool.query('SELECT defeated_ids, claimed_ids FROM campaign_progress WHERE username = ?', [uname])
+        let defeated_ids = []
+        let claimed_ids = []
+        if (rows.length > 0) {
+          try { defeated_ids = JSON.parse(rows[0].defeated_ids || '[]') } catch(_) {}
+          try { claimed_ids = JSON.parse(rows[0].claimed_ids || '[]') } catch(_) {}
+        }
+
+        // Ellenőrzés: A játékos legyőzte-e egyáltalán a játékban?
+        if (!defeated_ids.includes(stageId)) {
+          res.writeHead(400, { 'Content-Type': 'application/json' })
+          return res.end(JSON.stringify({ error: 'Ezt a trainert még nem győzted le a szerveren! Keresd meg a játékban!' }))
+        }
+
+        // Ellenőrzés: a beküldött stageId valóban a soron következő-e a claimelésben?
+        const expectedStageIndex = claimed_ids.length
+        const expectedStage = CAMPAIGN_STAGES[expectedStageIndex]
+        if (!expectedStage || expectedStage.id !== stageId) {
+          res.writeHead(400, { 'Content-Type': 'application/json' })
+          return res.end(JSON.stringify({ error: 'Nem ezt a jutalmat kellene átvenned, vagy már átvetted.' }))
+        }
+
+        // Haladás mentése
+        claimed_ids.push(stageId)
+        if (rows.length > 0) {
+          await pool.query('UPDATE campaign_progress SET claimed_ids = ?, last_updated = NOW() WHERE username = ?',
+            [JSON.stringify(claimed_ids), uname])
+        } else {
+          // Ha valamiért itt kerül be, de defeated id-nál került be... ez elvileg sosem fut le
+        }
+
+        // Jutalmak kiadása Minecraft parancsokkal
+        const stage = expectedStage
+        if (stage.reward) {
+          if (stage.reward.cobbledollars) {
+            sendCommand(`cobbledollars add ${uname} ${stage.reward.cobbledollars}`)
+          }
+          if (stage.reward.items) {
+            for (const item of stage.reward.items) {
+              sendCommand(`give ${uname} ${item}`)
+            }
+          }
+          // Gratulációs üzenet a játékban a jutalomról
+          const stageLabel = stage.type === 'gym' ? `Gym Badge: ${stage.badge}` : stage.type === 'elite4' ? `Elit 4: ${stage.name}` : `🏆 BAJNOK!`
+          sendCommand(`tellraw ${uname} {"text":"[Kampány] Jutalmad átvéve: ${stage.name}! (${stageLabel}) Megkaptad: ${stage.rewardText}","color":"gold","bold":true}`)
+        }
+
+        console.log(`[Campaign] ${uname} átvette a jutalmat: ${stageId} (${claimed_ids.length}/${CAMPAIGN_STAGES.length})`)
+        const nextStage = CAMPAIGN_STAGES[claimed_ids.length] || null
+        res.writeHead(200, { 'Content-Type': 'application/json' })
+        return res.end(JSON.stringify({ success: true, claimed_count: claimed_ids.length, total: CAMPAIGN_STAGES.length, nextStage }))
+      } catch (e) {
+        console.error('[Campaign] Hiba:', e.message)
+        res.writeHead(500, { 'Content-Type': 'application/json' })
+        return res.end(JSON.stringify({ error: 'Szerver hiba.' }))
+      }
+    })
+    return
+  }
+
+  if (url === '/api/campaign/reset' && req.method === 'POST') {
+    // Admin-only reset (nem igényel tokent, de szerver-oldali secret kell)
+    let body = ''
+    req.on('data', c => body += c)
+    req.on('end', async () => {
+      try {
+        const { username: uname, secret } = JSON.parse(body)
+        if (secret !== LAUNCHER_SECRET) {
+          res.writeHead(403, { 'Content-Type': 'application/json' })
+          return res.end(JSON.stringify({ error: 'Hozzáférés megtagadva.' }))
+        }
+        if (!pool) { res.writeHead(503); return res.end('{}') }
+        await pool.query('DELETE FROM campaign_progress WHERE username = ?', [uname])
+        res.writeHead(200, { 'Content-Type': 'application/json' })
+        return res.end(JSON.stringify({ success: true }))
+      } catch (e) {
+        res.writeHead(500); return res.end(JSON.stringify({ error: e.message }))
       }
     })
     return

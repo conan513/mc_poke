@@ -567,10 +567,16 @@
               </span>
               <span data-i18n="home.play_btn">JÁTÉK INDÍTÁSA</span>
             </button>
-            <button class="btn-secondary" id="btn-console-toggle">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width: 16px; height: 16px; vertical-align: middle; margin-right: 6px;"><path d="M4 17l6-6-6-6"></path><path d="M12 19h8"></path></svg>
-              <span data-i18n="home.console_btn">Konzol</span>
-            </button>
+            <div style="display:flex; gap:8px;">
+              <button class="btn-secondary" id="btn-campaign" style="flex:1; display:flex; align-items:center; justify-content:center; gap:6px;">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width: 16px; height: 16px;"><path d="M3.85 8.62a4 4 0 0 1 4.78-4.77 4 4 0 0 1 6.74 0 4 4 0 0 1 4.78 4.78 4 4 0 0 1 0 6.74 4 4 0 0 1-4.77 4.78 4 4 0 0 1-6.75 0 4 4 0 0 1-4.78-4.77 4 4 0 0 1 0-6.76Z"></path><path d="m9 12 2 2 4-4"></path></svg>
+                <span>Kampány</span>
+              </button>
+              <button class="btn-secondary" id="btn-console-toggle" style="flex:1;">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width: 16px; height: 16px; vertical-align: middle; margin-right: 6px;"><path d="M4 17l6-6-6-6"></path><path d="M12 19h8"></path></svg>
+                <span data-i18n="home.console_btn">Konzol</span>
+              </button>
+            </div>
           </div>
 
           <div class="home-links">
@@ -667,6 +673,118 @@
               </span>
               <span class="btn-text" data-i18n="skin.save_btn">Mentés és Alkalmazás</span>
             </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── MODAL: Campaign Timeline ── -->
+    <div class="modal-overlay hidden" id="modal-campaign">
+      <div class="modal-card campaign-modal">
+        <div class="modal-header">
+          <h2 class="modal-title">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width: 20px; height: 20px; vertical-align: middle; margin-right: 8px; color: var(--accent-gold);"><path d="M3.85 8.62a4 4 0 0 1 4.78-4.77 4 4 0 0 1 6.74 0 4 4 0 0 1 4.78 4.78 4 4 0 0 1 0 6.74 4 4 0 0 1-4.77 4.78 4 4 0 0 1-6.75 0 4 4 0 0 1-4.78-4.77 4 4 0 0 1 0-6.76Z"></path><path d="m9 12 2 2 4-4"></path></svg>
+            <span>Kanto Kampány</span>
+          </h2>
+          <button class="modal-close" id="btn-close-campaign">✕</button>
+        </div>
+        <div class="modal-body" style="padding: 0; overflow: hidden; display: flex; flex-direction: column; height: 100%;">
+          <!-- Progress header -->
+          <div class="campaign-progress-header" id="campaign-progress-header">
+            <div class="campaign-progress-bar-bg">
+              <div class="campaign-progress-bar-fill" id="campaign-progress-fill"></div>
+            </div>
+            <div class="campaign-progress-text">
+              <span id="campaign-progress-label">Betöltés...</span>
+              <span id="campaign-progress-pct">0/13</span>
+            </div>
+          </div>
+
+          <!-- Timeline -->
+          <div class="campaign-timeline-wrap">
+            <!-- Timeline track -->
+            <div class="campaign-timeline" id="campaign-timeline">
+              <!-- JS tölti fel -->
+              <div class="campaign-loading">
+                <div class="loader-spinner"></div>
+                <span>Bettöltés...</span>
+              </div>
+            </div>
+
+            <!-- Current stage detail card -->
+            <div class="campaign-detail-panel" id="campaign-detail-panel">
+              <div class="campaign-detail-loading" id="campaign-detail-loading">
+                <div class="loader-spinner"></div>
+              </div>
+              <div class="campaign-detail-content hidden" id="campaign-detail-content">
+                <div class="campaign-detail-header">
+                  <div class="campaign-detail-sprite-wrap">
+                    <img id="campaign-detail-sprite" src="" alt="" class="campaign-sprite">
+                    <div class="campaign-sprite-glow"></div>
+                  </div>
+                  <div class="campaign-detail-info">
+                    <div class="campaign-stage-badge" id="campaign-stage-badge">Gym Leader</div>
+                    <h3 id="campaign-detail-name">Brock</h3>
+                    <p id="campaign-detail-title" class="campaign-detail-subtitle">Pewter City Gym Leader</p>
+                  </div>
+                </div>
+
+                <div class="campaign-detail-body">
+                  <div class="campaign-info-row">
+                    <span class="campaign-info-icon">🏅</span>
+                    <div>
+                      <strong>Jelvény</strong>
+                      <p id="campaign-detail-badge"></p>
+                    </div>
+                  </div>
+                  <div class="campaign-info-row">
+                    <span class="campaign-info-icon">⚡</span>
+                    <div>
+                      <strong>Specialitás</strong>
+                      <p id="campaign-detail-specialty"></p>
+                    </div>
+                  </div>
+                  <div class="campaign-info-row">
+                    <span class="campaign-info-icon">🐎</span>
+                    <div>
+                      <strong>Pokémonok</strong>
+                      <p id="campaign-detail-pokemon" style="font-size: 0.85rem;"></p>
+                    </div>
+                  </div>
+                  <div class="campaign-info-row">
+                    <span class="campaign-info-icon">📏</span>
+                    <div>
+                      <strong>Szint korlát</strong>
+                      <p id="campaign-detail-levelcap"></p>
+                    </div>
+                  </div>
+                  <div class="campaign-info-row campaign-hint-row">
+                    <span class="campaign-info-icon">🗺️</span>
+                    <div>
+                      <strong>Hol találod?</strong>
+                      <p id="campaign-detail-hint" style="font-size: 0.85rem; color: var(--accent-blue);"></p>
+                    </div>
+                  </div>
+                  <div class="campaign-reward-box">
+                    <span class="campaign-reward-label">🎁 Jutalom győzelem után:</span>
+                    <span id="campaign-detail-reward"></span>
+                  </div>
+                </div>
+
+                <button class="btn-primary campaign-complete-btn" id="btn-campaign-complete">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" style="width: 18px; height: 18px;"><path d="m9 12 2 2 4-4"></path><circle cx="12" cy="12" r="10"></circle></svg>
+                  Legyőztem! Jutalom kérése
+                </button>
+                <p class="campaign-complete-hint">Csak akkor nyomd meg, ha már valóban legyőztéd őt a játékban!</p>
+              </div>
+
+              <!-- Completed / Champion state -->
+              <div class="campaign-champion-state hidden" id="campaign-champion-state">
+                <div style="font-size: 4rem; margin-bottom: 15px;">🏆</div>
+                <h2 style="color: var(--accent-gold); margin-bottom: 10px;">Bajnok lettél!</h2>
+                <p style="color: #ccc;">Mind a 8 Gym Leadert és az Elit 4-et legyőztéd. A Kanto-i Pokémon Bajnokság győztese vagy!</p>
+              </div>
+            </div>
           </div>
         </div>
       </div>

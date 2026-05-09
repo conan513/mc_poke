@@ -1932,7 +1932,316 @@ $id('btn-hub-claim-reward').addEventListener('click', async () => {
   }
 })
 
-// ── External links ────────────────────────────────────────────
+// ── Campaign System ───────────────────────────────────────────
+/**
+ * Kanto Gym Leader → Elite 4 → Champion timeline.
+ * Adatok a szerverről jönnek (/api/campaign/status).
+ * A timeline csak az AKTUÁLIS ellenfelet mutatja részletesen,
+ * a többi zárolva (locked) vagy befejezve (done).
+ */
+
+// Sprite mapping – Showdown sprite nevei a karakterekhez
+const CAMPAIGN_SPRITES = {
+  brock:    'https://play.pokemonshowdown.com/sprites/xyani/onix.gif',
+  misty:    'https://play.pokemonshowdown.com/sprites/xyani/starmie.gif',
+  lt_surge: 'https://play.pokemonshowdown.com/sprites/xyani/raichu.gif',
+  erika:    'https://play.pokemonshowdown.com/sprites/xyani/vileplume.gif',
+  koga:     'https://play.pokemonshowdown.com/sprites/xyani/weezing.gif',
+  sabrina:  'https://play.pokemonshowdown.com/sprites/xyani/alakazam.gif',
+  blaine:   'https://play.pokemonshowdown.com/sprites/xyani/arcanine.gif',
+  giovanni: 'https://play.pokemonshowdown.com/sprites/xyani/rhydon.gif',
+  lorelei:  'https://play.pokemonshowdown.com/sprites/xyani/lapras.gif',
+  bruno:    'https://play.pokemonshowdown.com/sprites/xyani/machamp.gif',
+  agatha:   'https://play.pokemonshowdown.com/sprites/xyani/gengar.gif',
+  lance:    'https://play.pokemonshowdown.com/sprites/xyani/dragonite.gif',
+  blue:     'https://play.pokemonshowdown.com/sprites/xyani/blastoise.gif',
+}
+
+let _campaignStatus = null   // cached status from server
+let _campaignLoading = false
+
+function getCampaignServerUrl() {
+  const v = $id('input-server-url')?.value?.trim()
+  return (v || 'http://94.72.100.43:8080').replace(/\/+$/, '')
+}
+
+async function loadCampaignStatus() {
+  if (_campaignLoading) return
+  _campaignLoading = true
+
+  const uname = currentProfile?.name || username
+  if (!uname) { _campaignLoading = false; return }
+
+  try {
+    const url = `${getCampaignServerUrl()}/api/campaign/status?username=${encodeURIComponent(uname)}`
+    const res = await fetch(url)
+    if (!res.ok) throw new Error(`HTTP ${res.status}`)
+    _campaignStatus = await res.json()
+    renderCampaignUI()
+  } catch (e) {
+    console.warn('[Campaign] Status fetch failed:', e.message)
+    // Ha nincs szerver, mutassunk fallback-et (0 legyőzve)
+    _campaignStatus = { defeated_count: 0, defeated_ids: [], currentStage: null, total: 13 }
+    renderCampaignUI()
+  } finally {
+    _campaignLoading = false
+  }
+}
+
+function renderCampaignUI() {
+  if (!_campaignStatus) return
+  const { defeated_ids, claimed_ids, currentStageIndex, currentStage, total } = _campaignStatus
+
+  // Progress bar
+  const pct = Math.round((currentStageIndex / total) * 100)
+  const fillEl = $id('campaign-progress-fill')
+  if (fillEl) fillEl.style.width = `${pct}%`
+
+  const labelEl = $id('campaign-progress-label')
+  if (labelEl) {
+    if (currentStageIndex >= total) {
+      labelEl.textContent = '🏆 Bajnoki cím megszerzve!'
+    } else {
+      const stageName = currentStage?.name || '?'
+      labelEl.textContent = `Következő: ${stageName}`
+    }
+  }
+  const pctEl = $id('campaign-progress-pct')
+  if (pctEl) pctEl.textContent = `${currentStageIndex} / ${total}`
+
+  // Timeline nodes
+  renderCampaignTimeline(currentStageIndex, claimed_ids)
+
+  // Detail panel
+  renderCampaignDetail(currentStage, currentStageIndex >= total, defeated_ids)
+}
+
+// Stage type → section order
+const SECTION_BREAKS = { 0: 'Gym Leaders', 8: 'Elit Négyes', 12: 'Bajnok' }
+
+function renderCampaignTimeline(currentStageIndex, claimed_ids) {
+  const timeline = $id('campaign-timeline')
+  if (!timeline) return
+  timeline.innerHTML = ''
+
+  // All 13 stages (public data – we hardcode names/icons client-side for the locked ones)
+  const allStages = [
+    { id:'brock', name:'Brock', icon:'🪨', type:'gym' },
+    { id:'misty', name:'Misty', icon:'💧', type:'gym' },
+    { id:'lt_surge', name:'Lt. Surge', icon:'⚡', type:'gym' },
+    { id:'erika', name:'Erika', icon:'🌿', type:'gym' },
+    { id:'koga', name:'Koga', icon:'💜', type:'gym' },
+    { id:'sabrina', name:'Sabrina', icon:'🔮', type:'gym' },
+    { id:'blaine', name:'Blaine', icon:'🔥', type:'gym' },
+    { id:'giovanni', name:'Giovanni', icon:'🌍', type:'gym' },
+    { id:'lorelei', name:'Lorelei', icon:'🏅', type:'elite4' },
+    { id:'bruno', name:'Bruno', icon:'🏅', type:'elite4' },
+    { id:'agatha', name:'Agatha', icon:'🏅', type:'elite4' },
+    { id:'lance', name:'Lance', icon:'🏅', type:'elite4' },
+    { id:'blue', name:'Blue', icon:'👑', type:'champion' },
+  ]
+
+  allStages.forEach((stage, idx) => {
+    // Section label
+    if (SECTION_BREAKS[idx] !== undefined) {
+      const lbl = document.createElement('div')
+      lbl.className = 'campaign-section-label'
+      lbl.textContent = SECTION_BREAKS[idx]
+      timeline.appendChild(lbl)
+    }
+
+    // Connector line (not for first)
+    if (idx > 0 && SECTION_BREAKS[idx] === undefined) {
+      const conn = document.createElement('div')
+      const prevDone = idx <= currentStageIndex
+      conn.className = `campaign-node-connector ${prevDone ? 'done' : ''}`
+      timeline.appendChild(conn)
+    }
+
+    const isDone   = claimed_ids.includes(stage.id)
+    const isActive = idx === currentStageIndex
+    const isLocked = idx > currentStageIndex
+
+    const node = document.createElement('div')
+    node.className = `campaign-node ${isDone ? 'done' : ''} ${isActive ? 'active' : ''} ${isLocked ? 'locked' : ''}`
+
+    // Dot
+    const dot = document.createElement('div')
+    dot.className = 'campaign-node-dot'
+    if (isDone) {
+      dot.textContent = '✅'
+    } else if (isActive) {
+      dot.textContent = stage.icon
+    } else {
+      dot.textContent = isLocked ? '🔒' : stage.icon
+    }
+
+    // Label
+    const lbl = document.createElement('div')
+    lbl.className = 'campaign-node-label'
+    lbl.innerHTML = `
+      <span class="campaign-node-name">${isLocked && idx > currentStageIndex + 0 ? (isActive ? stage.name : '???') : stage.name}</span>
+      <span class="campaign-node-sub">${isDone ? 'Átvett ✓' : isActive ? 'Aktuális' : isLocked ? 'Zárolt' : ''}</span>
+    `
+
+    // Active stage name is always visible
+    if (isActive) lbl.querySelector('.campaign-node-name').textContent = stage.name
+
+    node.appendChild(dot)
+    node.appendChild(lbl)
+    timeline.appendChild(node)
+  })
+
+  // Scroll active node into view
+  const activeNode = timeline.querySelector('.campaign-node.active')
+  if (activeNode) {
+    setTimeout(() => activeNode.scrollIntoView({ behavior: 'smooth', block: 'center' }), 100)
+  }
+}
+
+function renderCampaignDetail(currentStage, isChampion, defeated_ids = []) {
+  const loadingEl  = $id('campaign-detail-loading')
+  const contentEl  = $id('campaign-detail-content')
+  const championEl = $id('campaign-champion-state')
+
+  if (!loadingEl || !contentEl || !championEl) return
+
+  // Hide loading
+  loadingEl.style.display = 'none'
+
+  if (isChampion) {
+    contentEl.classList.add('hidden')
+    championEl.classList.remove('hidden')
+    return
+  }
+
+  if (!currentStage) {
+    contentEl.classList.add('hidden')
+    return
+  }
+
+  contentEl.classList.remove('hidden')
+  championEl.classList.add('hidden')
+
+  // Badge type styling
+  const badgeEl = $id('campaign-stage-badge')
+  if (badgeEl) {
+    if (currentStage.type === 'champion') {
+      badgeEl.className = 'campaign-stage-badge champion'
+      badgeEl.textContent = '👑 Bajnok'
+    } else if (currentStage.type === 'elite4') {
+      badgeEl.className = 'campaign-stage-badge elite4'
+      badgeEl.textContent = '🏅 Elit Négyes'
+    } else {
+      badgeEl.className = 'campaign-stage-badge'
+      badgeEl.textContent = '🏋️ Gym Leader'
+    }
+  }
+
+  // Sprite
+  const spriteEl = $id('campaign-detail-sprite')
+  if (spriteEl) {
+    const spriteUrl = CAMPAIGN_SPRITES[currentStage.id] || `https://play.pokemonshowdown.com/sprites/xyani/${currentStage.id}.gif`
+    spriteEl.src = spriteUrl
+    spriteEl.alt = currentStage.name
+  }
+
+  // Text fields
+  const setEl = (id, txt) => { const el = $id(id); if (el) el.textContent = txt || '' }
+
+  setEl('campaign-detail-name',      currentStage.name)
+  setEl('campaign-detail-title',     currentStage.title)
+  setEl('campaign-detail-badge',     `${currentStage.badgeIcon || ''} ${currentStage.badge || ''}`)
+  setEl('campaign-detail-specialty', currentStage.specialty)
+  setEl('campaign-detail-pokemon',   currentStage.pokemon?.join(' · ') || '')
+  setEl('campaign-detail-levelcap',  currentStage.levelCap ? `Max. ${currentStage.levelCap} szint` : '')
+  setEl('campaign-detail-hint',      currentStage.hint)
+  setEl('campaign-detail-reward',    currentStage.rewardText)
+
+  // Complete button state based on whether it was defeated in-game
+  const completeBtn = $id('btn-campaign-complete')
+  if (completeBtn) {
+    const isDefeatedInGame = defeated_ids.includes(currentStage.id)
+
+    if (isDefeatedInGame) {
+      completeBtn.disabled = false
+      completeBtn.style.background = 'linear-gradient(135deg, #eab308, #ca8a04)'
+      completeBtn.style.boxShadow = '0 0 15px rgba(234, 179, 8, 0.4)'
+      completeBtn.innerHTML = `
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" style="width:18px;height:18px;"><path d="M20 6L9 17l-5-5"></path></svg>
+        Jutalom átvétele!
+      `
+      const hint = $id('campaign-detail-content').querySelector('.campaign-complete-hint')
+      if (hint) hint.innerHTML = '<span style="color: #4ade80;">Gatratulálunk! Legyőzted a játékban!</span>'
+    } else {
+      completeBtn.disabled = true
+      completeBtn.style.background = 'rgba(255,255,255,0.05)'
+      completeBtn.style.boxShadow = 'none'
+      completeBtn.innerHTML = `
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" style="width:18px;height:18px;"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+        Zárolva (Nem győzted le)
+      `
+      const hint = $id('campaign-detail-content').querySelector('.campaign-complete-hint')
+      if (hint) hint.textContent = 'Keresd meg a játékban, és nyerj ellene a feloldáshoz!'
+    }
+  }
+}
+
+// ── Complete button ────────────────────────────────────────────
+$id('btn-campaign-complete')?.addEventListener('click', async () => {
+  const uname = currentProfile?.name || username
+  if (!uname) return showToast('❌ Nincs bejelentkezett profil!')
+  if (!_campaignStatus?.currentStage) return
+
+  const stageId = _campaignStatus.currentStage.id
+  const btn = $id('btn-campaign-complete')
+  btn.disabled = true
+  btn.innerHTML = '<div class="loading-spinner small" style="margin:0;width:18px;height:18px;"></div> Kérés folyamatban...'
+
+  try {
+    const res = await fetch(`${getCampaignServerUrl()}/api/campaign/complete`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ username: uname, stageId })
+    })
+    const data = await res.json()
+    if (res.ok) {
+      const stageName = _campaignStatus.currentStage.name
+      showToast(`🎁 ${stageName} jutalma sikeresen átvéve!`)
+      _campaignStatus = null  // force reload
+      await loadCampaignStatus()
+    } else {
+      showToast(`❌ ${data.error || 'Szerver hiba.'}`)
+      _campaignStatus = null
+      await loadCampaignStatus() // Reload to reset button state
+    }
+  } catch (e) {
+    console.error('[Campaign] Complete error:', e)
+    showToast('❌ Hálózati hiba!')
+    _campaignStatus = null
+    await loadCampaignStatus()
+  }
+})
+
+// ── Open / Close campaign modal ───────────────────────────────
+$id('btn-campaign')?.addEventListener('click', () => {
+  $id('modal-campaign')?.classList.remove('hidden')
+  _campaignStatus = null  // always refresh on open
+  loadCampaignStatus()
+})
+
+$id('btn-close-campaign')?.addEventListener('click', () => {
+  $id('modal-campaign')?.classList.add('hidden')
+})
+
+// Close on outside click
+$id('modal-campaign')?.addEventListener('click', (e) => {
+  if (e.target === $id('modal-campaign')) {
+    $id('modal-campaign').classList.add('hidden')
+  }
+})
+
+
 $id('link-modrinth').addEventListener('click', () => {
   if (window.cobble) window.cobble.openExternal('https://modrinth.com/modpack/cobbleverse')
 })
