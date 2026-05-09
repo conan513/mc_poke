@@ -44,15 +44,16 @@ const BLACKLISTED_MODS = [
 ];
 
 
-// IBM Semeru (Eclipse OpenJ9) – ~30-40% kevesebb RAM mint a HotSpot JVM,
-// lazy heap allocation, jobb shared class cache, teljesen Fabric-kompatibilis.
-// Letöltési oldal: https://developer.ibm.com/languages/java/semeru-runtimes/downloads/
+// Oracle GraalVM 21 – a volt GraalVM Enterprise Edition utóda (2023-tól ingyenes).
+// Minecraft benchmark szerint chunk-generálásban 20%+ gyorsabb a standard Temurin-nél.
+// Forrás: https://github.com/brucethemoose/Minecraft-Performance-Flags-Benchmarks
+// Letöltési oldal: https://www.oracle.com/java/technologies/downloads/#graalvmjava21
 const JAVA_URLS = {
-  linux_x64:    'https://github.com/ibmruntimes/semeru21-binaries/releases/download/jdk-21.0.7%2B6_openj9-0.49.0/ibm-semeru-open-jdk_x64_linux_21.0.7_6_openj9-0.49.0.tar.gz',
-  linux_arm64:  'https://github.com/ibmruntimes/semeru21-binaries/releases/download/jdk-21.0.7%2B6_openj9-0.49.0/ibm-semeru-open-jdk_aarch64_linux_21.0.7_6_openj9-0.49.0.tar.gz',
-  win32_x64:    'https://github.com/ibmruntimes/semeru21-binaries/releases/download/jdk-21.0.7%2B6_openj9-0.49.0/ibm-semeru-open-jdk_x64_windows_21.0.7_6_openj9-0.49.0.zip',
-  darwin_x64:   'https://github.com/ibmruntimes/semeru21-binaries/releases/download/jdk-21.0.7%2B6_openj9-0.49.0/ibm-semeru-open-jdk_x64_mac_21.0.7_6_openj9-0.49.0.tar.gz',
-  darwin_arm64: 'https://github.com/ibmruntimes/semeru21-binaries/releases/download/jdk-21.0.7%2B6_openj9-0.49.0/ibm-semeru-open-jdk_aarch64_mac_21.0.7_6_openj9-0.49.0.tar.gz',
+  linux_x64:    'https://download.oracle.com/graalvm/21/latest/graalvm-jdk-21_linux-x64_bin.tar.gz',
+  linux_arm64:  'https://download.oracle.com/graalvm/21/latest/graalvm-jdk-21_linux-aarch64_bin.tar.gz',
+  win32_x64:    'https://download.oracle.com/graalvm/21/latest/graalvm-jdk-21_windows-x64_bin.zip',
+  darwin_x64:   'https://download.oracle.com/graalvm/21/latest/graalvm-jdk-21_macos-x64_bin.tar.gz',
+  darwin_arm64: 'https://download.oracle.com/graalvm/21/latest/graalvm-jdk-21_macos-aarch64_bin.tar.gz',
 }
 
 function getJavaExecutable() {
@@ -68,7 +69,7 @@ async function installJava() {
   const javaExe = getJavaExecutable()
 
   if (fs.existsSync(javaExe)) {
-    logInfo('[Java] IBM Semeru 21 (OpenJ9) már telepítve.')
+    logInfo('[Java] Oracle GraalVM 21 már telepítve.')
     return javaExe
   }
 
@@ -79,7 +80,7 @@ async function installJava() {
 
   if (!url) throw new Error(`Nem támogatott platform Java letöltéshez: ${platform} ${arch}`)
 
-  logInfo(`[Java] IBM Semeru 21 (OpenJ9) letöltése (${platform} ${arch})...`)
+  logInfo(`[Java] Oracle GraalVM 21 letöltése (${platform} ${arch})...`)
   const ext = url.endsWith('.zip') ? '.zip' : '.tar.gz'
   const javaDl = path.join(SERVER_DIR, `java21${ext}`)
 
@@ -156,7 +157,7 @@ async function installJava() {
   }
 
   if (process.platform !== 'win32') fs.chmodSync(resolvedJavaExe, 0o755)
-  logInfo('[Java] IBM Semeru 21 (OpenJ9) telepítése sikeres.')
+  logInfo('[Java] Oracle GraalVM 21 telepítése sikeres.')
   return resolvedJavaExe
 }
 

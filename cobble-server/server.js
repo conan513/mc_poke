@@ -682,24 +682,52 @@ function startMinecraft() {
   if (mcStatus === 'running' || !activeJavaPath) return
   console.log('[Minecraft] Szerver indítása (java -jar fabric-server-launch.jar nogui)...')
   
-  // ── IBM Semeru / Eclipse OpenJ9 JVM argumentumok ─────────────
-  // Az OpenJ9 "gencon" (Generational Concurrent) GC-je ~30-40%-kal kevesebb
-  // RAM-ot használ és rövidebb GC pause-okat produkál a HotSpot G1GC-hez képest.
+  // ── Oracle GraalVM 21 JVM argumentumok ───────────────────────
+  // Forrás: https://github.com/brucethemoose/Minecraft-Performance-Flags-Benchmarks
+  // A GraalVM agresszívabb JIT fordítója ~20%+ gyorsabb chunk-generálást ad.
   //
-  // Lazy heap: -Xms2G -Xmx8G → az OS csak annyit lát foglaltnak amennyi kell,
-  // nem foglalja le az összes 8GB-ot azonnal (szemben a HotSpot -Xms8G-vel).
-  //
-  // -Xshareclasses → shared class cache: a szerver 2. indításától ~20-30s-tal
-  // gyorsabban indul, mert a JIT compiled classok lemezre kerülnek cache-be.
+  // FONTOS: GraalVM-mel CSAK G1GC használható (ZGC/Shenandoah nem kompatibilis).
+  // Az -Dgraal.CompilerConfiguration=enterprise és TuneInlinerExploration
+  // az Oracle GraalVM (volt EE) exkluzív optimalizátorát kapcsolja be.
   const serverJvmArgs = [
     '-Xmx8G',
-    '-Xms2G',            // Lazy heap – OpenJ9 maga nyújtja ki ahogy kell
-    '-Xgcpolicy:gencon', // Generational Concurrent GC (OpenJ9 ajánlott Minecraft-hoz)
-    '-Xmn512M',          // Young generation mérete – csökkenti a minor GC pause-okat
-    '-Xgc:concurrentScavenge', // Párhuzamos minor GC → kevesebb tick freeze
-    '-XX:+DisableExplicitGC', // System.gc() hívások letiltása (mod-ok ellen)
-    '-Xshareclasses:cacheDir=server-data/.jitcache,name=cobbleverse,enableBCI', // JIT cache
-    '-Xtune:virtualized',     // Virtualizált/konténer környezethez optimalizált resource detection
+    '-Xms8G',
+    // ── GraalVM-specifikus JIT optimalizáció ──
+    '-XX:+UnlockExperimentalVMOptions',
+    '-XX:+UnlockDiagnosticVMOptions',
+    '-XX:+AlwaysActAsServerClassMachine',
+    '-XX:+AlwaysPreTouch',
+    '-XX:+DisableExplicitGC',
+    '-XX:+UseNUMA',
+    '-XX:AllocatePrefetchStyle=3',
+    '-XX:NmethodSweepActivity=1',
+    '-XX:ReservedCodeCacheSize=400M',
+    '-XX:NonNMethodCodeHeapSize=12M',
+    '-XX:ProfiledCodeHeapSize=194M',
+    '-XX:NonProfiledCodeHeapSize=194M',
+    '-XX:-DontCompileHugeMethods',
+    '-XX:+PerfDisableSharedMem',
+    '-XX:+UseFastUnorderedTimeStamps',
+    '-XX:+UseCriticalJavaThreadPriority',
+    '-XX:+EagerJVMCI',               // GraalVM JIT azonnali aktiválása
+    '-Dgraal.TuneInlinerExploration=1', // Agresszív method inlining
+    '-Dgraal.CompilerConfiguration=enterprise', // Oracle EE compiler konfig
+    // ── G1GC (kötelező GraalVM-mel) ──────────
+    '-XX:+UseG1GC',
+    '-XX:MaxGCPauseMillis=130',
+    '-XX:G1HeapRegionSize=16M',
+    '-XX:G1NewSizePercent=28',
+    '-XX:G1ReservePercent=20',
+    '-XX:G1MixedGCCountTarget=3',
+    '-XX:InitiatingHeapOccupancyPercent=10',
+    '-XX:G1MixedGCLiveThresholdPercent=90',
+    '-XX:G1RSetUpdatingPauseTimePercent=0',
+    '-XX:SurvivorRatio=32',
+    '-XX:MaxTenuringThreshold=1',
+    '-XX:G1SATBBufferEnqueueingThresholdPercent=30',
+    '-XX:G1ConcMarkStepDurationMillis=5',
+    '-XX:G1ConcRSHotCardLimit=16',
+    '-XX:G1ConcRefinementServiceIntervalMillis=150',
     '-jar', 'fabric-server-launch.jar',
     'nogui'
   ]
