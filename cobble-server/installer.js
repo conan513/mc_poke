@@ -968,11 +968,13 @@ async function install() {
       'max-players=20',
       'motd=CobbleVerse Server',
       'spawn-protection=0',
-      'view-distance=8',
-      'simulation-distance=6',
-      'sync-chunk-writes=false'
+      'view-distance=6',
+      'simulation-distance=5',
+      'sync-chunk-writes=false',
+      'entity-broadcast-range-percentage=75',
+      'network-compression-threshold=256'
     ].join('\n') + '\n')
-    logInfo('[Installer] server.properties létrehozva (online-mode=false, sync-chunk-writes=false, DH optimalizált).')
+    logInfo('[Installer] server.properties létrehozva (online-mode=false, entity-broadcast 75%, compression 256).')
   } else {
     // A fájl már létezik – beállítások ellenőrzése
     let props = fs.readFileSync(serverPropsPath, 'utf8')
@@ -1010,9 +1012,28 @@ async function install() {
       modified = true
     }
 
+    // entity-broadcast-range-percentage=75 → csak a 75%-os sugarú entitásokat küldi a kliensnek
+    // Cobblemon-nál ez a leggyorsabb módja az entity sync overhead csökkentésének.
+    if (/^entity-broadcast-range-percentage\s*=\s*(?!75$).*/m.test(props)) {
+      props = props.replace(/^entity-broadcast-range-percentage\s*=.*/m, 'entity-broadcast-range-percentage=75')
+      modified = true
+    } else if (!/^entity-broadcast-range-percentage\s*=/m.test(props)) {
+      props = props.trimEnd() + '\nentity-broadcast-range-percentage=75\n'
+      modified = true
+    }
+
+    // network-compression-threshold=256 → kisebb csomagoknál nem tömörít → kevesebb CPU
+    if (/^network-compression-threshold\s*=\s*(?!256$).*/m.test(props)) {
+      props = props.replace(/^network-compression-threshold\s*=.*/m, 'network-compression-threshold=256')
+      modified = true
+    } else if (!/^network-compression-threshold\s*=/m.test(props)) {
+      props = props.trimEnd() + '\nnetwork-compression-threshold=256\n'
+      modified = true
+    }
+
     if (modified) {
       fs.writeFileSync(serverPropsPath, props)
-      logInfo('[Installer] server.properties frissítve (offline mód, view/simulation distance DH-hoz).')
+      logInfo('[Installer] server.properties frissítve (entity-broadcast 75%, compression 256, view/sim distance).')
     } else {
       logInfo('[Installer] server.properties megfelelő, nincs teendő.')
     }

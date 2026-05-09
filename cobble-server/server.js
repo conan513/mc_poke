@@ -205,33 +205,37 @@ function configureServerCore() {
   # Ez az egyetlen legnagyobb hatású beállítás Cobblemon modpackokon.
   enable_entity_slowdown = true
 
-  # Milliseconds per tick budget for inactive entities (default: 40 = 2 ticks/s).
-  # 50 = max 1 tick per 50ms for inactive mobs → drasztikusan csökkenti a Pokémon AI overhead-et.
-  inactive_entity_slowdown = 50
+  # Milliseconds per tick budget for inactive entities.
+  # 60ms = inaktív Pokémon max 1 tick/60ms → drasztikusan csökkenti a Pokémon AI overhead-et.
+  inactive_entity_slowdown = 60
 
   # Aggressively limit the number of entities loaded per chunk.
-  # Cobblemon alapból nagyon sok entity-t spawn-ol.
   enable_entity_cramming = false
 
 [chunk_loading]
   # Max chunks loaded per tick by a single player during exploration.
-  # Alapértelmezés nincs korlátozva – ez okozza a felfedezési lag spike-okat.
-  max_chunk_loads_per_tick = 8
+  # 6 = mérsékelt chunk burst limit (alapértelmezés: nincs határ).
+  max_chunk_loads_per_tick = 6
 
   # Disable simulation of chunks that have no nearby players.
   disable_unloaded_chunk_simulation = true
 
 [entity_limits]
   # Global entity cap per chunk (minden entity típusra összesen).
-  # Alapértelmezés: végtelen. Cobblemonnal ez gyorsan 200+ entity/chunk-hoz vezet.
-  global_cap = 80
+  # 60 = konzervatív felső határ, Cobblemon hajlamos 150+ entitást gyűjteni chunk-onként.
+  global_cap = 60
 
   # Mob-specifikus korlátok
+  # FONTOS: cobblemon:pokemon a legnagyobb TPS-tolvaj – 20/chunk már bőven elég.
   [entity_limits.limits]
-    "minecraft:bat" = 4
-    "minecraft:cod" = 8
-    "minecraft:salmon" = 8
-    "minecraft:tropical_fish" = 8
+    "cobblemon:pokemon" = 20
+    "cobblemon:empty_pokeball" = 5
+    "minecraft:bat" = 2
+    "minecraft:cod" = 6
+    "minecraft:salmon" = 6
+    "minecraft:tropical_fish" = 6
+    "minecraft:squid" = 4
+    "minecraft:glow_squid" = 4
 `
 
   try {
@@ -714,12 +718,12 @@ function startMinecraft() {
     '-Dgraal.CompilerConfiguration=enterprise', // Oracle EE compiler konfig
     // ── G1GC (kötelező GraalVM-mel) ──────────
     '-XX:+UseG1GC',
-    '-XX:MaxGCPauseMillis=130',
+    '-XX:MaxGCPauseMillis=80',         // 130→80ms: rövidebb GC szünet → kevesebb TPS drop
     '-XX:G1HeapRegionSize=16M',
     '-XX:G1NewSizePercent=28',
     '-XX:G1ReservePercent=20',
     '-XX:G1MixedGCCountTarget=3',
-    '-XX:InitiatingHeapOccupancyPercent=10',
+    '-XX:InitiatingHeapOccupancyPercent=15', // 10→15%: kevesebb idő előre GC, jobb throughput
     '-XX:G1MixedGCLiveThresholdPercent=90',
     '-XX:G1RSetUpdatingPauseTimePercent=0',
     '-XX:SurvivorRatio=32',
