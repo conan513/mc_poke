@@ -44,12 +44,15 @@ const BLACKLISTED_MODS = [
 ];
 
 
+// IBM Semeru (Eclipse OpenJ9) – ~30-40% kevesebb RAM mint a HotSpot JVM,
+// lazy heap allocation, jobb shared class cache, teljesen Fabric-kompatibilis.
+// Letöltési oldal: https://developer.ibm.com/languages/java/semeru-runtimes/downloads/
 const JAVA_URLS = {
-  linux_x64: 'https://github.com/adoptium/temurin21-binaries/releases/download/jdk-21.0.5%2B11/OpenJDK21U-jdk_x64_linux_hotspot_21.0.5_11.tar.gz',
-  linux_arm64: 'https://github.com/adoptium/temurin21-binaries/releases/download/jdk-21.0.5%2B11/OpenJDK21U-jdk_aarch64_linux_hotspot_21.0.5_11.tar.gz',
-  win32_x64: 'https://github.com/adoptium/temurin21-binaries/releases/download/jdk-21.0.5%2B11/OpenJDK21U-jdk_x64_windows_hotspot_21.0.5_11.zip',
-  darwin_x64: 'https://github.com/adoptium/temurin21-binaries/releases/download/jdk-21.0.5%2B11/OpenJDK21U-jdk_x64_mac_hotspot_21.0.5_11.tar.gz',
-  darwin_arm64: 'https://github.com/adoptium/temurin21-binaries/releases/download/jdk-21.0.5%2B11/OpenJDK21U-jdk_aarch64_mac_hotspot_21.0.5_11.tar.gz',
+  linux_x64:    'https://github.com/ibmruntimes/semeru21-binaries/releases/download/jdk-21.0.7%2B6_openj9-0.49.0/ibm-semeru-open-jdk_x64_linux_21.0.7_6_openj9-0.49.0.tar.gz',
+  linux_arm64:  'https://github.com/ibmruntimes/semeru21-binaries/releases/download/jdk-21.0.7%2B6_openj9-0.49.0/ibm-semeru-open-jdk_aarch64_linux_21.0.7_6_openj9-0.49.0.tar.gz',
+  win32_x64:    'https://github.com/ibmruntimes/semeru21-binaries/releases/download/jdk-21.0.7%2B6_openj9-0.49.0/ibm-semeru-open-jdk_x64_windows_21.0.7_6_openj9-0.49.0.zip',
+  darwin_x64:   'https://github.com/ibmruntimes/semeru21-binaries/releases/download/jdk-21.0.7%2B6_openj9-0.49.0/ibm-semeru-open-jdk_x64_mac_21.0.7_6_openj9-0.49.0.tar.gz',
+  darwin_arm64: 'https://github.com/ibmruntimes/semeru21-binaries/releases/download/jdk-21.0.7%2B6_openj9-0.49.0/ibm-semeru-open-jdk_aarch64_mac_21.0.7_6_openj9-0.49.0.tar.gz',
 }
 
 function getJavaExecutable() {
@@ -65,7 +68,7 @@ async function installJava() {
   const javaExe = getJavaExecutable()
 
   if (fs.existsSync(javaExe)) {
-    logInfo('[Java] Java 21 már telepítve.')
+    logInfo('[Java] IBM Semeru 21 (OpenJ9) már telepítve.')
     return javaExe
   }
 
@@ -76,7 +79,7 @@ async function installJava() {
 
   if (!url) throw new Error(`Nem támogatott platform Java letöltéshez: ${platform} ${arch}`)
 
-  logInfo(`[Java] Java 21 letöltése (${platform} ${arch})...`)
+  logInfo(`[Java] IBM Semeru 21 (OpenJ9) letöltése (${platform} ${arch})...`)
   const ext = url.endsWith('.zip') ? '.zip' : '.tar.gz'
   const javaDl = path.join(SERVER_DIR, `java21${ext}`)
 
@@ -153,7 +156,7 @@ async function installJava() {
   }
 
   if (process.platform !== 'win32') fs.chmodSync(resolvedJavaExe, 0o755)
-  logInfo('[Java] Java 21 telepítése sikeres.')
+  logInfo('[Java] IBM Semeru 21 (OpenJ9) telepítése sikeres.')
   return resolvedJavaExe
 }
 

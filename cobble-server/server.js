@@ -682,35 +682,24 @@ function startMinecraft() {
   if (mcStatus === 'running' || !activeJavaPath) return
   console.log('[Minecraft] Szerver indítása (java -jar fabric-server-launch.jar nogui)...')
   
+  // ── IBM Semeru / Eclipse OpenJ9 JVM argumentumok ─────────────
+  // Az OpenJ9 "gencon" (Generational Concurrent) GC-je ~30-40%-kal kevesebb
+  // RAM-ot használ és rövidebb GC pause-okat produkál a HotSpot G1GC-hez képest.
+  //
+  // Lazy heap: -Xms2G -Xmx8G → az OS csak annyit lát foglaltnak amennyi kell,
+  // nem foglalja le az összes 8GB-ot azonnal (szemben a HotSpot -Xms8G-vel).
+  //
+  // -Xshareclasses → shared class cache: a szerver 2. indításától ~20-30s-tal
+  // gyorsabban indul, mert a JIT compiled classok lemezre kerülnek cache-be.
   const serverJvmArgs = [
     '-Xmx8G',
-    '-Xms8G',
-    // G1GC – Aikar-féle alap, finomhangolva a spike-ok csökkentésére
-    '-XX:+UseG1GC',
-    '-XX:+ParallelRefProcEnabled',
-    // MaxGCPauseMillis: 200ms → 50ms. Régen 200ms-t is megállhatott a tick thread
-    // GC közben – ez okozta a látható 1-2 mp-es fagyásokat.
-    '-XX:MaxGCPauseMillis=50',
-    '-XX:+UnlockExperimentalVMOptions',
-    '-XX:+DisableExplicitGC',
-    '-XX:+AlwaysPreTouch',
-    '-XX:G1NewSizePercent=30',
-    '-XX:G1MaxNewSizePercent=40',
-    '-XX:G1HeapRegionSize=8M',
-    '-XX:G1ReservePercent=20',
-    '-XX:G1HeapWastePercent=5',
-    '-XX:G1MixedGCCountTarget=4',
-    // IHOP: 15% → 25%. 8GB heap-nél 15% = 1.2GB-nál már GC indult → túl agresszív,
-    // ezért volt folyamatos GC overhead annak ellenére hogy a hardver látszólag szabad volt.
-    // 25% = kb. 2GB-nál indul, kevesebb de hosszabb ciklus, kisebb zaj a tick threaden.
-    '-XX:InitiatingHeapOccupancyPercent=25',
-    '-XX:G1MixedGCLiveThresholdPercent=90',
-    '-XX:G1RSetUpdatingPauseTimePercent=5',
-    '-XX:SurvivorRatio=32',
-    '-XX:+PerfDisableSharedMem',
-    '-XX:MaxTenuringThreshold=1',
-    // GC naplózás – a jövőbeli spike-okat korrelálni lehet a GC eseményekkel
-    '-Xlog:gc:file=logs/gc.log:time,uptime,level,tags:filecount=5,filesize=20m',
+    '-Xms2G',            // Lazy heap – OpenJ9 maga nyújtja ki ahogy kell
+    '-Xgcpolicy:gencon', // Generational Concurrent GC (OpenJ9 ajánlott Minecraft-hoz)
+    '-Xmn512M',          // Young generation mérete – csökkenti a minor GC pause-okat
+    '-Xgc:concurrentScavenge', // Párhuzamos minor GC → kevesebb tick freeze
+    '-XX:+DisableExplicitGC', // System.gc() hívások letiltása (mod-ok ellen)
+    '-Xshareclasses:cacheDir=server-data/.jitcache,name=cobbleverse,enableBCI', // JIT cache
+    '-Xtune:virtualized',     // Virtualizált/konténer környezethez optimalizált resource detection
     '-jar', 'fabric-server-launch.jar',
     'nogui'
   ]
