@@ -2225,19 +2225,28 @@ $id('btn-campaign-complete')?.addEventListener('click', async () => {
 
 // ── Open / Close campaign modal ───────────────────────────────
 $id('btn-campaign')?.addEventListener('click', () => {
-  $id('modal-campaign')?.classList.remove('hidden')
+  const modal = $id('modal-campaign')
+  if (modal) {
+    modal.classList.remove('hidden')
+    setTimeout(() => modal.classList.add('active'), 10)
+  }
   _campaignStatus = null  // always refresh on open
   loadCampaignStatus()
 })
 
 $id('btn-close-campaign')?.addEventListener('click', () => {
-  $id('modal-campaign')?.classList.add('hidden')
+  const modal = $id('modal-campaign')
+  if (modal) {
+    modal.classList.remove('active')
+    setTimeout(() => modal.classList.add('hidden'), 300)
+  }
 })
 
 // Close on outside click
 $id('modal-campaign')?.addEventListener('click', (e) => {
   if (e.target === $id('modal-campaign')) {
-    $id('modal-campaign').classList.add('hidden')
+    $id('modal-campaign').classList.remove('active')
+    setTimeout(() => $id('modal-campaign').classList.add('hidden'), 300)
   }
 })
 
