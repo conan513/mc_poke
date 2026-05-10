@@ -767,19 +767,13 @@ setInterval(() => {
 
 function startMinecraft() {
   if (mcStatus === 'running' || !activeJavaPath) return
-  console.log('[Minecraft] Szerver indítása (java -jar fabric-server-launch.jar nogui)...')
+  console.log('[Minecraft] Szerver indítása (NeoForge run.sh)...')
   
   // ── Oracle GraalVM 21 JVM argumentumok ───────────────────────
   // Forrás: https://github.com/brucethemoose/Minecraft-Performance-Flags-Benchmarks
-  // A GraalVM agresszívabb JIT fordítója ~20%+ gyorsabb chunk-generálást ad.
-  //
-  // FONTOS: GraalVM-mel CSAK G1GC használható (ZGC/Shenandoah nem kompatibilis).
-  // Az -Dgraal.CompilerConfiguration=enterprise és TuneInlinerExploration
-  // az Oracle GraalVM (volt EE) exkluzív optimalizátorát kapcsolja be.
-  const serverJvmArgs = [
+  const jvmArgs = [
     '-Xmx8G',
     '-Xms8G',
-    // ── GraalVM-specifikus JIT optimalizáció ──
     '-XX:+UnlockExperimentalVMOptions',
     '-XX:+UnlockDiagnosticVMOptions',
     '-XX:+AlwaysActAsServerClassMachine',
@@ -796,19 +790,16 @@ function startMinecraft() {
     '-XX:+PerfDisableSharedMem',
     '-XX:+UseFastUnorderedTimeStamps',
     '-XX:+UseCriticalJavaThreadPriority',
-    '-XX:+EagerJVMCI',               // GraalVM JIT azonnali aktiválása
-    '-Dgraal.TuneInlinerExploration=1', // Agresszív method inlining
-    '-Dgraal.CompilerConfiguration=enterprise', // Oracle EE compiler konfig
-    // ── G1GC (kötelező GraalVM-mel) ──────────
+    '-XX:+EagerJVMCI',
+    '-Dgraal.TuneInlinerExploration=1',
+    '-Dgraal.CompilerConfiguration=enterprise',
     '-XX:+UseG1GC',
-    '-XX:MaxGCPauseMillis=37',         // RUBBER BAND FIX: 80→37ms. 1 tick = 50ms, tehát 80ms
-                                       // szünet = 1.6 tick kiesés → szerver visszadobja a játékost.
-                                       // 37ms < 50ms (1 tick), így GC befér egy tick résbe.
+    '-XX:MaxGCPauseMillis=37',
     '-XX:G1HeapRegionSize=16M',
     '-XX:G1NewSizePercent=28',
     '-XX:G1ReservePercent=20',
     '-XX:G1MixedGCCountTarget=3',
-    '-XX:InitiatingHeapOccupancyPercent=20', // 15→20%: ritkábban triggerel GC → kevesebb szünet
+    '-XX:InitiatingHeapOccupancyPercent=20',
     '-XX:G1MixedGCLiveThresholdPercent=90',
     '-XX:G1RSetUpdatingPauseTimePercent=0',
     '-XX:SurvivorRatio=32',
@@ -817,12 +808,49 @@ function startMinecraft() {
     '-XX:G1ConcMarkStepDurationMillis=5',
     '-XX:G1ConcRSHotCardLimit=16',
     '-XX:G1ConcRefinementServiceIntervalMillis=150',
-    '-jar', 'fabric-server-launch.jar',
-    'nogui'
   ]
-  mcProcess = spawn(activeJavaPath, serverJvmArgs, {
+
+  // NeoForge run.sh maga tartalmazza a -jar argumentumot, csak a JVM_OPTS-t
+  // kell átadni env változóként, hogy a NeoForge runner felhasználja.
+  const nfRunScript = process.platform === 'win32'
+    ? path.join(DATA_DIR, 'run.bat')
+    : path.join(DATA_DIR, 'run.sh')
+
+  let spawnCmd, spawnArgs, spawnEnv
+  if (fs.existsSync(nfRunScript)) {
+    // NeoForge run szkript – JVM args env-en keresztül
+    const javaBinDir = path.dirname(activeJavaPath)
+    spawnEnv = {
+      ...process.env,
+      JAVA_OPTS: jvmArgs.join(' '),
+      JAVA_HOME: path.dirname(javaBinDir),
+      // PATH elejére rakjuk a mi GraalVM 21 java-nkat, hogy a run.sh ne a
+      // rendszer Java-ját (pl. Java 26) használja, hanem a mi 21-esünket
+      PATH: javaBinDir + path.delimiter + (process.env.PATH || '')
+    }
+    if (process.platform === 'win32') {
+      spawnCmd = nfRunScript
+      spawnArgs = []
+    } else {
+      spawnCmd = '/bin/sh'
+      spawnArgs = [nfRunScript]
+    }
+  } else {
+    // Fallback: közvetlen NeoForge JAR keresés
+    const nfJars = fs.existsSync(DATA_DIR)
+      ? fs.readdirSync(DATA_DIR).filter(f => f.startsWith('neoforge-') && f.endsWith('.jar') && !f.includes('installer'))
+      : []
+    const nfJar = nfJars[0] || 'neoforge-server.jar'
+    console.warn(`[Minecraft] run.sh nem található, fallback: java -jar ${nfJar}`)
+    spawnEnv = process.env
+    spawnCmd = activeJavaPath
+    spawnArgs = [...jvmArgs, '-jar', nfJar, 'nogui']
+  }
+
+  mcProcess = spawn(spawnCmd, [...spawnArgs, 'nogui'].filter(Boolean), {
     cwd: DATA_DIR,
-    stdio: ['pipe', 'pipe', 'inherit'] // stdout 'pipe', hogy tudjuk olvasni a játékos csatlakozásokat
+    env: spawnEnv,
+    stdio: ['pipe', 'pipe', 'inherit']
   })
   mcStatus = 'running'
   isServerReady = false

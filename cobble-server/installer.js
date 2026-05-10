@@ -20,9 +20,10 @@ function logError(...args) {
 
 const MODPACK_PROJECT_ID = 'Jkb29YJU'
 const MC_VERSION = '1.21.1'
+// Modpack letöltése Fabric-alapú (overrides/konfig/datapack miatt), de mod JAR-okat nem töltjük le belőle
 const MODRINTH_VERSIONS_URL = `https://api.modrinth.com/v2/project/${MODPACK_PROJECT_ID}/version?loaders=["fabric"]&game_versions=["${MC_VERSION}"]`
-const FABRIC_META_URL = `https://meta.fabricmc.net/v2/versions/loader/${MC_VERSION}`
-const FABRIC_INSTALLER_META_URL = 'https://meta.fabricmc.net/v2/versions/installer'
+// NeoForge maven meta
+const NEOFORGE_MAVEN_META = 'https://maven.neoforged.net/releases/net/neoforged/neoforge/maven-metadata.xml'
 
 const SERVER_DIR = path.join(__dirname, 'server-data')
 const MODS_DIR = path.join(SERVER_DIR, 'mods')
@@ -372,7 +373,14 @@ async function updateModsFromModrinth() {
     let updatedCount = 0;
     for (const projectId of projectsToCheck) {
       try {
-        const query = `loaders=${encodeURIComponent('["fabric"]')}&game_versions=${encodeURIComponent(`["${MC_VERSION}"]`)}`
+        const oldVersion = Object.values(hashToVersion).find(v => v.project_id === projectId);
+        let loadersArray = ['neoforge', 'fabric'];
+        if (oldVersion && oldVersion.loaders) {
+          loadersArray = oldVersion.loaders.filter(l => l === 'neoforge' || l === 'fabric');
+          if (loadersArray.length === 0) loadersArray = ['neoforge', 'fabric'];
+        }
+
+        const query = `loaders=${encodeURIComponent(JSON.stringify(loadersArray))}&game_versions=${encodeURIComponent(`["${MC_VERSION}"]`)}`
         const versions = await modrinthRequest(`/v2/project/${projectId}/version?${query}`);
         const releases = versions.filter(v => v.version_type === 'release');
         const latest = releases[0] || versions[0];
@@ -427,81 +435,111 @@ async function updateModsFromModrinth() {
  * Ensures specific extra mods are present.
  */
 const EXTRA_MODS = [
-  { slug: 'chipped', loaders: ['fabric'], gameVersions: [MC_VERSION] },
-  { slug: 'creeper-firework', loaders: ['fabric'], gameVersions: [MC_VERSION] },
-  { slug: 'terrablender', loaders: ['fabric'], gameVersions: [MC_VERSION] },
-  { slug: 'skinrestorer', loaders: ['fabric'], gameVersions: [MC_VERSION] },
-  // Cobblemon extra mods
+  // === SINYTRA CONNECTOR (Fabric modok futtatása NeoForge-on) ===
+  // Sinytra Connector + Forgified Fabric API együtt kell a Fabric-only modokhoz
+  { slug: 'connector',                      loaders: ['neoforge'], gameVersions: [MC_VERSION] },
+  { slug: 'forgified-fabric-api',           loaders: ['neoforge'], gameVersions: [MC_VERSION] },
+
+  // === CORE MODOK (NeoForge natív) ===
+  { slug: 'cobblemon',                      loaders: ['neoforge'], gameVersions: [MC_VERSION] },
+  { slug: 'architectury-api',               loaders: ['neoforge'], gameVersions: [MC_VERSION] },
+  { slug: 'kotlin-for-forge',               loaders: ['neoforge'], gameVersions: [MC_VERSION] },
+
+  // === NEOFORGE NATÍV MODOK ===
+  { slug: 'chipped',                        loaders: ['neoforge'], gameVersions: [MC_VERSION] },
+  { slug: 'creeper-firework',               loaders: ['neoforge'], gameVersions: [MC_VERSION] },
+  { slug: 'terrablender',                   loaders: ['neoforge'], gameVersions: [MC_VERSION] },
+  { slug: 'skinrestorer',                   loaders: ['neoforge'], gameVersions: [MC_VERSION] },
+
+  // Cobblemon extra modok (NeoForge natív)
+  { slug: 'cobblemon-smartphone',           loaders: ['neoforge'], gameVersions: [MC_VERSION] },
+  { slug: 'more-cobblemon-stats',           loaders: ['neoforge'], gameVersions: [MC_VERSION] },
+  { slug: 'cobblemon-cobbled-levels',       loaders: ['neoforge'], gameVersions: [MC_VERSION] },
+  { slug: 'village-spawn-point',            loaders: ['neoforge'], gameVersions: [MC_VERSION] },
+  { slug: 'serene-seasons',                 loaders: ['neoforge'], gameVersions: [MC_VERSION] },
+  { slug: 'fix-cobblemon-pokemon-experience', loaders: ['neoforge'], gameVersions: [MC_VERSION] },
+  { slug: 'cobblemon-pokestops',            loaders: ['neoforge'], gameVersions: [MC_VERSION] },
+  { slug: 'pokemon-field-lab',              loaders: ['neoforge'], gameVersions: [MC_VERSION] },
+  { slug: 'cobblemon-pokerus',              loaders: ['neoforge'], gameVersions: [MC_VERSION] },
+  { slug: 'livelierpokemon',                loaders: ['neoforge'], gameVersions: [MC_VERSION] },
+  { slug: 'pokebike',                       loaders: ['neoforge'], gameVersions: [MC_VERSION] },
+  { slug: 'cobblemon-alpha-project',        loaders: ['neoforge'], gameVersions: [MC_VERSION] },
+  { slug: 'rad-gyms',                       loaders: ['neoforge'], gameVersions: [MC_VERSION] },
+  { slug: 'cobble-contests',                loaders: ['neoforge'], gameVersions: [MC_VERSION] },
+  { slug: 'cobblemon-trials-edition',       loaders: ['neoforge'], gameVersions: [MC_VERSION] },
+  { slug: 'cobblemon-battle-tower',         loaders: ['neoforge'], gameVersions: [MC_VERSION] },
+  { slug: 'cobblemon-simple-pokecenters',   loaders: ['neoforge'], gameVersions: [MC_VERSION] },
+  { slug: 'cobblemon-integrations',         loaders: ['neoforge'], gameVersions: [MC_VERSION] },
+  { slug: 'lootr',                          loaders: ['neoforge'], gameVersions: [MC_VERSION] },
+  { slug: 'lootrmon',                       loaders: ['neoforge'], gameVersions: [MC_VERSION] },
+  { slug: 'cobblemonoptimizer',             loaders: ['neoforge'], gameVersions: [MC_VERSION] },
+  { slug: 'cobblemon-tents',                loaders: ['neoforge'], gameVersions: [MC_VERSION] },
+  { slug: 'cobblemon-snap',                 loaders: ['neoforge'], gameVersions: [MC_VERSION] },
+  { slug: 'cobblemon-villager-overhaul',    loaders: ['neoforge'], gameVersions: [MC_VERSION] },
+  { slug: 'modern-ui',                      loaders: ['neoforge'], gameVersions: [MC_VERSION] },
+  { slug: 'tt20',                           loaders: ['neoforge'], gameVersions: [MC_VERSION] },
+
+  // Függőségek (NeoForge natív)
+  { slug: 'cobblemore-library',             loaders: ['neoforge'], gameVersions: [MC_VERSION] },
+  { slug: 'create',                         loaders: ['neoforge'], gameVersions: [MC_VERSION] }, // create-fabric helyett
+  { slug: 'create-power-loader',            loaders: ['neoforge'], gameVersions: [MC_VERSION] },
+  { slug: 'wild-battle-api',                loaders: ['neoforge'], gameVersions: [MC_VERSION] },
+  { slug: 'jade',                           loaders: ['neoforge'], gameVersions: [MC_VERSION] }, // cobblemon-pokestops igényli
+  { slug: 'rctapi',                         loaders: ['neoforge'], gameVersions: [MC_VERSION] }, // cobblemon-battle-tower igényli
+  { slug: 'balm',                           loaders: ['neoforge'], gameVersions: [MC_VERSION] }, // waystones, netherportalfix igényli
+  { slug: 'cloth-config',                   loaders: ['neoforge'], gameVersions: [MC_VERSION] },
+  { slug: 'farmers-delight',                loaders: ['neoforge'], gameVersions: [MC_VERSION] },
+  { slug: 'accessories',                    loaders: ['neoforge'], gameVersions: [MC_VERSION] },
+  { slug: 'owo-lib',                        loaders: ['neoforge'], gameVersions: [MC_VERSION] },
+  { slug: 'resourceful-lib',                loaders: ['neoforge'], gameVersions: [MC_VERSION] },
+  { slug: 'geckolib',                       loaders: ['neoforge'], gameVersions: [MC_VERSION] },
+  { slug: 'collective',                     loaders: ['neoforge'], gameVersions: [MC_VERSION] },
+  { slug: 'glitchcore',                     loaders: ['neoforge'], gameVersions: [MC_VERSION] },
+  { slug: 'forge-config-api-port',          loaders: ['neoforge'], gameVersions: [MC_VERSION] },
+  { slug: 'servercore',                     loaders: ['neoforge'], gameVersions: [MC_VERSION] },
+  { slug: 'spark',                          loaders: ['neoforge'], gameVersions: [MC_VERSION] },
+
+  // === COBBLEMON ADDONS (NeoForge – a crashlogból hiányoztak) ===
+  { slug: 'cobbledollars',                  loaders: ['neoforge'], gameVersions: [MC_VERSION] },
+  { slug: 'cobbreeding',                    loaders: ['neoforge'], gameVersions: [MC_VERSION] },
+  { slug: 'cobblenav',                      loaders: ['neoforge'], gameVersions: [MC_VERSION] },
+  { slug: 'cobblemon-tim-core',             loaders: ['neoforge'], gameVersions: [MC_VERSION] },
+  { slug: 'cobblemon-capture-xp',           loaders: ['neoforge'], gameVersions: [MC_VERSION] },
+  { slug: 'cobblemon-fight-or-flight-reborn', loaders: ['neoforge'], gameVersions: [MC_VERSION] },
+  { slug: 'cobblemonraiddens',              loaders: ['neoforge'], gameVersions: [MC_VERSION] },
+  { slug: 'cobblemon-battle-extras',        loaders: ['neoforge'], gameVersions: [MC_VERSION] },
+  { slug: 'catch-rate-display',             loaders: ['neoforge'], gameVersions: [MC_VERSION] },
+
+  // Teljesítmény (NeoForge natív)
+  { slug: 'ksyxis',                         loaders: ['neoforge'], gameVersions: [MC_VERSION] },
+  { slug: 'scalablelux',                    loaders: ['neoforge'], gameVersions: [MC_VERSION] },
+  { slug: 'lmd',                            loaders: ['neoforge'], gameVersions: [MC_VERSION] },
+  { slug: 'packet-fixer',                   loaders: ['neoforge'], gameVersions: [MC_VERSION] },
+  { slug: 'almanac',                        loaders: ['neoforge'], gameVersions: [MC_VERSION] },
+
+  // === FABRIC-ONLY MODOK (Sinytra Connector futtatja ezeket) ===
+  { slug: 'fabric-language-kotlin',         loaders: ['fabric'], gameVersions: [MC_VERSION] },
   { slug: 'player-locator-plus',            loaders: ['fabric'], gameVersions: [MC_VERSION] },
   { slug: 'cobblemon-mount-mastery',        loaders: ['fabric'], gameVersions: [MC_VERSION] },
-  { slug: 'cobblemon-smartphone',           loaders: ['fabric'], gameVersions: [MC_VERSION] },
   { slug: 'trainer-accessories',            loaders: ['fabric'], gameVersions: [MC_VERSION] },
-  { slug: 'more-cobblemon-stats',           loaders: ['fabric'], gameVersions: [MC_VERSION] },
   { slug: 'cobblemon-max-level-catch-cap',  loaders: ['fabric'], gameVersions: [MC_VERSION] },
   { slug: 'cobblemon-capture-notification', loaders: ['fabric'], gameVersions: [MC_VERSION] },
-  { slug: 'cobblemon-cobbled-levels',       loaders: ['fabric'], gameVersions: [MC_VERSION] },
-  { slug: 'village-spawn-point',            loaders: ['fabric'], gameVersions: [MC_VERSION] },
   { slug: 'easyauth',                       loaders: ['fabric'], gameVersions: [MC_VERSION] },
-  { slug: 'serene-seasons',                 loaders: ['fabric'], gameVersions: [MC_VERSION] },
-  { slug: 'seasonhud-fabric',               loaders: ['fabric'], gameVersions: [MC_VERSION] },
   { slug: 'easywhitelist',                  loaders: ['fabric'], gameVersions: [MC_VERSION] },
   { slug: 'cobbletcg',                      loaders: ['fabric'], gameVersions: [MC_VERSION] },
-  // Új modok (felhasználói kérés)
-  { slug: 'fix-cobblemon-pokemon-experience', loaders: ['fabric'], gameVersions: [MC_VERSION] },
-  { slug: 'cobblemon-pokestops',            loaders: ['fabric'], gameVersions: [MC_VERSION] },
   { slug: 'cobblemon-pet-a-poke',           loaders: ['fabric'], gameVersions: [MC_VERSION] },
-  { slug: 'pokemon-field-lab',              loaders: ['fabric'], gameVersions: [MC_VERSION] },
-  { slug: 'cobblemon-pokerus',              loaders: ['fabric'], gameVersions: [MC_VERSION] },
-  { slug: 'livelierpokemon',                loaders: ['fabric'], gameVersions: [MC_VERSION] },
-  { slug: 'pokebike',                       loaders: ['fabric'], gameVersions: [MC_VERSION] },
-  { slug: 'cobblemonmovedex',               loaders: ['fabric'], gameVersions: [MC_VERSION] },
-  { slug: 'cobblemon-alpha-project',        loaders: ['fabric'], gameVersions: [MC_VERSION] },
-  { slug: 'cobblemarks+',                   loaders: ['fabric'], gameVersions: [MC_VERSION] },
-  { slug: 'rad-gyms',                       loaders: ['fabric'], gameVersions: [MC_VERSION] },
   { slug: 'cobblemon-underground-mining-minigame', loaders: ['fabric'], gameVersions: [MC_VERSION] },
-  { slug: 'cobble-contests',                loaders: ['fabric'], gameVersions: [MC_VERSION] },
-  { slug: 'cobblemon-trials-edition',       loaders: ['fabric'], gameVersions: [MC_VERSION] },
-  { slug: 'cobblemon-battle-tower',         loaders: ['fabric'], gameVersions: [MC_VERSION] },
-  { slug: 'cobblemon-simple-pokecenters',   loaders: ['fabric'], gameVersions: [MC_VERSION] },
-  { slug: 'cobblemon-integrations',         loaders: ['fabric'], gameVersions: [MC_VERSION] },
-  { slug: 'lootr',                          loaders: ['fabric'], gameVersions: [MC_VERSION] },
-  { slug: 'lootrmon',                       loaders: ['fabric'], gameVersions: [MC_VERSION] },
   { slug: 'cobblemon-farmers',              loaders: ['fabric'], gameVersions: [MC_VERSION] },
   { slug: 'cobblemon-auto-battle',          loaders: ['fabric'], gameVersions: [MC_VERSION] },
-  { slug: 'cobblemon_expeditions',          loaders: ['fabric'], gameVersions: [MC_VERSION] },
-  { slug: 'cobblemonoptimizer',             loaders: ['fabric'], gameVersions: [MC_VERSION] },
   { slug: 'trainer-pass',                   loaders: ['fabric'], gameVersions: [MC_VERSION] },
   { slug: 'tc-cobble-flight',               loaders: ['fabric'], gameVersions: [MC_VERSION] },
-  { slug: 'cobblemon-tents',                loaders: ['fabric'], gameVersions: [MC_VERSION] },
-  { slug: 'cobblemon-snap',                 loaders: ['fabric'], gameVersions: [MC_VERSION] },
-  { slug: 'cobblemon-villager-overhaul',    loaders: ['fabric'], gameVersions: [MC_VERSION] },
-  { slug: 'modern-ui',                    loaders: ['fabric'], gameVersions: [MC_VERSION] },
-  { slug: 'tt20',                         loaders: ['fabric'], gameVersions: [MC_VERSION] },
-  // Függőségek
-  { slug: 'cobblemore-library',             loaders: ['fabric'], gameVersions: [MC_VERSION] },
   { slug: 'pommel-held-item-models',        loaders: ['fabric'], gameVersions: [MC_VERSION] },
-  { slug: 'create-power-loader',            loaders: ['fabric'], gameVersions: [MC_VERSION] },
-  { slug: 'create-fabric',                  loaders: ['fabric'], gameVersions: [MC_VERSION] },
-  { slug: 'wild-battle-api',                loaders: ['fabric'], gameVersions: [MC_VERSION] },
-  { slug: 'cloth-config',                   loaders: ['fabric'], gameVersions: [MC_VERSION] },
-  { slug: 'farmers-delight',                loaders: ['fabric'], gameVersions: [MC_VERSION] },
-  { slug: 'expandability',                  loaders: ['fabric'], gameVersions: [MC_VERSION] },
   { slug: 'trainerattributeslib',           loaders: ['fabric'], gameVersions: [MC_VERSION] },
-  { slug: 'accessories',                    loaders: ['fabric'], gameVersions: [MC_VERSION] },
-  { slug: 'geckolib',                       loaders: ['fabric'], gameVersions: [MC_VERSION] },
-  { slug: 'collective',                     loaders: ['fabric'], gameVersions: [MC_VERSION] },
-  { slug: 'glitchcore',                     loaders: ['fabric'], gameVersions: [MC_VERSION] },
-  { slug: 'forge-config-api-port',          loaders: ['fabric'], gameVersions: [MC_VERSION] },
-  { slug: 'fusion',                         loaders: ['fabric'], gameVersions: [MC_VERSION] },
-  { slug: 'servercore',                    loaders: ['fabric'], gameVersions: [MC_VERSION] },
-  { slug: 'spark',                         loaders: ['fabric'], gameVersions: [MC_VERSION] },
-  // Teljesítmény optimalizáló modok
-  { slug: 'krypton',                       loaders: ['fabric'], gameVersions: [MC_VERSION] },
-  { slug: 'ksyxis',                        loaders: ['fabric'], gameVersions: [MC_VERSION] },
-  { slug: 'scalablelux',                   loaders: ['fabric'], gameVersions: [MC_VERSION] },
-  { slug: 'lmd',                           loaders: ['fabric'], gameVersions: [MC_VERSION] },
-  { slug: 'packet-fixer',                  loaders: ['fabric'], gameVersions: [MC_VERSION] },
-  { slug: 'almanac',                       loaders: ['fabric'], gameVersions: [MC_VERSION] },
+  { slug: 'krypton',                        loaders: ['fabric'], gameVersions: [MC_VERSION] },
+  { slug: 'cobblemonmovedex',               loaders: ['fabric'], gameVersions: [MC_VERSION] },
+  { slug: 'cobblemarks+',                   loaders: ['fabric'], gameVersions: [MC_VERSION] },
+  { slug: 'cobblemon_expeditions',          loaders: ['fabric'], gameVersions: [MC_VERSION] },
+  { slug: 'seasonhud-fabric',               loaders: ['fabric'], gameVersions: [MC_VERSION] },
 ];
 
 /**
@@ -553,8 +591,7 @@ async function ensureExtraMods() {
       const targetDir = isDatapack ? DATAPACKS_DIR : MODS_DIR;
       const dest = path.join(targetDir, file.filename);
 
-      const existingFiles = fs.readdirSync(targetDir);
-      const isPresent = existingFiles.some(f => f.toLowerCase().includes(slug.toLowerCase()));
+      const isPresent = fs.existsSync(dest);
 
       if (!isPresent) {
         logInfo(`[Modrinth] Extra ${isDatapack ? 'datapack' : 'mod'} letöltése: ${slug} -> ${file.filename}`);
@@ -637,17 +674,17 @@ async function ensureCurseForgeMods() {
         // Use fixed file ID
         latest = { id: fileId, fileName: `${name}.jar` }; // fileName will be refined if possible or used as fallback
       } else {
-        // modLoaderType: 4 is Fabric
-        const response = await curseforgeRequest(id, MC_VERSION, 4);
+        // modLoaderType: 6 = NeoForge (4 = Fabric)
+        const response = await curseforgeRequest(id, MC_VERSION, 6);
         const files = response.data || [];
 
-        // Filter for Fabric explicitly just in case
-        const fabricFiles = files.filter(f => f.gameVersions.includes('Fabric'));
-        latest = fabricFiles[0];
+        // Filter for NeoForge explicitly just in case
+        const neoFiles = files.filter(f => f.gameVersions.includes('NeoForge'));
+        latest = neoFiles[0];
       }
 
       if (!latest) {
-        logInfo(`[CurseForge] Nincs megfelelő Fabric verzió: ${name} (MC ${MC_VERSION})`);
+        logInfo(`[CurseForge] Nincs megfelelő NeoForge verzió: ${name} (MC ${MC_VERSION})`);
         continue;
       }
 
@@ -701,6 +738,89 @@ async function cleanupBlacklistedMods() {
   }
 }
 
+/**
+ * Scans the mods directory and removes duplicate mods.
+ * A mod is considered a duplicate if it shares the same base name.
+ * If both Fabric and NeoForge versions exist, NeoForge is kept.
+ * If multiple versions exist, the most recently modified file is kept.
+ */
+function cleanupDuplicateMods() {
+  if (!fs.existsSync(MODS_DIR)) return;
+  
+  logInfo('[Installer] Duplikált modok keresése és tisztítása...');
+  const files = fs.readdirSync(MODS_DIR).filter(f => f.endsWith('.jar'));
+  
+  const modGroups = {};
+  
+  function getBaseName(filename) {
+    let name = filename.replace(/\.jar$/i, '');
+    name = name.replace(/-(fabric|neoforge|forge)/i, '');
+    name = name.replace(/\+.*$/, '');
+    const versionMatch = name.match(/-(mc)?v?\d/i);
+    if (versionMatch) {
+      name = name.substring(0, versionMatch.index);
+    }
+    return name.toLowerCase().replace(/_/g, '-');
+  }
+
+  for (const file of files) {
+    const baseName = getBaseName(file);
+    if (!modGroups[baseName]) modGroups[baseName] = [];
+    modGroups[baseName].push(file);
+  }
+
+  let deletedCount = 0;
+
+  for (const [baseName, groupFiles] of Object.entries(modGroups)) {
+    if (groupFiles.length > 1) {
+      logInfo(`[Installer] Duplikáció észlelve a '${baseName}' modnál: ${groupFiles.join(', ')}`);
+      
+      let bestFile = groupFiles[0];
+      let bestIsNeoForge = bestFile.toLowerCase().includes('neoforge');
+      let bestMtime = fs.statSync(path.join(MODS_DIR, bestFile)).mtimeMs;
+
+      for (let i = 1; i < groupFiles.length; i++) {
+        const file = groupFiles[i];
+        const isNeoForge = file.toLowerCase().includes('neoforge');
+        const mtime = fs.statSync(path.join(MODS_DIR, file)).mtimeMs;
+        
+        let shouldReplace = false;
+        if (isNeoForge && !bestIsNeoForge) {
+          shouldReplace = true;
+        } else if (isNeoForge === bestIsNeoForge) {
+          if (mtime > bestMtime) {
+            shouldReplace = true;
+          }
+        }
+        
+        if (shouldReplace) {
+          bestFile = file;
+          bestIsNeoForge = isNeoForge;
+          bestMtime = mtime;
+        }
+      }
+      
+      for (const file of groupFiles) {
+        if (file !== bestFile) {
+          logInfo(`[Installer] Törlésre került: ${file} (A megtartott: ${bestFile})`);
+          try {
+            fs.unlinkSync(path.join(MODS_DIR, file));
+            deletedCount++;
+          } catch (e) {
+            logError(`[Installer] Nem sikerült törölni a duplikált modot: ${file}`);
+          }
+        }
+      }
+    }
+  }
+  
+  if (deletedCount > 0) {
+    logInfo(`[Installer] Tisztítás befejezve: ${deletedCount} db duplikált mod törölve.`);
+  } else {
+    logInfo('[Installer] Nem találtam duplikált modokat.');
+  }
+}
+
 function fetchJson(url) {
   return new Promise((resolve, reject) => {
     const request = (targetUrl) => {
@@ -719,16 +839,33 @@ function fetchJson(url) {
   })
 }
 
-async function getLatestFabric() {
-  const loaders = await fetchJson(FABRIC_META_URL)
-  const stableLoaders = loaders.filter(l => l.loader?.stable !== false)
-  const loader = stableLoaders[0].loader.version
+/**
+ * Lekéri a legfrissebb NeoForge verziót az MC_VERSION-hez.
+ * A maven-metadata.xml-ből szűri az adott MC-verzióhoz illő build-eket.
+ * NeoForge verzió formátuma: 21.1.x (1.21.1 -> prefix "21.1.")
+ */
+async function getLatestNeoForge() {
+  const xml = await new Promise((resolve, reject) => {
+    https.get(NEOFORGE_MAVEN_META, { headers: { 'User-Agent': 'CobbleServer/1.0' } }, res => {
+      let data = ''
+      res.on('data', c => data += c)
+      res.on('end', () => resolve(data))
+    }).on('error', reject)
+  })
 
-  const installers = await fetchJson(FABRIC_INSTALLER_META_URL)
-  const stableInsts = installers.filter(i => i.stable !== false)
-  const installer = stableInsts[0].version
+  // MC 1.21.1 -> NeoForge prefix: "21.1."
+  const mcParts = MC_VERSION.split('.')
+  const prefix = `${mcParts[0].replace('1.', '')}.${mcParts[1]}.` // "21.1."
+  // Fallback: ha a fenti nem műlik, manuálisan: '21.1.'
+  const nfPrefix = MC_VERSION === '1.21.1' ? '21.1.' : prefix
 
-  return { loader, installer }
+  const matches = [...xml.matchAll(/<version>([^<]+)<\/version>/g)]
+  const versions = matches.map(m => m[1]).filter(v => v.startsWith(nfPrefix))
+
+  if (versions.length === 0) throw new Error(`Nem található NeoForge verzió MC ${MC_VERSION}-hoz`)
+
+  // A legutolsó (legfrissebb) verzió
+  return versions[versions.length - 1]
 }
 
 async function verifyIntegrity(state) {
@@ -741,10 +878,12 @@ async function verifyIntegrity(state) {
     return false
   }
 
-  // 2. Fabric check
-  const launchJar = path.join(SERVER_DIR, 'fabric-server-launch.jar')
-  if (!fs.existsSync(launchJar)) {
-    console.warn('[Installer] Fabric szerver jar nem található, újratelepítés szükséges.')
+  // 2. NeoForge check
+  const nfRunScript = process.platform === 'win32'
+    ? path.join(SERVER_DIR, 'run.bat')
+    : path.join(SERVER_DIR, 'run.sh')
+  if (!fs.existsSync(nfRunScript)) {
+    console.warn('[Installer] NeoForge futási szkript nem található, újratelepítés szükséges.')
     return false
   }
 
@@ -814,11 +953,6 @@ async function install() {
     backup()
     logInfo(`[Installer] Modpack telepítése/frissítése: ${latestPack.version_number}`)
     const mrpackPath = path.join(SERVER_DIR, 'modpack.mrpack')
-    const MODS_STAGING = path.join(SERVER_DIR, 'mods.new')
-
-    // Clean staging area
-    if (fs.existsSync(MODS_STAGING)) fs.rmSync(MODS_STAGING, { recursive: true, force: true })
-    fs.mkdirSync(MODS_STAGING, { recursive: true })
 
     try {
       await downloadFile(file.url, mrpackPath, {
@@ -827,14 +961,15 @@ async function install() {
           process.stdout.write(`\r[Installer] Modpack letöltése: ${Math.round(p * 100)}%`)
         }
       })
-      logInfo('\n[Installer] Kicsomagolás...')
+      logInfo('\n[Installer] Kicsomagolás (csak overrides/konfig)...')
 
       const zip = new AdmZip(mrpackPath)
-      const index = JSON.parse(zip.readAsText('modrinth.index.json'))
 
       for (const entry of zip.getEntries()) {
         if (entry.isDirectory) continue
         const lowerName = entry.entryName.toLowerCase()
+        // Mod JAR-okat kihagyjuk (ezeket EXTRA_MODS kezeli NeoForge-on)
+        if (lowerName.endsWith('.jar')) continue
         if (BLACKLISTED_MODS.some(b => lowerName.includes(b))) continue
 
         let destPath = null
@@ -850,42 +985,10 @@ async function install() {
         }
       }
 
-      const files = index.files || []
-      const serverFiles = files.filter(f => {
-        if (f.env && f.env.server === 'unsupported') return false
-        const lowerPath = f.path.toLowerCase()
-        if (BLACKLISTED_MODS.some(b => lowerPath.includes(b))) return false
-        return true
-      })
-
-      logInfo(`[Installer] Szerver modok letöltése (${serverFiles.length} db) a staging mappába...`)
+      // NeoForge portálás: Fabric mod JAR-ok kihagyva, EXTRA_MODS kezeli őket.
+      logInfo('[Installer] NeoForge mód: modpack mod JAR-ok kihagyva (EXTRA_MODS kezeli őket).')
 
       const baseFilenames = []
-      let done = 0
-      for (let i = 0; i < serverFiles.length; i += 5) {
-        const batch = serverFiles.slice(i, i + 5)
-        await Promise.all(batch.map(async f => {
-          const filename = path.basename(f.path)
-          const dest = path.join(MODS_STAGING, filename)
-          baseFilenames.push(filename)
-          const downloadUrl = f.downloads?.[0]
-          if (downloadUrl) {
-            await downloadFile(downloadUrl, dest, { hash: f.hashes.sha1 }).catch(e => {
-              logError(`\n[Installer] Hiba a mod letöltésekor (${filename}): ${e.message}`)
-              throw e
-            })
-          }
-          done++
-        }))
-        process.stdout.write(`\r[Installer] Modok: ${done}/${serverFiles.length}`)
-      }
-      logInfo()
-
-      logInfo('[Installer] Modok cseréje...')
-      if (fs.existsSync(MODS_BACKUP)) fs.rmSync(MODS_BACKUP, { recursive: true, force: true })
-      if (fs.existsSync(MODS_DIR)) fs.renameSync(MODS_DIR, MODS_BACKUP)
-      fs.renameSync(MODS_STAGING, MODS_DIR)
-
       fs.writeFileSync(path.join(SERVER_DIR, '.modpack-files.json'), JSON.stringify(baseFilenames, null, 2))
 
       fs.unlinkSync(mrpackPath)
@@ -911,28 +1014,26 @@ async function install() {
     logInfo(`[Installer] Modpack verzió egyezik, de frissítések ellenőrzése szükséges...`)
   }
 
-  // 2. Fabric Server Install
-  const fv = await getLatestFabric()
-  const launchJar = path.join(SERVER_DIR, 'fabric-server-launch.jar')
+  // 2. NeoForge Server Install
+  const nfVersion = await getLatestNeoForge()
+  const nfRunScript = process.platform === 'win32'
+    ? path.join(SERVER_DIR, 'run.bat')
+    : path.join(SERVER_DIR, 'run.sh')
 
-  if (state.fabricLoader !== fv.loader || !fs.existsSync(launchJar)) {
-    logInfo(`[Installer] Fabric Server ${fv.loader} telepítése...`)
-    const installerJar = path.join(SERVER_DIR, 'fabric-installer.jar')
-    const installerUrl = `https://maven.fabricmc.net/net/fabricmc/fabric-installer/${fv.installer}/fabric-installer-${fv.installer}.jar`
+  if (state.neoforgeVersion !== nfVersion || !fs.existsSync(nfRunScript)) {
+    logInfo(`[Installer] NeoForge ${nfVersion} telepítése...`)
+    const installerJar = path.join(SERVER_DIR, `neoforge-${nfVersion}-installer.jar`)
+    const installerUrl = `https://maven.neoforged.net/releases/net/neoforged/neoforge/${nfVersion}/neoforge-${nfVersion}-installer.jar`
     await downloadFile(installerUrl, installerJar)
 
     await new Promise((resolve, reject) => {
-      // Pass explicit -dir on Windows and other platforms to ensure the
-      // Fabric installer writes files to the expected SERVER_DIR. Some
-      // installer versions ignore cwd on Windows when resolving paths.
-      const args = ['-jar', installerJar, 'server', '-dir', SERVER_DIR, '-mcversion', MC_VERSION, '-loader', fv.loader, '-downloadMinecraft']
       execFile(
         javaPath,
-        args,
+        ['-jar', installerJar, '--install-server', SERVER_DIR],
         { cwd: SERVER_DIR },
         (err, stdout, stderr) => {
-          if (err && !fs.existsSync(launchJar)) {
-            reject(new Error('Fabric server telepítés hiba: ' + (stderr || err.message)))
+          if (err && !fs.existsSync(nfRunScript)) {
+            reject(new Error('NeoForge server telepítés hiba: ' + (stderr || err.message)))
           } else {
             resolve()
           }
@@ -941,10 +1042,17 @@ async function install() {
     })
 
     if (fs.existsSync(installerJar)) fs.unlinkSync(installerJar)
-    state.fabricLoader = fv.loader
+
+    // run.sh futési jog beállítása Linuxon
+    if (process.platform !== 'win32' && fs.existsSync(nfRunScript)) {
+      fs.chmodSync(nfRunScript, 0o755)
+    }
+
+    state.neoforgeVersion = nfVersion
     fs.writeFileSync(stateFile, JSON.stringify(state, null, 2))
+    logInfo(`[Installer] NeoForge ${nfVersion} telepítése sikeres.`)
   } else {
-    logInfo(`[Installer] Fabric Server (${fv.loader}) már telepítve.`)
+    logInfo(`[Installer] NeoForge (${nfVersion}) már telepítve.`)
   }
 
   // 3. EULA
@@ -1062,6 +1170,9 @@ async function install() {
 
   // 7. Modrinth Mod Updates
   await updateModsFromModrinth()
+
+  // 8. Cleanup Duplicate Mods
+  cleanupDuplicateMods()
 
   // Regenerate .modpack-files.json from the actual current mods folder.
   if (fs.existsSync(MODS_DIR)) {
