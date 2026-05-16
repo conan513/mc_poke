@@ -517,7 +517,7 @@ const EXTRA_MODS = [
   { slug: 'cobblemon-tim-core',             loaders: ['neoforge'], gameVersions: [MC_VERSION] },
   { slug: 'cobblemon-capture-xp',           loaders: ['neoforge'], gameVersions: [MC_VERSION] },
   { slug: 'cobblemon-fight-or-flight-reborn', loaders: ['neoforge'], gameVersions: [MC_VERSION] },
-  { slug: 'cobblemonraiddens',              loaders: ['neoforge'], version: '0.7.2+1.21.1', projectId: 'GebWh45l', gameVersions: [MC_VERSION] },
+  { slug: 'cobblemonraiddens',              loaders: ['neoforge'], gameVersions: [MC_VERSION] },
   { slug: 'cobblemon-battle-extras',        loaders: ['neoforge'], gameVersions: [MC_VERSION] },
   { slug: 'catch-rate-display',             loaders: ['neoforge'], gameVersions: [MC_VERSION] },
 
