@@ -107,7 +107,7 @@ function getGameDir() {
 }
 
 function getJavaDir() {
-  return path.join(getRootDataDir(), 'java23')
+  return path.join(getRootDataDir(), 'java21')
 }
 
 function getModpackDir() {
@@ -721,8 +721,8 @@ async function installNeoForge() {
       jvmOptions.push('-Djavax.net.ssl.trustStoreType=WINDOWS-ROOT')
     }
 
-    // NeoForge installer options: --installClient <dir>
-    const args = [...jvmOptions, '-jar', installerJar, '--installClient', mcDir]
+    // NeoForge installer options: --installClient (standalone flag, uses cwd as install dir)
+    const args = [...jvmOptions, '-jar', installerJar, '--installClient']
 
     execFile(java, args, { cwd: mcDir, windowsHide: true }, (err, stdout, stderr) => {
       if (stdout && stdout.trim()) console.log('[NeoForge installer stdout]\n' + stdout)
