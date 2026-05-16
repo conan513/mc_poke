@@ -658,16 +658,16 @@ async function installNeoForge() {
   }
 
   // ── 3. Download NeoForge Installer ────────────────────────────
-  const installerUrl = \`https://maven.neoforged.net/releases/net/neoforged/neoforge/\${latestLoader}/neoforge-\${latestLoader}-installer.jar\`
+  const installerUrl = `https://maven.neoforged.net/releases/net/neoforged/neoforge/${latestLoader}/neoforge-${latestLoader}-installer.jar`
   const installerJar = path.join(getGameDir(), 'neoforge-installer.jar')
 
-  sendProgress('neoforge', 8, \`NeoForge Installer letöltése...\`)
+  sendProgress('neoforge', 8, `NeoForge Installer letöltése...`)
   await downloadFile(installerUrl, installerJar, (p) => {
-    sendProgress('neoforge', 8 + Math.round(p * 32), \`NeoForge Installer: \${Math.round(p * 100)}%\`)
+    sendProgress('neoforge', 8 + Math.round(p * 32), `NeoForge Installer: ${Math.round(p * 100)}%`)
   })
 
   // ── 4. Run NeoForge Installer ──────────────────────────────────
-  sendProgress('neoforge', 42, \`NeoForge ${latestLoader} telepítése...\`)
+  sendProgress('neoforge', 42, `NeoForge ${latestLoader} telepítése...`)
   fse.ensureDirSync(mcDir)
 
   await new Promise(async (resolve, reject) => {
@@ -713,8 +713,8 @@ async function installNeoForge() {
 
     const jvmOptions = []
     if (truststorePath) {
-      jvmOptions.push(\`-Djavax.net.ssl.trustStore=\${truststorePath}\`)
-      jvmOptions.push(\`-Djavax.net.ssl.trustStorePassword=\${truststorePass}\`)
+      jvmOptions.push(`-Djavax.net.ssl.trustStore=${truststorePath}`)
+      jvmOptions.push(`-Djavax.net.ssl.trustStorePassword=${truststorePass}`)
     }
 
     if (process.platform === 'win32') {
@@ -745,7 +745,7 @@ async function installNeoForge() {
     neoForgeInstalledAt: new Date().toISOString(),
   })
 
-  sendProgress('neoforge', 100, \`NeoForge \${latestLoader} telepítve ✓\`)
+  sendProgress('neoforge', 100, `NeoForge ${latestLoader} telepítve ✓`)
 }
 
 // ── Minecraft Assets + Libraries ─────────────────────────────
