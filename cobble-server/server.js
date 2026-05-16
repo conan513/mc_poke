@@ -509,6 +509,7 @@ const DIRS = {}
 SYNC_FOLDERS.forEach(f => {
   DIRS[f] = path.join(DATA_DIR, f)
 })
+DIRS['client-mods'] = path.join(DATA_DIR, 'client-mods')
 
 // Convenience constant for the mods folder used in several handlers
 const MODS_DIR = DIRS['mods']
@@ -696,6 +697,7 @@ async function updateShowcase() {
 SYNC_FOLDERS.forEach(f => {
   fs.mkdirSync(DIRS[f], { recursive: true })
 })
+fs.mkdirSync(DIRS['client-mods'], { recursive: true })
 fs.mkdirSync(SKINS_DIR, { recursive: true })
 console.log(`[Skins-Init] Absolute skins directory: ${path.resolve(SKINS_DIR)}`)
 
@@ -2183,7 +2185,11 @@ async function handleRequest(req, res) {
   for (const folder of SYNC_FOLDERS) {
     if (url.startsWith(`/${folder}/`)) {
       const relPath = decodeURIComponent(url.slice(folder.length + 2))
-      const filePath = path.join(DIRS[folder], relPath)
+      let filePath = path.join(DIRS[folder], relPath)
+      if (folder === 'mods' && !fs.existsSync(filePath)) {
+        const altPath = path.join(DIRS['client-mods'], relPath)
+        if (fs.existsSync(altPath)) filePath = altPath
+      }
       if (fs.existsSync(filePath) && fs.statSync(filePath).isFile()) {
         res.writeHead(200, { 'Content-Type': 'application/octet-stream' })
         fs.createReadStream(filePath).pipe(res)

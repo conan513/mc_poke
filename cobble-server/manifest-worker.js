@@ -66,6 +66,14 @@ parentPort.on('message', async ({ type, dirs, syncFolders }) => {
       manifest.folders[f] = manifest[f].length
     }
 
+    if (dirs['client-mods']) {
+      const clientFiles = await getFilesRecursive(dirs['client-mods'])
+      const mappedClientMods = await mapFiles(clientFiles, dirs['client-mods'])
+      if (!manifest['mods']) manifest['mods'] = []
+      manifest['mods'] = manifest['mods'].concat(mappedClientMods)
+      manifest.folders['mods'] = manifest['mods'].length
+    }
+
     const allMods = manifest['mods'] || []
     manifest.modCount = allMods.filter(f => f.filename.endsWith('.jar')).length
 

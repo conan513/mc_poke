@@ -27,6 +27,7 @@ const NEOFORGE_MAVEN_META = 'https://maven.neoforged.net/releases/net/neoforged/
 
 const SERVER_DIR = path.join(__dirname, 'server-data')
 const MODS_DIR = path.join(SERVER_DIR, 'mods')
+const CLIENT_MODS_DIR = path.join(SERVER_DIR, 'client-mods')
 const DATAPACKS_DIR = path.join(SERVER_DIR, 'datapacks')
 const MODS_BACKUP = path.join(SERVER_DIR, 'mods.old')
 const STATE_FILE = path.join(SERVER_DIR, '.server-install-state.json')
@@ -41,7 +42,7 @@ const BLACKLISTED_MODS = [
   'cobblemon-rankeds', 'cobblemau',
   'vmp-fabric', 'lag-protection', 'lag_protection',
   'cobblelagclear', 'itemclearlag', 'fix-attack-lag', 'no-entity-lag',
-  'rustlingspot', 'mikeskills'
+  'rustlingspot', 'mikeskills', 'easyauth', 'seasonhud-fabric'
 ];
 
 
@@ -374,6 +375,14 @@ async function updateModsFromModrinth() {
     for (const projectId of projectsToCheck) {
       try {
         const oldVersion = Object.values(hashToVersion).find(v => v.project_id === projectId);
+        
+        // Skip update if this mod is pinned in EXTRA_MODS
+        const isPinned = EXTRA_MODS.some(m => m.version && (m.slug === oldVersion?.slug || m.slug === projectId || m.projectId === projectId));
+        if (isPinned) {
+          logInfo(`[Modrinth] Frissítés kihagyva (pinelve): ${oldVersion?.slug || projectId}`);
+          continue;
+        }
+
         let loadersArray = ['neoforge', 'fabric'];
         if (oldVersion && oldVersion.loaders) {
           loadersArray = oldVersion.loaders.filter(l => l === 'neoforge' || l === 'fabric');
@@ -438,6 +447,8 @@ const EXTRA_MODS = [
   // === SINYTRA CONNECTOR (Fabric modok futtatása NeoForge-on) ===
   // Sinytra Connector + Forgified Fabric API együtt kell a Fabric-only modokhoz
   { slug: 'connector',                      loaders: ['neoforge'], gameVersions: [MC_VERSION] },
+  { slug: 'connector-extras',               loaders: ['neoforge'], gameVersions: [MC_VERSION] },
+
   { slug: 'forgified-fabric-api',           loaders: ['neoforge'], gameVersions: [MC_VERSION] },
 
   // === CORE MODOK (NeoForge natív) ===
@@ -506,7 +517,7 @@ const EXTRA_MODS = [
   { slug: 'cobblemon-tim-core',             loaders: ['neoforge'], gameVersions: [MC_VERSION] },
   { slug: 'cobblemon-capture-xp',           loaders: ['neoforge'], gameVersions: [MC_VERSION] },
   { slug: 'cobblemon-fight-or-flight-reborn', loaders: ['neoforge'], gameVersions: [MC_VERSION] },
-  { slug: 'cobblemonraiddens',              loaders: ['neoforge'], gameVersions: [MC_VERSION] },
+  { slug: 'cobblemonraiddens',              loaders: ['neoforge'], version: '0.7.2+1.21.1', projectId: 'GebWh45l', gameVersions: [MC_VERSION] },
   { slug: 'cobblemon-battle-extras',        loaders: ['neoforge'], gameVersions: [MC_VERSION] },
   { slug: 'catch-rate-display',             loaders: ['neoforge'], gameVersions: [MC_VERSION] },
 
@@ -524,7 +535,7 @@ const EXTRA_MODS = [
   { slug: 'trainer-accessories',            loaders: ['fabric'], gameVersions: [MC_VERSION] },
   { slug: 'cobblemon-max-level-catch-cap',  loaders: ['fabric'], gameVersions: [MC_VERSION] },
   { slug: 'cobblemon-capture-notification', loaders: ['fabric'], gameVersions: [MC_VERSION] },
-  { slug: 'easyauth',                       loaders: ['fabric'], gameVersions: [MC_VERSION] },
+  { slug: 'basic-login',                    loaders: ['neoforge'], gameVersions: [MC_VERSION] },
   { slug: 'easywhitelist',                  loaders: ['fabric'], gameVersions: [MC_VERSION] },
   { slug: 'cobbletcg',                      loaders: ['fabric'], gameVersions: [MC_VERSION] },
   { slug: 'cobblemon-pet-a-poke',           loaders: ['fabric'], gameVersions: [MC_VERSION] },
@@ -539,7 +550,7 @@ const EXTRA_MODS = [
   { slug: 'cobblemonmovedex',               loaders: ['fabric'], gameVersions: [MC_VERSION] },
   { slug: 'cobblemarks+',                   loaders: ['fabric'], gameVersions: [MC_VERSION] },
   { slug: 'cobblemon_expeditions',          loaders: ['fabric'], gameVersions: [MC_VERSION] },
-  { slug: 'seasonhud-fabric',               loaders: ['fabric'], gameVersions: [MC_VERSION] },
+  { slug: 'seasonhud',                      loaders: ['neoforge'], version: '1.21.1-2.0.3', projectId: 'VNjUn3NA', gameVersions: [MC_VERSION], isClientOnly: true },
 ];
 
 /**
@@ -570,7 +581,7 @@ const CUSTOM_DIRECT_MODS = [
 async function ensureExtraMods() {
   logInfo(`[Modrinth] Extra modok ellenőrzése: ${EXTRA_MODS.map(m => m.slug).join(', ')}...`);
 
-  for (const { slug, loaders, gameVersions, isDatapack } of EXTRA_MODS) {
+  for (const { slug, loaders, gameVersions, isDatapack, isClientOnly } of EXTRA_MODS) {
     try {
       const params = [];
       if (loaders) params.push(`loaders=${encodeURIComponent(JSON.stringify(loaders))}`);
@@ -578,7 +589,12 @@ async function ensureExtraMods() {
       const qs = params.length ? '?' + params.join('&') : '';
 
       const versions = await modrinthRequest(`/v2/project/${slug}/version${qs}`);
-      const latest = versions.filter(v => v.version_type === 'release')[0] || versions[0];
+      let latest = versions.filter(v => v.version_type === 'release')[0] || versions[0];
+      
+      const pinnedVersion = EXTRA_MODS.find(m => m.slug === slug)?.version;
+      if (pinnedVersion) {
+        latest = versions.find(v => v.version_number === pinnedVersion) || latest;
+      }
 
       if (!latest) {
         logInfo(`[Modrinth] Nincs megfelelő verzió: ${slug} (MC ${MC_VERSION})`);
@@ -588,7 +604,7 @@ async function ensureExtraMods() {
       logInfo(`[Modrinth] ${slug} → ${latest.version_number}`);
 
       const file = latest.files.find(f => f.primary) || latest.files[0];
-      const targetDir = isDatapack ? DATAPACKS_DIR : MODS_DIR;
+      const targetDir = isDatapack ? DATAPACKS_DIR : (isClientOnly ? CLIENT_MODS_DIR : MODS_DIR);
       const dest = path.join(targetDir, file.filename);
 
       const isPresent = fs.existsSync(dest);
@@ -775,19 +791,30 @@ function cleanupDuplicateMods() {
     if (groupFiles.length > 1) {
       logInfo(`[Installer] Duplikáció észlelve a '${baseName}' modnál: ${groupFiles.join(', ')}`);
       
+      // Kikeressük az EXTRA_MODS-ból, hogy ehhez a modhoz milyen loadert preferálunk
+      let expectedLoaders = ['neoforge'];
+      for (const mod of EXTRA_MODS) {
+        const modSlug = mod.slug.toLowerCase().replace(/-/g, '');
+        const cleanBase = baseName.replace(/-/g, '');
+        if (cleanBase === modSlug) {
+          if (mod.loaders) expectedLoaders = mod.loaders;
+          break;
+        }
+      }
+
       let bestFile = groupFiles[0];
-      let bestIsNeoForge = bestFile.toLowerCase().includes('neoforge');
+      let bestMatchesExpected = expectedLoaders.some(l => bestFile.toLowerCase().includes(l));
       let bestMtime = fs.statSync(path.join(MODS_DIR, bestFile)).mtimeMs;
 
       for (let i = 1; i < groupFiles.length; i++) {
         const file = groupFiles[i];
-        const isNeoForge = file.toLowerCase().includes('neoforge');
+        const matchesExpected = expectedLoaders.some(l => file.toLowerCase().includes(l));
         const mtime = fs.statSync(path.join(MODS_DIR, file)).mtimeMs;
         
         let shouldReplace = false;
-        if (isNeoForge && !bestIsNeoForge) {
+        if (matchesExpected && !bestMatchesExpected) {
           shouldReplace = true;
-        } else if (isNeoForge === bestIsNeoForge) {
+        } else if (matchesExpected === bestMatchesExpected) {
           if (mtime > bestMtime) {
             shouldReplace = true;
           }
@@ -795,7 +822,7 @@ function cleanupDuplicateMods() {
         
         if (shouldReplace) {
           bestFile = file;
-          bestIsNeoForge = isNeoForge;
+          bestMatchesExpected = matchesExpected;
           bestMtime = mtime;
         }
       }
@@ -934,6 +961,7 @@ async function install() {
   const javaPath = await installJava()
 
   fs.mkdirSync(MODS_DIR, { recursive: true })
+  fs.mkdirSync(CLIENT_MODS_DIR, { recursive: true })
 
   // 1. Modpack check & download
   logInfo('[Installer] Keresem a legfrissebb Cobbleverse modpackot...')
