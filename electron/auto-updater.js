@@ -1,14 +1,24 @@
 const { autoUpdater } = require('electron-updater');
-const { ipcMain, dialog } = require('electron');
-const path = require('path');
+const { ipcMain } = require('electron');
 
 // Logging
 autoUpdater.logger = require('electron-log');
 autoUpdater.logger.transports.file.level = 'info';
 
-// Auto-download the update as soon as it’s found – no user prompt needed.
+// Auto-download the update as soon as it's found – no user prompt needed.
 autoUpdater.autoDownload = true;
 autoUpdater.autoInstallOnAppQuit = true;
+
+// ── CRITICAL: Set the feed URL to our own server BEFORE any checkForUpdates()
+// call. Without this, electron-updater reads the "publish" field from
+// package.json and tries GitHub first — which 404s because we never upload
+// latest-linux.yml there.
+const DEFAULT_UPDATE_SERVER = 'http://94.72.100.43:8080/releases/';
+autoUpdater.setFeedURL({
+  provider: 'generic',
+  url: DEFAULT_UPDATE_SERVER,
+});
+console.log(`[Updater] Feed URL: ${DEFAULT_UPDATE_SERVER}`);
 
 // Minimum launcher version that supports NeoForge.
 // Old clients below this must be forced to update.
@@ -40,26 +50,26 @@ function setupAutoUpdater(mainWindow, appVersion) {
   // Check for updates every 2 hours
   setInterval(() => {
     autoUpdater.checkForUpdatesAndNotify().catch(err => {
-      console.error('Update check failed:', err);
+      console.error('Update check failed:', err.message);
     });
   }, 2 * 60 * 60 * 1000);
 
   // Events
   autoUpdater.on('checking-for-update', () => {
-    console.log('Checking for update...');
+    console.log('[Updater] Checking for update...');
   });
 
   autoUpdater.on('update-available', (info) => {
-    console.log('Update available:', info.version);
+    console.log('[Updater] Update available:', info.version);
     mainWindow.webContents.send('update-available', info);
   });
 
-  autoUpdater.on('update-not-available', (info) => {
-    console.log('Update not available.');
+  autoUpdater.on('update-not-available', () => {
+    console.log('[Updater] No update available.');
   });
 
   autoUpdater.on('error', (err) => {
-    console.error('Error in auto-updater: ', err);
+    console.error('[Updater] Error:', err.message);
     mainWindow.webContents.send('update-error', err.message);
   });
 
@@ -68,9 +78,9 @@ function setupAutoUpdater(mainWindow, appVersion) {
   });
 
   autoUpdater.on('update-downloaded', (info) => {
-    console.log('Update downloaded, restarting...');
+    console.log('[Updater] Update downloaded, restarting...');
     mainWindow.webContents.send('update-downloaded', info);
-    // Automatically quit and install after a short delay to let the UI render the message
+    // Automatically quit and install after a short delay so the UI can show a message
     setTimeout(() => {
       autoUpdater.quitAndInstall(false, true);
     }, 3000);
@@ -99,19 +109,21 @@ function setupAutoUpdater(mainWindow, appVersion) {
     autoUpdater.quitAndInstall();
   });
 
+  // Allow renderer to override the update server URL (e.g. if user changes server)
   ipcMain.handle('set-update-server-url', (event, serverUrl) => {
     if (!serverUrl) return;
     const updateUrl = `${serverUrl.replace(/\/+$/, '')}/releases/`;
-    console.log(`[Updater] Feed URL beállítva: ${updateUrl}`);
+    console.log(`[Updater] Feed URL frissítve: ${updateUrl}`);
     autoUpdater.setFeedURL({
       provider: 'generic',
       url: updateUrl
     });
   });
 
-  // Initial check
+  // Initial check – feed URL is already set to the generic server at module
+  // load time, so this will NEVER hit GitHub.
   autoUpdater.checkForUpdatesAndNotify().catch(err => {
-    console.error('Initial update check failed:', err);
+    console.error('[Updater] Initial update check failed:', err.message);
   });
 }
 
