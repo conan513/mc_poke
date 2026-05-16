@@ -1352,13 +1352,40 @@ async function launch({ username, uuid, ram, serverUrl, closeOnLaunch, loaderTyp
     onLog?.(`[Launcher-Hiba] Nem sikerült frissíteni a konfigurációkat: ${e.message}`)
   }
 
+  // ── NeoForge JVM argument injection ──────────────────────────
+  // MCLC reads vanilla 1.21.1 JVM args from getVersion(), but it does NOT
+  // process the custom version's arguments.jvm (NeoForge's JSON). Those args
+  // contain critical module-system flags (-p, --add-modules ALL-MODULE-PATH,
+  // --add-opens, --add-exports, -DignoreList, -DlibraryDirectory) that the
+  // BootstrapLauncher requires. Without them Java exits immediately with code 1.
+  let neoForgeJvmArgs = []
+  if (loaderType !== 'fabric') {
+    try {
+      const neoJson = JSON.parse(
+        fs.readFileSync(path.join(mcDir, 'versions', versionId, `${versionId}.json`), 'utf8')
+      )
+      const libDir = path.join(mcDir, 'libraries')
+      const sep = process.platform === 'win32' ? ';' : ':'
+      neoForgeJvmArgs = (neoJson.arguments?.jvm || [])
+        .filter(a => typeof a === 'string') // skip rule-objects (OS-conditional)
+        .map(a => a
+          .replace(/\$\{library_directory\}/g, libDir)
+          .replace(/\$\{classpath_separator\}/g, sep)
+          .replace(/\$\{version_name\}/g, versionId)
+        )
+      onLog?.(`[Launcher] NeoForge JVM args betöltve: ${neoForgeJvmArgs.length} db`)
+    } catch (e) {
+      onLog?.(`[Launcher-Warning] NeoForge JVM args betöltése sikertelen: ${e.message}`)
+    }
+  }
+
   const client = new Client()
 
   const opts = {
     authorization: uuid ? {
       access_token: 'null',
       client_token: 'null',
-      uuid: uuid.replace(/-/g, ''), // MCLC often expects UUID without dashes for some fields
+      uuid: uuid.replace(/-/g, ''),
       name: username,
       user_properties: '{}'
     } : Authenticator.getAuth(username),
@@ -1370,12 +1397,8 @@ async function launch({ username, uuid, ram, serverUrl, closeOnLaunch, loaderTyp
     },
     memory: {
       max: `${ramMb}M`,
-      // Min = 25% of max (floor 512 MB): avoids excessive early GC cycles while
-      // still leaving headroom for the OS when the game hasn't loaded everything yet
       min: `${Math.max(512, Math.floor(ramMb * 0.25))}M`,
     },
-
-
     javaPath: java,
     gameDirectory: instanceDir,
     quickPlay: {
@@ -1385,24 +1408,23 @@ async function launch({ username, uuid, ram, serverUrl, closeOnLaunch, loaderTyp
     overrides: {
       gameDirectory: instanceDir,
       customArgs: ['--quickPlayMultiplayer', `${targetHost}:25565`],
-      // NeoForge only installs a JSON into its version dir, not a JAR.
-      // MCLC must use the vanilla 1.21.1 client jar as the minecraft jar.
+      // NeoForge only installs a JSON, not a JAR. Point MCLC at the vanilla jar.
       minecraftJar: path.join(mcDir, 'versions', MC_VERSION, `${MC_VERSION}.jar`),
     },
     server: {
       host: targetHost,
       port: 25565
     },
-    // Platform-optimised JVM args: ZUncommit returns unused heap to the OS,
-    // CompressedOops shrinks pointer sizes, platform-specific page tricks
-    // (THugePages on Linux, LargePages on Windows) reduce TLB pressure.
-    customArgs: buildJvmArgs(ramMb, process.platform),
-
-
+    // NeoForge module args first, then platform-optimised GC/heap args.
+    customArgs: [...neoForgeJvmArgs, ...buildJvmArgs(ramMb, process.platform)],
   }
 
   client.on('arguments', (args) => {
     onLog?.(`[ARGS] ${args.join(' ')}`)
+  })
+  client.on('debug', (msg) => {
+    // Captures MCLC internal errors (e.g. checkJava failure, missing files)
+    onLog?.(`[MCLC] ${msg}`)
   })
   client.on('data', (data) => {
     onLog?.(data.toString())

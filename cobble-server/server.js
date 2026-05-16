@@ -2134,7 +2134,7 @@ async function handleRequest(req, res) {
   }
 
   // ── Serve Web Installer assets (app.js, style.css, images, releases) ──
-  const allowedExtensions = ['.js', '.css', '.png', '.jpg', '.jpeg', '.exe', '.AppImage', '.deb', '.zip', '.dmg', '.json', '.ico']
+  const allowedExtensions = ['.js', '.css', '.png', '.jpg', '.jpeg', '.exe', '.AppImage', '.deb', '.zip', '.dmg', '.json', '.ico', '.yml', '.yaml', '.rpm', '.pacman', '.tar', '.gz']
   const requestedFile = url.startsWith('/') ? url.slice(1) : url
 
   // Basic security: prevent directory traversal
@@ -2155,11 +2155,19 @@ async function handleRequest(req, res) {
       '.AppImage': 'application/octet-stream',
       '.deb': 'application/vnd.debian.binary-package',
       '.zip': 'application/zip',
-      '.dmg': 'application/x-apple-diskimage'
+      '.dmg': 'application/x-apple-diskimage',
+      '.yml': 'text/yaml',
+      '.yaml': 'text/yaml',
+      '.rpm': 'application/x-rpm',
+      '.pacman': 'application/octet-stream',
+      '.gz': 'application/gzip',
+      '.tar': 'application/x-tar',
     }
+    // YML metadata files must not be cached – the updater needs the latest version info
+    const isMetadata = ext === '.yml' || ext === '.yaml'
     res.writeHead(200, {
       'Content-Type': mimeTypes[ext] || 'application/octet-stream',
-      'Cache-Control': 'public, max-age=86400'
+      'Cache-Control': isMetadata ? 'no-cache, no-store, must-revalidate' : 'public, max-age=86400'
     })
     fs.createReadStream(filePath).pipe(res)
     return
