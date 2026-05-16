@@ -1231,7 +1231,14 @@ if (window.cobble) {
         $id('intro-install-progress-container')?.classList.add('hidden');
       }, 2000);
     }
-    setTimeout(goToHome, 800)
+    // Re-fetch install status so the Play button reflects the newly
+    // installed state instead of the stale pre-install value.
+    setTimeout(async () => {
+      if (window.cobble) {
+        window._lastInstallStatus = await window.cobble.checkInstalled()
+      }
+      goToHome()
+    }, 800)
   }
   })
 }

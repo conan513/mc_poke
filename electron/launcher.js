@@ -711,7 +711,11 @@ async function installNeoForge() {
       }
     }
 
-    const jvmOptions = []
+    const jvmOptions = [
+      // The NeoForge installer is a Swing/AWT GUI app – without this flag it
+      // tries to open a window, which fails in Electron's headless main process.
+      '-Djava.awt.headless=true',
+    ]
     if (truststorePath) {
       jvmOptions.push(`-Djavax.net.ssl.trustStore=${truststorePath}`)
       jvmOptions.push(`-Djavax.net.ssl.trustStorePassword=${truststorePass}`)
@@ -721,17 +725,33 @@ async function installNeoForge() {
       jvmOptions.push('-Djavax.net.ssl.trustStoreType=WINDOWS-ROOT')
     }
 
-    // NeoForge installer options: --installClient (standalone flag, uses cwd as install dir)
-    const args = [...jvmOptions, '-jar', installerJar, '--installClient']
+    // The NeoForge installer validates that launcher_profiles.json exists in the
+    // target directory before it proceeds. Create a minimal dummy if absent.
+    const profilesJson = path.join(mcDir, 'launcher_profiles.json')
+    if (!fs.existsSync(profilesJson)) {
+      fs.writeFileSync(profilesJson, JSON.stringify({
+        profiles: {},
+        selectedProfile: '(Default)',
+        clientToken: crypto.randomUUID?.() || 'cobble-launcher',
+        authenticationDatabase: {},
+        launcherVersion: { name: '2.13.1', format: 21 }
+      }, null, 2))
+      console.log('[NeoForge] launcher_profiles.json létrehozva (dummy).')
+    }
 
-    execFile(java, args, { cwd: mcDir, windowsHide: true }, (err, stdout, stderr) => {
+    // NeoForge installer: --installClient <dir> installs to the given directory.
+    // Default would be ~/.minecraft which is wrong for our custom layout.
+    const args = [...jvmOptions, '-jar', installerJar, '--installClient', mcDir]
+
+    execFile(java, args, { cwd: mcDir, windowsHide: true, maxBuffer: 10 * 1024 * 1024 }, (err, stdout, stderr) => {
       if (stdout && stdout.trim()) console.log('[NeoForge installer stdout]\n' + stdout)
       if (stderr && stderr.trim()) console.error('[NeoForge installer stderr]\n' + stderr)
       if (err) {
         if (fs.existsSync(versionJson)) {
           return resolve()
         }
-        return reject(new Error('NeoForge telepítés sikertelen: ' + (stderr || err.message)))
+        const detail = (stderr || '').trim() || err.message
+        return reject(new Error('NeoForge telepítés sikertelen: ' + detail))
       }
       return resolve()
     })
@@ -1364,7 +1384,10 @@ async function launch({ username, uuid, ram, serverUrl, closeOnLaunch, loaderTyp
     },
     overrides: {
       gameDirectory: instanceDir,
-      customArgs: ['--quickPlayMultiplayer', `${targetHost}:25565`]
+      customArgs: ['--quickPlayMultiplayer', `${targetHost}:25565`],
+      // NeoForge only installs a JSON into its version dir, not a JAR.
+      // MCLC must use the vanilla 1.21.1 client jar as the minecraft jar.
+      minecraftJar: path.join(mcDir, 'versions', MC_VERSION, `${MC_VERSION}.jar`),
     },
     server: {
       host: targetHost,
