@@ -7,6 +7,7 @@ contextBridge.exposeInMainWorld('cobble', {
 
   // App path
   getAppPath: () => ipcRenderer.invoke('get-app-path'),
+  getAppVersion: () => ipcRenderer.invoke('get-app-version'),
   getLocale: () => ipcRenderer.invoke('get-locale'),
   getHWID: () => ipcRenderer.invoke('get-hwid'),
   getTotalMem: () => ipcRenderer.invoke('get-total-mem'),
@@ -43,6 +44,7 @@ contextBridge.exposeInMainWorld('cobble', {
   onUpdateDownloadProgress: (cb) => ipcRenderer.on('update-download-progress', (_, p) => cb(p)),
   onUpdateDownloaded: (cb) => ipcRenderer.on('update-downloaded', (_, info) => cb(info)),
   onUpdateError: (cb) => ipcRenderer.on('update-error', (_, err) => cb(err)),
+  onForceUpdateRequired: (cb) => ipcRenderer.on('force-update-required', (_, info) => cb(info)),
 
   // External links
   openExternal: (url) => ipcRenderer.send('open-external', url),

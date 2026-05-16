@@ -37,6 +37,8 @@ const FABRIC_INSTALLER_META_URL = 'https://meta.fabricmc.net/v2/versions/install
 
 // Runtime state – populated after resolving from API
 let resolvedNeoForgeVersion = null
+let resolvedFabricLoaderVersion = null
+let resolvedFabricInstallerVersion = null
 
 // Java 21 download URLs per platform
 const JAVA_URLS = {
@@ -380,6 +382,183 @@ function getJavaExecutable() {
   } else {
     return path.join(javaDir, 'bin', 'java')
   }
+}
+
+// ── Fabric Installer ─────────────────────────────────────────
+
+/**
+ * Fetch the latest stable Fabric Loader + Installer versions from the Fabric Meta API.
+ * Returns { loader: '0.x.y', installer: '1.x.y' }
+ */
+async function fetchLatestFabricVersions() {
+  return new Promise((resolve, reject) => {
+    const makeReq = (url, cb) => {
+      const mod = url.startsWith('https') ? https : http
+      mod.get(url, { headers: { 'User-Agent': 'CobbleLauncher/1.0' } }, (res) => {
+        if (res.statusCode === 301 || res.statusCode === 302) return makeReq(res.headers.location, cb)
+        let data = ''
+        res.on('data', c => data += c)
+        res.on('end', () => { try { cb(null, JSON.parse(data)) } catch(e) { cb(e) } })
+        res.on('error', cb)
+      }).on('error', cb)
+    }
+
+    // Loader list for our MC version – first entry is the latest stable
+    makeReq(FABRIC_META_URL, (err, loaderList) => {
+      if (err || !Array.isArray(loaderList) || loaderList.length === 0) {
+        return reject(new Error('Fabric Meta API elérhetetlen – ellenőrizd az internetkapcsolatot!'))
+      }
+      // Filter to stable only (stable: true)
+      const stable = loaderList.filter(e => e.loader?.stable !== false)
+      const latestLoader = (stable[0] || loaderList[0]).loader.version
+
+      // Installer list
+      makeReq(FABRIC_INSTALLER_META_URL, (err2, installerList) => {
+        if (err2 || !Array.isArray(installerList) || installerList.length === 0) {
+          return reject(new Error('Fabric Installer API elérhetetlen!'))
+        }
+        const stableInst = installerList.filter(e => e.stable !== false)
+        const latestInstaller = (stableInst[0] || installerList[0]).version
+        resolve({ loader: latestLoader, installer: latestInstaller })
+      })
+    })
+  })
+}
+
+async function installFabric() {
+  const mcDir = getGameDir()
+
+  // ── 1. Resolve latest versions from Fabric API ──────────────
+  sendProgress('fabric', 2, 'Fabric verzió ellenőrzése...')
+  let latestLoader, latestInstaller
+  try {
+    const v = await fetchLatestFabricVersions()
+    latestLoader = v.loader
+    latestInstaller = v.installer
+    resolvedFabricLoaderVersion = latestLoader
+    resolvedFabricInstallerVersion = latestInstaller
+    console.log(`[Fabric] Legfrissebb loader: ${latestLoader}, installer: ${latestInstaller}`)
+  } catch (e) {
+    // Fallback: use last known version from state file
+    const state = readState()
+    if (state.fabricLoaderVersion) {
+      console.warn('[Fabric] API nem elérhető, tárolt verzió használata:', state.fabricLoaderVersion)
+      latestLoader = state.fabricLoaderVersion
+      latestInstaller = state.fabricInstallerVersion || '1.0.1'
+      resolvedFabricLoaderVersion = latestLoader
+    } else {
+      throw e
+    }
+  }
+
+  // ── 2. Compare with installed version ───────────────────────
+  const state = readState()
+  const installedLoader = state.fabricLoaderVersion
+  const versionId = `fabric-loader-${latestLoader}-${MC_VERSION}`
+  const versionJson = path.join(mcDir, 'versions', versionId, `${versionId}.json`)
+
+  const alreadyInstalled = fs.existsSync(versionJson)
+  const isUpToDate = alreadyInstalled && installedLoader === latestLoader
+
+  if (isUpToDate) {
+    sendProgress('fabric', 100, `Fabric Loader ${latestLoader} már telepítve ✓`)
+    return
+  }
+
+  if (alreadyInstalled && installedLoader && installedLoader !== latestLoader) {
+    sendProgress('fabric', 5, `Fabric frissítés: ${installedLoader} → ${latestLoader}`)
+  } else {
+    sendProgress('fabric', 5, `Fabric Loader ${latestLoader} telepítése...`)
+  }
+
+  // ── 3. Download Fabric Installer ────────────────────────────
+  const installerUrl = `https://maven.fabricmc.net/net/fabricmc/fabric-installer/${latestInstaller}/fabric-installer-${latestInstaller}.jar`
+  const installerJar = path.join(getGameDir(), 'fabric-installer.jar')
+
+  sendProgress('fabric', 8, `Fabric Installer ${latestInstaller} letöltése...`)
+  await downloadFile(installerUrl, installerJar, (p) => {
+    sendProgress('fabric', 8 + Math.round(p * 32), `Fabric Installer: ${Math.round(p * 100)}%`)
+  })
+
+  // ── 4. Run Fabric Installer ──────────────────────────────────
+  sendProgress('fabric', 42, `Fabric Loader ${latestLoader} telepítése...`)
+  fse.ensureDirSync(mcDir)
+
+  await new Promise(async (resolve, reject) => {
+    const java = javaPath || getJavaExecutable() || 'java'
+
+    const pemPath = process.env.COBBLE_CA_PEM || path.join(getGameDir(), 'custom_ca.pem')
+    let truststorePath = null
+    const truststorePass = 'changeit'
+    if (fs.existsSync(pemPath)) {
+      try {
+        const getKeytoolPath = (javaExe) => {
+          const binDir = path.dirname(javaExe)
+          const kt = process.platform === 'win32' ? path.join(binDir, 'keytool.exe') : path.join(binDir, 'keytool')
+          return kt
+        }
+
+        const keytool = getKeytoolPath(java)
+        truststorePath = path.join(getGameDir(), 'custom-truststore.p12')
+
+        if (fs.existsSync(keytool)) {
+          await new Promise(async (kresolve, kreject) => {
+            const ktArgs = ['-importcert', '-file', pemPath, '-alias', 'cobble_ca', '-keystore', truststorePath, '-storepass', truststorePass, '-storetype', 'PKCS12', '-noprompt']
+            execFile(keytool, ktArgs, { cwd: getGameDir() }, (kerr, kstdout, kstderr) => {
+              if (kerr) {
+                console.error('[Truststore] keytool failed:', kstderr || kerr.message)
+                truststorePath = null
+                return kresolve()
+              }
+              console.log('[Truststore] custom truststore created at', truststorePath)
+              return kresolve()
+            })
+          })
+        } else {
+          console.warn('[Truststore] keytool nem található a java mellett.')
+          truststorePath = null
+        }
+      } catch (e) {
+        console.warn('[Truststore] Hiba a truststore létrehozásakor:', e.message)
+        truststorePath = null
+      }
+    }
+
+    const jvmOptions = []
+    if (truststorePath) {
+      jvmOptions.push(`-Djavax.net.ssl.trustStore=${truststorePath}`)
+      jvmOptions.push(`-Djavax.net.ssl.trustStorePassword=${truststorePass}`)
+    }
+
+    if (process.platform === 'win32') {
+      jvmOptions.push('-Djavax.net.ssl.trustStoreType=WINDOWS-ROOT')
+    }
+
+    const args = [...jvmOptions, '-jar', installerJar, 'client', '-dir', mcDir, '-mcversion', MC_VERSION, '-loader', latestLoader, '-noprofile']
+
+    execFile(java, args, { cwd: mcDir, windowsHide: true }, (err, stdout, stderr) => {
+      if (stdout && stdout.trim()) console.log('[Fabric installer stdout]\n' + stdout)
+      if (stderr && stderr.trim()) console.error('[Fabric installer stderr]\n' + stderr)
+      if (err) {
+        if (fs.existsSync(versionJson)) {
+          return resolve()
+        }
+        return reject(new Error('Fabric telepítés sikertelen: ' + (stderr || err.message)))
+      }
+      return resolve()
+    })
+  })
+
+  if (fs.existsSync(installerJar)) fs.unlinkSync(installerJar)
+
+  // ── 5. Persist installed version ────────────────────────────
+  writeState({
+    fabricLoaderVersion: latestLoader,
+    fabricInstallerVersion: latestInstaller,
+    fabricInstalledAt: new Date().toISOString(),
+  })
+
+  sendProgress('fabric', 100, `Fabric Loader ${latestLoader} telepítve ✓`)
 }
 
 // ── NeoForge Installer ─────────────────────────────────────────
@@ -744,7 +923,7 @@ async function cleanupClientMods(onLog) {
  * Scans the mods folder and checks Modrinth for newer versions
  * compatible with the current MC version and Fabric.
  */
-async function updateModsFromModrinth(onLog) {
+async function updateModsFromModrinth(loaderType = 'neoforge', onLog) {
   const instanceDir = getModpackDir()
   const modsDir = path.join(instanceDir, 'mods')
   if (!fs.existsSync(modsDir)) return
@@ -785,8 +964,8 @@ async function updateModsFromModrinth(onLog) {
 
     let updatedCount = 0
     for (const projectId of projectsToCheck) {
-      // Get all versions for this project for MC 1.21.1 and NeoForge
-      const query = `loaders=${encodeURIComponent('["neoforge"]')}&game_versions=${encodeURIComponent(`["${MC_VERSION}"]`)}`
+      // Get all versions for this project for MC 1.21.1 and the requested loader
+      const query = `loaders=${encodeURIComponent(`["${loaderType}"]`)}&game_versions=${encodeURIComponent(`["${MC_VERSION}"]`)}`
       const versions = await modrinthRequest(`/v2/project/${projectId}/version?${query}`)
       // Sort by date (Modrinth usually does this, but to be sure)
       const releases = versions.filter(v => v.version_type === 'release')
@@ -1065,7 +1244,7 @@ function buildJvmArgs(ramMb, platform) {
 
 // ── Public API ───────────────────────────────────────────────
 
-async function install({ username, ram, serverUrl }, onProgress) {
+async function install({ username, ram, serverUrl, loaderType = 'neoforge' }, onProgress) {
   progressCallback = onProgress
 
   migrateStructure()
@@ -1074,14 +1253,18 @@ async function install({ username, ram, serverUrl }, onProgress) {
 
   await installJava()
   await installMinecraft()
-  await installNeoForge()
+  if (loaderType === 'fabric') {
+    await installFabric()
+  } else {
+    await installNeoForge()
+  }
   await installModpack(serverUrl)
 
   sendProgress('done', 100, 'Minden telepítve! Jó játékot! 🎮')
   progressCallback = null
 }
 
-async function launch({ username, uuid, ram, serverUrl, closeOnLaunch }, onLog, onClose) {
+async function launch({ username, uuid, ram, serverUrl, closeOnLaunch, loaderType = 'neoforge' }, onLog, onClose) {
   const ramMb = ram || 4096
 
   migrateStructure()
@@ -1092,10 +1275,16 @@ async function launch({ username, uuid, ram, serverUrl, closeOnLaunch }, onLog, 
 
   // Use the resolved (latest) loader version, or fall back to state file
   const state = readState()
-  const loaderVersion = resolvedNeoForgeVersion || state.neoForgeVersion || '21.1.230'
-  const versionId = `neoforge-${loaderVersion}`
-
-  onLog?.(`[Launcher] NeoForge: ${loaderVersion}`)
+  let loaderVersion, versionId
+  if (loaderType === 'fabric') {
+    loaderVersion = resolvedFabricLoaderVersion || state.fabricLoaderVersion || '0.16.9'
+    versionId = `fabric-loader-${loaderVersion}-${MC_VERSION}`
+    onLog?.(`[Launcher] Fabric: ${loaderVersion}`)
+  } else {
+    loaderVersion = resolvedNeoForgeVersion || state.neoForgeVersion || '21.1.230'
+    versionId = `neoforge-${loaderVersion}`
+    onLog?.(`[Launcher] NeoForge: ${loaderVersion}`)
+  }
 
   // ── Unified Server Resolution ────────────────────────────────
   const DEFAULT_HOST = "94.72.100.43"
@@ -1212,21 +1401,23 @@ async function launch({ username, uuid, ram, serverUrl, closeOnLaunch }, onLog, 
 }
 
 
-function isInstalled() {
+function isInstalled(loaderType = 'neoforge') {
   const state = readState()
   const modsDir = path.join(getModpackDir(), 'mods')
   const clientJar = path.join(getGameDir(), 'versions', MC_VERSION, `${MC_VERSION}.jar`)
   const javaExe = getJavaExecutable()
   const modpackOk = !!state.modpackVersionId && fs.existsSync(modsDir)
+  
+  const loaderOk = loaderType === 'fabric' ? !!state.fabricLoaderVersion : !!state.neoForgeVersion
+
   return {
     java: fs.existsSync(javaExe) && state.javaVersion === JAVA_VERSION_TARGET,
-
     minecraft: fs.existsSync(clientJar),
     modpack: modpackOk,
     modpackVersion: state.modpackVersionNumber || null,
     neoForgeVersion: state.neoForgeVersion || null,
-    allDone: fs.existsSync(javaExe) && state.javaVersion === JAVA_VERSION_TARGET && fs.existsSync(clientJar) && modpackOk,
-
+    fabricVersion: state.fabricLoaderVersion || null,
+    allDone: fs.existsSync(javaExe) && state.javaVersion === JAVA_VERSION_TARGET && fs.existsSync(clientJar) && modpackOk && loaderOk,
   }
 }
 
@@ -1236,7 +1427,7 @@ function isInstalled() {
  */
 async function checkForUpdates() {
   const state = readState()
-  const result = { modpack: null, neoforge: null }
+  const result = { modpack: null, neoforge: null, fabric: null }
 
   // Modpack
   try {
@@ -1258,6 +1449,17 @@ async function checkForUpdates() {
       result.neoforge = {
         currentVersion: state.neoForgeVersion || '?',
         latestVersion: loader,
+      }
+    }
+  } catch (_) {}
+
+  // Fabric
+  try {
+    const v = await fetchLatestFabricVersions()
+    if (v.loader !== state.fabricLoaderVersion) {
+      result.fabric = {
+        currentVersion: state.fabricLoaderVersion || '?',
+        latestVersion: v.loader,
       }
     }
   } catch (_) {}

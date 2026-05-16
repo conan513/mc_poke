@@ -6,11 +6,37 @@ const path = require('path');
 autoUpdater.logger = require('electron-log');
 autoUpdater.logger.transports.file.level = 'info';
 
-// Disable auto download (we want to control it via UI/IPC)
-autoUpdater.autoDownload = false;
+// Auto-download the update as soon as it’s found – no user prompt needed.
+autoUpdater.autoDownload = true;
+autoUpdater.autoInstallOnAppQuit = true;
 
-function setupAutoUpdater(mainWindow) {
-  
+// Minimum launcher version that supports NeoForge.
+// Old clients below this must be forced to update.
+const MIN_REQUIRED_VERSION = '1.0.1';
+
+function versionIsOlderThan(current, required) {
+  const a = current.split('.').map(Number);
+  const b = required.split('.').map(Number);
+  for (let i = 0; i < 3; i++) {
+    if ((a[i] || 0) < (b[i] || 0)) return true;
+    if ((a[i] || 0) > (b[i] || 0)) return false;
+  }
+  return false;
+}
+
+function setupAutoUpdater(mainWindow, appVersion) {
+  // Check if this launcher version is below the minimum required.
+  // This blocks old Fabric-based launchers from running.
+  if (versionIsOlderThan(appVersion, MIN_REQUIRED_VERSION)) {
+    mainWindow.webContents.once('did-finish-load', () => {
+      mainWindow.webContents.send('force-update-required', {
+        currentVersion: appVersion,
+        minVersion: MIN_REQUIRED_VERSION,
+        reason: 'neoforge_migration'
+      });
+    });
+  }
+
   // Check for updates every 2 hours
   setInterval(() => {
     autoUpdater.checkForUpdatesAndNotify().catch(err => {
@@ -42,8 +68,12 @@ function setupAutoUpdater(mainWindow) {
   });
 
   autoUpdater.on('update-downloaded', (info) => {
-    console.log('Update downloaded');
+    console.log('Update downloaded, restarting...');
     mainWindow.webContents.send('update-downloaded', info);
+    // Automatically quit and install after a short delay to let the UI render the message
+    setTimeout(() => {
+      autoUpdater.quitAndInstall(false, true);
+    }, 3000);
   });
 
   // IPC Handlers

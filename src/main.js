@@ -1163,7 +1163,8 @@ document.querySelectorAll('.ram-btn').forEach(btn => {
 const stepMap = {
   java:      'step-java',
   minecraft: 'step-minecraft',
-  fabric:    'step-fabric',
+  neoforge:  'step-neoforge',
+  fabric:    'step-fabric',   // kept for backward compat
   modpack:   'step-modpack',
 }
 
@@ -1178,7 +1179,7 @@ if (window.cobble) {
   $id('progress-fill').style.width = `${percent}%`
 
   // Map step to overall progress
-  const stepWeights = { java: [0,20], minecraft: [20,55], fabric: [55,65], modpack: [65,100], done: [100,100] }
+  const stepWeights = { java: [0,20], minecraft: [20,50], neoforge: [50,65], fabric: [50,65], modpack: [65,100], done: [100,100] }
   const range = stepWeights[step]
   let overall = percent;
   if (range) {
@@ -1252,7 +1253,7 @@ async function startInstall() {
 
   const serverUrl = $id('input-server-url').value.trim()
   if (!window.cobble) return { success: false, error: 'Not in launcher' }
-  const result = await window.cobble.install({ username, ram: selectedRam, serverUrl })
+  const result = await window.cobble.install({ username, ram: selectedRam, serverUrl, loaderType: 'neoforge' })
 
   if (!result.success) {
     showToast(t('toast.install_error') + result.error)
@@ -1671,7 +1672,8 @@ async function handleLaunch() {
       uuid: verifyData.uuid, 
       ram: selectedRam, 
       serverUrl,
-      closeOnLaunch
+      closeOnLaunch,
+      loaderType: 'neoforge'
     })
 
   if (!result.success) {
@@ -1708,6 +1710,64 @@ if (window.cobble) {
     const btn = $id('btn-play')
     btn.disabled = false
     btn.querySelector('span:last-child').textContent = t('home.play_btn')
+  })
+}
+
+// ── Launcher Force-Update Overlay ─────────────────────────────
+if (window.cobble) {
+  // Force update: old client must update before doing anything
+  window.cobble.onForceUpdateRequired && window.cobble.onForceUpdateRequired((info) => {
+    const overlay = document.createElement('div')
+    overlay.id = 'force-update-overlay'
+    overlay.style.cssText = [
+      'position:fixed','inset:0','z-index:99999',
+      'background:rgba(5,5,15,0.97)',
+      'display:flex','flex-direction:column','align-items:center','justify-content:center',
+      'gap:20px','color:#fff','font-family:inherit','text-align:center','padding:40px'
+    ].join(';')
+    overlay.innerHTML = `
+      <svg viewBox="0 0 64 64" fill="none" style="width:72px;height:72px">
+        <circle cx="32" cy="32" r="30" stroke="#f87171" stroke-width="3"/>
+        <path d="M32 20v14M32 42v2" stroke="#f87171" stroke-width="3" stroke-linecap="round"/>
+      </svg>
+      <h2 style="font-size:1.6rem;margin:0;color:#f87171">Launcher frissítés szükséges!</h2>
+      <p style="max-width:480px;line-height:1.6;color:#ccc;margin:0">
+        A szerver mostantól <strong style="color:#a78bfa">NeoForge</strong> modloadert használ.<br>
+        A régi launcher (<strong>${info.currentVersion}</strong>) nem kompatibilis.<br>
+        Az új verzió letöltése automatikusan megkezdődik...
+      </p>
+      <div id="force-update-progress" style="width:100%;max-width:400px">
+        <div style="background:#1a1a2e;border-radius:8px;overflow:hidden;height:12px">
+          <div id="force-update-fill" style="height:100%;width:0%;background:linear-gradient(90deg,#7c3aed,#a78bfa);transition:width 0.3s"></div>
+        </div>
+        <p id="force-update-msg" style="color:#a78bfa;font-size:0.9rem;margin:8px 0 0">Frissítés keresése...</p>
+      </div>
+    `
+    document.body.appendChild(overlay)
+  })
+
+  // Update available: show progress in force-update overlay if visible, else show toast
+  window.cobble.onUpdateAvailable && window.cobble.onUpdateAvailable((info) => {
+    const msg = document.getElementById('force-update-msg')
+    if (msg) msg.textContent = `Új verzió (${info.version}) letöltése...`
+    else showToast(`🔄 Launcher frissítés letöltése: ${info.version}`)
+  })
+
+  // Download progress
+  window.cobble.onUpdateDownloadProgress && window.cobble.onUpdateDownloadProgress((p) => {
+    const fill = document.getElementById('force-update-fill')
+    const msg = document.getElementById('force-update-msg')
+    if (fill) fill.style.width = `${Math.round(p.percent || 0)}%`
+    if (msg) msg.textContent = `Letöltés: ${Math.round(p.percent || 0)}%`
+  })
+
+  // Downloaded: show restart message
+  window.cobble.onUpdateDownloaded && window.cobble.onUpdateDownloaded((info) => {
+    const msg = document.getElementById('force-update-msg')
+    const fill = document.getElementById('force-update-fill')
+    if (fill) fill.style.width = '100%'
+    if (msg) msg.textContent = `✓ Letöltve! Újraindítás...`
+    else showToast(`✅ Launcher ${info.version} telepítve – újraindítás...`)
   })
 }
 

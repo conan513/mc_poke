@@ -197,8 +197,8 @@ function createWindow() {
   mainWindow.on('focus', () => mainWindow.webContents.send('power-state', 'active'))
   mainWindow.on('blur', () => mainWindow.webContents.send('power-state', 'save'))
 
-  // Initialize auto-updater
-  setupAutoUpdater(mainWindow)
+  // Initialize auto-updater (pass version for force-update check)
+  setupAutoUpdater(mainWindow, app.getVersion())
 
 }
 
@@ -231,6 +231,7 @@ ipcMain.on('window-close', () => {
 })
 
 ipcMain.handle('get-app-path', () => app.getPath('userData'))
+ipcMain.handle('get-app-version', () => app.getVersion())
 ipcMain.handle('get-locale', () => app.getLocale())
 ipcMain.handle('get-hwid', () => getHWID())
 ipcMain.handle('get-total-mem', async () => {
@@ -294,9 +295,9 @@ ipcMain.handle('get-total-mem', async () => {
 
 
 // Install / First Setup
-ipcMain.handle('install', async (event, { username, ram, serverUrl }) => {
+ipcMain.handle('install', async (event, { username, ram, serverUrl, loaderType }) => {
   try {
-    await launcher.install({ username, ram, serverUrl }, (progress) => {
+    await launcher.install({ username, ram, serverUrl, loaderType }, (progress) => {
       mainWindow.webContents.send('install-progress', progress)
     })
     return { success: true }
@@ -310,14 +311,14 @@ ipcMain.handle('check-updates', async () => {
   try {
     return await launcher.checkForUpdates()
   } catch (err) {
-    return { modpack: null, fabric: null }
+    return { modpack: null, fabric: null, neoforge: null }
   }
 })
 
 // Run update (same as install, but always runs through modpack+fabric steps)
-ipcMain.handle('run-update', async (event, { username, ram, serverUrl }) => {
+ipcMain.handle('run-update', async (event, { username, ram, serverUrl, loaderType }) => {
   try {
-    await launcher.install({ username, ram, serverUrl }, (progress) => {
+    await launcher.install({ username, ram, serverUrl, loaderType }, (progress) => {
       mainWindow.webContents.send('install-progress', progress)
     })
     return { success: true }
@@ -327,9 +328,9 @@ ipcMain.handle('run-update', async (event, { username, ram, serverUrl }) => {
 })
 
 // Launch game
-ipcMain.handle('launch', async (event, { username, uuid, ram, serverUrl, closeOnLaunch }) => {
+ipcMain.handle('launch', async (event, { username, uuid, ram, serverUrl, closeOnLaunch, loaderType }) => {
   try {
-    await launcher.launch({ username, uuid, ram, serverUrl, closeOnLaunch }, (data) => {
+    await launcher.launch({ username, uuid, ram, serverUrl, closeOnLaunch, loaderType }, (data) => {
       mainWindow.webContents.send('game-log', data)
     }, () => {
       mainWindow.webContents.send('game-closed')
@@ -341,8 +342,8 @@ ipcMain.handle('launch', async (event, { username, uuid, ram, serverUrl, closeOn
 })
 
 // Check install status
-ipcMain.handle('check-installed', async () => {
-  return launcher.isInstalled()
+ipcMain.handle('check-installed', async (event, loaderType) => {
+  return launcher.isInstalled(loaderType)
 })
 
 ipcMain.handle('search-skins', async (event, query) => {

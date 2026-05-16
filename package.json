@@ -1,6 +1,6 @@
 {
   "name": "cobble-launcher",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "COBBLEMON UNIVERSE Minecraft Launcher",
   "main": "electron/main.js",
   "scripts": {
