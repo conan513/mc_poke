@@ -36,8 +36,7 @@ const FABRIC_META_URL = `https://meta.fabricmc.net/v2/versions/loader/${MC_VERSI
 const FABRIC_INSTALLER_META_URL = 'https://meta.fabricmc.net/v2/versions/installer'
 
 // Runtime state – populated after resolving from API
-let resolvedFabricLoaderVersion = null
-let resolvedFabricInstallerVersion = null
+let resolvedNeoForgeVersion = null
 
 // Java 21 download URLs per platform
 const JAVA_URLS = {
@@ -383,68 +382,77 @@ function getJavaExecutable() {
   }
 }
 
-// ── Fabric Installer ─────────────────────────────────────────
+// ── NeoForge Installer ─────────────────────────────────────────
 
 /**
- * Fetch the latest stable Fabric Loader + Installer versions from the Fabric Meta API.
- * Returns { loader: '0.x.y', installer: '1.x.y' }
+ * Fetch the latest NeoForge version for MC_VERSION (e.g., 21.1.x)
+ * Parses the maven-metadata.xml from NeoForge maven repository.
  */
-async function fetchLatestFabricVersions() {
+async function fetchLatestNeoForgeVersion() {
   return new Promise((resolve, reject) => {
+    const url = 'https://maven.neoforged.net/releases/net/neoforged/neoforge/maven-metadata.xml'
     const makeReq = (url, cb) => {
       const mod = url.startsWith('https') ? https : http
       mod.get(url, { headers: { 'User-Agent': 'CobbleLauncher/1.0' } }, (res) => {
         if (res.statusCode === 301 || res.statusCode === 302) return makeReq(res.headers.location, cb)
         let data = ''
         res.on('data', c => data += c)
-        res.on('end', () => { try { cb(null, JSON.parse(data)) } catch(e) { cb(e) } })
+        res.on('end', () => { cb(null, data) })
         res.on('error', cb)
       }).on('error', cb)
     }
 
-    // Loader list for our MC version – first entry is the latest stable
-    makeReq(FABRIC_META_URL, (err, loaderList) => {
-      if (err || !Array.isArray(loaderList) || loaderList.length === 0) {
-        return reject(new Error('Fabric Meta API elérhetetlen – ellenőrizd az internetkapcsolatot!'))
+    makeReq(url, (err, xml) => {
+      if (err || !xml) {
+        return reject(new Error('NeoForge Maven API elérhetetlen – ellenőrizd az internetkapcsolatot!'))
       }
-      // Filter to stable only (stable: true)
-      const stable = loaderList.filter(e => e.loader?.stable !== false)
-      const latestLoader = (stable[0] || loaderList[0]).loader.version
+      
+      // Parse all <version> tags
+      const versions = []
+      const regex = /<version>([^<]+)<\/version>/g
+      let match
+      while ((match = regex.exec(xml)) !== null) {
+        versions.push(match[1])
+      }
 
-      // Installer list
-      makeReq(FABRIC_INSTALLER_META_URL, (err2, installerList) => {
-        if (err2 || !Array.isArray(installerList) || installerList.length === 0) {
-          return reject(new Error('Fabric Installer API elérhetetlen!'))
-        }
-        const stableInst = installerList.filter(e => e.stable !== false)
-        const latestInstaller = (stableInst[0] || installerList[0]).version
-        resolve({ loader: latestLoader, installer: latestInstaller })
+      // Filter to our major.minor version, e.g. 21.1.*
+      // MC 1.21.1 corresponds to NeoForge 21.1.x
+      const prefix = MC_VERSION.substring(2) + '.' // "21.1."
+      const compatibleVersions = versions.filter(v => v.startsWith(prefix))
+      
+      if (compatibleVersions.length === 0) {
+        return reject(new Error(`Nem találtunk NeoForge verziót a ${MC_VERSION} verzióhoz!`))
+      }
+
+      // Sort versions based on build number (the third part)
+      compatibleVersions.sort((a, b) => {
+        const aBuild = parseInt(a.split('.')[2] || 0)
+        const bBuild = parseInt(b.split('.')[2] || 0)
+        return bBuild - aBuild // Descending order
       })
+
+      resolve(compatibleVersions[0])
     })
   })
 }
 
-async function installFabric() {
+async function installNeoForge() {
   const mcDir = getGameDir()
 
-  // ── 1. Resolve latest versions from Fabric API ──────────────
-  sendProgress('fabric', 2, 'Fabric verzió ellenőrzése...')
-  let latestLoader, latestInstaller
+  // ── 1. Resolve latest versions from NeoForge Maven ──────────────
+  sendProgress('neoforge', 2, 'NeoForge verzió ellenőrzése...')
+  let latestLoader
   try {
-    const v = await fetchLatestFabricVersions()
-    latestLoader = v.loader
-    latestInstaller = v.installer
-    resolvedFabricLoaderVersion = latestLoader
-    resolvedFabricInstallerVersion = latestInstaller
-    console.log(`[Fabric] Legfrissebb loader: ${latestLoader}, installer: ${latestInstaller}`)
+    latestLoader = await fetchLatestNeoForgeVersion()
+    resolvedNeoForgeVersion = latestLoader
+    console.log(`[NeoForge] Legfrissebb loader: ${latestLoader}`)
   } catch (e) {
     // Fallback: use last known version from state file
     const state = readState()
-    if (state.fabricLoaderVersion) {
-      console.warn('[Fabric] API nem elérhető, tárolt verzió használata:', state.fabricLoaderVersion)
-      latestLoader = state.fabricLoaderVersion
-      latestInstaller = state.fabricInstallerVersion || '1.0.1'
-      resolvedFabricLoaderVersion = latestLoader
+    if (state.neoForgeVersion) {
+      console.warn('[NeoForge] API nem elérhető, tárolt verzió használata:', state.neoForgeVersion)
+      latestLoader = state.neoForgeVersion
+      resolvedNeoForgeVersion = latestLoader
     } else {
       throw e
     }
@@ -452,50 +460,47 @@ async function installFabric() {
 
   // ── 2. Compare with installed version ───────────────────────
   const state = readState()
-  const installedLoader = state.fabricLoaderVersion
-  const versionId = `fabric-loader-${latestLoader}-${MC_VERSION}`
+  const installedLoader = state.neoForgeVersion
+  const versionId = `neoforge-${latestLoader}`
   const versionJson = path.join(mcDir, 'versions', versionId, `${versionId}.json`)
 
   const alreadyInstalled = fs.existsSync(versionJson)
   const isUpToDate = alreadyInstalled && installedLoader === latestLoader
 
   if (isUpToDate) {
-    sendProgress('fabric', 100, `Fabric Loader ${latestLoader} már telepítve ✓`)
+    sendProgress('neoforge', 100, `NeoForge ${latestLoader} már telepítve ✓`)
     return
   }
 
   if (alreadyInstalled && installedLoader && installedLoader !== latestLoader) {
-    sendProgress('fabric', 5, `Fabric frissítés: ${installedLoader} → ${latestLoader}`)
+    sendProgress('neoforge', 5, `NeoForge frissítés: ${installedLoader} → ${latestLoader}`)
   } else {
-    sendProgress('fabric', 5, `Fabric Loader ${latestLoader} telepítése...`)
+    sendProgress('neoforge', 5, `NeoForge ${latestLoader} telepítése...`)
   }
 
-  // ── 3. Download Fabric Installer ────────────────────────────
-  const installerUrl = `https://maven.fabricmc.net/net/fabricmc/fabric-installer/${latestInstaller}/fabric-installer-${latestInstaller}.jar`
-  const installerJar = path.join(getGameDir(), 'fabric-installer.jar')
+  // ── 3. Download NeoForge Installer ────────────────────────────
+  const installerUrl = \`https://maven.neoforged.net/releases/net/neoforged/neoforge/\${latestLoader}/neoforge-\${latestLoader}-installer.jar\`
+  const installerJar = path.join(getGameDir(), 'neoforge-installer.jar')
 
-  sendProgress('fabric', 8, `Fabric Installer ${latestInstaller} letöltése...`)
+  sendProgress('neoforge', 8, \`NeoForge Installer letöltése...\`)
   await downloadFile(installerUrl, installerJar, (p) => {
-    sendProgress('fabric', 8 + Math.round(p * 32), `Fabric Installer: ${Math.round(p * 100)}%`)
+    sendProgress('neoforge', 8 + Math.round(p * 32), \`NeoForge Installer: \${Math.round(p * 100)}%\`)
   })
 
-  // ── 4. Run Fabric Installer ──────────────────────────────────
-  sendProgress('fabric', 42, `Fabric Loader ${latestLoader} telepítése...`)
+  // ── 4. Run NeoForge Installer ──────────────────────────────────
+  sendProgress('neoforge', 42, \`NeoForge ${latestLoader} telepítése...\`)
   fse.ensureDirSync(mcDir)
 
   await new Promise(async (resolve, reject) => {
     const java = javaPath || getJavaExecutable() || 'java'
 
     // If a custom CA PEM was provided, import it into a PKCS12 truststore
-    // and pass it to the JVM via -Djavax.net.ssl.trustStore.
     const pemPath = process.env.COBBLE_CA_PEM || path.join(getGameDir(), 'custom_ca.pem')
     let truststorePath = null
     const truststorePass = 'changeit'
     if (fs.existsSync(pemPath)) {
       try {
-        // derive keytool path from java executable
         const getKeytoolPath = (javaExe) => {
-          // common layouts: .../bin/java  -> .../bin/keytool(.exe)
           const binDir = path.dirname(javaExe)
           const kt = process.platform === 'win32' ? path.join(binDir, 'keytool.exe') : path.join(binDir, 'keytool')
           return kt
@@ -518,62 +523,36 @@ async function installFabric() {
             })
           })
         } else {
-          console.warn('[Truststore] keytool not found next to java; cannot create truststore automatically.')
+          console.warn('[Truststore] keytool nem található a java mellett.')
           truststorePath = null
         }
       } catch (e) {
-        console.warn('[Truststore] Error creating truststore:', e.message)
+        console.warn('[Truststore] Hiba a truststore létrehozásakor:', e.message)
         truststorePath = null
       }
     }
 
-    // Prepare JVM args; if we have a truststore, pass it as a JVM system property
     const jvmOptions = []
     if (truststorePath) {
-      jvmOptions.push(`-Djavax.net.ssl.trustStore=${truststorePath}`)
-      jvmOptions.push(`-Djavax.net.ssl.trustStorePassword=${truststorePass}`)
+      jvmOptions.push(\`-Djavax.net.ssl.trustStore=\${truststorePath}\`)
+      jvmOptions.push(\`-Djavax.net.ssl.trustStorePassword=\${truststorePass}\`)
     }
 
-    // On Windows, instruct the JVM to use the native Windows certificate store
-    // so it trusts the same CAs as the OS (fixes PKIX / fabricmc.net SSL errors).
     if (process.platform === 'win32') {
       jvmOptions.push('-Djavax.net.ssl.trustStoreType=WINDOWS-ROOT')
     }
 
-    // Optional insecure Java-level "trust-all" agent for installer debugging.
-    // Enabled by setting INSTALLER_INSECURE_JAVA_AGENT=1 or INSTALLER_INSECURE=java-agent
-    const insecureAgentEnabled = process.env.INSTALLER_INSECURE_JAVA_AGENT === '1' || process.env.INSTALLER_INSECURE === 'java-agent'
-    if (insecureAgentEnabled) {
-        // Prefer a prebuilt agent bundled with the app for reliability.
-        const bundled = path.join(__dirname, 'insecure-resources', 'trust-all-agent.jar')
-        const agentDir = path.join(getGameDir(), 'insecure-agent')
-        fse.ensureDirSync(agentDir)
-        const agentJar = path.join(agentDir, 'trust-all-agent.jar')
-        try {
-          if (fs.existsSync(bundled)) {
-            // copy the bundled jar into the user data dir so we can reference it from there
-            fse.copyFileSync(bundled, agentJar)
-            jvmOptions.unshift(`-javaagent:${agentJar}`)
-            console.warn('[InsecureAgent] Using bundled trust-all agent (INSECURE)')
-          } else {
-            console.warn('[InsecureAgent] No bundled agent found; skipping insecure agent')
-          }
-        } catch (e) {
-          console.warn('[InsecureAgent] Error enabling bundled agent:', e.message)
-        }
-      }
-
-    const args = [...jvmOptions, '-jar', installerJar, 'client', '-dir', mcDir, '-mcversion', MC_VERSION, '-loader', latestLoader, '-noprofile']
+    // NeoForge installer options: --installClient <dir>
+    const args = [...jvmOptions, '-jar', installerJar, '--installClient', mcDir]
 
     execFile(java, args, { cwd: mcDir, windowsHide: true }, (err, stdout, stderr) => {
-      if (stdout && stdout.trim()) console.log('[Fabric installer stdout]\n' + stdout)
-      if (stderr && stderr.trim()) console.error('[Fabric installer stderr]\n' + stderr)
+      if (stdout && stdout.trim()) console.log('[NeoForge installer stdout]\n' + stdout)
+      if (stderr && stderr.trim()) console.error('[NeoForge installer stderr]\n' + stderr)
       if (err) {
         if (fs.existsSync(versionJson)) {
-          // Installer reported error but version already exists — treat as success
           return resolve()
         }
-        return reject(new Error('Fabric telepítés sikertelen: ' + (stderr || err.message)))
+        return reject(new Error('NeoForge telepítés sikertelen: ' + (stderr || err.message)))
       }
       return resolve()
     })
@@ -583,12 +562,11 @@ async function installFabric() {
 
   // ── 5. Persist installed version ────────────────────────────
   writeState({
-    fabricLoaderVersion: latestLoader,
-    fabricInstallerVersion: latestInstaller,
-    fabricInstalledAt: new Date().toISOString(),
+    neoForgeVersion: latestLoader,
+    neoForgeInstalledAt: new Date().toISOString(),
   })
 
-  sendProgress('fabric', 100, `Fabric Loader ${latestLoader} telepítve ✓`)
+  sendProgress('neoforge', 100, \`NeoForge \${latestLoader} telepítve ✓\`)
 }
 
 // ── Minecraft Assets + Libraries ─────────────────────────────
@@ -807,8 +785,8 @@ async function updateModsFromModrinth(onLog) {
 
     let updatedCount = 0
     for (const projectId of projectsToCheck) {
-      // Get all versions for this project for MC 1.21.1 and Fabric
-      const query = `loaders=${encodeURIComponent('["fabric"]')}&game_versions=${encodeURIComponent(`["${MC_VERSION}"]`)}`
+      // Get all versions for this project for MC 1.21.1 and NeoForge
+      const query = `loaders=${encodeURIComponent('["neoforge"]')}&game_versions=${encodeURIComponent(`["${MC_VERSION}"]`)}`
       const versions = await modrinthRequest(`/v2/project/${projectId}/version?${query}`)
       // Sort by date (Modrinth usually does this, but to be sure)
       const releases = versions.filter(v => v.version_type === 'release')
@@ -1096,7 +1074,7 @@ async function install({ username, ram, serverUrl }, onProgress) {
 
   await installJava()
   await installMinecraft()
-  await installFabric()
+  await installNeoForge()
   await installModpack(serverUrl)
 
   sendProgress('done', 100, 'Minden telepítve! Jó játékot! 🎮')
@@ -1114,10 +1092,10 @@ async function launch({ username, uuid, ram, serverUrl, closeOnLaunch }, onLog, 
 
   // Use the resolved (latest) loader version, or fall back to state file
   const state = readState()
-  const loaderVersion = resolvedFabricLoaderVersion || state.fabricLoaderVersion || '0.16.9'
-  const versionId = `fabric-loader-${loaderVersion}-${MC_VERSION}`
+  const loaderVersion = resolvedNeoForgeVersion || state.neoForgeVersion || '21.1.230'
+  const versionId = `neoforge-${loaderVersion}`
 
-  onLog?.(`[Launcher] Fabric Loader: ${loaderVersion}`)
+  onLog?.(`[Launcher] NeoForge: ${loaderVersion}`)
 
   // ── Unified Server Resolution ────────────────────────────────
   const DEFAULT_HOST = "94.72.100.43"
@@ -1246,7 +1224,7 @@ function isInstalled() {
     minecraft: fs.existsSync(clientJar),
     modpack: modpackOk,
     modpackVersion: state.modpackVersionNumber || null,
-    fabricVersion: state.fabricLoaderVersion || null,
+    neoForgeVersion: state.neoForgeVersion || null,
     allDone: fs.existsSync(javaExe) && state.javaVersion === JAVA_VERSION_TARGET && fs.existsSync(clientJar) && modpackOk,
 
   }
@@ -1258,7 +1236,7 @@ function isInstalled() {
  */
 async function checkForUpdates() {
   const state = readState()
-  const result = { modpack: null, fabric: null }
+  const result = { modpack: null, neoforge: null }
 
   // Modpack
   try {
@@ -1273,13 +1251,13 @@ async function checkForUpdates() {
     }
   } catch (_) {}
 
-  // Fabric
+  // NeoForge
   try {
-    const v = await fetchLatestFabricVersions()
-    if (v.loader !== state.fabricLoaderVersion) {
-      result.fabric = {
-        currentVersion: state.fabricLoaderVersion || '?',
-        latestVersion: v.loader,
+    const loader = await fetchLatestNeoForgeVersion()
+    if (loader !== state.neoForgeVersion) {
+      result.neoforge = {
+        currentVersion: state.neoForgeVersion || '?',
+        latestVersion: loader,
       }
     }
   } catch (_) {}

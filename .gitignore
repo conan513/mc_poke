@@ -41,3 +41,8 @@ Desktop.ini
 *.njsproj
 *.sln
 *.sw?
+
+# Kliens teszt és telepítő fájlok
+electron/temp-mc/
+electron/neoforge-*-installer.jar
+*.log
