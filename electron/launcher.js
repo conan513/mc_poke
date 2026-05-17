@@ -1408,8 +1408,10 @@ async function launch({ username, uuid, ram, serverUrl, closeOnLaunch, loaderTyp
     overrides: {
       gameDirectory: instanceDir,
       customArgs: ['--quickPlayMultiplayer', `${targetHost}:25565`],
-      // NeoForge only installs a JSON, not a JAR. Point MCLC at the vanilla jar.
-      minecraftJar: path.join(mcDir, 'versions', MC_VERSION, `${MC_VERSION}.jar`),
+      // NeoForge requires the patched client jar, whereas Fabric dynamically loads the vanilla jar.
+      minecraftJar: loaderType === 'fabric'
+        ? path.join(mcDir, 'versions', MC_VERSION, `${MC_VERSION}.jar`)
+        : path.join(mcDir, 'libraries', 'net', 'neoforged', 'neoforge', loaderVersion, `neoforge-${loaderVersion}-client.jar`),
     },
     server: {
       host: targetHost,

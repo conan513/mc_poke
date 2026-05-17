@@ -551,6 +551,7 @@ const EXTRA_MODS = [
   { slug: 'cobblemarks+',                   loaders: ['fabric'], gameVersions: [MC_VERSION] },
   { slug: 'cobblemon_expeditions',          loaders: ['fabric'], gameVersions: [MC_VERSION] },
   { slug: 'seasonhud',                      loaders: ['neoforge'], version: '1.21.1-2.0.3', projectId: 'VNjUn3NA', gameVersions: [MC_VERSION], isClientOnly: true },
+  { slug: 'athena',                         loaders: ['neoforge'], gameVersions: [MC_VERSION], isClientOnly: true },
 ];
 
 /**
