@@ -2840,6 +2840,14 @@ animateParticles()
     
     const totalGB = Math.round(totalSystemMem / (1024 * 1024 * 1024))
     if (totalGB <= 8 && selectedRam > 4096) {
+      warning.textContent = currentLang === 'hu'
+        ? '8 GB alatt ne válassz 4 GB-nál nagyobb heapet a stabilitás érdekében.'
+        : 'On 8 GB or less, do not select more than 4 GB heap for stability.'
+      warning.classList.remove('hidden')
+    } else if (totalGB <= 16 && selectedRam > 8192) {
+      warning.textContent = currentLang === 'hu'
+        ? '16 GB RAM esetén a 12 GB heap instabillá teheti a modpackot. 8 GB ajánlott.'
+        : 'On 16 GB RAM, 12 GB heap may be unstable with this modpack. 8 GB recommended.'
       warning.classList.remove('hidden')
     } else {
       warning.classList.add('hidden')

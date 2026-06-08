@@ -1119,6 +1119,10 @@ async function launch({ username, uuid, ram, serverUrl, closeOnLaunch }, onLog, 
     onLog?.(`[Launcher] Low-memory system detected (${systemRamGb} GB RAM). Clamping Minecraft heap to 4096 MB.`)
     ramMb = 4096
   }
+  if (systemRamGb <= 16 && ramMb > 8192) {
+    onLog?.(`[Launcher] 16 GB rendszer alatt a 12 GB heap instabillá teheti a modpackot. Átállítás 8192 MB-ra.`)
+    ramMb = 8192
+  }
 
   migrateStructure()
 
@@ -1323,7 +1327,7 @@ async function prepareLocalSkinConfig(instanceDir, username, serverUrl) {
 /**
  * Ensures options.txt and servers.dat are ready for a seamless first launch.
  */
-async function ensureFirstLaunchConfigs(instanceDir, host) {
+async function ensureFirstLaunchConfigs(instanceDir, host, ramMb) {
   try {
     const defaultOptionsDir = path.join(instanceDir, 'config', 'defaultoptions')
     fse.ensureDirSync(defaultOptionsDir)
@@ -1346,6 +1350,23 @@ async function ensureFirstLaunchConfigs(instanceDir, host) {
       'showSubtitles': 'false',
       'autoJump': 'false',
       'syncChunkWrites': 'false'
+    }
+
+    const totalGB = Math.floor(os.totalmem() / (1024 * 1024 * 1024))
+    const lowMemProfile = (ramMb <= 8192) || totalGB <= 16
+    if (lowMemProfile) {
+      Object.assign(settingsToEnsure, {
+        'graphics': 'fast',
+        'fancyGraphics': 'false',
+        'renderDistance': '6',
+        'simulationDistance': '4',
+        'useVsync': 'false',
+        'particles': '1',
+        'biomeBlend': '1',
+        'entityShadows': 'false',
+        'mipmapLevels': '0',
+        'maxFps': '60'
+      })
     }
 
     let modified = false
