@@ -42,7 +42,7 @@ const BLACKLISTED_MODS = [
   'cobblelagclear', 'itemclearlag', 'fix-attack-lag', 'no-entity-lag',
   'rustlingspot', 'mikeskills',
   'iris', 'tc-cobble-flight', 'cobbletcg', 'shine',
-  'vulkanmod-extra', 'not-enough-vulkan'
+  'vulkanmod-extra', 'not-enough-vulkan', 'modern-ui'
 ];
 // Ensure ImmediatelyFast (client-side renderer tweak) is not installed on server
 BLACKLISTED_MODS.push('immediatelyfast');
