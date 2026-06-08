@@ -440,6 +440,10 @@ const EXTRA_MODS = [
   { slug: 'creeper-firework', loaders: ['fabric'], gameVersions: [MC_VERSION] },
   { slug: 'terrablender', loaders: ['fabric'], gameVersions: [MC_VERSION] },
   { slug: 'skinrestorer', loaders: ['fabric'], gameVersions: [MC_VERSION] },
+  { slug: 'vulkanmod', loaders: ['fabric'], gameVersions: [MC_VERSION] },
+  { slug: 'vulkanmod-extra', loaders: ['fabric'], gameVersions: [MC_VERSION] },
+  { slug: 'not-enough-vulkan', loaders: ['fabric'], gameVersions: [MC_VERSION] },
+  { slug: 'beryl', loaders: ['fabric'], gameVersions: [MC_VERSION] },
   // Cobblemon extra mods
   { slug: 'player-locator-plus',            loaders: ['fabric'], gameVersions: [MC_VERSION] },
   { slug: 'cobblemon-mount-mastery',        loaders: ['fabric'], gameVersions: [MC_VERSION] },
