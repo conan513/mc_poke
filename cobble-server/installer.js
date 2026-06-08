@@ -542,6 +542,12 @@ const CUSTOM_DIRECT_MODS = [
  */
 const PINNED_MODRINTH_MODS = [
   { slug: 'c2me-fabric', version: '0.3.0+alpha.0.362+1.21.1' },
+  // Pin Sodium and related addons to versions compatible with Shine
+  // NOTE: adjust version strings if Modrinth uses a different version_number format
+  { slug: 'sodium', version: 'mc1.21.1-0.6.13-fabric' },
+  { slug: 'sodium-extra', version: 'mc1.21.1-0.6.0+fabric' },
+  { slug: 'moreculling', version: 'y4J2jK6V' },
+  { slug: 'reeses-sodium-options', version: 'mc1.21.4-1.8.3+fabric' },
 ];
 
 /**
@@ -602,8 +608,8 @@ async function ensurePinnedMods() {
       const query = `loaders=${encodeURIComponent('["fabric"]')}&game_versions=${encodeURIComponent(`["${MC_VERSION}"]`)}`;
       const versions = await modrinthRequest(`/v2/project/${slug}/version?${query}`);
 
-      // Megkeressük a megadott verziót
-      const targetVersion = versions.find(v => v.version_number === version);
+      // Megkeressük a megadott verziót (támogatjuk a version_number és a Modrinth version id szerinti egyezést)
+      const targetVersion = versions.find(v => v.version_number === version || v.id === version);
       if (!targetVersion) {
         logError(`[Pinned] Verzió nem található: ${slug} ${version}`);
         continue;
