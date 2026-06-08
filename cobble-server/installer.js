@@ -552,7 +552,6 @@ const EXTRA_MODS = [
   { slug: 'tt20',                         loaders: ['fabric'], gameVersions: [MC_VERSION] },
   // Függőségek
   { slug: 'matthiesen-lib-api',             loaders: ['fabric'], gameVersions: [MC_VERSION] },
-  { slug: 'matthiesen-lib',                 loaders: ['fabric'], gameVersions: [MC_VERSION] },
   { slug: 'cobblemore-library',             loaders: ['fabric'], gameVersions: [MC_VERSION] },
   { slug: 'pommel-held-item-models',        loaders: ['fabric'], gameVersions: [MC_VERSION] },
   { slug: 'create-power-loader',            loaders: ['fabric'], gameVersions: [MC_VERSION] },
@@ -598,7 +597,8 @@ const CURSEFORGE_MODS = [
  * Közvetlen letöltésű modok (pl. GitHub release)
  */
 const CUSTOM_DIRECT_MODS = [
-  { url: 'https://github.com/zlainsama/PeacefulSurface/releases/download/1.21.1-v1c-fabric/peacefulsurface-1.21.1-v1c-fabric.jar', name: 'peacefulsurface-1.21.1-v1c-fabric.jar' }
+  { url: 'https://github.com/zlainsama/PeacefulSurface/releases/download/1.21.1-v1c-fabric/peacefulsurface-1.21.1-v1c-fabric.jar', name: 'peacefulsurface-1.21.1-v1c-fabric.jar' },
+  { url: 'https://cdn.modrinth.com/data/cPmFkPpB/versions/OIY3AgiQ/matthiesen-lib-fabric-1.5.7.jar', name: 'matthiesen-lib-fabric-1.5.7.jar' }
 ];
 
 /**
