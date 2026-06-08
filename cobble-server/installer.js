@@ -440,6 +440,7 @@ const EXTRA_MODS = [
   { slug: 'creeper-firework', loaders: ['fabric'], gameVersions: [MC_VERSION] },
   { slug: 'terrablender', loaders: ['fabric'], gameVersions: [MC_VERSION] },
   { slug: 'skinrestorer', loaders: ['fabric'], gameVersions: [MC_VERSION] },
+  // Vulkan-related client mods (re-added per request)
   { slug: 'vulkanmod', loaders: ['fabric'], gameVersions: [MC_VERSION] },
   { slug: 'vulkanmod-extra', loaders: ['fabric'], gameVersions: [MC_VERSION] },
   { slug: 'not-enough-vulkan', loaders: ['fabric'], gameVersions: [MC_VERSION] },
@@ -543,6 +544,8 @@ const CUSTOM_DIRECT_MODS = [
 const PINNED_MODRINTH_MODS = [
   { slug: 'c2me-fabric', version: '0.3.0+alpha.0.362+1.21.1' },
   { slug: 'moreculling', version: 'y4J2jK6V' },
+  // Pin Sodium to a version known to be compatible with VulkanMod (roll back as requested)
+  { slug: 'sodium', version: '0.8.12-alpha.3+mc1.21.1' },
 ];
 
 /**
