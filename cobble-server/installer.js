@@ -40,7 +40,7 @@ const BLACKLISTED_MODS = [
   'cobblemon-rankeds', 'cobblemau',
   'vmp-fabric', 'lag-protection', 'lag_protection',
   'cobblelagclear', 'itemclearlag', 'fix-attack-lag', 'no-entity-lag',
-  'rustlingspot', 'mikeskills'
+  'rustlingspot', 'mikeskills', 'iris'
 ];
 
 // Minecraft benchmark szerint chunk-generálásban 20%+ gyorsabb a standard Temurin-nél.
@@ -501,6 +501,7 @@ const EXTRA_MODS = [
   { slug: 'lmd',                           loaders: ['fabric'], gameVersions: [MC_VERSION] },
   { slug: 'packet-fixer',                  loaders: ['fabric'], gameVersions: [MC_VERSION] },
   { slug: 'almanac',                       loaders: ['fabric'], gameVersions: [MC_VERSION] },
+  { slug: 'shine',                         loaders: ['fabric'], gameVersions: [MC_VERSION] },
 ];
 
 /**
