@@ -52,6 +52,8 @@ BLACKLISTED_MODS.push('sodium');
 BLACKLISTED_MODS.push('sodium-extra');
 BLACKLISTED_MODS.push('reeses-sodium-options');
 BLACKLISTED_MODS.push('sodiumoptionsapi');
+// Remove incompatible C2ME mod from remote installs
+BLACKLISTED_MODS.push('c2me');
 // Memory-heavy client-side mods that consume excessive RAM
 BLACKLISTED_MODS.push('bloom');           // Advanced particle effects
 BLACKLISTED_MODS.push('complementary');   // Shader addon
@@ -539,8 +541,8 @@ const EXTRA_MODS = [
   { slug: 'cobblemon-villager-overhaul',    loaders: ['fabric'], gameVersions: [MC_VERSION] },
   { slug: 'tt20',                         loaders: ['fabric'], gameVersions: [MC_VERSION] },
   // Függőségek
-  { slug: 'matthiesen-lib-api',             loaders: ['fabric'], gameVersions: [MC_VERSION] },
-  { slug: 'matthiesen-lib',                 loaders: ['fabric'], gameVersions: [MC_VERSION] },
+  { slug: 'matthiesen_lib_api',             loaders: ['fabric'], gameVersions: [MC_VERSION] },
+  { slug: 'matthiesen_lib',                 loaders: ['fabric'], gameVersions: [MC_VERSION] },
   { slug: 'cobblemore-library',             loaders: ['fabric'], gameVersions: [MC_VERSION] },
   { slug: 'pommel-held-item-models',        loaders: ['fabric'], gameVersions: [MC_VERSION] },
   { slug: 'create-power-loader',            loaders: ['fabric'], gameVersions: [MC_VERSION] },
