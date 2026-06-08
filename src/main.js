@@ -31,7 +31,7 @@ console.error = (...args) => { _err(...args); logToScreen(args.join(' '), 'error
 window.onerror = (m, s, l, c, e) => { console.error(`${m} at ${s}:${l}`); }
 
 // ── State ────────────────────────────────────────────────────
-let selectedRam = parseInt(localStorage.getItem('cobble_ram')) || 6144
+let selectedRam = null  // null = auto-scaling in launcher.js
 let totalSystemMem = 8 * 1024 * 1024 * 1024 // Default fallback: 8GB in bytes
 let closeOnLaunch = localStorage.getItem('cobble_close_launch') === 'true'
 let powerSaveEnabled = localStorage.getItem('cobble_power_save') !== 'false' // Default true
@@ -1158,14 +1158,7 @@ function showToast(msg) {
 $id('btn-minimize').addEventListener('click', () => { if(window.cobble) window.cobble.minimize() })
 $id('btn-close').addEventListener('click', () => { if(window.cobble) window.cobble.close() })
 
-// ── RAM selector ──────────────────────────────────────────────
-document.querySelectorAll('.ram-btn').forEach(btn => {
-  btn.addEventListener('click', () => {
-    document.querySelectorAll('.ram-btn').forEach(b => b.classList.remove('active'))
-    btn.classList.add('active')
-    selectedRam = parseInt(btn.dataset.val)
-  })
-})
+// ── RAM selector removed – launcher.js handles auto-scaling ──
 
 // ── Install / Launch flow ─────────────────────────────────────
 // ── Progress handler ──────────────────────────────────────────
@@ -1296,7 +1289,7 @@ function goToHome() {
     console.log('%c[DEV MODE] Running on Localhost', 'color: #3b82f6; font-weight: bold; font-size: 14px;')
     setTimeout(() => showToast('🚀 Local Development Mode Active'), 2000)
   }
-  $id('home-ram-display').textContent = `${selectedRam} MB`
+  $id('home-ram-display').textContent = t('home.ram_auto')  // Display 'Auto' instead
   syncRamUI()
 
   if (statusInfo.modpackVersion) {
@@ -2578,46 +2571,7 @@ animateParticles()
       window.cobble.setUpdateServerUrl(url)
     }
   })
-  const syncRamUI = () => {
-    const ramVal = parseInt(selectedRam)
-    document.querySelectorAll('.ram-btn').forEach(btn => {
-      const btnVal = parseInt(btn.dataset.val)
-      const isActive = btnVal === ramVal
-      const isRecommended = !!btn.querySelector('.recommended-badge')
-
-      btn.classList.toggle('active', isActive)
-
-      if (isActive && isRecommended) {
-        // Selected AND recommended: gold border + blue glow blend
-        btn.style.borderColor = 'var(--accent-gold)'
-        btn.style.boxShadow = '0 0 18px rgba(251, 191, 36, 0.55)'
-      } else if (isActive) {
-        // Selected only: blue
-        btn.style.borderColor = 'var(--accent-blue)'
-        btn.style.boxShadow = '0 0 12px rgba(96, 165, 250, 0.2)'
-      } else if (isRecommended) {
-        // Recommended but not selected: gold
-        btn.style.borderColor = 'var(--accent-gold)'
-        btn.style.boxShadow = '0 0 18px rgba(251, 191, 36, 0.45)'
-      } else {
-        // Plain
-        btn.style.borderColor = ''
-        btn.style.boxShadow = ''
-      }
-    })
-    const display = $id('home-ram-display')
-    if (display) display.textContent = `${ramVal} MB`
-    updateRamWarning()
-  }
-
-  document.querySelectorAll('.ram-btn').forEach(btn =>
-    btn.addEventListener('click', () => {
-      selectedRam = parseInt(btn.dataset.val)
-      try { localStorage.setItem('cobble_ram', btn.dataset.val) } catch(e) {}
-      syncRamUI()
-    })
-  )
-
+  
   // Settings: Close on launch & Power save
   $id('check-close-launch').checked = closeOnLaunch
   $id('check-close-launch').addEventListener('change', (e) => {
@@ -2631,126 +2585,6 @@ animateParticles()
     localStorage.setItem('cobble_power_save', powerSaveEnabled)
     if (!powerSaveEnabled) document.body.classList.remove('power-save')
   })
-
-  // Initial sync to ensure UI is consistent
-  syncRamUI()
-
-  // Validation: Ensure selectedRam is one of the available options (4GB, 6GB, 8GB, 12GB)
-  const validRamValues = [4096, 6144, 8192, 12288]
-  if (!validRamValues.includes(parseInt(selectedRam))) {
-    console.log(`[System] Invalid RAM setting (${selectedRam}), resetting to 6GB`)
-    selectedRam = 6144
-    syncRamUI()
-  }
-
-  // Detect total memory and set recommendations
-  if (window.cobble) {
-    try {
-      totalSystemMem = await window.cobble.getTotalMem()
-    } catch (err) {
-      console.warn('[System] Could not fetch total RAM:', err.message)
-      totalSystemMem = 0
-    }
-
-    const totalGB = totalSystemMem / (1024 * 1024 * 1024)
-    const logMsg = `[System] Total RAM detected: ${totalGB.toFixed(2)} GB`
-    console.log(logMsg)
-    addLog(logMsg)
-
-    // ── Step 1: Check if detection failed → use fallback FIRST ──
-    let isFallback = false
-    if (isNaN(totalGB) || totalGB <= 0) {
-      console.warn('[System] RAM detection failed on this platform, using 6GB safe fallback')
-      totalSystemMem = 0
-      isFallback = true
-    }
-
-    // ── Step 2: Calculate recommended RAM ──
-    // Thresholds:
-    //  0 GB (detection failed) → 6 GB fallback
-    // >20 GB                   → 12 GB recommended
-    // >14 GB                   → 8 GB recommended
-    // >10 GB                   → 6 GB recommended
-    //  else                    → 4 GB recommended
-    let recommended
-    if (isFallback) {
-      recommended = 6144
-    } else if (totalGB > 20) {
-      recommended = 12288
-    } else if (totalGB > 14) {
-      recommended = 8192
-    } else if (totalGB > 10) {
-      recommended = 6144
-    } else {
-      recommended = 4096
-    }
-
-    // ── Step 3: Smart RAM auto-select (only on first run or version bump) ──
-    const savedRam = localStorage.getItem('cobble_ram')
-    const smartCheckVer = localStorage.getItem('cobble_ram_smart_ver') || '0'
-    console.log(`[RAM] savedRam=${savedRam} smartVer=${smartCheckVer} recommended=${recommended} isFallback=${isFallback}`)
-    if (!savedRam || smartCheckVer !== '4') {
-      selectedRam = recommended
-      localStorage.setItem('cobble_ram', String(recommended))
-      localStorage.setItem('cobble_ram_smart_ver', '4')
-      const msg = `[System] Smart RAM auto-selected: ${recommended} MB (system: ${totalGB.toFixed(1)} GB${isFallback ? ', fallback' : ''})`
-      console.log(msg)
-      addLog(msg)
-    } else if (!isFallback && totalGB <= 8 && selectedRam > 4096) {
-      selectedRam = 4096
-      localStorage.setItem('cobble_ram', '4096')
-      const msg = `[System] Low-memory system detected (${totalGB.toFixed(1)} GB): forcing 4096 MB RAM for stability.`
-      console.log(msg)
-      addLog(msg)
-    }
-
-    // ── Step 4: Mark the recommended button with a yellow badge ──
-    const isHU = currentLang === 'hu'
-    const recLabel   = isHU ? 'AJÁNLOTT'       : 'RECOMMENDED'
-    const recSubLabel = isHU ? 'Ez az ajánlott' : 'This is recommended'
-
-    document.querySelectorAll('.ram-btn').forEach(btn => {
-      // Remove any old badges and sub-labels inside this button
-      btn.querySelectorAll('.recommended-badge, .ram-rec-sublabel').forEach(el => el.remove())
-      btn.style.boxShadow = ''
-      if (!btn.classList.contains('active')) btn.style.borderColor = ''
-
-      if (parseInt(btn.dataset.val) === recommended) {
-        // Badge (pill top-right) – always gold/yellow
-        const badge = document.createElement('span')
-        badge.className = 'recommended-badge'
-        badge.textContent = recLabel
-        badge.title = recSubLabel
-        badge.dataset.isFallback = isFallback
-
-        // Always gold/yellow highlight for the button border & glow
-        btn.style.borderColor = 'var(--accent-gold)'
-        btn.style.boxShadow   = '0 0 18px rgba(251, 191, 36, 0.45)'
-        btn.appendChild(badge)
-
-        // "Ez az ajánlott" sub-label inside the button (bottom)
-        const sub = document.createElement('div')
-        sub.className = 'ram-rec-sublabel'
-        sub.textContent = recSubLabel
-        btn.appendChild(sub)
-      }
-    })
-
-    const lowMemoryLock = totalGB <= 8
-    document.querySelectorAll('.ram-btn').forEach(btn => {
-      const btnVal = parseInt(btn.dataset.val)
-      if (lowMemoryLock && btnVal > 4096) {
-        btn.disabled = true
-        btn.title = currentLang === 'hu' ? '8 GB RAM alatt nem ajánlott' : 'Not recommended on 8 GB RAM systems'
-      } else {
-        btn.disabled = false
-        btn.removeAttribute('title')
-      }
-    })
-
-    syncRamUI()
-    addLog(`[System] Recommended: ${recommended} MB | Selected: ${selectedRam} MB | Fallback: ${isFallback}`)
-  }
 
   // Power state listener from main process
   if (window.cobble) {
@@ -2834,27 +2668,7 @@ animateParticles()
     }
   }
 
-  function updateRamWarning() {
-    const warning = $id('ram-warning')
-    if (!warning) return
-    
-    const totalGB = Math.round(totalSystemMem / (1024 * 1024 * 1024))
-    if (totalGB <= 8 && selectedRam > 4096) {
-      warning.textContent = currentLang === 'hu'
-        ? '8 GB alatt ne válassz 4 GB-nál nagyobb heapet a stabilitás érdekében.'
-        : 'On 8 GB or less, do not select more than 4 GB heap for stability.'
-      warning.classList.remove('hidden')
-    } else if (totalGB <= 16 && selectedRam > 8192) {
-      warning.textContent = currentLang === 'hu'
-        ? '16 GB RAM esetén a 12 GB heap instabillá teheti a modpackot. 8 GB ajánlott.'
-        : 'On 16 GB RAM, 12 GB heap may be unstable with this modpack. 8 GB recommended.'
-      warning.classList.remove('hidden')
-    } else {
-      warning.classList.add('hidden')
-    }
-  }
 
-  // Initial check
 
   checkConnection()
 

@@ -51,6 +51,12 @@ BLACKLISTED_MODS.push('sodium');
 BLACKLISTED_MODS.push('sodium-extra');
 BLACKLISTED_MODS.push('reeses-sodium-options');
 BLACKLISTED_MODS.push('sodiumoptionsapi');
+// Memory-heavy client-side mods that consume excessive RAM
+BLACKLISTED_MODS.push('bloom');           // Advanced particle effects
+BLACKLISTED_MODS.push('complementary');   // Shader addon
+BLACKLISTED_MODS.push('distant-horizons'); // LOD rendering (very memory-intensive)
+BLACKLISTED_MODS.push('betterdynamiclights'); // Extra lighting calculations
+BLACKLISTED_MODS.push('minecraftcapes');  // Cape rendering (cosmetics)
 
 // Minecraft benchmark szerint chunk-generálásban 20%+ gyorsabb a standard Temurin-nél.
 // Forrás: https://github.com/brucethemoose/Minecraft-Performance-Flags-Benchmarks

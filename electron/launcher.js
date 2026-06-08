@@ -1023,9 +1023,9 @@ async function installModpack(serverUrl = '') {
  */
 function buildJvmArgs(ramMb, platform) {
   const maxMb = ramMb || 4096
-  // SoftMaxHeapSize = 85% of max → JVM will uncommit memory above this limit
+  // SoftMaxHeapSize = 75% of max → JVM will uncommit memory above this limit
   // back to the OS when idle, keeping the resident set smaller
-  const softMaxMb = Math.floor(maxMb * 0.85)
+  const softMaxMb = Math.floor(maxMb * 0.75)
 
   // Common args that work well on all three platforms
   const commonArgs = [
@@ -1033,8 +1033,8 @@ function buildJvmArgs(ramMb, platform) {
     '-XX:+UseZGC',
     '-XX:+ZGenerational',           // Generational ZGC (Java 21+): shorter GC pauses
     '-XX:+ZUncommit',               // Return unused heap pages to the OS when idle
-    '-XX:ZUncommitDelay=30',        // Wait 30s of inactivity before uncommitting
-    '-XX:ZCollectionInterval=30',  // More frequent ZGC collections for long-lived game sessions
+    '-XX:ZUncommitDelay=15',        // Wait 15s of inactivity before uncommitting (more aggressive)
+    '-XX:ZCollectionInterval=15',   // More frequent ZGC collections for long-lived game sessions
     `-XX:SoftMaxHeapSize=${softMaxMb}M`, // Soft ceiling – triggers uncommit above this
 
     // ── Pointer & Heap Compression ─────────────────────────
@@ -1042,27 +1042,33 @@ function buildJvmArgs(ramMb, platform) {
     '-XX:+UseCompressedClassPointers',  // Compress class metadata pointers
 
     // ── Metaspace / Direct Memory Caps ────────────────────
-    '-XX:MetaspaceSize=128m',
-    '-XX:MaxMetaspaceSize=512m',
-    '-XX:CompressedClassSpaceSize=256m',
-    '-XX:MaxDirectMemorySize=512m',
-    '-XX:SoftRefLRUPolicyMSPerMB=50',
+    '-XX:MetaspaceSize=96m',            // Reduced from 128m
+    '-XX:MaxMetaspaceSize=256m',        // Reduced from 512m (mods don't load that many classes)
+    '-XX:CompressedClassSpaceSize=128m', // Reduced from 256m
+    '-XX:MaxDirectMemorySize=256m',     // Reduced from 512m
+    '-XX:SoftRefLRUPolicyMSPerMB=30',   // Reduced from 50
 
     // ── String Memory Deduplication ────────────────────────
     '-XX:+UseStringDeduplication',      // Merge duplicate String objects
     '-XX:StringDeduplicationAgeThreshold=1', // Deduplicate after first GC cycle
+    '-XX:StringDeduplicationUntouchingAge=1', // Aggressive dedup
 
     // ── JIT & Code Cache ───────────────────────────────────
     '-XX:+OptimizeStringConcat',        // JIT-optimize String concatenation
     '-XX:+UseCodeCacheFlushing',        // Flush JIT cache when full (mods generate lots of code)
-    '-XX:ReservedCodeCacheSize=512m',   // Larger code cache limit (default 240m is too small)
+    '-XX:ReservedCodeCacheSize=256m',   // Reduced from 512m (balances perf vs memory)
+    '-XX:NonProfiledCodeHeapSize=128m', // Reduced non-profiled code heap
+    '-XX:ProfiledCodeHeapSize=64m',     // Reduced profiled code heap
 
-    // ── Stability & Misc ───────────────────────────────────
+    // ── Stability & Memory Reduction ───────────────────────
     '-XX:+UnlockExperimentalVMOptions',
     '-XX:+DisableExplicitGC',           // Ignore System.gc() calls from mods
     '-XX:+PerfDisableSharedMem',        // Don't put perfdata in shared memory
     '-XX:ConcGCThreads=2',              // Concurrent GC threads
     '-XX:ParallelGCThreads=4',          // Parallel GC threads
+    '-XX:+AlwaysPreTouch',              // Pre-allocate pages (reduces stutter, uses more upfront)
+    '-XX:-UseAdaptiveSizePolicyWithSystemGC',
+    '-XX:AutoBoxCacheMax=512',          // Reduce autobox cache
     '-Dfml.ignorePatchDiscrepancies=true',
     '-Dfml.ignoreInvalidMinecraftCertificates=true',
   ]
@@ -1113,16 +1119,25 @@ async function install({ username, ram, serverUrl }, onProgress) {
 }
 
 async function launch({ username, uuid, ram, serverUrl, closeOnLaunch }, onLog, onClose) {
-  let ramMb = ram || 4096
+  let ramMb = ram || 2048  // Default fallback
   const systemRamGb = Math.floor(os.totalmem() / (1024 * 1024 * 1024))
-  if (systemRamGb <= 8 && ramMb > 4096) {
-    onLog?.(`[Launcher] Low-memory system detected (${systemRamGb} GB RAM). Clamping Minecraft heap to 4096 MB.`)
-    ramMb = 4096
+  
+  // Smart memory scaling: allocate exactly 1/4 of total system RAM
+  if (!ram) {
+    // Auto-scale: 1/4 of system RAM, bounded between 1 GB and 8 GB
+    ramMb = Math.max(1024, Math.min(8192, Math.floor(systemRamGb * 256)))
+    
+    const logMsg = `[Launcher] Auto-scaled RAM allocation: ${ramMb} MB (1/4 of ${systemRamGb} GB system RAM)`
+    onLog?.(logMsg)
   }
-  if (systemRamGb <= 16 && ramMb > 8192) {
-    onLog?.(`[Launcher] 16 GB rendszer alatt a 12 GB heap instabillá teheti a modpackot. Átállítás 8192 MB-ra.`)
-    ramMb = 8192
+  
+  // Hard limits to prevent OOM crashes on extremely low-memory systems
+  if (systemRamGb <= 4 && ramMb > 1024) {
+    onLog?.(`[Launcher] Critical low-memory system detected (${systemRamGb} GB RAM). Clamping to 1024 MB.`)
+    ramMb = 1024
   }
+
+  onLog?.(`[Launcher] Memory allocation: ${ramMb} MB (${Math.round((ramMb / (systemRamGb * 1024)) * 100)}% of ${systemRamGb} GB system RAM)`)
 
   migrateStructure()
 
