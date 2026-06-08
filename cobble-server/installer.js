@@ -486,6 +486,8 @@ const EXTRA_MODS = [
   { slug: 'cobblemon-villager-overhaul',    loaders: ['fabric'], gameVersions: [MC_VERSION] },
   { slug: 'modern-ui',                    loaders: ['fabric'], gameVersions: [MC_VERSION] },
   { slug: 'tt20',                         loaders: ['fabric'], gameVersions: [MC_VERSION] },
+  // Visual / client-side enhancements
+  { slug: 'shine',                        loaders: ['fabric'], gameVersions: [MC_VERSION] },
   // Függőségek
   { slug: 'cobblemore-library',             loaders: ['fabric'], gameVersions: [MC_VERSION] },
   { slug: 'pommel-held-item-models',        loaders: ['fabric'], gameVersions: [MC_VERSION] },
