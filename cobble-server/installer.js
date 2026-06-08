@@ -57,6 +57,7 @@ BLACKLISTED_MODS.push('complementary');   // Shader addon
 BLACKLISTED_MODS.push('distant-horizons'); // LOD rendering (very memory-intensive)
 BLACKLISTED_MODS.push('betterdynamiclights'); // Extra lighting calculations
 BLACKLISTED_MODS.push('minecraftcapes');  // Cape rendering (cosmetics)
+BLACKLISTED_MODS.push('euphoria');        // Euphoria Patches - problematic mod
 
 // Minecraft benchmark szerint chunk-generálásban 20%+ gyorsabb a standard Temurin-nél.
 // Forrás: https://github.com/brucethemoose/Minecraft-Performance-Flags-Benchmarks

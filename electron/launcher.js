@@ -736,7 +736,7 @@ async function fetchLatestModpackVersion() {
 /**
  * BLACKLIST: Mods that are known to cause crashes or are unwanted on the client.
  */
-const CLEANUP_BLACKLIST = ['custom-splash-screen', 'customsplashscreen', 'mobsbegone', 'soundsbegone', 'interactic', 'battlecam'];
+const CLEANUP_BLACKLIST = ['custom-splash-screen', 'customsplashscreen', 'mobsbegone', 'soundsbegone', 'interactic', 'battlecam', 'euphoria'];
 
 /**
  * Removes blacklisted mods from the mods folder.
