@@ -42,7 +42,7 @@ const BLACKLISTED_MODS = [
   'cobblelagclear', 'itemclearlag', 'fix-attack-lag', 'no-entity-lag',
   'rustlingspot', 'mikeskills',
   'iris', 'tc-cobble-flight', 'cobbletcg', 'shine',
-  'vulkanmod-extra', 'modern-ui',
+  'vulkanmod-extra', 'modern-ui', 'chipped',
   'xaeroworldmap', 'xaerominimap', 'particlerain', 'particular', 'particle_core', 'cobblemon-smartphone'
 ];
 // Ensure ImmediatelyFast (client-side renderer tweak) is not installed on server
@@ -500,7 +500,6 @@ async function updateModsFromModrinth() {
  * Ensures specific extra mods are present.
  */
 const EXTRA_MODS = [
-  { slug: 'chipped', loaders: ['fabric'], gameVersions: [MC_VERSION] },
   { slug: 'creeper-firework', loaders: ['fabric'], gameVersions: [MC_VERSION] },
   { slug: 'terrablender', loaders: ['fabric'], gameVersions: [MC_VERSION] },
   { slug: 'skinrestorer', loaders: ['fabric'], gameVersions: [MC_VERSION] },
