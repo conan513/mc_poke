@@ -43,6 +43,8 @@ const BLACKLISTED_MODS = [
   'rustlingspot', 'mikeskills',
   'iris', 'tc-cobble-flight', 'cobbletcg', 'shine'
 ];
+// Ensure ImmediatelyFast (client-side renderer tweak) is not installed on server
+BLACKLISTED_MODS.push('immediatelyfast');
 
 // Minecraft benchmark szerint chunk-generálásban 20%+ gyorsabb a standard Temurin-nél.
 // Forrás: https://github.com/brucethemoose/Minecraft-Performance-Flags-Benchmarks
