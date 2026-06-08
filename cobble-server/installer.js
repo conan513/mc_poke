@@ -544,10 +544,9 @@ const CUSTOM_DIRECT_MODS = [
  * Rögzített Modrinth modulok (ezek nem kerülnek frissítésre)
  */
 const PINNED_MODRINTH_MODS = [
-  { slug: 'c2me-fabric', version: '0.3.0+alpha.0.362+1.21.1' },
-  { slug: 'moreculling', version: 'y4J2jK6V' },
-  // Pin Sodium to a version known to be compatible with VulkanMod (roll back as requested)
-  { slug: 'sodium', version: '0.8.12-alpha.3+mc1.21.1' },
+  { slug: 'moreculling', version: '1.0.8' },
+  // Pin Sodium to the specific Modrinth version from user-provided link
+  { slug: 'sodium', version: 'mc1.21.1-0.8.12-alpha.3-fabric' },
 ];
 
 /**
