@@ -43,6 +43,13 @@ const BLACKLISTED_MODS = [
   'rustlingspot', 'mikeskills'
 ];
 
+const MODRINTH_AUTO_UPDATE_EXCLUDE = [
+  'sodium-fabric',
+  'sodium-extra-fabric',
+  'reeses-sodium-options-fabric',
+  'sodiumoptionsapi-fabric'
+];
+
 
 // Oracle GraalVM 21 – a volt GraalVM Enterprise Edition utóda (2023-tól ingyenes).
 // Minecraft benchmark szerint chunk-generálásban 20%+ gyorsabb a standard Temurin-nél.
@@ -393,6 +400,11 @@ async function updateModsFromModrinth() {
 
         if (needsUpdate) {
           const newestFile = latest.files.find(f => f.primary) || latest.files[0];
+          const newestFilename = newestFile.filename.toLowerCase();
+          if (MODRINTH_AUTO_UPDATE_EXCLUDE.some(pattern => newestFilename.includes(pattern))) {
+            logInfo(`[Modrinth] Sodium-related mod frissítése kihagyva: ${newestFile.filename}`);
+            continue;
+          }
           const oldVersion = currentVersionsForProject[0];
           const oldHash = Object.keys(hashToVersion).find(h => hashToVersion[h].id === oldVersion.id);
           const oldFileInfo = fileToInfo[oldHash];

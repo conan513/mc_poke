@@ -25,6 +25,13 @@ const MODPACK_PROJECT_ID = 'Jkb29YJU'
 const MC_VERSION = '1.21.1'
 const JAVA_VERSION_TARGET = 21
 
+const MODRINTH_AUTO_UPDATE_EXCLUDE = [
+  'sodium-fabric',
+  'sodium-extra-fabric',
+  'reeses-sodium-options-fabric',
+  'sodiumoptionsapi-fabric'
+]
+
 
 // Modrinth API – latest modpack versions for this MC version & Fabric
 const MODRINTH_VERSIONS_URL =
@@ -824,7 +831,13 @@ async function updateModsFromModrinth(onLog) {
 
       if (isOutdated) {
         const newestFile = latest.files.find(f => f.primary) || latest.files[0]
-        
+        const newestFilename = newestFile.filename.toLowerCase()
+
+        if (MODRINTH_AUTO_UPDATE_EXCLUDE.some(pattern => newestFilename.includes(pattern))) {
+          onLog?.(`[Modrinth] Sodium-related mod frissítése kihagyva: ${newestFile.filename}`)
+          continue
+        }
+
         // We might have multiple local jars for the same project (unlikely but possible)
         // We'll replace the one that is oldest.
         const oldVersion = currentVersionsForProject[0]
