@@ -485,8 +485,6 @@ const EXTRA_MODS = [
   { slug: 'skinrestorer', loaders: ['fabric'], gameVersions: [MC_VERSION] },
   // Vulkan-related client mods (re-added per request)
   { slug: 'vulkanmod', loaders: ['fabric'], gameVersions: [MC_VERSION] },
-  { slug: 'vulkanmod-extra', loaders: ['fabric'], gameVersions: [MC_VERSION] },
-  { slug: 'not-enough-vulkan', loaders: ['fabric'], gameVersions: [MC_VERSION] },
   { slug: 'beryl', loaders: ['fabric'], gameVersions: [MC_VERSION] },
   // Cobblemon extra mods
   { slug: 'player-locator-plus',            loaders: ['fabric'], gameVersions: [MC_VERSION] },
@@ -913,6 +911,28 @@ async function install() {
   const javaPath = await installJava()
 
   fs.mkdirSync(MODS_DIR, { recursive: true })
+
+  // 0b. Sync .modpack-files.json with actual mods folder
+  // (Ezt eltávolított vagy frissített modok miatt kell, hogy ne írja újra a teljes modpackot)
+  const modpackFilesPath = path.join(SERVER_DIR, '.modpack-files.json')
+  if (fs.existsSync(modpackFilesPath) && fs.existsSync(MODS_DIR)) {
+    try {
+      const expectedFiles = JSON.parse(fs.readFileSync(modpackFilesPath, 'utf8'))
+      const actualFiles = fs.readdirSync(MODS_DIR).filter(f => f.endsWith('.jar'))
+      
+      // Csak azok a fájlok maradnak a listában, amelyek ténylegesen léteznek
+      const syncedFiles = expectedFiles.filter(f => actualFiles.includes(f))
+      
+      if (syncedFiles.length !== expectedFiles.length) {
+        const removed = expectedFiles.length - syncedFiles.length
+        logInfo(`[Installer] Szinkronizálás: .modpack-files.json ${expectedFiles.length} → ${syncedFiles.length} (${removed} eltávolított)`)
+        fs.writeFileSync(modpackFilesPath, JSON.stringify(syncedFiles, null, 2))
+      }
+    } catch (e) {
+      // Ha hiba van, ignoráljuk és folytatjuk
+      logInfo(`[Installer] .modpack-files.json szinkronizálás hiba (nem kritikus): ${e.message}`)
+    }
+  }
 
   // 1. Modpack check & download
   logInfo('[Installer] Keresem a legfrissebb Cobbleverse modpackot...')
