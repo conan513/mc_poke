@@ -43,7 +43,7 @@ const BLACKLISTED_MODS = [
   'rustlingspot', 'mikeskills',
   'iris', 'tc-cobble-flight', 'cobbletcg', 'shine',
   'vulkanmod-extra', 'not-enough-vulkan', 'modern-ui',
-  'xaeros-world-map', 'xaeros-minimap', 'particle-rain', 'particular', 'particle-core', 'cobblemon-smartphone'
+  'xaeroworldmap', 'xaerominimap', 'particlerain', 'particular', 'particle_core', 'cobblemon-smartphone'
 ];
 // Ensure ImmediatelyFast (client-side renderer tweak) is not installed on server
 BLACKLISTED_MODS.push('immediatelyfast');
