@@ -529,7 +529,6 @@ const EXTRA_MODS = [
   { slug: 'cobblemon-tents',                loaders: ['fabric'], gameVersions: [MC_VERSION] },
   { slug: 'cobblemon-snap',                 loaders: ['fabric'], gameVersions: [MC_VERSION] },
   { slug: 'cobblemon-villager-overhaul',    loaders: ['fabric'], gameVersions: [MC_VERSION] },
-  { slug: 'modern-ui',                    loaders: ['fabric'], gameVersions: [MC_VERSION] },
   { slug: 'tt20',                         loaders: ['fabric'], gameVersions: [MC_VERSION] },
   // Függőségek
   { slug: 'cobblemore-library',             loaders: ['fabric'], gameVersions: [MC_VERSION] },
