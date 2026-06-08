@@ -538,6 +538,8 @@ const EXTRA_MODS = [
   { slug: 'cobblemon-villager-overhaul',    loaders: ['fabric'], gameVersions: [MC_VERSION] },
   { slug: 'tt20',                         loaders: ['fabric'], gameVersions: [MC_VERSION] },
   // Függőségek
+  { slug: 'matthiesen-lib-api',             loaders: ['fabric'], gameVersions: [MC_VERSION] },
+  { slug: 'matthiesen-lib',                 loaders: ['fabric'], gameVersions: [MC_VERSION] },
   { slug: 'cobblemore-library',             loaders: ['fabric'], gameVersions: [MC_VERSION] },
   { slug: 'pommel-held-item-models',        loaders: ['fabric'], gameVersions: [MC_VERSION] },
   { slug: 'create-power-loader',            loaders: ['fabric'], gameVersions: [MC_VERSION] },
