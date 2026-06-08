@@ -286,6 +286,16 @@ function getFileHash(filePath, algorithm = 'sha1') {
   })
 }
 
+function filenameMatchesSlug(filename, slug) {
+  const name = path.basename(filename, path.extname(filename)).toLowerCase()
+  const normalizedSlug = slug.toLowerCase()
+  if (name === normalizedSlug) return true
+  if (!name.startsWith(normalizedSlug + '-') && !name.startsWith(normalizedSlug + '_')) return false
+  const suffix = name.slice(normalizedSlug.length)
+  if (suffix === '-api' || suffix === '_api') return false
+  return true
+}
+
 /**
  * Generic Modrinth API request helper.
  */
@@ -541,8 +551,8 @@ const EXTRA_MODS = [
   { slug: 'cobblemon-villager-overhaul',    loaders: ['fabric'], gameVersions: [MC_VERSION] },
   { slug: 'tt20',                         loaders: ['fabric'], gameVersions: [MC_VERSION] },
   // Függőségek
-  { slug: 'matthiesen_lib_api',             loaders: ['fabric'], gameVersions: [MC_VERSION] },
-  { slug: 'matthiesen_lib',                 loaders: ['fabric'], gameVersions: [MC_VERSION] },
+  { slug: 'matthiesen-lib-api',             loaders: ['fabric'], gameVersions: [MC_VERSION] },
+  { slug: 'matthiesen-lib',                 loaders: ['fabric'], gameVersions: [MC_VERSION] },
   { slug: 'cobblemore-library',             loaders: ['fabric'], gameVersions: [MC_VERSION] },
   { slug: 'pommel-held-item-models',        loaders: ['fabric'], gameVersions: [MC_VERSION] },
   { slug: 'create-power-loader',            loaders: ['fabric'], gameVersions: [MC_VERSION] },
@@ -626,7 +636,7 @@ async function ensureExtraMods() {
       const dest = path.join(targetDir, file.filename);
 
       const existingFiles = fs.readdirSync(targetDir);
-      const isPresent = existingFiles.some(f => f.toLowerCase().includes(slug.toLowerCase()));
+      const isPresent = existingFiles.some(f => filenameMatchesSlug(f, slug));
 
       if (!isPresent) {
         logInfo(`[Modrinth] Extra ${isDatapack ? 'datapack' : 'mod'} letöltése: ${slug} -> ${file.filename}`);
