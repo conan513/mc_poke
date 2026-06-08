@@ -765,10 +765,24 @@ setInterval(() => {
 
 // ── Minecraft Process Management ─────────────────────────────
 
+function getDefaultMinHeap(heapSize) {
+  const match = String(heapSize).match(/^(\d+)([KMG])$/i)
+  if (!match) return heapSize
+
+  const value = Number(match[1])
+  const unit = match[2].toUpperCase()
+  const minValue = Math.max(1, Math.floor(value / 2))
+  return `${minValue}${unit}`
+}
+
 function startMinecraft() {
   if (mcStatus === 'running' || !activeJavaPath) return
   console.log('[Minecraft] Szerver indítása (java -jar fabric-server-launch.jar nogui)...')
   
+  const serverHeapMax = process.env.COBBLE_SERVER_MAX_HEAP || process.env.COBBLE_SERVER_XMX || '8G'
+  const serverHeapMin = process.env.COBBLE_SERVER_MIN_HEAP || process.env.COBBLE_SERVER_XMS || getDefaultMinHeap(serverHeapMax)
+  console.log(`[Minecraft] JVM memória beállítások: Xms=${serverHeapMin}, Xmx=${serverHeapMax}`)
+
   // ── Oracle GraalVM 21 JVM argumentumok ───────────────────────
   // Forrás: https://github.com/brucethemoose/Minecraft-Performance-Flags-Benchmarks
   // A GraalVM agresszívabb JIT fordítója ~20%+ gyorsabb chunk-generálást ad.
@@ -777,8 +791,8 @@ function startMinecraft() {
   // Az -Dgraal.CompilerConfiguration=enterprise és TuneInlinerExploration
   // az Oracle GraalVM (volt EE) exkluzív optimalizátorát kapcsolja be.
   const serverJvmArgs = [
-    '-Xmx8G',
-    '-Xms8G',
+    `-Xmx${serverHeapMax}`,
+    `-Xms${serverHeapMin}`,
     // ── GraalVM-specifikus JIT optimalizáció ──
     '-XX:+UnlockExperimentalVMOptions',
     '-XX:+UnlockDiagnosticVMOptions',
@@ -807,6 +821,8 @@ function startMinecraft() {
     '-XX:G1HeapRegionSize=16M',
     '-XX:G1NewSizePercent=28',
     '-XX:G1ReservePercent=20',
+    '-XX:MinHeapFreeRatio=10',
+    '-XX:MaxHeapFreeRatio=20',
     '-XX:G1MixedGCCountTarget=3',
     '-XX:InitiatingHeapOccupancyPercent=20', // 15→20%: ritkábban triggerel GC → kevesebb szünet
     '-XX:G1MixedGCLiveThresholdPercent=90',
@@ -817,6 +833,9 @@ function startMinecraft() {
     '-XX:G1ConcMarkStepDurationMillis=5',
     '-XX:G1ConcRSHotCardLimit=16',
     '-XX:G1ConcRefinementServiceIntervalMillis=150',
+    '-XX:+UseCompressedOops',
+    '-XX:+UseCompressedClassPointers',
+    '-XX:+UseStringDeduplication',
     '-jar', 'fabric-server-launch.jar',
     'nogui'
   ]
