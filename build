@@ -1,0 +1,79 @@
+#!/bin/bash
+
+# ════════════════════════════════════════════════════════════════════════════════
+# COBBLEMON UNIVERSE - Build Tools Launcher
+# ════════════════════════════════════════════════════════════════════════════════
+
+cd "$(dirname "$0")"
+
+echo ""
+echo "╔════════════════════════════════════════════════════════════╗"
+echo "║  🎮 COBBLEMON UNIVERSE - Build Tools                      ║"
+echo "╚════════════════════════════════════════════════════════════╝"
+echo ""
+echo "📍 Build Tools a ./build-tools/ mappában"
+echo ""
+echo "🚀 Gyors indítás:"
+echo ""
+echo "  1) Web Browser (http://localhost:3000)  ✨"
+echo "  2) CLI Interactive (Terminal menü)      💻"
+echo "  3) CLI Direct (Arch Linux build)        🐧"
+echo "  4) Dokumentáció megnyitása              📚"
+echo "  5) build-tools mappa megnyitása         📁"
+echo ""
+echo "---"
+echo ""
+
+read -p "Választás (1-5) vagy Enter a help-hez: " choice
+
+case $choice in
+    1)
+        echo ""
+        echo "🌐 Web szerver indítása..."
+        exec ./build-tools/start-build-server.sh
+        ;;
+    2)
+        echo ""
+        echo "💻 CLI interaktív mód..."
+        echo ""
+        exec ./build-tools/cli/build-client.sh
+        ;;
+    3)
+        echo ""
+        echo "🐧 Arch Linux build indítása..."
+        echo ""
+        exec ./build-tools/cli/build-client-linux-arch.sh
+        ;;
+    4)
+        echo ""
+        echo "📚 README megnyitása..."
+        echo ""
+        less ./build-tools/README.md
+        ;;
+    5)
+        echo ""
+        echo "📁 build-tools mappa:"
+        echo ""
+        ls -lh ./build-tools/
+        echo ""
+        ;;
+    *)
+        echo "📖 Build Tools Help"
+        echo ""
+        echo "Elérhető parancsok:"
+        echo ""
+        echo "  ./build                              # Ez a launcher"
+        echo "  ./build-tools/start-build-server.sh  # Web szerver"
+        echo "  ./build-tools/cli/build-client.sh    # CLI menü"
+        echo "  ./build-tools/cli/build-client-linux-arch.sh  # Arch Linux"
+        echo ""
+        echo "Dokumentáció:"
+        echo "  ./build-tools/README.md              # Build Tools overview"
+        echo "  ./build-tools/docs/BUILD_SERVER.md   # Web szerver guide"
+        echo "  ./build-tools/docs/BUILD_CLIENT.md   # CLI build scriptek"
+        echo "  ./build-tools/docs/BUILD_SYSTEM.md   # Teljes rendszer"
+        echo ""
+        ;;
+esac
+
+echo ""

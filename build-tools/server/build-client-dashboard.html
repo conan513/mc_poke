@@ -1,0 +1,1393 @@
+<!DOCTYPE html>
+<html lang="hu">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>COBBLEMON UNIVERSE - Client Builder</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #ff6b6b;
+            --primary-dark: #ff5252;
+            --secondary: #4ecdc4;
+            --accent: #ffd93d;
+            --dark-bg: #1a1a2e;
+            --dark-card: #16213e;
+            --text-light: #eaeaea;
+            --text-muted: #b0b0b0;
+            --success: #2ecc71;
+            --warning: #f39c12;
+            --linux-color: #ff6600;
+            --arch-color: #1793d1;
+            --debian-color: #a80030;
+            --fedora-color: #003d7a;
+            --appimage-color: #6c9fd6;
+            --flatpak-color: #4a86cf;
+            --windows-color: #0078d4;
+            --macos-color: #999999;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, var(--dark-bg) 0%, #0f0f1e 100%);
+            color: var(--text-light);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 50px;
+            padding: 30px 20px;
+            background: linear-gradient(135deg, rgba(255, 107, 107, 0.1) 0%, rgba(78, 205, 196, 0.1) 100%);
+            border-radius: 15px;
+            border: 2px solid rgba(255, 107, 107, 0.3);
+        }
+
+        h1 {
+            font-size: 3em;
+            margin-bottom: 10px;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .subtitle {
+            font-size: 1.1em;
+            color: var(--text-muted);
+            margin-bottom: 5px;
+        }
+
+        .version {
+            font-size: 0.9em;
+            color: var(--text-muted);
+            opacity: 0.7;
+        }
+
+        .build-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 25px;
+            margin-bottom: 40px;
+        }
+
+        .category {
+            display: contents;
+        }
+
+        .category-title {
+            grid-column: 1 / -1;
+            font-size: 1.8em;
+            margin-top: 20px;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 3px solid var(--primary);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .category-icon {
+            font-size: 1.5em;
+        }
+
+        .build-card {
+            background: var(--dark-card);
+            border-radius: 12px;
+            padding: 25px;
+            border: 2px solid rgba(255, 107, 107, 0.2);
+            transition: all 0.3s ease;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .build-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, var(--primary), var(--secondary));
+            transform: scaleX(0);
+            transform-origin: left;
+            transition: transform 0.3s ease;
+        }
+
+        .build-card:hover {
+            transform: translateY(-5px);
+            border-color: var(--primary);
+            box-shadow: 0 10px 30px rgba(255, 107, 107, 0.2);
+        }
+
+        .build-card:hover::before {
+            transform: scaleX(1);
+        }
+
+        .card-header {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+
+        .card-icon {
+            font-size: 2.5em;
+            min-width: 60px;
+            text-align: center;
+        }
+
+        .card-title {
+            flex: 1;
+        }
+
+        .card-name {
+            font-size: 1.3em;
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+
+        .card-subtitle {
+            font-size: 0.85em;
+            color: var(--text-muted);
+        }
+
+        .card-description {
+            font-size: 0.95em;
+            color: var(--text-muted);
+            margin-bottom: 15px;
+            line-height: 1.5;
+        }
+
+        .card-commands {
+            margin-bottom: 15px;
+        }
+
+        .command-label {
+            font-size: 0.8em;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: var(--text-muted);
+            margin-bottom: 8px;
+            display: block;
+        }
+
+        .command-box {
+            background: rgba(0, 0, 0, 0.3);
+            border-left: 3px solid var(--accent);
+            padding: 10px 12px;
+            border-radius: 5px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.85em;
+            overflow-x: auto;
+            margin-bottom: 8px;
+            position: relative;
+        }
+
+        .command-box:last-child {
+            margin-bottom: 0;
+        }
+
+        .copy-btn {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            background: rgba(255, 107, 107, 0.2);
+            border: 1px solid rgba(255, 107, 107, 0.5);
+            color: var(--primary);
+            padding: 4px 8px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.75em;
+            transition: all 0.3s ease;
+            opacity: 0;
+        }
+
+        .command-box:hover .copy-btn {
+            opacity: 1;
+        }
+
+        .copy-btn:hover {
+            background: var(--primary);
+            color: white;
+        }
+
+        .card-info {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            font-size: 0.85em;
+            color: var(--text-muted);
+        }
+
+        .info-item {
+            display: flex;
+            gap: 8px;
+            align-items: flex-start;
+        }
+
+        .info-icon {
+            color: var(--secondary);
+            min-width: 16px;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 3px 10px;
+            border-radius: 20px;
+            font-size: 0.75em;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-top: 10px;
+        }
+
+        .badge-arch {
+            background: rgba(23, 147, 209, 0.2);
+            color: var(--arch-color);
+            border: 1px solid var(--arch-color);
+        }
+
+        .badge-debian {
+            background: rgba(168, 0, 48, 0.2);
+            color: var(--debian-color);
+            border: 1px solid var(--debian-color);
+        }
+
+        .badge-fedora {
+            background: rgba(0, 61, 122, 0.2);
+            color: var(--fedora-color);
+            border: 1px solid var(--fedora-color);
+        }
+
+        .badge-appimage {
+            background: rgba(108, 159, 214, 0.2);
+            color: var(--appimage-color);
+            border: 1px solid var(--appimage-color);
+        }
+
+        .badge-linux {
+            background: rgba(255, 102, 0, 0.2);
+            color: var(--linux-color);
+            border: 1px solid var(--linux-color);
+        }
+
+        .badge-windows {
+            background: rgba(0, 120, 212, 0.2);
+            color: var(--windows-color);
+            border: 1px solid var(--windows-color);
+        }
+
+        .badge-macos {
+            background: rgba(153, 153, 153, 0.2);
+            color: var(--macos-color);
+            border: 1px solid var(--macos-color);
+        }
+
+        .badge-flatpak {
+            background: rgba(74, 134, 207, 0.2);
+            color: var(--flatpak-color);
+            border: 1px solid var(--flatpak-color);
+        }
+
+        .install-info {
+            background: rgba(46, 204, 113, 0.1);
+            border-left: 3px solid var(--success);
+            padding: 12px;
+            border-radius: 5px;
+            font-size: 0.85em;
+            color: var(--text-muted);
+            margin-top: 15px;
+        }
+
+        .install-cmd {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 8px 10px;
+            border-radius: 4px;
+            font-family: 'Courier New', monospace;
+            margin-top: 8px;
+            font-size: 0.8em;
+        }
+
+        footer {
+            text-align: center;
+            margin-top: 60px;
+            padding-top: 30px;
+            border-top: 2px solid rgba(255, 107, 107, 0.2);
+            color: var(--text-muted);
+        }
+
+        .footer-text {
+            margin-bottom: 10px;
+        }
+
+        .theme-toggle {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: var(--dark-card);
+            border: 2px solid rgba(255, 107, 107, 0.3);
+            color: var(--text-light);
+            padding: 10px 15px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 1.2em;
+            transition: all 0.3s ease;
+        }
+
+        .theme-toggle:hover {
+            border-color: var(--primary);
+            transform: scale(1.1);
+        }
+
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 2em;
+            }
+
+            .category-title {
+                font-size: 1.4em;
+            }
+
+            .build-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .card-info {
+                grid-template-columns: 1fr;
+            }
+
+            .command-box {
+                font-size: 0.75em;
+                padding: 8px 10px;
+            }
+        }
+
+        body.light-mode {
+            background: linear-gradient(135deg, #f5f5f5 0%, #eeeeee 100%);
+            color: #333;
+        }
+
+        body.light-mode .build-card {
+            background: white;
+            border-color: rgba(255, 107, 107, 0.3);
+        }
+
+        body.light-mode .command-box {
+            background: rgba(0, 0, 0, 0.05);
+            color: #333;
+        }
+
+        body.light-mode .theme-toggle {
+            background: white;
+            border-color: rgba(255, 107, 107, 0.3);
+            color: #333;
+        }
+
+        .toast {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: var(--success);
+            color: white;
+            padding: 15px 25px;
+            border-radius: 8px;
+            font-size: 0.95em;
+            animation: slideIn 0.3s ease, slideOut 0.3s ease 2.7s;
+            z-index: 1000;
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateX(400px);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        @keyframes slideOut {
+            from {
+                transform: translateX(0);
+                opacity: 1;
+            }
+            to {
+                transform: translateX(400px);
+                opacity: 0;
+            }
+        }
+
+        .build-btn {
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            border: none;
+            color: white;
+            padding: 8px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 0.9em;
+            transition: all 0.3s ease;
+            white-space: nowrap;
+            min-width: 100px;
+        }
+
+        .build-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 5px 15px rgba(255, 107, 107, 0.4);
+        }
+
+        .build-btn:active {
+            transform: scale(0.98);
+        }
+
+        .build-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: scale(1);
+        }
+
+        /* Build Modal Styles */
+        .build-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.7);
+            z-index: 9999;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .build-modal.active {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .build-modal-content {
+            background: var(--dark-card);
+            border-radius: 15px;
+            border: 2px solid var(--primary);
+            padding: 30px;
+            width: 90%;
+            max-width: 800px;
+            max-height: 80vh;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+        }
+
+        .build-modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid rgba(255, 107, 107, 0.3);
+        }
+
+        .build-modal-title {
+            font-size: 1.5em;
+            font-weight: 600;
+        }
+
+        .build-modal-close {
+            background: none;
+            border: none;
+            color: var(--text-muted);
+            font-size: 1.5em;
+            cursor: pointer;
+            transition: color 0.3s ease;
+        }
+
+        .build-modal-close:hover {
+            color: var(--primary);
+        }
+
+        .build-modal-output {
+            flex: 1;
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 107, 107, 0.2);
+            border-radius: 8px;
+            padding: 15px;
+            overflow-y: auto;
+            font-family: 'Courier New', monospace;
+            font-size: 0.85em;
+            line-height: 1.5;
+            color: var(--text-light);
+            margin-bottom: 15px;
+        }
+
+        .build-modal-output.empty {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-muted);
+        }
+
+        .output-line {
+            margin-bottom: 2px;
+        }
+
+        .output-line.success {
+            color: #2ecc71;
+        }
+
+        .output-line.error {
+            color: #e74c3c;
+        }
+
+        .output-line.warning {
+            color: #f39c12;
+        }
+
+        .output-line.info {
+            color: #3498db;
+        }
+
+        .build-modal-status {
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+            font-weight: 600;
+            margin-bottom: 15px;
+            background: rgba(46, 204, 113, 0.1);
+            border: 1px solid rgba(46, 204, 113, 0.3);
+            color: #2ecc71;
+        }
+
+        .build-modal-status.building {
+            background: rgba(52, 152, 219, 0.1);
+            border-color: rgba(52, 152, 219, 0.3);
+            color: #3498db;
+        }
+
+        .build-modal-status.error {
+            background: rgba(231, 76, 60, 0.1);
+            border-color: rgba(231, 76, 60, 0.3);
+            color: #e74c3c;
+        }
+
+        .build-modal-footer {
+            display: flex;
+            gap: 10px;
+            justify-content: flex-end;
+        }
+
+        .build-modal-btn {
+            padding: 10px 20px;
+            border-radius: 6px;
+            border: none;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .build-modal-btn-primary {
+            background: var(--primary);
+            color: white;
+        }
+
+        .build-modal-btn-primary:hover {
+            background: var(--primary-dark);
+        }
+
+        .build-modal-btn-secondary {
+            background: transparent;
+            border: 1px solid var(--text-muted);
+            color: var(--text-muted);
+        }
+
+        .build-modal-btn-secondary:hover {
+            border-color: var(--text-light);
+            color: var(--text-light);
+        }
+
+        .spinner {
+            display: inline-block;
+            width: 12px;
+            height: 12px;
+            border: 2px solid rgba(255, 107, 107, 0.3);
+            border-top-color: var(--primary);
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <div class="theme-toggle" onclick="toggleTheme()" title="Téma váltás">🌓</div>
+
+    <!-- Build Modal -->
+    <div id="buildModal" class="build-modal">
+        <div class="build-modal-content">
+            <div class="build-modal-header">
+                <div>
+                    <span id="buildIcon" style="font-size: 1.5em; margin-right: 10px;">⚙️</span>
+                    <span class="build-modal-title" id="buildTitle">Build...</span>
+                </div>
+                <button class="build-modal-close" onclick="closeBuildModal()">✕</button>
+            </div>
+            
+            <div class="build-modal-status building" id="buildStatus" style="display: none;">
+                <span class="spinner"></span> Build fut...
+            </div>
+            
+            <div class="build-modal-output empty" id="buildOutput">
+                <span>Csatlakozás szerverhez...</span>
+            </div>
+            
+            <div class="build-modal-footer">
+                <button class="build-modal-btn build-modal-btn-secondary" onclick="closeBuildModal()">Bezárás</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="container">
+        <header>
+            <h1>🎮 COBBLEMON UNIVERSE</h1>
+            <p class="subtitle">Client Builder Dashboard</p>
+            <p class="version">Platform-specifikus build scriptek</p>
+            <p id="connection-status" style="font-size: 0.9em; margin-top: 10px; opacity: 0.7;">🔗 Csatlakozás...</p>
+        </header>
+
+        <div class="build-grid">
+            <!-- LINUX CATEGORY -->
+            <div class="category-title">
+                <span class="category-icon">🐧</span>
+                <span>Linux - Összes Formátum</span>
+            </div>
+
+            <div class="build-card">
+                <div class="card-header">
+                    <div class="card-icon">📦</div>
+                    <div class="card-title">
+                        <div class="card-name">Arch Linux</div>
+                        <div class="card-subtitle">pacman csomag</div>
+                    </div>
+                </div>
+                <div class="card-description">
+                    Arch Linux felhasználók számára optimalizált csomag. Közvetlenül pacman-ből telepíthető.
+                </div>
+                <div class="card-commands">
+                    <span class="command-label">📝 Build / Másolás</span>
+                    <div style="display: grid; grid-template-columns: 1fr auto; gap: 8px;">
+                        <div class="command-box" style="margin-bottom: 0;">
+                            ./build-client-linux-arch.sh
+                            <button class="copy-btn" onclick="copyToClipboard(this)">Másolás</button>
+                        </div>
+                        <button class="build-btn" onclick="startBuild('linux-arch')" title="Build indítása szerverről">🚀 Build</button>
+                    </div>
+                    <span class="command-label">💾 Telepítés</span>
+                    <div class="command-box">
+                        sudo pacman -U Cobblemon-Universe-x64.pacman
+                        <button class="copy-btn" onclick="copyToClipboard(this)">Másolás</button>
+                    </div>
+                </div>
+                <div class="info-item">
+                    <span class="info-icon">📍</span>
+                    <span>Kimenet: <code>web-installer/releases/*.pacman</code></span>
+                </div>
+                <span class="badge badge-arch">Arch</span>
+            </div>
+
+            <div class="build-card">
+                <div class="card-header">
+                    <div class="card-icon">📦</div>
+                    <div class="card-title">
+                        <div class="card-name">Debian/Ubuntu</div>
+                        <div class="card-subtitle">deb csomag</div>
+                    </div>
+                </div>
+                <div class="card-description">
+                    Debian és Ubuntu alapú rendszerekhez. APT-tel vagy dpkg-vel telepíthető.
+                </div>
+                <div class="card-commands">
+                    <span class="command-label">📝 Build</span>
+                    <div class="command-box">
+                        ./build-client-linux-debian.sh
+                        <button class="copy-btn" onclick="copyToClipboard(this)">Másolás</button>
+                    </div>
+                    <span class="command-label">💾 Telepítés</span>
+                    <div class="command-box">
+                        sudo apt install ./Cobblemon-Universe-x64.deb
+                        <button class="copy-btn" onclick="copyToClipboard(this)">Másolás</button>
+                    </div>
+                </div>
+                <div class="info-item">
+                    <span class="info-icon">📍</span>
+                    <span>Kimenet: <code>web-installer/releases/*.deb</code></span>
+                </div>
+                <span class="badge badge-debian">Debian</span>
+            </div>
+
+            <div class="build-card">
+                <div class="card-header">
+                    <div class="card-icon">📦</div>
+                    <div class="card-title">
+                        <div class="card-name">Red Hat/Fedora</div>
+                        <div class="card-subtitle">rpm csomag</div>
+                    </div>
+                </div>
+                <div class="card-description">
+                    Fedora, RHEL és CentOS alapú rendszerekhez. DNF-fel vagy rpm-vel telepíthető.
+                </div>
+                <div class="card-commands">
+                    <span class="command-label">📝 Build</span>
+                    <div class="command-box">
+                        ./build-client-linux-redhat.sh
+                        <button class="copy-btn" onclick="copyToClipboard(this)">Másolás</button>
+                    </div>
+                    <span class="command-label">💾 Telepítés</span>
+                    <div class="command-box">
+                        sudo dnf install Cobblemon-Universe-x64.rpm
+                        <button class="copy-btn" onclick="copyToClipboard(this)">Másolás</button>
+                    </div>
+                </div>
+                <div class="info-item">
+                    <span class="info-icon">📍</span>
+                    <span>Kimenet: <code>web-installer/releases/*.rpm</code></span>
+                </div>
+                <span class="badge badge-fedora">Fedora</span>
+            </div>
+
+            <div class="build-card">
+                <div class="card-header">
+                    <div class="card-icon">🎞️</div>
+                    <div class="card-title">
+                        <div class="card-name">AppImage</div>
+                        <div class="card-subtitle">Universal Linux</div>
+                    </div>
+                </div>
+                <div class="card-description">
+                    Szinte bármilyen Linux disztribúción működik. Nem igényel telepítést.
+                </div>
+                <div class="card-commands">
+                    <span class="command-label">📝 Build</span>
+                    <div class="command-box">
+                        ./build-client-linux-appimage.sh
+                        <button class="copy-btn" onclick="copyToClipboard(this)">Másolás</button>
+                    </div>
+                    <span class="command-label">🚀 Futtatás</span>
+                    <div class="command-box">
+                        chmod +x Cobblemon-Universe-x64.AppImage && ./Cobblemon-Universe-x64.AppImage
+                        <button class="copy-btn" onclick="copyToClipboard(this)">Másolás</button>
+                    </div>
+                </div>
+                <div class="info-item">
+                    <span class="info-icon">📍</span>
+                    <span>Kimenet: <code>*.AppImage (x64, arm64)</code></span>
+                </div>
+                <span class="badge badge-appimage">AppImage</span>
+            </div>
+
+            <div class="build-card">
+                <div class="card-header">
+                    <div class="card-icon">📦</div>
+                    <div class="card-title">
+                        <div class="card-name">TAR.GZ</div>
+                        <div class="card-subtitle">Portable archívum</div>
+                    </div>
+                </div>
+                <div class="card-description">
+                    Hordozható, tömörített archívum. Bármilyen Linux-ra működik.
+                </div>
+                <div class="card-commands">
+                    <span class="command-label">📝 Build</span>
+                    <div class="command-box">
+                        ./build-client-linux-targz.sh
+                        <button class="copy-btn" onclick="copyToClipboard(this)">Másolás</button>
+                    </div>
+                    <span class="command-label">📂 Kicsomagolás</span>
+                    <div class="command-box">
+                        tar -xzf Cobblemon-Universe-x64.tar.gz
+                        <button class="copy-btn" onclick="copyToClipboard(this)">Másolás</button>
+                    </div>
+                </div>
+                <div class="info-item">
+                    <span class="info-icon">📍</span>
+                    <span>Kimenet: <code>*.tar.gz (x64, arm64)</code></span>
+                </div>
+                <span class="badge badge-linux">Portable</span>
+            </div>
+
+            <div class="build-card">
+                <div class="card-header">
+                    <div class="card-icon">🎁</div>
+                    <div class="card-title">
+                        <div class="card-name">Flatpak</div>
+                        <div class="card-subtitle">Sandbox</div>
+                    </div>
+                </div>
+                <div class="card-description">
+                    Sandbox-os csomagolás. Magasabb biztonság és izoláció.
+                </div>
+                <div class="card-commands">
+                    <span class="command-label">📝 Build</span>
+                    <div class="command-box">
+                        ./build-client-linux-flatpak.sh
+                        <button class="copy-btn" onclick="copyToClipboard(this)">Másolás</button>
+                    </div>
+                    <span class="command-label">💾 Telepítés</span>
+                    <div class="command-box">
+                        flatpak install Cobblemon-Universe.flatpak
+                        <button class="copy-btn" onclick="copyToClipboard(this)">Másolás</button>
+                    </div>
+                </div>
+                <div class="info-item">
+                    <span class="info-icon">📍</span>
+                    <span>Kimenet: <code>web-installer/releases/*.flatpak</code></span>
+                </div>
+                <span class="badge badge-flatpak">Flatpak</span>
+            </div>
+
+            <!-- LINUX ALL -->
+            <div class="build-card" style="grid-column: 1 / -1; background: linear-gradient(135deg, rgba(255, 102, 0, 0.1) 0%, rgba(78, 205, 196, 0.1) 100%); border-color: rgba(255, 102, 0, 0.5);">
+                <div class="card-header">
+                    <div class="card-icon">🐧</div>
+                    <div class="card-title">
+                        <div class="card-name">Összes Linux Formátum</div>
+                        <div class="card-subtitle">Egy build-ben: pacman, deb, rpm, AppImage, tar.gz, flatpak</div>
+                    </div>
+                </div>
+                <div class="card-description">
+                    Egyetlen parancs segítségével az összes Linux csomagot egyszerre generálja.
+                </div>
+                <div class="card-commands">
+                    <span class="command-label">📝 Build</span>
+                    <div class="command-box">
+                        ./build-client-linux.sh
+                        <button class="copy-btn" onclick="copyToClipboard(this)">Másolás</button>
+                    </div>
+                </div>
+                <div class="info-item">
+                    <span class="info-icon">💡</span>
+                    <span>Javasolt: ha az összes Linux platformra szeretnél buildelni</span>
+                </div>
+            </div>
+
+            <!-- WINDOWS CATEGORY -->
+            <div class="category-title" style="margin-top: 40px;">
+                <span class="category-icon">🪟</span>
+                <span>Windows</span>
+            </div>
+
+            <div class="build-card">
+                <div class="card-header">
+                    <div class="card-icon">💻</div>
+                    <div class="card-title">
+                        <div class="card-name">Windows Installer</div>
+                        <div class="card-subtitle">NSIS + Portable</div>
+                    </div>
+                </div>
+                <div class="card-description">
+                    Windows felhasználók számára teljes telepítő és hordozható verziók.
+                </div>
+                <div class="card-commands">
+                    <span class="command-label">📝 Build (Windows-on)</span>
+                    <div class="command-box">
+                        .\build-client-win.sh
+                        <button class="copy-btn" onclick="copyToClipboard(this)">Másolás</button>
+                    </div>
+                </div>
+                <div class="info-item">
+                    <span class="info-icon">📍</span>
+                    <span>Kimenet: <code>*.exe (installer & portable)</code></span>
+                </div>
+                <div class="info-item">
+                    <span class="info-icon">⚠️</span>
+                    <span>Csak Windows-on működik!</span>
+                </div>
+                <span class="badge badge-windows">Windows</span>
+            </div>
+
+            <!-- MACOS CATEGORY -->
+            <div class="category-title">
+                <span class="category-icon">🍎</span>
+                <span>macOS</span>
+            </div>
+
+            <div class="build-card">
+                <div class="card-header">
+                    <div class="card-icon">💿</div>
+                    <div class="card-title">
+                        <div class="card-name">macOS DMG</div>
+                        <div class="card-subtitle">Telepítő lemez</div>
+                    </div>
+                </div>
+                <div class="card-description">
+                    macOS felhasználók számára DMG formátumú telepítő.
+                </div>
+                <div class="card-commands">
+                    <span class="command-label">📝 Build (macOS-en)</span>
+                    <div class="command-box">
+                        ./build-client-mac.sh
+                        <button class="copy-btn" onclick="copyToClipboard(this)">Másolás</button>
+                    </div>
+                </div>
+                <div class="info-item">
+                    <span class="info-icon">📍</span>
+                    <span>Kimenet: <code>web-installer/releases/*.dmg</code></span>
+                </div>
+                <div class="info-item">
+                    <span class="info-icon">⚠️</span>
+                    <span>Csak macOS-en működik!</span>
+                </div>
+                <span class="badge badge-macos">macOS</span>
+            </div>
+
+            <!-- MAIN BUILDER -->
+            <div class="category-title" style="margin-top: 40px;">
+                <span class="category-icon">⚡</span>
+                <span>Gyors Start</span>
+            </div>
+
+            <div class="build-card" style="grid-column: 1 / -1; background: linear-gradient(135deg, rgba(255, 107, 107, 0.15) 0%, rgba(255, 217, 61, 0.15) 100%); border: 2px dashed rgba(255, 107, 107, 0.5);">
+                <div class="card-header">
+                    <div class="card-icon">🚀</div>
+                    <div class="card-title">
+                        <div class="card-name">Interaktív Builder</div>
+                        <div class="card-subtitle">Menüből válassz platformot</div>
+                    </div>
+                </div>
+                <div class="card-description">
+                    Szép interaktív menü, amely végigvezet az összes opciókon. Ajánlott az új felhasználóknak!
+                </div>
+                <div class="card-commands">
+                    <span class="command-label">📝 Indítás</span>
+                    <div class="command-box">
+                        ./build-client.sh
+                        <button class="copy-btn" onclick="copyToClipboard(this)">Másolás</button>
+                    </div>
+                </div>
+                <div class="card-info">
+                    <div class="info-item">
+                        <span class="info-icon">✨</span>
+                        <span>Szép, színes output</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-icon">🎯</span>
+                        <span>Lépésről lépésre</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-icon">⌨️</span>
+                        <span>Vagy parancssori arg</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-icon">📋</span>
+                        <span>Minden platform</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- COMMAND LINE ARGS -->
+            <div class="category-title">
+                <span class="category-icon">💻</span>
+                <span>Parancssori Argumentumok</span>
+            </div>
+
+            <div class="build-card" style="grid-column: 1 / -1;">
+                <div class="card-description" style="margin-bottom: 20px;">
+                    Az alábbi argumentumokkal közvetlenül meghívható a builder:
+                </div>
+                <div class="card-commands">
+                    <span class="command-label">Arch Linux</span>
+                    <div class="command-box">./build-client.sh linux-arch<button class="copy-btn" onclick="copyToClipboard(this)">Másolás</button></div>
+
+                    <span class="command-label">Debian/Ubuntu</span>
+                    <div class="command-box">./build-client.sh linux-debian<button class="copy-btn" onclick="copyToClipboard(this)">Másolás</button></div>
+
+                    <span class="command-label">Red Hat/Fedora</span>
+                    <div class="command-box">./build-client.sh linux-redhat<button class="copy-btn" onclick="copyToClipboard(this)">Másolás</button></div>
+
+                    <span class="command-label">AppImage</span>
+                    <div class="command-box">./build-client.sh linux-appimage<button class="copy-btn" onclick="copyToClipboard(this)">Másolás</button></div>
+
+                    <span class="command-label">TAR.GZ</span>
+                    <div class="command-box">./build-client.sh linux-targz<button class="copy-btn" onclick="copyToClipboard(this)">Másolás</button></div>
+
+                    <span class="command-label">Flatpak</span>
+                    <div class="command-box">./build-client.sh linux-flatpak<button class="copy-btn" onclick="copyToClipboard(this)">Másolás</button></div>
+
+                    <span class="command-label">Összes Linux</span>
+                    <div class="command-box">./build-client.sh linux-all<button class="copy-btn" onclick="copyToClipboard(this)">Másolás</button></div>
+
+                    <span class="command-label">Windows</span>
+                    <div class="command-box">./build-client.sh windows<button class="copy-btn" onclick="copyToClipboard(this)">Másolás</button></div>
+
+                    <span class="command-label">macOS</span>
+                    <div class="command-box">./build-client.sh macos<button class="copy-btn" onclick="copyToClipboard(this)">Másolás</button></div>
+
+                    <span class="command-label">Összes Platform</span>
+                    <div class="command-box">./build-client.sh all<button class="copy-btn" onclick="copyToClipboard(this)">Másolás</button></div>
+                </div>
+            </div>
+        </div>
+
+        <footer>
+            <p class="footer-text">🎮 COBBLEMON UNIVERSE - Client Builder | 2026</p>
+            <p class="footer-text" style="font-size: 0.85em;">Készítette: Lumyverse & Conan | MIT Licenc</p>
+        </footer>
+    </div>
+
+    <script>
+        let ws = null;
+        let buildInProgress = false;
+
+        // ════════════════════════════════════════════════════════════════════════════════
+        // WebSocket kapcsolat
+        // ════════════════════════════════════════════════════════════════════════════════
+
+        function connectWebSocket() {
+            const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+            const wsUrl = `${protocol}//${window.location.host}`;
+            
+            ws = new WebSocket(wsUrl);
+
+            ws.onopen = () => {
+                console.log('[WS] Csatlakozva');
+                updateConnectionStatus(true);
+            };
+
+            ws.onmessage = (event) => {
+                try {
+                    const message = JSON.parse(event.data);
+                    handleBuildMessage(message);
+                } catch (e) {
+                    console.error('[WS] Parse hiba:', e);
+                }
+            };
+
+            ws.onerror = (error) => {
+                console.error('[WS] Hiba:', error);
+                updateConnectionStatus(false);
+            };
+
+            ws.onclose = () => {
+                console.log('[WS] Lecsatlakozva');
+                updateConnectionStatus(false);
+                setTimeout(connectWebSocket, 3000);
+            };
+        }
+
+        function updateConnectionStatus(connected) {
+            const status = document.getElementById('connection-status');
+            if (connected) {
+                status.textContent = '🟢 Csatlakozva';
+                status.style.color = '#2ecc71';
+            } else {
+                status.textContent = '🔴 Szétkapcsolva';
+                status.style.color = '#e74c3c';
+            }
+        }
+
+        // ════════════════════════════════════════════════════════════════════════════════
+        // Build üzenetek kezelése
+        // ════════════════════════════════════════════════════════════════════════════════
+
+        function handleBuildMessage(message) {
+            const outputEl = document.getElementById('buildOutput');
+            const statusEl = document.getElementById('buildStatus');
+
+            switch (message.type) {
+                case 'start':
+                    buildInProgress = true;
+                    outputEl.innerHTML = '';
+                    outputEl.classList.remove('empty');
+                    statusEl.style.display = 'block';
+                    statusEl.className = 'build-modal-status building';
+                    statusEl.innerHTML = '<span class="spinner"></span> Build fut...';
+                    console.log('[BUILD] Kezdődik:', message.buildType);
+                    break;
+
+                case 'output':
+                    const line = document.createElement('div');
+                    line.className = 'output-line';
+                    line.textContent = message.text.trim();
+                    
+                    // Szín alapján a tartalomnak
+                    if (message.text.includes('✓') || message.text.includes('kész')) {
+                        line.className += ' success';
+                    } else if (message.text.includes('✗') || message.text.includes('hiba')) {
+                        line.className += ' error';
+                    } else if (message.text.includes('⚠')) {
+                        line.className += ' warning';
+                    } else if (message.text.includes('ℹ')) {
+                        line.className += ' info';
+                    }
+                    
+                    outputEl.appendChild(line);
+                    outputEl.scrollTop = outputEl.scrollHeight;
+                    break;
+
+                case 'success':
+                    buildInProgress = false;
+                    statusEl.className = 'build-modal-status';
+                    statusEl.innerHTML = '✅ Build sikeres!';
+                    statusEl.style.display = 'block';
+                    showToast(message.title + ' ' + message.message);
+                    break;
+
+                case 'error':
+                    buildInProgress = false;
+                    statusEl.className = 'build-modal-status error';
+                    statusEl.innerHTML = '❌ ' + (message.title || 'Build hiba');
+                    statusEl.style.display = 'block';
+                    showToast(message.title + ' - ' + message.message, 'error');
+                    break;
+            }
+        }
+
+        // ════════════════════════════════════════════════════════════════════════════════
+        // Build indítása
+        // ════════════════════════════════════════════════════════════════════════════════
+
+        async function startBuild(buildType) {
+            if (buildInProgress) {
+                showToast('Build már fut!', 'warning');
+                return;
+            }
+
+            // Modal megnyitása
+            const modal = document.getElementById('buildModal');
+            modal.classList.add('active');
+
+            const buildNames = {
+                'linux-arch': 'Arch Linux',
+                'linux-debian': 'Debian/Ubuntu',
+                'linux-redhat': 'Red Hat/Fedora',
+                'linux-appimage': 'AppImage',
+                'linux-targz': 'TAR.GZ',
+                'linux-flatpak': 'Flatpak',
+                'linux-all': 'Összes Linux',
+                'windows': 'Windows',
+                'macos': 'macOS'
+            };
+
+            document.getElementById('buildTitle').textContent = buildNames[buildType] + ' - Build';
+            
+            const icons = {
+                'linux-arch': '📦', 'linux-debian': '📦', 'linux-redhat': '📦',
+                'linux-appimage': '🎞️', 'linux-targz': '📦', 'linux-flatpak': '🎁',
+                'linux-all': '🐧', 'windows': '🪟', 'macos': '🍎'
+            };
+            document.getElementById('buildIcon').textContent = icons[buildType] || '⚙️';
+
+            try {
+                const response = await fetch(`/api/build/${buildType}`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' }
+                });
+
+                if (!response.ok) {
+                    throw new Error('API hiba: ' + response.statusText);
+                }
+
+                console.log('[BUILD] Indítva: ' + buildType);
+            } catch (error) {
+                console.error('[BUILD] Hiba:', error);
+                showToast('Build indítási hiba: ' + error.message, 'error');
+                closeBuildModal();
+            }
+        }
+
+        function closeBuildModal() {
+            if (!buildInProgress) {
+                document.getElementById('buildModal').classList.remove('active');
+            }
+        }
+
+        // ════════════════════════════════════════════════════════════════════════════════
+        // Utility funkciók
+        // ════════════════════════════════════════════════════════════════════════════════
+
+        function copyToClipboard(button) {
+            const commandBox = button.parentElement;
+            const text = commandBox.textContent.replace('Másolás', '').trim();
+            
+            navigator.clipboard.writeText(text).then(() => {
+                button.textContent = '✓ Másolva!';
+                button.style.backgroundColor = 'rgba(46, 204, 113, 0.3)';
+                button.style.borderColor = 'rgba(46, 204, 113, 0.7)';
+                button.style.color = '#2ecc71';
+                
+                showToast('Parancs vágólapra másolva!');
+                
+                setTimeout(() => {
+                    button.textContent = 'Másolás';
+                    button.style.backgroundColor = 'rgba(255, 107, 107, 0.2)';
+                    button.style.borderColor = 'rgba(255, 107, 107, 0.5)';
+                    button.style.color = 'var(--primary)';
+                }, 2000);
+            }).catch(err => {
+                console.error('Másolási hiba:', err);
+                showToast('Másolási hiba!');
+            });
+        }
+
+        function showToast(message, type = 'info') {
+            const toast = document.createElement('div');
+            toast.className = 'toast';
+            toast.textContent = message;
+            
+            if (type === 'error') {
+                toast.style.background = '#e74c3c';
+            } else if (type === 'warning') {
+                toast.style.background = '#f39c12';
+            } else if (type === 'success') {
+                toast.style.background = '#2ecc71';
+            }
+            
+            document.body.appendChild(toast);
+            
+            setTimeout(() => {
+                toast.remove();
+            }, 3000);
+        }
+
+        function toggleTheme() {
+            document.body.classList.toggle('light-mode');
+            localStorage.setItem('theme', document.body.classList.contains('light-mode') ? 'light' : 'dark');
+        }
+
+        // ════════════════════════════════════════════════════════════════════════════════
+        // Inicializálás
+        // ════════════════════════════════════════════════════════════════════════════════
+
+        window.addEventListener('load', () => {
+            // Téma betöltése
+            const savedTheme = localStorage.getItem('theme');
+            if (savedTheme === 'light') {
+                document.body.classList.add('light-mode');
+            }
+
+            // WebSocket csatlakozás
+            connectWebSocket();
+
+            // Build gombokat kezelése - dinamikéban hozzáadunk őket az összes command boxhoz
+            setupBuildButtons();
+        });
+
+        // Build gombokat a parancsok mellé
+        function setupBuildButtons() {
+            const buildMappings = {
+                'linux-arch': ['.Arch Linux', 'build-client-linux-arch.sh'],
+                'linux-debian': ['Debian/Ubuntu', 'build-client-linux-debian.sh'],
+                'linux-redhat': ['Red Hat/Fedora', 'build-client-linux-redhat.sh'],
+                'linux-appimage': ['AppImage', 'build-client-linux-appimage.sh'],
+                'linux-targz': ['TAR.GZ', 'build-client-linux-targz.sh'],
+                'linux-flatpak': ['Flatpak', 'build-client-linux-flatpak.sh'],
+                'windows': ['Windows', 'build-client-win.sh'],
+                'macos': ['macOS', 'build-client-mac.sh']
+            };
+
+            // Az összes build card-ot dinamikéban módosítjuk
+            document.querySelectorAll('.card-name').forEach(nameEl => {
+                const cardName = nameEl.textContent.trim();
+                
+                for (const [buildType, [displayName, scriptName]] of Object.entries(buildMappings)) {
+                    if (cardName.includes(displayName)) {
+                        // Keresünk a card-nak a card-commands szekciót
+                        const card = nameEl.closest('.build-card');
+                        const cardCommands = card.querySelector('.card-commands');
+                        
+                        if (cardCommands) {
+                            // Hozzáadunk egy build gombot az első command-box után
+                            const firstCommandBox = cardCommands.querySelector('.command-box');
+                            if (firstCommandBox) {
+                                const buildBtn = document.createElement('button');
+                                buildBtn.className = 'build-btn';
+                                buildBtn.textContent = '🚀 Build';
+                                buildBtn.style.marginTop = '12px';
+                                buildBtn.onclick = () => startBuild(buildType);
+                                
+                                firstCommandBox.parentElement.insertBefore(
+                                    buildBtn,
+                                    firstCommandBox.nextSibling
+                                );
+                            }
+                        }
+                    }
+                }
+            });
+
+            // Arch Linux összes format gomb
+            const allLinuxCard = Array.from(document.querySelectorAll('.build-card')).find(card => {
+                const name = card.querySelector('.card-name');
+                return name && name.textContent.includes('Összes Linux');
+            });
+            
+            if (allLinuxCard) {
+                const cardCommands = allLinuxCard.querySelector('.card-commands');
+                if (cardCommands) {
+                    const firstCommandBox = cardCommands.querySelector('.command-box');
+                    if (firstCommandBox) {
+                        const buildBtn = document.createElement('button');
+                        buildBtn.className = 'build-btn';
+                        buildBtn.textContent = '🚀 Build';
+                        buildBtn.style.marginTop = '12px';
+                        buildBtn.onclick = () => startBuild('linux-all');
+                        
+                        firstCommandBox.parentElement.insertBefore(
+                            buildBtn,
+                            firstCommandBox.nextSibling
+                        );
+                    }
+                }
+            }
+
+            // Interaktív builder gomb
+            const builderCard = Array.from(document.querySelectorAll('.build-card')).find(card => {
+                const name = card.querySelector('.card-name');
+                return name && name.textContent.includes('Interaktív');
+            });
+            
+            if (builderCard) {
+                const cardCommands = builderCard.querySelector('.card-commands');
+                if (cardCommands) {
+                    const firstCommandBox = cardCommands.querySelector('.command-box');
+                    if (firstCommandBox) {
+                        const buildBtn = document.createElement('button');
+                        buildBtn.className = 'build-btn';
+                        buildBtn.textContent = '🚀 Menü';
+                        buildBtn.style.marginTop = '12px';
+                        buildBtn.style.background = 'linear-gradient(135deg, var(--accent), #ffc107)';
+                        buildBtn.onclick = () => {
+                            showToast('Az interaktív menüt csak terminálból tudod futtatni!');
+                            copyToClipboard(firstCommandBox.querySelector('.copy-btn'));
+                        };
+                        
+                        firstCommandBox.parentElement.insertBefore(
+                            buildBtn,
+                            firstCommandBox.nextSibling
+                        );
+                    }
+                }
+            }
+        }
+    </script>
+</body>
+</html>
