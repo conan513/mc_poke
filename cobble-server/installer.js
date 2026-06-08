@@ -45,6 +45,11 @@ const BLACKLISTED_MODS = [
 ];
 // Ensure ImmediatelyFast (client-side renderer tweak) is not installed on server
 BLACKLISTED_MODS.push('immediatelyfast');
+// Also blacklist Sodium and related client-side renderer addons so server won't host them
+BLACKLISTED_MODS.push('sodium');
+BLACKLISTED_MODS.push('sodium-extra');
+BLACKLISTED_MODS.push('reeses-sodium-options');
+BLACKLISTED_MODS.push('sodiumoptionsapi');
 
 // Minecraft benchmark szerint chunk-generálásban 20%+ gyorsabb a standard Temurin-nél.
 // Forrás: https://github.com/brucethemoose/Minecraft-Performance-Flags-Benchmarks
@@ -545,8 +550,6 @@ const CUSTOM_DIRECT_MODS = [
  */
 const PINNED_MODRINTH_MODS = [
   { slug: 'moreculling', version: '1.0.8' },
-  // Pin Sodium to the specific Modrinth version from user-provided link
-  { slug: 'sodium', version: 'mc1.21.1-0.8.12-alpha.3-fabric' },
 ];
 
 /**
