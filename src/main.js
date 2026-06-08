@@ -63,6 +63,11 @@ async function loadSkinGallery(query = '') {
     if (window.cobble && window.cobble.searchSkins) {
       skinGallery = await window.cobble.searchSkins(query ? query.trim() : '');
     }
+
+    // Trim large results to a sane maximum to avoid rendering too many DOM nodes
+    if (Array.isArray(skinGallery) && skinGallery.length > 60) {
+      skinGallery = skinGallery.slice(0, 60);
+    }
     
     if (!skinGallery || skinGallery.length === 0) {
        const emptyHtml = '<div style="grid-column: 1/-1; text-align: center; color: #ccc;">Nincs találat.</div>';
@@ -209,12 +214,9 @@ async function startIntro() {
   $id('intro-flash')?.classList.add('hidden');
   $id('intro-flash')?.classList.remove('active');
 
-  // Preload Pokemons to avoid delay during reveal
+  // Preload Pokemons to avoid delay during reveal (no lingering references)
   const reveals = ['bulbasaur','squirtle','charmander','pikachu','eevee','mew','togepi','jigglypuff','pichu','totodile','cyndaquil','chikorita','mudkip','torchic','treecko']
-  reveals.forEach(poke => {
-    const img = new Image();
-    img.src = `https://play.pokemonshowdown.com/sprites/xyani/${poke}.gif`;
-  });
+  reveals.forEach(poke => { const img = new Image(); img.src = `https://play.pokemonshowdown.com/sprites/xyani/${poke}.gif`; });
 
   // Reset pitch cards
   const pitches = [1, 2, 3];
@@ -623,10 +625,17 @@ async function startIntro() {
       img.className = 'floating-pkmn'
       img.style.top = Math.random() * 80 + 'vh'
       img.style.animationDuration = (Math.random() * 5 + 10) + 's'
-      
+
       // Cleanup broken images if showdown is missing a GIF
       img.onerror = () => img.remove();
-      
+
+      // Keep a cap on number of floating elements to avoid unbounded memory/DOM growth
+      const MAX_FLOATERS = 20;
+      if (container.children.length >= MAX_FLOATERS) {
+        const first = container.firstElementChild;
+        if (first) first.remove();
+      }
+
       container.appendChild(img)
       setTimeout(() => img.remove(), 15000)
       setTimeout(spawnPkmn, Math.random() * 2000 + 1000)
@@ -2687,6 +2696,12 @@ animateParticles()
       const msg = `[System] Smart RAM auto-selected: ${recommended} MB (system: ${totalGB.toFixed(1)} GB${isFallback ? ', fallback' : ''})`
       console.log(msg)
       addLog(msg)
+    } else if (!isFallback && totalGB <= 8 && selectedRam > 4096) {
+      selectedRam = 4096
+      localStorage.setItem('cobble_ram', '4096')
+      const msg = `[System] Low-memory system detected (${totalGB.toFixed(1)} GB): forcing 4096 MB RAM for stability.`
+      console.log(msg)
+      addLog(msg)
     }
 
     // ── Step 4: Mark the recommended button with a yellow badge ──
@@ -2718,6 +2733,18 @@ animateParticles()
         sub.className = 'ram-rec-sublabel'
         sub.textContent = recSubLabel
         btn.appendChild(sub)
+      }
+    })
+
+    const lowMemoryLock = totalGB <= 8
+    document.querySelectorAll('.ram-btn').forEach(btn => {
+      const btnVal = parseInt(btn.dataset.val)
+      if (lowMemoryLock && btnVal > 4096) {
+        btn.disabled = true
+        btn.title = currentLang === 'hu' ? '8 GB RAM alatt nem ajánlott' : 'Not recommended on 8 GB RAM systems'
+      } else {
+        btn.disabled = false
+        btn.removeAttribute('title')
       }
     })
 

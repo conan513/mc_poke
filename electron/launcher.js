@@ -1034,11 +1034,19 @@ function buildJvmArgs(ramMb, platform) {
     '-XX:+ZGenerational',           // Generational ZGC (Java 21+): shorter GC pauses
     '-XX:+ZUncommit',               // Return unused heap pages to the OS when idle
     '-XX:ZUncommitDelay=30',        // Wait 30s of inactivity before uncommitting
+    '-XX:ZCollectionInterval=30',  // More frequent ZGC collections for long-lived game sessions
     `-XX:SoftMaxHeapSize=${softMaxMb}M`, // Soft ceiling – triggers uncommit above this
 
     // ── Pointer & Heap Compression ─────────────────────────
     '-XX:+UseCompressedOops',           // 32-bit object refs in 64-bit JVM (~10-15% heap saving)
     '-XX:+UseCompressedClassPointers',  // Compress class metadata pointers
+
+    // ── Metaspace / Direct Memory Caps ────────────────────
+    '-XX:MetaspaceSize=128m',
+    '-XX:MaxMetaspaceSize=512m',
+    '-XX:CompressedClassSpaceSize=256m',
+    '-XX:MaxDirectMemorySize=512m',
+    '-XX:SoftRefLRUPolicyMSPerMB=50',
 
     // ── String Memory Deduplication ────────────────────────
     '-XX:+UseStringDeduplication',      // Merge duplicate String objects
@@ -1105,7 +1113,12 @@ async function install({ username, ram, serverUrl }, onProgress) {
 }
 
 async function launch({ username, uuid, ram, serverUrl, closeOnLaunch }, onLog, onClose) {
-  const ramMb = ram || 4096
+  let ramMb = ram || 4096
+  const systemRamGb = Math.floor(os.totalmem() / (1024 * 1024 * 1024))
+  if (systemRamGb <= 8 && ramMb > 4096) {
+    onLog?.(`[Launcher] Low-memory system detected (${systemRamGb} GB RAM). Clamping Minecraft heap to 4096 MB.`)
+    ramMb = 4096
+  }
 
   migrateStructure()
 
