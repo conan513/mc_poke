@@ -823,8 +823,8 @@ async function updateModsFromModrinth(onLog) {
       const localFilename = oldFileInfo ? oldFileInfo.file.toLowerCase() : ''
 
       const sortedVersions = versions.sort((a, b) => new Date(b.date_published) - new Date(a.date_published))
-      const isSodiumMod = /(?:sodium(?:-extra)?|reeses-sodium-options|sodiumoptionsapi)/i.test(localFilename || '')
-      const latestForProject = isSodiumMod
+      const isAlphaCompatibleMod = /(?:sodium(?:-extra)?|reeses-sodium-options|sodiumoptionsapi|moreculling)/i.test(localFilename || '')
+      const latestForProject = isAlphaCompatibleMod
         ? sortedVersions[0]
         : (sortedVersions.filter(v => v.version_type === 'release')[0] || sortedVersions[0])
 
