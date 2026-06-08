@@ -25,15 +25,6 @@ const MODPACK_PROJECT_ID = 'Jkb29YJU'
 const MC_VERSION = '1.21.1'
 const JAVA_VERSION_TARGET = 21
 
-const MODRINTH_AUTO_UPDATE_EXCLUDE = [
-  'sodium-fabric',
-  'sodium-extra-fabric',
-  'reeses-sodium-options-fabric',
-  'sodiumoptionsapi-fabric'
-]
-
-
-// Modrinth API – latest modpack versions for this MC version & Fabric
 const MODRINTH_VERSIONS_URL =
   `https://api.modrinth.com/v2/project/${MODPACK_PROJECT_ID}/version` +
   `?loaders=["fabric"]&game_versions=["${MC_VERSION}"]`
@@ -826,38 +817,35 @@ async function updateModsFromModrinth(onLog) {
       // Find which of our local versions belong to this project
       const currentVersionsForProject = Object.values(hashToVersion).filter(v => v.project_id === projectId)
       
-      // Check if we have an older version
-      const isOutdated = currentVersionsForProject.some(v => new Date(v.date_published) < new Date(latest.date_published))
+      const oldVersion = currentVersionsForProject[0]
+      const oldHash = oldVersion && Object.keys(hashToVersion).find(h => hashToVersion[h].id === oldVersion.id)
+      const oldFileInfo = oldHash ? fileToInfo[oldHash] : null
+      const localFilename = oldFileInfo ? oldFileInfo.file.toLowerCase() : ''
 
-      if (isOutdated) {
-        const newestFile = latest.files.find(f => f.primary) || latest.files[0]
-        const newestFilename = newestFile.filename.toLowerCase()
+      const sortedVersions = versions.sort((a, b) => new Date(b.date_published) - new Date(a.date_published))
+      const isSodiumMod = /(?:sodium(?:-extra)?|reeses-sodium-options|sodiumoptionsapi)/i.test(localFilename || '')
+      const latestForProject = isSodiumMod
+        ? sortedVersions[0]
+        : (sortedVersions.filter(v => v.version_type === 'release')[0] || sortedVersions[0])
 
-        if (MODRINTH_AUTO_UPDATE_EXCLUDE.some(pattern => newestFilename.includes(pattern))) {
-          onLog?.(`[Modrinth] Sodium-related mod frissítése kihagyva: ${newestFile.filename}`)
-          continue
-        }
+      if (!latestForProject) continue
 
-        // We might have multiple local jars for the same project (unlikely but possible)
-        // We'll replace the one that is oldest.
-        const oldVersion = currentVersionsForProject[0]
-        const oldHash = Object.keys(hashToVersion).find(h => hashToVersion[h].id === oldVersion.id)
-        const oldFileInfo = fileToInfo[oldHash]
+      const chosenFile = latestForProject.files.find(f => f.primary) || latestForProject.files[0]
+      const shouldUpdate = currentVersionsForProject.some(v => new Date(v.date_published) < new Date(latestForProject.date_published))
 
-        if (oldFileInfo) {
-          onLog?.(`[Modrinth] Frissítés: ${oldFileInfo.file} → ${newestFile.filename}`)
-          const dest = path.join(modsDir, newestFile.filename)
-          
-          try {
-            await downloadFile(newestFile.url, dest)
-            // If the filename is different, remove the old one.
-            if (fs.existsSync(oldFileInfo.fullPath) && oldFileInfo.fullPath !== dest) {
-              fs.unlinkSync(oldFileInfo.fullPath)
-            }
-            updatedCount++
-          } catch (dlErr) {
-            onLog?.(`[Modrinth-Hiba] Nem sikerült letölteni: ${newestFile.filename}`)
+      if (shouldUpdate && oldFileInfo) {
+        onLog?.(`[Modrinth] Frissítés: ${oldFileInfo.file} → ${chosenFile.filename}`)
+        const dest = path.join(modsDir, chosenFile.filename)
+        
+        try {
+          await downloadFile(chosenFile.url, dest)
+          // If the filename is different, remove the old one.
+          if (fs.existsSync(oldFileInfo.fullPath) && oldFileInfo.fullPath !== dest) {
+            fs.unlinkSync(oldFileInfo.fullPath)
           }
+          updatedCount++
+        } catch (dlErr) {
+          onLog?.(`[Modrinth-Hiba] Nem sikerült letölteni: ${chosenFile.filename}`)
         }
       }
     }

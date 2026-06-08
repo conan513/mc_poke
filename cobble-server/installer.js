@@ -43,15 +43,6 @@ const BLACKLISTED_MODS = [
   'rustlingspot', 'mikeskills'
 ];
 
-const MODRINTH_AUTO_UPDATE_EXCLUDE = [
-  'sodium-fabric',
-  'sodium-extra-fabric',
-  'reeses-sodium-options-fabric',
-  'sodiumoptionsapi-fabric'
-];
-
-
-// Oracle GraalVM 21 – a volt GraalVM Enterprise Edition utóda (2023-tól ingyenes).
 // Minecraft benchmark szerint chunk-generálásban 20%+ gyorsabb a standard Temurin-nél.
 // Forrás: https://github.com/brucethemoose/Minecraft-Performance-Flags-Benchmarks
 // Letöltési oldal: https://www.oracle.com/java/technologies/downloads/#graalvmjava21
@@ -390,35 +381,31 @@ async function updateModsFromModrinth() {
         }
 
         const currentVersionsForProject = Object.values(hashToVersion).filter(v => v.project_id === projectId);
+        const oldVersion = currentVersionsForProject[0];
+        const oldHash = oldVersion && Object.keys(hashToVersion).find(h => hashToVersion[h].id === oldVersion.id);
+        const oldFileInfo = oldHash ? fileToInfo[oldHash] : null;
+        const localFilename = oldFileInfo ? oldFileInfo.file.toLowerCase() : '';
 
-        // Find if any local version of this project is older than the latest version
-        const needsUpdate = currentVersionsForProject.some(v => {
-          const currentDate = new Date(v.date_published);
-          const latestDate = new Date(latest.date_published);
-          return latestDate > currentDate;
-        });
+        const sortedVersions = versions.sort((a, b) => new Date(b.date_published) - new Date(a.date_published));
+        const isSodiumMod = /(?:sodium(?:-extra)?|reeses-sodium-options|sodiumoptionsapi)/i.test(localFilename || '');
+        const latestForProject = isSodiumMod
+          ? sortedVersions[0]
+          : (sortedVersions.filter(v => v.version_type === 'release')[0] || sortedVersions[0]);
 
-        if (needsUpdate) {
-          const newestFile = latest.files.find(f => f.primary) || latest.files[0];
-          const newestFilename = newestFile.filename.toLowerCase();
-          if (MODRINTH_AUTO_UPDATE_EXCLUDE.some(pattern => newestFilename.includes(pattern))) {
-            logInfo(`[Modrinth] Sodium-related mod frissítése kihagyva: ${newestFile.filename}`);
-            continue;
+        if (!latestForProject) continue;
+
+        const chosenFile = latestForProject.files.find(f => f.primary) || latestForProject.files[0];
+        const shouldUpdate = currentVersionsForProject.some(v => new Date(latestForProject.date_published) > new Date(v.date_published));
+
+        if (shouldUpdate && oldFileInfo) {
+          logInfo(`[Modrinth] FRISSÍTÉS: ${oldFileInfo.file} -> ${chosenFile.filename} (${latestForProject.version_number})`);
+          const dest = path.join(MODS_DIR, chosenFile.filename);
+
+          await downloadFile(chosenFile.url, dest, { hash: chosenFile.hashes.sha1, algorithm: 'sha1' });
+          if (fs.existsSync(oldFileInfo.fullPath) && oldFileInfo.fullPath !== dest) {
+            fs.unlinkSync(oldFileInfo.fullPath);
           }
-          const oldVersion = currentVersionsForProject[0];
-          const oldHash = Object.keys(hashToVersion).find(h => hashToVersion[h].id === oldVersion.id);
-          const oldFileInfo = fileToInfo[oldHash];
-
-          if (oldFileInfo) {
-            logInfo(`[Modrinth] FRISSÍTÉS: ${oldFileInfo.file} -> ${newestFile.filename} (${latest.version_number})`);
-            const dest = path.join(MODS_DIR, newestFile.filename);
-
-            await downloadFile(newestFile.url, dest, { hash: newestFile.hashes.sha1, algorithm: 'sha1' });
-            if (fs.existsSync(oldFileInfo.fullPath) && oldFileInfo.fullPath !== dest) {
-              fs.unlinkSync(oldFileInfo.fullPath);
-            }
-            updatedCount++;
-          }
+          updatedCount++;
         }
       } catch (e) {
         logError(`[Modrinth-Hiba] Hiba a projekt ellenőrzésekor (${projectId}): ${e.message}`);
