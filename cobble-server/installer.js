@@ -41,7 +41,7 @@ const BLACKLISTED_MODS = [
   'vmp-fabric', 'lag-protection', 'lag_protection',
   'cobblelagclear', 'itemclearlag', 'fix-attack-lag', 'no-entity-lag',
   'rustlingspot', 'mikeskills',
-  'iris'
+  'iris', 'tc-cobble-flight', 'cobbletcg', 'shine'
 ];
 
 // Minecraft benchmark szerint chunk-generálásban 20%+ gyorsabb a standard Temurin-nél.
@@ -454,7 +454,6 @@ const EXTRA_MODS = [
   { slug: 'serene-seasons',                 loaders: ['fabric'], gameVersions: [MC_VERSION] },
   { slug: 'seasonhud-fabric',               loaders: ['fabric'], gameVersions: [MC_VERSION] },
   { slug: 'easywhitelist',                  loaders: ['fabric'], gameVersions: [MC_VERSION] },
-  { slug: 'cobbletcg',                      loaders: ['fabric'], gameVersions: [MC_VERSION] },
   // Új modok (felhasználói kérés)
   { slug: 'fix-cobblemon-pokemon-experience', loaders: ['fabric'], gameVersions: [MC_VERSION] },
   { slug: 'cobblemon-pokestops',            loaders: ['fabric'], gameVersions: [MC_VERSION] },
@@ -480,14 +479,11 @@ const EXTRA_MODS = [
   { slug: 'cobblemon_expeditions',          loaders: ['fabric'], gameVersions: [MC_VERSION] },
   { slug: 'cobblemonoptimizer',             loaders: ['fabric'], gameVersions: [MC_VERSION] },
   { slug: 'trainer-pass',                   loaders: ['fabric'], gameVersions: [MC_VERSION] },
-  { slug: 'tc-cobble-flight',               loaders: ['fabric'], gameVersions: [MC_VERSION] },
   { slug: 'cobblemon-tents',                loaders: ['fabric'], gameVersions: [MC_VERSION] },
   { slug: 'cobblemon-snap',                 loaders: ['fabric'], gameVersions: [MC_VERSION] },
   { slug: 'cobblemon-villager-overhaul',    loaders: ['fabric'], gameVersions: [MC_VERSION] },
   { slug: 'modern-ui',                    loaders: ['fabric'], gameVersions: [MC_VERSION] },
   { slug: 'tt20',                         loaders: ['fabric'], gameVersions: [MC_VERSION] },
-  // Visual / client-side enhancements
-  { slug: 'shine',                        loaders: ['fabric'], gameVersions: [MC_VERSION] },
   // Függőségek
   { slug: 'cobblemore-library',             loaders: ['fabric'], gameVersions: [MC_VERSION] },
   { slug: 'pommel-held-item-models',        loaders: ['fabric'], gameVersions: [MC_VERSION] },
@@ -542,12 +538,7 @@ const CUSTOM_DIRECT_MODS = [
  */
 const PINNED_MODRINTH_MODS = [
   { slug: 'c2me-fabric', version: '0.3.0+alpha.0.362+1.21.1' },
-  // Pin Sodium and related addons to versions compatible with Shine
-  // NOTE: adjust version strings if Modrinth uses a different version_number format
-  { slug: 'sodium', version: 'mc1.21.1-0.6.13-fabric' },
-  { slug: 'sodium-extra', version: 'mc1.21.1-0.6.0+fabric' },
   { slug: 'moreculling', version: 'y4J2jK6V' },
-  { slug: 'reeses-sodium-options', version: 'mc1.21.4-1.8.3+fabric' },
 ];
 
 /**
