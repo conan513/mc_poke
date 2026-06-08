@@ -328,6 +328,9 @@ async function updateModsFromModrinth() {
 
   logInfo('[Modrinth] Modok frissítéseinek ellenőrzése (MC 1.21.1)...');
 
+  // Rögzített modok listája a kizáráshoz
+  const pinnedSlugs = PINNED_MODRINTH_MODS.map(m => m.slug).map(s => s.toLowerCase());
+
   try {
     const files = fs.readdirSync(MODS_DIR).filter(f => f.endsWith('.jar'));
     logInfo(`[Modrinth] ${files.length} .jar fájl találva a mods mappában.`);
@@ -385,6 +388,12 @@ async function updateModsFromModrinth() {
         const oldHash = oldVersion && Object.keys(hashToVersion).find(h => hashToVersion[h].id === oldVersion.id);
         const oldFileInfo = oldHash ? fileToInfo[oldHash] : null;
         const localFilename = oldFileInfo ? oldFileInfo.file.toLowerCase() : '';
+
+        // Ellenőrzés: ha ez egy rögzített mod, kihagyjuk a frissítést
+        if (pinnedSlugs.some(slug => localFilename.includes(slug))) {
+          logInfo(`[Modrinth] ⌛ Rögzített mod, frissítés kihagyása: ${localFilename}`);
+          continue;
+        }
 
         const sortedVersions = versions.sort((a, b) => new Date(b.date_published) - new Date(a.date_published));
         const isSodiumMod = /(?:sodium(?:-extra)?|reeses-sodium-options|sodiumoptionsapi)/i.test(localFilename || '');
@@ -526,6 +535,13 @@ const CUSTOM_DIRECT_MODS = [
 ];
 
 /**
+ * Rögzített Modrinth modulok (ezek nem kerülnek frissítésre)
+ */
+const PINNED_MODRINTH_MODS = [
+  { slug: 'c2me-fabric', version: '0.3.0+alpha.0.362+1.21.1' },
+];
+
+/**
  * Ensures specific extra mods are present.
  */
 async function ensureExtraMods() {
@@ -563,6 +579,62 @@ async function ensureExtraMods() {
       }
     } catch (e) {
       logError(`[Modrinth-Hiba] Extra mod hiba (${slug}): ${e.message}`);
+    }
+  }
+}
+
+/**
+ * Ensures pinned Modrinth mods are installed with their specific versions.
+ */
+async function ensurePinnedMods() {
+  if (PINNED_MODRINTH_MODS.length === 0) return;
+
+  logInfo(`[Pinned] Rögzített Modrinth modok ellenőrzése: ${PINNED_MODRINTH_MODS.map(m => m.slug).join(', ')}...`);
+
+  for (const { slug, version } of PINNED_MODRINTH_MODS) {
+    try {
+      logInfo(`[Pinned] ${slug} (${version}) keresése...`);
+
+      // Lekérdezzük az összes verziót ehhez a projekthez
+      const query = `loaders=${encodeURIComponent('["fabric"]')}&game_versions=${encodeURIComponent(`["${MC_VERSION}"]`)}`;
+      const versions = await modrinthRequest(`/v2/project/${slug}/version?${query}`);
+
+      // Megkeressük a megadott verziót
+      const targetVersion = versions.find(v => v.version_number === version);
+      if (!targetVersion) {
+        logError(`[Pinned] Verzió nem található: ${slug} ${version}`);
+        continue;
+      }
+
+      const file = targetVersion.files.find(f => f.primary) || targetVersion.files[0];
+      const dest = path.join(MODS_DIR, file.filename);
+
+      // Eltávolítjuk az összes régi verziót ehhez a modhoz
+      if (fs.existsSync(MODS_DIR)) {
+        const existingFiles = fs.readdirSync(MODS_DIR);
+        for (const f of existingFiles) {
+          if (f.toLowerCase().includes(slug.toLowerCase()) && f !== file.filename) {
+            const oldPath = path.join(MODS_DIR, f);
+            logInfo(`[Pinned] Régi verzió törlése: ${f}`);
+            try {
+              fs.unlinkSync(oldPath);
+            } catch (e) {
+              logError(`[Pinned] Hiba a régi verzió törlésekor: ${e.message}`);
+            }
+          }
+        }
+      }
+
+      // Ha az adott verzió még nem jelen van, letöltjük
+      if (!fs.existsSync(dest)) {
+        logInfo(`[Pinned] Rögzített mod letöltése: ${slug} -> ${file.filename}`);
+        await downloadFile(file.url, dest, { hash: file.hashes.sha1, algorithm: 'sha1' });
+        logInfo(`[Pinned] ✅ ${slug} (${version}) telepítve.`);
+      } else {
+        logInfo(`[Pinned] ✓ ${slug} (${version}) már jelen van.`);
+      }
+    } catch (e) {
+      logError(`[Pinned-Hiba] Hiba a rögzített mod kezelésekor (${slug}): ${e.message}`);
     }
   }
 }
@@ -1040,6 +1112,9 @@ async function install() {
 
   // 4. Extra Mods (Chipped, TerraBlender)
   await ensureExtraMods()
+
+  // 4b. Pinned Mods (rögzített verziók - pl. C2ME)
+  await ensurePinnedMods()
 
   // 6. Blacklist Cleanup (Ensure unwanted mods are gone)
   await cleanupBlacklistedMods()
