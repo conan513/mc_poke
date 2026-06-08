@@ -42,7 +42,8 @@ const BLACKLISTED_MODS = [
   'cobblelagclear', 'itemclearlag', 'fix-attack-lag', 'no-entity-lag',
   'rustlingspot', 'mikeskills',
   'iris', 'tc-cobble-flight', 'cobbletcg', 'shine',
-  'vulkanmod-extra', 'not-enough-vulkan', 'modern-ui'
+  'vulkanmod-extra', 'not-enough-vulkan', 'modern-ui',
+  'xaeros-world-map', 'xaeros-minimap', 'particle-rain', 'particular', 'particle-core', 'cobblemon-smartphone'
 ];
 // Ensure ImmediatelyFast (client-side renderer tweak) is not installed on server
 BLACKLISTED_MODS.push('immediatelyfast');
@@ -497,8 +498,8 @@ const EXTRA_MODS = [
   // Cobblemon extra mods
   { slug: 'player-locator-plus',            loaders: ['fabric'], gameVersions: [MC_VERSION] },
   { slug: 'cobblemon-mount-mastery',        loaders: ['fabric'], gameVersions: [MC_VERSION] },
-  { slug: 'cobblemon-smartphone',           loaders: ['fabric'], gameVersions: [MC_VERSION] },
   { slug: 'trainer-accessories',            loaders: ['fabric'], gameVersions: [MC_VERSION] },
+  { slug: 'bluemap',                        loaders: ['fabric'], gameVersions: [MC_VERSION] },
   { slug: 'more-cobblemon-stats',           loaders: ['fabric'], gameVersions: [MC_VERSION] },
   { slug: 'cobblemon-max-level-catch-cap',  loaders: ['fabric'], gameVersions: [MC_VERSION] },
   { slug: 'cobblemon-capture-notification', loaders: ['fabric'], gameVersions: [MC_VERSION] },
