@@ -171,57 +171,93 @@ function downloadFile(url, dest, options = {}) {
   const onProgress = typeof options === 'function' ? options : options.onProgress
   const expectedHash = options.hash
   const algorithm = options.algorithm || 'sha1'
+  const maxRetries = options.maxRetries !== undefined ? options.maxRetries : 3
+  const initialDelayMs = options.initialDelayMs !== undefined ? options.initialDelayMs : 1000
 
   return new Promise((resolve, reject) => {
     fs.mkdirSync(path.dirname(dest), { recursive: true })
     const tmpDest = dest + '.tmp'
 
-    const request = (targetUrl) => {
-      const mod = targetUrl.startsWith('https') ? https : http
-      mod.get(targetUrl, { headers: { 'User-Agent': 'CobbleServer/1.0' } }, (res) => {
-        if ([301, 302, 307, 308].includes(res.statusCode)) return request(res.headers.location)
-        if (res.statusCode !== 200) return reject(new Error(`HTTP ${res.statusCode} for ${targetUrl}`))
+    const sleep = (ms) => new Promise(r => setTimeout(r, ms))
 
-        const total = parseInt(res.headers['content-length'] || '0', 10)
-        let downloaded = 0
-        const file = fs.createWriteStream(tmpDest)
-
-        res.on('data', chunk => {
-          downloaded += chunk.length
-          if (total > 0 && onProgress) onProgress(downloaded / total)
-        })
-
-        res.pipe(file)
-
-        file.on('finish', async () => {
-          file.close(async () => {
-            try {
-              if (expectedHash) {
-                const actualHash = await getFileHash(tmpDest, algorithm)
-                if (actualHash !== expectedHash) {
-                  fs.unlinkSync(tmpDest)
-                  return reject(new Error(`Hash hiba! Elvárt: ${expectedHash}, Kapott: ${actualHash}`))
+    const attemptDownload = async (retryCount = 0) => {
+      try {
+        await new Promise((resolveRequest, rejectRequest) => {
+          const request = (targetUrl) => {
+            const mod = targetUrl.startsWith('https') ? https : http
+            mod.get(targetUrl, { headers: { 'User-Agent': 'CobbleServer/1.0' } }, (res) => {
+              if ([301, 302, 307, 308].includes(res.statusCode)) return request(res.headers.location)
+              
+              // Temporary errors (5xx) should be retried; permanent errors (4xx) should not
+              if (res.statusCode !== 200) {
+                if (fs.existsSync(tmpDest)) fs.unlinkSync(tmpDest)
+                
+                // Retry on 5xx errors (server errors)
+                if (res.statusCode >= 500 && retryCount < maxRetries) {
+                  rejectRequest(new Error(`HTTP ${res.statusCode} - will retry`, { retryable: true }))
+                } else {
+                  rejectRequest(new Error(`HTTP ${res.statusCode} for ${targetUrl}`))
                 }
+                return
               }
 
-              // Siker: átnevezés véglegesre
-              if (fs.existsSync(dest)) fs.unlinkSync(dest)
-              fs.renameSync(tmpDest, dest)
-              resolve()
-            } catch (err) {
-              if (fs.existsSync(tmpDest)) fs.unlinkSync(tmpDest)
-              reject(err)
-            }
-          })
-        })
+              const total = parseInt(res.headers['content-length'] || '0', 10)
+              let downloaded = 0
+              const file = fs.createWriteStream(tmpDest)
 
-        file.on('error', (err) => {
-          if (fs.existsSync(tmpDest)) fs.unlinkSync(tmpDest)
-          reject(err)
+              res.on('data', chunk => {
+                downloaded += chunk.length
+                if (total > 0 && onProgress) onProgress(downloaded / total)
+              })
+
+              res.pipe(file)
+
+              file.on('finish', async () => {
+                file.close(async () => {
+                  try {
+                    if (expectedHash) {
+                      const actualHash = await getFileHash(tmpDest, algorithm)
+                      if (actualHash !== expectedHash) {
+                        fs.unlinkSync(tmpDest)
+                        return rejectRequest(new Error(`Hash hiba! Elvárt: ${expectedHash}, Kapott: ${actualHash}`))
+                      }
+                    }
+
+                    // Siker: átnevezés véglegesre
+                    if (fs.existsSync(dest)) fs.unlinkSync(dest)
+                    fs.renameSync(tmpDest, dest)
+                    resolveRequest()
+                  } catch (err) {
+                    if (fs.existsSync(tmpDest)) fs.unlinkSync(tmpDest)
+                    rejectRequest(err)
+                  }
+                })
+              })
+
+              file.on('error', (err) => {
+                if (fs.existsSync(tmpDest)) fs.unlinkSync(tmpDest)
+                rejectRequest(err)
+              })
+            }).on('error', (err) => {
+              if (fs.existsSync(tmpDest)) fs.unlinkSync(tmpDest)
+              rejectRequest(err)
+            })
+          }
+          request(url)
         })
-      }).on('error', reject)
+      } catch (err) {
+        // Check if this is a retryable error and we have retries left
+        if (err.message.includes('HTTP') && err.message.includes('will retry') && retryCount < maxRetries) {
+          const delayMs = initialDelayMs * Math.pow(2, retryCount) // Exponential backoff
+          logInfo(`[Downloader] Ismételt próbálkozás ${retryCount + 1}/${maxRetries} után ${delayMs}ms várakozás...`)
+          await sleep(delayMs)
+          return attemptDownload(retryCount + 1)
+        }
+        throw err
+      }
     }
-    request(url)
+
+    attemptDownload().then(resolve).catch(reject)
   })
 }
 
@@ -1140,8 +1176,16 @@ async function install() {
   for (const mod of CUSTOM_DIRECT_MODS) {
     const dest = path.join(MODS_DIR, mod.name);
     if (!fs.existsSync(dest)) {
-      logInfo(`[DirectDL] Mod letöltése: ${mod.name}...`);
-      await downloadFile(mod.url, dest);
+      try {
+        logInfo(`[DirectDL] Mod letöltése: ${mod.name}...`);
+        await downloadFile(mod.url, dest, { maxRetries: 3 });
+        logInfo(`[DirectDL] ✅ Sikeres: ${mod.name}`);
+      } catch (err) {
+        logError(`[DirectDL] ❌ Hiba a(z) ${mod.name} letöltésekor: ${err.message}`);
+        logError(`[DirectDL] Az indítás folytatódik a letöltés nélkül. URL: ${mod.url}`);
+      }
+    } else {
+      logInfo(`[DirectDL] ✓ Már jelen van: ${mod.name}`);
     }
   }
 
