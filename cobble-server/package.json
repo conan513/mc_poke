@@ -10,6 +10,7 @@
   "dependencies": {
     "adm-zip": "^0.5.16",
     "mysql2": "^3.9.7",
-    "bcryptjs": "^2.4.3"
+    "bcryptjs": "^2.4.3",
+    "fs-extra": "^11.1.1"
   }
 }
