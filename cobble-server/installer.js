@@ -43,7 +43,7 @@ const BLACKLISTED_MODS = [
   'rustlingspot', 'mikeskills',
   'iris', 'tc-cobble-flight', 'cobbletcg', 'shine',
   'vulkanmod-extra', 'modern-ui',
-  'xaeroworldmap', 'xaerominimap', 'particlerain', 'particular', 'particle_core', 'cobblemon-smartphone'
+  'xaeroworldmap', 'xaerominimap', 'particlerain', 'particular', 'particle_core', 'cobblemon-smartphone', 'cobblemon-tents'
 ];
 // Ensure ImmediatelyFast (client-side renderer tweak) is not installed on server
 BLACKLISTED_MODS.push('immediatelyfast');
@@ -547,7 +547,6 @@ const EXTRA_MODS = [
   { slug: 'cobblemon_expeditions',          loaders: ['fabric'], gameVersions: [MC_VERSION] },
   { slug: 'cobblemonoptimizer',             loaders: ['fabric'], gameVersions: [MC_VERSION] },
   { slug: 'trainer-pass',                   loaders: ['fabric'], gameVersions: [MC_VERSION] },
-  { slug: 'cobblemon-tents',                loaders: ['fabric'], gameVersions: [MC_VERSION] },
   { slug: 'cobblemon-snap',                 loaders: ['fabric'], gameVersions: [MC_VERSION] },
   { slug: 'cobblemon-villager-overhaul',    loaders: ['fabric'], gameVersions: [MC_VERSION] },
   { slug: 'tt20',                         loaders: ['fabric'], gameVersions: [MC_VERSION] },
