@@ -43,7 +43,8 @@ const BLACKLISTED_MODS = [
   'rustlingspot', 'mikeskills',
   'iris', 'tc-cobble-flight', 'cobbletcg', 'shine',
   'vulkanmod-extra', 'modern-ui',
-  'xaeroworldmap', 'xaerominimap', 'particlerain', 'particular', 'particle_core', 'cobblemon-smartphone', 'cobblemon-tents'
+  'xaeroworldmap', 'xaerominimap', 'particlerain', 'particular', 'particle_core', 'cobblemon-smartphone', 'cobblemon-tents',
+  'create-fabric', 'create-power-loader', 'farmers-delight', 'fusion', 'spark', 'servercore'
 ];
 // Ensure ImmediatelyFast (client-side renderer tweak) is not installed on server
 BLACKLISTED_MODS.push('immediatelyfast');
@@ -554,11 +555,8 @@ const EXTRA_MODS = [
   { slug: 'matthiesen-lib-api',             loaders: ['fabric'], gameVersions: [MC_VERSION] },
   { slug: 'cobblemore-library',             loaders: ['fabric'], gameVersions: [MC_VERSION] },
   { slug: 'pommel-held-item-models',        loaders: ['fabric'], gameVersions: [MC_VERSION] },
-  { slug: 'create-power-loader',            loaders: ['fabric'], gameVersions: [MC_VERSION] },
-  { slug: 'create-fabric',                  loaders: ['fabric'], gameVersions: [MC_VERSION] },
   { slug: 'wild-battle-api',                loaders: ['fabric'], gameVersions: [MC_VERSION] },
   { slug: 'cloth-config',                   loaders: ['fabric'], gameVersions: [MC_VERSION] },
-  { slug: 'farmers-delight',                loaders: ['fabric'], gameVersions: [MC_VERSION] },
   { slug: 'expandability',                  loaders: ['fabric'], gameVersions: [MC_VERSION] },
   { slug: 'trainerattributeslib',           loaders: ['fabric'], gameVersions: [MC_VERSION] },
   { slug: 'accessories',                    loaders: ['fabric'], gameVersions: [MC_VERSION] },
@@ -566,9 +564,6 @@ const EXTRA_MODS = [
   { slug: 'collective',                     loaders: ['fabric'], gameVersions: [MC_VERSION] },
   { slug: 'glitchcore',                     loaders: ['fabric'], gameVersions: [MC_VERSION] },
   { slug: 'forge-config-api-port',          loaders: ['fabric'], gameVersions: [MC_VERSION] },
-  { slug: 'fusion',                         loaders: ['fabric'], gameVersions: [MC_VERSION] },
-  { slug: 'servercore',                    loaders: ['fabric'], gameVersions: [MC_VERSION] },
-  { slug: 'spark',                         loaders: ['fabric'], gameVersions: [MC_VERSION] },
   // Teljesítmény optimalizáló modok
   { slug: 'krypton',                       loaders: ['fabric'], gameVersions: [MC_VERSION] },
   { slug: 'ksyxis',                        loaders: ['fabric'], gameVersions: [MC_VERSION] },
