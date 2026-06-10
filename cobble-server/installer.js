@@ -41,9 +41,9 @@ const BLACKLISTED_MODS = [
   'vmp-fabric', 'lag-protection', 'lag_protection',
   'cobblelagclear', 'itemclearlag', 'fix-attack-lag', 'no-entity-lag',
   'rustlingspot', 'mikeskills',
-  'iris', 'tc-cobble-flight', 'cobbletcg', 'shine',
-  'vulkanmod-extra', 'modern-ui',
-  'xaeroworldmap', 'xaerominimap', 'particlerain', 'particular', 'particle_core', 'cobblemon-smartphone', 'cobblemon-tents', 'rechiseled', 'accessories',
+  'tc-cobble-flight', 'cobbletcg', 'shine',
+  'cobblemon-smartphone', 'cobblemon-tents', 'rechiseled',
+  'vulkanmod', 'beryl', 'not-enough-vulkan',
   'create-fabric', 'create-power-loader', 'farmers-delight', 'fusion', 'spark', 'servercore'
 ];
 // Ensure ImmediatelyFast (client-side renderer tweak) is not installed on server
@@ -505,14 +505,17 @@ const EXTRA_MODS = [
   { slug: 'creeper-firework', loaders: ['fabric'], gameVersions: [MC_VERSION] },
   { slug: 'terrablender', loaders: ['fabric'], gameVersions: [MC_VERSION] },
   { slug: 'skinrestorer', loaders: ['fabric'], gameVersions: [MC_VERSION] },
-  // Vulkan-related client mods (re-added per request)
-  { slug: 'vulkanmod', loaders: ['fabric'], gameVersions: [MC_VERSION] },
-  { slug: 'beryl', loaders: ['fabric'], gameVersions: [MC_VERSION] },
-  { slug: 'not-enough-vulkan', loaders: ['fabric'], gameVersions: [MC_VERSION] },
   // Cobblemon extra mods
   { slug: 'player-locator-plus',            loaders: ['fabric'], gameVersions: [MC_VERSION] },
   { slug: 'cobblemon-mount-mastery',        loaders: ['fabric'], gameVersions: [MC_VERSION] },
   { slug: 'trainer-accessories',            loaders: ['fabric'], gameVersions: [MC_VERSION] },
+  { slug: 'particlerain',                   loaders: ['fabric'], gameVersions: [MC_VERSION] },
+  { slug: 'particular',                     loaders: ['fabric'], gameVersions: [MC_VERSION] },
+  { slug: 'particle_core',                  loaders: ['fabric'], gameVersions: [MC_VERSION] },
+  { slug: 'accessories',                    loaders: ['fabric'], gameVersions: [MC_VERSION] },
+  { slug: 'iris',                          loaders: ['fabric'], gameVersions: [MC_VERSION] },
+  { slug: 'xaeroworldmap',                 loaders: ['fabric'], gameVersions: [MC_VERSION] },
+  { slug: 'xaerominimap',                  loaders: ['fabric'], gameVersions: [MC_VERSION] },
   { slug: 'bluemap',                        loaders: ['fabric'], gameVersions: [MC_VERSION] },
   { slug: 'more-cobblemon-stats',           loaders: ['fabric'], gameVersions: [MC_VERSION] },
   { slug: 'cobblemon-max-level-catch-cap',  loaders: ['fabric'], gameVersions: [MC_VERSION] },
