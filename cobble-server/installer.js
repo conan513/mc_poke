@@ -46,22 +46,6 @@ const BLACKLISTED_MODS = [
   'vulkanmod', 'beryl', 'not-enough-vulkan',
   'create-fabric', 'create-power-loader', 'farmers-delight', 'fusion', 'spark', 'servercore'
 ];
-// Ensure ImmediatelyFast (client-side renderer tweak) is not installed on server
-BLACKLISTED_MODS.push('immediatelyfast');
-// Also blacklist Sodium and related client-side renderer addons so server won't host them
-BLACKLISTED_MODS.push('sodium');
-BLACKLISTED_MODS.push('sodium-extra');
-BLACKLISTED_MODS.push('reeses-sodium-options');
-BLACKLISTED_MODS.push('sodiumoptionsapi');
-// Remove incompatible C2ME mod from remote installs
-BLACKLISTED_MODS.push('c2me');
-// Memory-heavy client-side mods that consume excessive RAM
-BLACKLISTED_MODS.push('bloom');           // Advanced particle effects
-BLACKLISTED_MODS.push('complementary');   // Shader addon
-BLACKLISTED_MODS.push('distant-horizons'); // LOD rendering (very memory-intensive)
-BLACKLISTED_MODS.push('betterdynamiclights'); // Extra lighting calculations
-BLACKLISTED_MODS.push('minecraftcapes');  // Cape rendering (cosmetics)
-BLACKLISTED_MODS.push('euphoria');        // Euphoria Patches - problematic mod
 
 // Minecraft benchmark szerint chunk-generálásban 20%+ gyorsabb a standard Temurin-nél.
 // Forrás: https://github.com/brucethemoose/Minecraft-Performance-Flags-Benchmarks
