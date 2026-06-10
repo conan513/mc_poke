@@ -585,7 +585,10 @@ const CUSTOM_DIRECT_MODS = [
  * Rögzített Modrinth modulok (ezek nem kerülnek frissítésre)
  */
 const PINNED_MODRINTH_MODS = [
-  { slug: 'moreculling', version: '1.0.8' },
+  { slug: 'moreculling', version: 'y4J2jK6V' },
+  { slug: 'sodium', version: 'mc1.21.1-0.6.13-fabric' },
+  { slug: 'sodium-extra', version: 'mc1.21.1-0.6.0+fabric' },
+  { slug: 'reeses-sodium-options', version: 'mc1.21.4-1.8.3+fabric' },
 ];
 
 /**
