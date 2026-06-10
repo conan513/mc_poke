@@ -500,7 +500,6 @@ const EXTRA_MODS = [
   { slug: 'iris',                          loaders: ['fabric'], gameVersions: [MC_VERSION] },
   { slug: 'xaeroworldmap',                 loaders: ['fabric'], gameVersions: [MC_VERSION] },
   { slug: 'xaerominimap',                  loaders: ['fabric'], gameVersions: [MC_VERSION] },
-  { slug: 'bluemap',                        loaders: ['fabric'], gameVersions: [MC_VERSION] },
   { slug: 'more-cobblemon-stats',           loaders: ['fabric'], gameVersions: [MC_VERSION] },
   { slug: 'cobblemon-max-level-catch-cap',  loaders: ['fabric'], gameVersions: [MC_VERSION] },
   { slug: 'cobblemon-capture-notification', loaders: ['fabric'], gameVersions: [MC_VERSION] },
