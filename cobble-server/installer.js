@@ -42,7 +42,8 @@ const BLACKLISTED_MODS = [
   'cobblelagclear', 'itemclearlag', 'fix-attack-lag', 'no-entity-lag',
   'rustlingspot', 'mikeskills',
   'tc-cobble-flight', 'cobbletcg', 'shine',
-  'iris', 'cobblemon-smartphone', 'cobblemon-tents', 'rechiseled',
+  'cobblemon-smartphone', 'cobblemon-tents', 'rechiseled',
+  'sodium-core-shader-support',
   'vulkanmod', 'beryl', 'not-enough-vulkan',
   'create-fabric', 'create-power-loader', 'farmers-delight', 'fusion', 'spark', 'servercore'
 ];
@@ -494,8 +495,8 @@ const EXTRA_MODS = [
   { slug: 'cobblemon-mount-mastery',        loaders: ['fabric'], gameVersions: [MC_VERSION] },
   { slug: 'trainer-accessories',            loaders: ['fabric'], gameVersions: [MC_VERSION] },
   { slug: 'cobblemon-cards',               loaders: ['fabric'], gameVersions: [MC_VERSION] },
-  { slug: 'sodium-core-shader-support',    loaders: ['fabric'], gameVersions: [MC_VERSION] },
   { slug: 'particlerain',                   loaders: ['fabric'], gameVersions: [MC_VERSION] },
+  { slug: 'iris',                           loaders: ['fabric'], gameVersions: [MC_VERSION] },
   { slug: 'particular',                     loaders: ['fabric'], gameVersions: [MC_VERSION] },
   { slug: 'particle_core',                  loaders: ['fabric'], gameVersions: [MC_VERSION] },
   { slug: 'accessories',                    loaders: ['fabric'], gameVersions: [MC_VERSION] },

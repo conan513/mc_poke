@@ -1119,25 +1119,20 @@ async function install({ username, ram, serverUrl }, onProgress) {
 }
 
 async function launch({ username, uuid, ram, serverUrl, closeOnLaunch }, onLog, onClose) {
-  let ramMb = ram || 2048  // Default fallback
+  // Force the client to use a fixed 4GB RAM allocation by default.
+  // Respect extremely low-memory systems by clamping to 1GB when necessary.
+  const FIXED_CLIENT_RAM_MB = 4096
+  let ramMb = FIXED_CLIENT_RAM_MB
   const systemRamGb = Math.floor(os.totalmem() / (1024 * 1024 * 1024))
-  
-  // Smart memory scaling: allocate exactly 1/4 of total system RAM
-  if (!ram) {
-    // Auto-scale: 1/4 of system RAM, bounded between 1 GB and 8 GB
-    ramMb = Math.max(1024, Math.min(8192, Math.floor(systemRamGb * 256)))
-    
-    const logMsg = `[Launcher] Auto-scaled RAM allocation: ${ramMb} MB (1/4 of ${systemRamGb} GB system RAM)`
-    onLog?.(logMsg)
-  }
-  
-  // Hard limits to prevent OOM crashes on extremely low-memory systems
+
+  // If the host only has 4GB or less physical RAM, clamp the client allocation
+  // down to 1GB to avoid killing the system.
   if (systemRamGb <= 4 && ramMb > 1024) {
-    onLog?.(`[Launcher] Critical low-memory system detected (${systemRamGb} GB RAM). Clamping to 1024 MB.`)
+    onLog?.(`[Launcher] Critical low-memory system detected (${systemRamGb} GB RAM). Clamping fixed client RAM to 1024 MB.`)
     ramMb = 1024
   }
 
-  onLog?.(`[Launcher] Memory allocation: ${ramMb} MB (${Math.round((ramMb / (systemRamGb * 1024)) * 100)}% of ${systemRamGb} GB system RAM)`)
+  onLog?.(`[Launcher] Memory allocation (fixed): ${ramMb} MB`)
 
   migrateStructure()
 
