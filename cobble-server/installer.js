@@ -43,7 +43,7 @@ const BLACKLISTED_MODS = [
   'rustlingspot', 'mikeskills',
   'iris', 'tc-cobble-flight', 'cobbletcg', 'shine',
   'vulkanmod-extra', 'modern-ui',
-  'xaeroworldmap', 'xaerominimap', 'particlerain', 'particular', 'particle_core', 'cobblemon-smartphone', 'cobblemon-tents', 'rechiseled',
+  'xaeroworldmap', 'xaerominimap', 'particlerain', 'particular', 'particle_core', 'cobblemon-smartphone', 'cobblemon-tents', 'rechiseled', 'accessories',
   'create-fabric', 'create-power-loader', 'farmers-delight', 'fusion', 'spark', 'servercore'
 ];
 // Ensure ImmediatelyFast (client-side renderer tweak) is not installed on server
@@ -559,7 +559,6 @@ const EXTRA_MODS = [
   { slug: 'cloth-config',                   loaders: ['fabric'], gameVersions: [MC_VERSION] },
   { slug: 'expandability',                  loaders: ['fabric'], gameVersions: [MC_VERSION] },
   { slug: 'trainerattributeslib',           loaders: ['fabric'], gameVersions: [MC_VERSION] },
-  { slug: 'accessories',                    loaders: ['fabric'], gameVersions: [MC_VERSION] },
   { slug: 'geckolib',                       loaders: ['fabric'], gameVersions: [MC_VERSION] },
   { slug: 'collective',                     loaders: ['fabric'], gameVersions: [MC_VERSION] },
   { slug: 'glitchcore',                     loaders: ['fabric'], gameVersions: [MC_VERSION] },
