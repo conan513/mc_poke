@@ -45,17 +45,17 @@ const BLACKLISTED_MODS = [
   'cobblemon-smartphone', 'cobblemon-tents', 'rechiseled',
   'sodium-core-shader-support',
   'vulkanmod', 'beryl', 'not-enough-vulkan',
-  'create-fabric', 'create-power-loader', 'farmers-delight', 'fusion', 'spark', 'servercore'
+  'create-fabric', 'create-power-loader', 'farmers-delight', 'fusion', 'spark', 'servercore', 'cobble-contests', 'livelierpokemon'
 ];
 
 // Minecraft benchmark szerint chunk-generálásban 20%+ gyorsabb a standard Temurin-nél.
 // Forrás: https://github.com/brucethemoose/Minecraft-Performance-Flags-Benchmarks
 // Letöltési oldal: https://www.oracle.com/java/technologies/downloads/#graalvmjava21
 const JAVA_URLS = {
-  linux_x64:    'https://download.oracle.com/graalvm/21/latest/graalvm-jdk-21_linux-x64_bin.tar.gz',
-  linux_arm64:  'https://download.oracle.com/graalvm/21/latest/graalvm-jdk-21_linux-aarch64_bin.tar.gz',
-  win32_x64:    'https://download.oracle.com/graalvm/21/latest/graalvm-jdk-21_windows-x64_bin.zip',
-  darwin_x64:   'https://download.oracle.com/graalvm/21/latest/graalvm-jdk-21_macos-x64_bin.tar.gz',
+  linux_x64: 'https://download.oracle.com/graalvm/21/latest/graalvm-jdk-21_linux-x64_bin.tar.gz',
+  linux_arm64: 'https://download.oracle.com/graalvm/21/latest/graalvm-jdk-21_linux-aarch64_bin.tar.gz',
+  win32_x64: 'https://download.oracle.com/graalvm/21/latest/graalvm-jdk-21_windows-x64_bin.zip',
+  darwin_x64: 'https://download.oracle.com/graalvm/21/latest/graalvm-jdk-21_macos-x64_bin.tar.gz',
   darwin_arm64: 'https://download.oracle.com/graalvm/21/latest/graalvm-jdk-21_macos-aarch64_bin.tar.gz',
 }
 
@@ -184,11 +184,11 @@ function downloadFile(url, dest, options = {}) {
             const mod = targetUrl.startsWith('https') ? https : http
             mod.get(targetUrl, { headers: { 'User-Agent': 'CobbleServer/1.0' } }, (res) => {
               if ([301, 302, 307, 308].includes(res.statusCode)) return request(res.headers.location)
-              
+
               // Temporary errors (5xx) should be retried; permanent errors (4xx) should not
               if (res.statusCode !== 200) {
                 if (fs.existsSync(tmpDest)) fs.unlinkSync(tmpDest)
-                
+
                 // Retry on 5xx errors (server errors)
                 if (res.statusCode >= 500 && retryCount < maxRetries) {
                   rejectRequest(new Error(`HTTP ${res.statusCode} - will retry`, { retryable: true }))
@@ -491,74 +491,72 @@ const EXTRA_MODS = [
   { slug: 'terrablender', loaders: ['fabric'], gameVersions: [MC_VERSION] },
   { slug: 'skinrestorer', loaders: ['fabric'], gameVersions: [MC_VERSION] },
   // Cobblemon extra mods
-  { slug: 'player-locator-plus',            loaders: ['fabric'], gameVersions: [MC_VERSION] },
-  { slug: 'cobblemon-mount-mastery',        loaders: ['fabric'], gameVersions: [MC_VERSION] },
-  { slug: 'trainer-accessories',            loaders: ['fabric'], gameVersions: [MC_VERSION] },
-  { slug: 'cobblemon-cards',               loaders: ['fabric'], gameVersions: [MC_VERSION] },
-  { slug: 'particlerain',                   loaders: ['fabric'], gameVersions: [MC_VERSION] },
-  { slug: 'iris',                           loaders: ['fabric'], gameVersions: [MC_VERSION] },
-  { slug: 'particular',                     loaders: ['fabric'], gameVersions: [MC_VERSION] },
-  { slug: 'particle_core',                  loaders: ['fabric'], gameVersions: [MC_VERSION] },
-  { slug: 'accessories',                    loaders: ['fabric'], gameVersions: [MC_VERSION] },
-  { slug: 'xaeroworldmap',                 loaders: ['fabric'], gameVersions: [MC_VERSION] },
-  { slug: 'xaerominimap',                  loaders: ['fabric'], gameVersions: [MC_VERSION] },
-  { slug: 'more-cobblemon-stats',           loaders: ['fabric'], gameVersions: [MC_VERSION] },
-  { slug: 'cobblemon-max-level-catch-cap',  loaders: ['fabric'], gameVersions: [MC_VERSION] },
+  { slug: 'player-locator-plus', loaders: ['fabric'], gameVersions: [MC_VERSION] },
+  { slug: 'cobblemon-mount-mastery', loaders: ['fabric'], gameVersions: [MC_VERSION] },
+  { slug: 'trainer-accessories', loaders: ['fabric'], gameVersions: [MC_VERSION] },
+  { slug: 'cobblemon-cards', loaders: ['fabric'], gameVersions: [MC_VERSION] },
+  { slug: 'particlerain', loaders: ['fabric'], gameVersions: [MC_VERSION] },
+  { slug: 'iris', loaders: ['fabric'], gameVersions: [MC_VERSION] },
+  { slug: 'particular', loaders: ['fabric'], gameVersions: [MC_VERSION] },
+  { slug: 'particle_core', loaders: ['fabric'], gameVersions: [MC_VERSION] },
+  { slug: 'accessories', loaders: ['fabric'], gameVersions: [MC_VERSION] },
+  { slug: 'xaeroworldmap', loaders: ['fabric'], gameVersions: [MC_VERSION] },
+  { slug: 'xaerominimap', loaders: ['fabric'], gameVersions: [MC_VERSION] },
+  { slug: 'more-cobblemon-stats', loaders: ['fabric'], gameVersions: [MC_VERSION] },
+  { slug: 'cobblemon-max-level-catch-cap', loaders: ['fabric'], gameVersions: [MC_VERSION] },
   { slug: 'cobblemon-capture-notification', loaders: ['fabric'], gameVersions: [MC_VERSION] },
-  { slug: 'cobblemon-cobbled-levels',       loaders: ['fabric'], gameVersions: [MC_VERSION] },
-  { slug: 'village-spawn-point',            loaders: ['fabric'], gameVersions: [MC_VERSION] },
-  { slug: 'easyauth',                       loaders: ['fabric'], gameVersions: [MC_VERSION] },
-  { slug: 'serene-seasons',                 loaders: ['fabric'], gameVersions: [MC_VERSION] },
-  { slug: 'seasonhud-fabric',               loaders: ['fabric'], gameVersions: [MC_VERSION] },
-  { slug: 'easywhitelist',                  loaders: ['fabric'], gameVersions: [MC_VERSION] },
+  { slug: 'cobblemon-cobbled-levels', loaders: ['fabric'], gameVersions: [MC_VERSION] },
+  { slug: 'village-spawn-point', loaders: ['fabric'], gameVersions: [MC_VERSION] },
+  { slug: 'easyauth', loaders: ['fabric'], gameVersions: [MC_VERSION] },
+  { slug: 'serene-seasons', loaders: ['fabric'], gameVersions: [MC_VERSION] },
+  { slug: 'seasonhud-fabric', loaders: ['fabric'], gameVersions: [MC_VERSION] },
+  { slug: 'easywhitelist', loaders: ['fabric'], gameVersions: [MC_VERSION] },
   // Új modok (felhasználói kérés)
   { slug: 'fix-cobblemon-pokemon-experience', loaders: ['fabric'], gameVersions: [MC_VERSION] },
-  { slug: 'cobblemon-pokestops',            loaders: ['fabric'], gameVersions: [MC_VERSION] },
-  { slug: 'cobblemon-pet-a-poke',           loaders: ['fabric'], gameVersions: [MC_VERSION] },
-  { slug: 'pokemon-field-lab',              loaders: ['fabric'], gameVersions: [MC_VERSION] },
-  { slug: 'cobblemon-pokerus',              loaders: ['fabric'], gameVersions: [MC_VERSION] },
-  { slug: 'livelierpokemon',                loaders: ['fabric'], gameVersions: [MC_VERSION] },
-  { slug: 'pokebike',                       loaders: ['fabric'], gameVersions: [MC_VERSION] },
-  { slug: 'cobblemonmovedex',               loaders: ['fabric'], gameVersions: [MC_VERSION] },
-  { slug: 'cobblemon-alpha-project',        loaders: ['fabric'], gameVersions: [MC_VERSION] },
-  { slug: 'cobblemarks+',                   loaders: ['fabric'], gameVersions: [MC_VERSION] },
-  { slug: 'rad-gyms',                       loaders: ['fabric'], gameVersions: [MC_VERSION] },
+  { slug: 'cobblemon-pokestops', loaders: ['fabric'], gameVersions: [MC_VERSION] },
+  { slug: 'cobblemon-pet-a-poke', loaders: ['fabric'], gameVersions: [MC_VERSION] },
+  { slug: 'pokemon-field-lab', loaders: ['fabric'], gameVersions: [MC_VERSION] },
+  { slug: 'cobblemon-pokerus', loaders: ['fabric'], gameVersions: [MC_VERSION] },
+  { slug: 'pokebike', loaders: ['fabric'], gameVersions: [MC_VERSION] },
+  { slug: 'cobblemonmovedex', loaders: ['fabric'], gameVersions: [MC_VERSION] },
+  { slug: 'cobblemon-alpha-project', loaders: ['fabric'], gameVersions: [MC_VERSION] },
+  { slug: 'cobblemarks+', loaders: ['fabric'], gameVersions: [MC_VERSION] },
+  { slug: 'rad-gyms', loaders: ['fabric'], gameVersions: [MC_VERSION] },
   { slug: 'cobblemon-underground-mining-minigame', loaders: ['fabric'], gameVersions: [MC_VERSION] },
-  { slug: 'cobble-contests',                loaders: ['fabric'], gameVersions: [MC_VERSION] },
-  { slug: 'cobblemon-trials-edition',       loaders: ['fabric'], gameVersions: [MC_VERSION] },
-  { slug: 'cobblemon-battle-tower',         loaders: ['fabric'], gameVersions: [MC_VERSION] },
-  { slug: 'cobblemon-simple-pokecenters',   loaders: ['fabric'], gameVersions: [MC_VERSION] },
-  { slug: 'cobblemon-integrations',         loaders: ['fabric'], gameVersions: [MC_VERSION] },
-  { slug: 'lootr',                          loaders: ['fabric'], gameVersions: [MC_VERSION] },
-  { slug: 'lootrmon',                       loaders: ['fabric'], gameVersions: [MC_VERSION] },
-  { slug: 'cobblemon-farmers',              loaders: ['fabric'], gameVersions: [MC_VERSION] },
-  { slug: 'cobblemon-auto-battle',          loaders: ['fabric'], gameVersions: [MC_VERSION] },
-  { slug: 'cobblemon_expeditions',          loaders: ['fabric'], gameVersions: [MC_VERSION] },
-  { slug: 'cobblemonoptimizer',             loaders: ['fabric'], gameVersions: [MC_VERSION] },
-  { slug: 'trainer-pass',                   loaders: ['fabric'], gameVersions: [MC_VERSION] },
-  { slug: 'cobblemon-snap',                 loaders: ['fabric'], gameVersions: [MC_VERSION] },
-  { slug: 'cobblemon-villager-overhaul',    loaders: ['fabric'], gameVersions: [MC_VERSION] },
-  { slug: 'tt20',                         loaders: ['fabric'], gameVersions: [MC_VERSION] },
+  { slug: 'cobblemon-trials-edition', loaders: ['fabric'], gameVersions: [MC_VERSION] },
+  { slug: 'cobblemon-battle-tower', loaders: ['fabric'], gameVersions: [MC_VERSION] },
+  { slug: 'cobblemon-simple-pokecenters', loaders: ['fabric'], gameVersions: [MC_VERSION] },
+  { slug: 'cobblemon-integrations', loaders: ['fabric'], gameVersions: [MC_VERSION] },
+  { slug: 'lootr', loaders: ['fabric'], gameVersions: [MC_VERSION] },
+  { slug: 'lootrmon', loaders: ['fabric'], gameVersions: [MC_VERSION] },
+  { slug: 'cobblemon-farmers', loaders: ['fabric'], gameVersions: [MC_VERSION] },
+  { slug: 'cobblemon-auto-battle', loaders: ['fabric'], gameVersions: [MC_VERSION] },
+  { slug: 'cobblemon_expeditions', loaders: ['fabric'], gameVersions: [MC_VERSION] },
+  { slug: 'cobblemonoptimizer', loaders: ['fabric'], gameVersions: [MC_VERSION] },
+  { slug: 'trainer-pass', loaders: ['fabric'], gameVersions: [MC_VERSION] },
+  { slug: 'cobblemon-snap', loaders: ['fabric'], gameVersions: [MC_VERSION] },
+  { slug: 'cobblemon-villager-overhaul', loaders: ['fabric'], gameVersions: [MC_VERSION] },
+  { slug: 'tt20', loaders: ['fabric'], gameVersions: [MC_VERSION] },
   // Függőségek
-  { slug: 'matthiesen-lib-api',             loaders: ['fabric'], gameVersions: [MC_VERSION] },
-  { slug: 'cobblemore-library',             loaders: ['fabric'], gameVersions: [MC_VERSION] },
-  { slug: 'pommel-held-item-models',        loaders: ['fabric'], gameVersions: [MC_VERSION] },
-  { slug: 'wild-battle-api',                loaders: ['fabric'], gameVersions: [MC_VERSION] },
-  { slug: 'cloth-config',                   loaders: ['fabric'], gameVersions: [MC_VERSION] },
-  { slug: 'expandability',                  loaders: ['fabric'], gameVersions: [MC_VERSION] },
-  { slug: 'trainerattributeslib',           loaders: ['fabric'], gameVersions: [MC_VERSION] },
-  { slug: 'geckolib',                       loaders: ['fabric'], gameVersions: [MC_VERSION] },
-  { slug: 'collective',                     loaders: ['fabric'], gameVersions: [MC_VERSION] },
-  { slug: 'glitchcore',                     loaders: ['fabric'], gameVersions: [MC_VERSION] },
-  { slug: 'forge-config-api-port',          loaders: ['fabric'], gameVersions: [MC_VERSION] },
+  { slug: 'matthiesen-lib-api', loaders: ['fabric'], gameVersions: [MC_VERSION] },
+  { slug: 'cobblemore-library', loaders: ['fabric'], gameVersions: [MC_VERSION] },
+  { slug: 'pommel-held-item-models', loaders: ['fabric'], gameVersions: [MC_VERSION] },
+  { slug: 'wild-battle-api', loaders: ['fabric'], gameVersions: [MC_VERSION] },
+  { slug: 'cloth-config', loaders: ['fabric'], gameVersions: [MC_VERSION] },
+  { slug: 'expandability', loaders: ['fabric'], gameVersions: [MC_VERSION] },
+  { slug: 'trainerattributeslib', loaders: ['fabric'], gameVersions: [MC_VERSION] },
+  { slug: 'geckolib', loaders: ['fabric'], gameVersions: [MC_VERSION] },
+  { slug: 'collective', loaders: ['fabric'], gameVersions: [MC_VERSION] },
+  { slug: 'glitchcore', loaders: ['fabric'], gameVersions: [MC_VERSION] },
+  { slug: 'forge-config-api-port', loaders: ['fabric'], gameVersions: [MC_VERSION] },
   // Teljesítmény optimalizáló modok
-  { slug: 'krypton',                       loaders: ['fabric'], gameVersions: [MC_VERSION] },
-  { slug: 'ksyxis',                        loaders: ['fabric'], gameVersions: [MC_VERSION] },
-  { slug: 'scalablelux',                   loaders: ['fabric'], gameVersions: [MC_VERSION] },
-  { slug: 'lmd',                           loaders: ['fabric'], gameVersions: [MC_VERSION] },
-  { slug: 'packet-fixer',                  loaders: ['fabric'], gameVersions: [MC_VERSION] },
-  { slug: 'almanac',                       loaders: ['fabric'], gameVersions: [MC_VERSION] },
-  { slug: 'memguard',                      loaders: ['fabric'], gameVersions: [MC_VERSION] },
+  { slug: 'krypton', loaders: ['fabric'], gameVersions: [MC_VERSION] },
+  { slug: 'ksyxis', loaders: ['fabric'], gameVersions: [MC_VERSION] },
+  { slug: 'scalablelux', loaders: ['fabric'], gameVersions: [MC_VERSION] },
+  { slug: 'lmd', loaders: ['fabric'], gameVersions: [MC_VERSION] },
+  { slug: 'packet-fixer', loaders: ['fabric'], gameVersions: [MC_VERSION] },
+  { slug: 'almanac', loaders: ['fabric'], gameVersions: [MC_VERSION] },
+  { slug: 'memguard', loaders: ['fabric'], gameVersions: [MC_VERSION] },
 ];
 
 /**
@@ -927,10 +925,10 @@ async function install() {
     try {
       const expectedFiles = JSON.parse(fs.readFileSync(modpackFilesPath, 'utf8'))
       const actualFiles = fs.readdirSync(MODS_DIR).filter(f => f.endsWith('.jar'))
-      
+
       // Csak azok a fájlok maradnak a listában, amelyek ténylegesen léteznek
       const syncedFiles = expectedFiles.filter(f => actualFiles.includes(f))
-      
+
       if (syncedFiles.length !== expectedFiles.length) {
         const removed = expectedFiles.length - syncedFiles.length
         logInfo(`[Installer] Szinkronizálás: .modpack-files.json ${expectedFiles.length} → ${syncedFiles.length} (${removed} eltávolított)`)
