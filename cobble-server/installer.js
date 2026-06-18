@@ -44,7 +44,7 @@ const BLACKLISTED_MODS = [
   'tc-cobble-flight', 'cobbletcg', 'shine',
   'cobblemon-smartphone', 'cobblemon-tents', 'rechiseled',
   'sodium-core-shader-support',
-  'vulkanmod', 'beryl', 'not-enough-vulkan', 'c2me', 'RoughlyEnoughItems', 
+  'vulkanmod', 'beryl', 'not-enough-vulkan', 'c2me', 'rei', 'rad-gyms', 
   'create-fabric', 'create-power-loader', 'farmers-delight', 'fusion', 'spark', 'servercore', 'cobble-contests', 'livelierpokemon'
 ];
 
@@ -521,7 +521,7 @@ const EXTRA_MODS = [
   { slug: 'cobblemonmovedex', loaders: ['fabric'], gameVersions: [MC_VERSION] },
   { slug: 'cobblemon-alpha-project', loaders: ['fabric'], gameVersions: [MC_VERSION] },
   { slug: 'cobblemarks+', loaders: ['fabric'], gameVersions: [MC_VERSION] },
-  { slug: 'rad-gyms', loaders: ['fabric'], gameVersions: [MC_VERSION] },
+  { slug: 'cobblemon-raid-dens-addon-auto-raid-den-designs', loaders: ['fabric'], gameVersions: [MC_VERSION] },
   { slug: 'cobblemon-underground-mining-minigame', loaders: ['fabric'], gameVersions: [MC_VERSION] },
   { slug: 'cobblemon-trials-edition', loaders: ['fabric'], gameVersions: [MC_VERSION] },
   { slug: 'cobblemon-battle-tower', loaders: ['fabric'], gameVersions: [MC_VERSION] },
