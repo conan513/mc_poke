@@ -44,7 +44,7 @@ const BLACKLISTED_MODS = [
   'tc-cobble-flight', 'cobbletcg', 'shine',
   'cobblemon-smartphone', 'cobblemon-tents', 'rechiseled',
   'sodium-core-shader-support',
-  'vulkanmod', 'beryl', 'not-enough-vulkan',
+  'vulkanmod', 'beryl', 'not-enough-vulkan', 'c2me', 
   'create-fabric', 'create-power-loader', 'farmers-delight', 'fusion', 'spark', 'servercore', 'cobble-contests', 'livelierpokemon'
 ];
 
