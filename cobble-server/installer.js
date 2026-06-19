@@ -524,6 +524,7 @@ const EXTRA_MODS = [
   { slug: 'npcmega', loaders: ['fabric'], gameVersions: [MC_VERSION] },
   { slug: 'cobbleloots', loaders: ['fabric'], gameVersions: [MC_VERSION] },
   { slug: 'cobblestacker', loaders: ['fabric'], gameVersions: [MC_VERSION] },
+  { slug: 'cobblemonchunkmenager', loaders: ['fabric'], gameVersions: [MC_VERSION] },
   { slug: 'cobblemon-pc-info', loaders: ['fabric'], gameVersions: [MC_VERSION] },
   { slug: 'cobblemon-radiant', loaders: ['fabric'], gameVersions: [MC_VERSION] },
   { slug: 'cobblemon-go-catch', loaders: ['fabric'], gameVersions: [MC_VERSION] },
