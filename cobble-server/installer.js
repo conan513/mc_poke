@@ -43,7 +43,7 @@ const BLACKLISTED_MODS = [
   'rustlingspot', 'mikeskills',
   'tc-cobble-flight', 'cobbletcg', 'shine',
   'cobblemon-smartphone', 'cobblemon-tents', 'rechiseled',
-  'sodium-core-shader-support',
+  'sodium-core-shader-support', 'jade', 'jade-addons-fabric',
   'vulkanmod', 'beryl', 'not-enough-vulkan', 'c2me', 'rei', 'rad-gyms', 
   'create-fabric', 'create-power-loader', 'farmers-delight', 'fusion', 'spark', 'servercore', 'cobble-contests', 'livelierpokemon'
 ];
