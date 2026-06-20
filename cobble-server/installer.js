@@ -44,7 +44,7 @@ const BLACKLISTED_MODS = [
   'tc-cobble-flight', 'cobbletcg', 'shine',
   'cobblemon-smartphone', 'cobblemon-tents', 'rechiseled',
   'sodium-core-shader-support', 'jade', 'jade-addons-fabric',
-  'vulkanmod', 'beryl', 'not-enough-vulkan', 'c2me', 'rei', 'rad-gyms', 
+  'vulkanmod', 'beryl', 'not-enough-vulkan', 'c2me', 'rei', 'rad-gyms', 'music-notification', 'cobblemon-radiant',
   'create-fabric', 'create-power-loader', 'farmers-delight', 'fusion', 'spark', 'servercore', 'cobble-contests', 'livelierpokemon'
 ];
 
@@ -527,7 +527,6 @@ const EXTRA_MODS = [
   { slug: 'cobblestacker', loaders: ['fabric'], gameVersions: [MC_VERSION] },
   { slug: 'cobblemonchunkmenager', loaders: ['fabric'], gameVersions: [MC_VERSION] },
   { slug: 'cobblemon-pc-info', loaders: ['fabric'], gameVersions: [MC_VERSION] },
-  { slug: 'cobblemon-radiant', loaders: ['fabric'], gameVersions: [MC_VERSION] },
   { slug: 'cobblemon-go-catch', loaders: ['fabric'], gameVersions: [MC_VERSION] },
   { slug: 'cobblemon-raid-dens-addon-auto-raid-den-designs', loaders: ['fabric'], gameVersions: [MC_VERSION] },
   { slug: 'cobblemon-underground-mining-minigame', loaders: ['fabric'], gameVersions: [MC_VERSION] },
