@@ -70,6 +70,7 @@ const FORCED_REMOVALS = [
   'pneumono_gravestones', 'pneumono_core',
   // Server-only mods – must never run on the client
   'frostbytes-skip-server-movement-check',
+  'skipservercheck', // a mod tényleges jar fájlneve: skipservercheck-x.x.x.jar
 ]
 
 async function syncServerMods(serverUrl, instanceDir, onLog) {

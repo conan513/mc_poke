@@ -748,6 +748,7 @@ const CLEANUP_BLACKLIST = ['custom-splash-screen', 'customsplashscreen', 'mobsbe
  */
 const SERVER_ONLY_MODS = [
   'frostbytes-skip-server-movement-check',
+  'skipservercheck', // a mod tényleges jar fájlneve: skipservercheck-x.x.x.jar
 ];
 
 /**

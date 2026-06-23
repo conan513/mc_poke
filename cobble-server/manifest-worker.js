@@ -27,6 +27,7 @@ const fp = fs.promises
  */
 const SERVER_ONLY_MODS = [
   'frostbytes-skip-server-movement-check',
+  'skipservercheck', // a mod tényleges jar fájlneve: skipservercheck-x.x.x.jar
 ]
 
 async function getFilesRecursive(dir, baseDir = dir) {
