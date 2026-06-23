@@ -44,7 +44,7 @@ const BLACKLISTED_MODS = [
   'tc-cobble-flight', 'cobbletcg', 'shine',
   'cobblemon-smartphone', 'cobblemon-tents', 'rechiseled',
   'sodium-core-shader-support', 'jade', 'jade-addons-fabric',
-  'vulkanmod', 'beryl', 'not-enough-vulkan', 'c2me', 'rei', 'rad-gyms', 'music-notification', 'cobblemon-radiant',
+  'vulkanmod', 'beryl', 'not-enough-vulkan', 'rei', 'rad-gyms', 'music-notification', 'cobblemon-radiant',
   'create-fabric', 'create-power-loader', 'farmers-delight', 'fusion', 'spark', 'servercore', 'cobble-contests', 'livelierpokemon'
 ];
 
