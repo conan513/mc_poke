@@ -67,7 +67,9 @@ const FORCED_REMOVALS = [
   'custom-splash-screen', 'customsplashscreen', 'soundsbegone', 
   'interactic', 'fancymenu', 'konkrete', 'drippyloadingscreen', 'loadingscreen', 'notenoughcrashes',
   'zombified-player', 'zombifiedplayer', 'squaremap', 'ordered-player-list', 'player-mobs', 'maplink',
-  'pneumono_gravestones', 'pneumono_core'
+  'pneumono_gravestones', 'pneumono_core',
+  // Server-only mods – must never run on the client
+  'frostbytes-skip-server-movement-check',
 ]
 
 async function syncServerMods(serverUrl, instanceDir, onLog) {

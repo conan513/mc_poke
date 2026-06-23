@@ -17,6 +17,18 @@ const crypto = require('crypto')
 
 const fp = fs.promises
 
+/**
+ * SERVER_ONLY_MODS
+ * ─────────────────────────────────────────────────────────────
+ * Ezek a modok csak a szerveren futnak – a kliens manifestből ki vannak zárva,
+ * így a launcher soha nem tölti le őket a játékosok gépére.
+ *
+ * Ide kell felvenni minden server-side only modot (slug / fájlnév részlet).
+ */
+const SERVER_ONLY_MODS = [
+  'frostbytes-skip-server-movement-check',
+]
+
 async function getFilesRecursive(dir, baseDir = dir) {
   let results = []
   try {
@@ -62,7 +74,18 @@ parentPort.on('message', async ({ type, dirs, syncFolders }) => {
 
     for (const f of syncFolders) {
       const files = await getFilesRecursive(dirs[f])
-      manifest[f] = await mapFiles(files, dirs[f])
+      const allMapped = await mapFiles(files, dirs[f])
+
+      // Szerver-only modok kiszűrése: ne kerüljenek a klienseknek küldött manifestbe
+      if (f === 'mods') {
+        manifest[f] = allMapped.filter(entry => {
+          const lower = entry.filename.toLowerCase()
+          return !SERVER_ONLY_MODS.some(slug => lower.includes(slug.toLowerCase()))
+        })
+      } else {
+        manifest[f] = allMapped
+      }
+
       manifest.folders[f] = manifest[f].length
     }
 
