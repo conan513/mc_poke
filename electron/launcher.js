@@ -739,7 +739,19 @@ async function fetchLatestModpackVersion() {
 const CLEANUP_BLACKLIST = ['custom-splash-screen', 'customsplashscreen', 'mobsbegone', 'soundsbegone', 'interactic', 'battlecam', 'euphoria'];
 
 /**
- * Removes blacklisted mods from the mods folder.
+ * SERVER_ONLY_MODS
+ * ─────────────────────────────────────────────────────────────
+ * Ezek a modok kizárólag a szerveren futnak. Az mrpack kicsomagolásakor
+ * és a mods mappa takarításakor egyaránt kizárásra kerülnek a kliensről.
+ *
+ * Ide kell felvenni minden server-side only modot (slug / fájlnév részlet).
+ */
+const SERVER_ONLY_MODS = [
+  'frostbytes-skip-server-movement-check',
+];
+
+/**
+ * Removes blacklisted and server-only mods from the mods folder.
  */
 async function cleanupClientMods(onLog) {
   const instanceDir = getModpackDir()
@@ -749,8 +761,10 @@ async function cleanupClientMods(onLog) {
   const files = fs.readdirSync(modsDir)
   for (const file of files) {
     const lower = file.toLowerCase()
-    if (CLEANUP_BLACKLIST.some(b => lower.includes(b))) {
-      onLog?.(`[Cleanup] Hibás vagy tiltott mod eltávolítása: ${file}`)
+    const isBlacklisted = CLEANUP_BLACKLIST.some(b => lower.includes(b))
+    const isServerOnly  = SERVER_ONLY_MODS.some(s => lower.includes(s.toLowerCase()))
+    if (isBlacklisted || isServerOnly) {
+      onLog?.(`[Cleanup] ${isServerOnly ? 'Server-only' : 'Tiltott'} mod eltávolítása: ${file}`)
       try {
         fs.unlinkSync(path.join(modsDir, file))
       } catch (e) {
@@ -943,6 +957,18 @@ async function installModpack(serverUrl = '') {
   for (let i = 0; i < files.length; i += 5) {
     const batch = files.slice(i, i + 5)
     await Promise.all(batch.map(async (file) => {
+      // Skip mods that are server-only:
+      //   1. Modrinth env flag: client side is 'unsupported'
+      //   2. Known server-only slug list
+      const fileLower = (file.path || '').toLowerCase()
+      const isClientUnsupported = file.env && file.env.client === 'unsupported'
+      const isServerOnlySlug = SERVER_ONLY_MODS.some(s => fileLower.includes(s.toLowerCase()))
+      if (isClientUnsupported || isServerOnlySlug) {
+        console.log(`[Modpack] Server-only mod kihagyva: ${file.path}`)
+        done++
+        return
+      }
+
       const dest = path.join(instanceDir, file.path)
       if (!fs.existsSync(dest)) {
         fse.ensureDirSync(path.dirname(dest))
