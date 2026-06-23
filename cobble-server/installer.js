@@ -564,6 +564,7 @@ const EXTRA_MODS = [
   { slug: 'packet-fixer', loaders: ['fabric'], gameVersions: [MC_VERSION] },
   { slug: 'almanac', loaders: ['fabric'], gameVersions: [MC_VERSION] },
   { slug: 'memguard', loaders: ['fabric'], gameVersions: [MC_VERSION] },
+  { slug: 'frostbytes-skip-server-movement-check', loaders: ['fabric'], gameVersions: [MC_VERSION] },
 ];
 
 /**
