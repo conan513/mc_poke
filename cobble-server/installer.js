@@ -491,6 +491,7 @@ const EXTRA_MODS = [
   { slug: 'terrablender', loaders: ['fabric'], gameVersions: [MC_VERSION] },
   { slug: 'skinrestorer', loaders: ['fabric'], gameVersions: [MC_VERSION] },
   { slug: 'zfastnoise', loaders: ['fabric'], gameVersions: [MC_VERSION] },
+  { slug: 'chunk-animator-plus', loaders: ['fabric'], gameVersions: [MC_VERSION] },
   // Cobblemon extra mods
   { slug: 'player-locator-plus', loaders: ['fabric'], gameVersions: [MC_VERSION] },
   { slug: 'cobblemon-mount-mastery', loaders: ['fabric'], gameVersions: [MC_VERSION] },
@@ -556,6 +557,7 @@ const EXTRA_MODS = [
   { slug: 'collective', loaders: ['fabric'], gameVersions: [MC_VERSION] },
   { slug: 'glitchcore', loaders: ['fabric'], gameVersions: [MC_VERSION] },
   { slug: 'forge-config-api-port', loaders: ['fabric'], gameVersions: [MC_VERSION] },
+  { slug: 'lithostitched', loaders: ['fabric'], gameVersions: [MC_VERSION] },
   // Teljesítmény optimalizáló modok
   { slug: 'krypton', loaders: ['fabric'], gameVersions: [MC_VERSION] },
   { slug: 'ksyxis', loaders: ['fabric'], gameVersions: [MC_VERSION] },
