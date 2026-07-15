@@ -20,7 +20,7 @@ function logError(...args) {
 
 const MODPACK_PROJECT_ID = 'Jkb29YJU'
 const MC_VERSION = '1.21.1'
-const PINNED_MODPACK_VERSION = '1.7.31' // null ha mindig a legfrissebbet szeretnénk letölteni
+const PINNED_MODPACK_VERSION = '' // null ha mindig a legfrissebbet szeretnénk letölteni
 const MODRINTH_VERSIONS_URL = `https://api.modrinth.com/v2/project/${MODPACK_PROJECT_ID}/version?loaders=["fabric"]&game_versions=["${MC_VERSION}"]`
 const FABRIC_META_URL = `https://meta.fabricmc.net/v2/versions/loader/${MC_VERSION}`
 const FABRIC_INSTALLER_META_URL = 'https://meta.fabricmc.net/v2/versions/installer'
