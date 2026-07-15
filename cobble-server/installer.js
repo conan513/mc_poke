@@ -20,6 +20,7 @@ function logError(...args) {
 
 const MODPACK_PROJECT_ID = 'Jkb29YJU'
 const MC_VERSION = '1.21.1'
+const PINNED_MODPACK_VERSION = '1.7.31' // null ha mindig a legfrissebbet szeretnénk letölteni
 const MODRINTH_VERSIONS_URL = `https://api.modrinth.com/v2/project/${MODPACK_PROJECT_ID}/version?loaders=["fabric"]&game_versions=["${MC_VERSION}"]`
 const FABRIC_META_URL = `https://meta.fabricmc.net/v2/versions/loader/${MC_VERSION}`
 const FABRIC_INSTALLER_META_URL = 'https://meta.fabricmc.net/v2/versions/installer'
@@ -949,9 +950,19 @@ async function install() {
   }
 
   // 1. Modpack check & download
-  logInfo('[Installer] Keresem a legfrissebb Cobbleverse modpackot...')
-  const versions = await fetchJson(MODRINTH_VERSIONS_URL)
-  const latestPack = versions.filter(v => v.version_type === 'release')[0] || versions[0]
+  let latestPack
+  if (PINNED_MODPACK_VERSION) {
+    logInfo(`[Installer] Keresem a rögzített Cobbleverse modpackot (${PINNED_MODPACK_VERSION})...`)
+    const versions = await fetchJson(`https://api.modrinth.com/v2/project/${MODPACK_PROJECT_ID}/version`)
+    latestPack = versions.find(v => v.version_number === PINNED_MODPACK_VERSION || v.id === PINNED_MODPACK_VERSION)
+    if (!latestPack) {
+      throw new Error(`Nem található a rögzített modpack verzió: ${PINNED_MODPACK_VERSION}`)
+    }
+  } else {
+    logInfo('[Installer] Keresem a legfrissebb Cobbleverse modpackot...')
+    const versions = await fetchJson(MODRINTH_VERSIONS_URL)
+    latestPack = versions.filter(v => v.version_type === 'release')[0] || versions[0]
+  }
   const file = latestPack.files.find(f => f.primary) || latestPack.files[0]
   const stateFile = path.join(SERVER_DIR, '.server-install-state.json')
 
