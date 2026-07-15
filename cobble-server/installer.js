@@ -45,7 +45,7 @@ const BLACKLISTED_MODS = [
   'cobblemon-smartphone', 'cobblemon-tents', 'rechiseled',
   'sodium-core-shader-support', 'jade', 'jade-addons-fabric',
   'vulkanmod', 'beryl', 'not-enough-vulkan', 'rei', 'rad-gyms', 'music-notification', 'cobblemon-radiant',
-  'create-fabric', 'create-power-loader', 'farmers-delight', 'fusion', 'spark', 'servercore', 'cobble-contests', 'livelierpokemon', 'rctapi'
+  'create-fabric', 'create-power-loader', 'farmers-delight', 'fusion', 'spark', 'servercore', 'cobble-contests', 'livelierpokemon'
 ];
 
 // Minecraft benchmark szerint chunk-generálásban 20%+ gyorsabb a standard Temurin-nél.
