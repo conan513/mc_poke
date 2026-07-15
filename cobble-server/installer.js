@@ -496,7 +496,6 @@ const EXTRA_MODS = [
   // Cobblemon extra mods
   { slug: 'player-locator-plus', loaders: ['fabric'], gameVersions: [MC_VERSION] },
   { slug: 'cobblemon-mount-mastery', loaders: ['fabric'], gameVersions: [MC_VERSION] },
-  { slug: 'trainer-accessories', loaders: ['fabric'], gameVersions: [MC_VERSION] },
   { slug: 'cobblemon-cards', loaders: ['fabric'], gameVersions: [MC_VERSION] },
   { slug: 'particlerain', loaders: ['fabric'], gameVersions: [MC_VERSION] },
   { slug: 'iris', loaders: ['fabric'], gameVersions: [MC_VERSION] },
@@ -541,7 +540,6 @@ const EXTRA_MODS = [
   { slug: 'cobblemon-auto-battle', loaders: ['fabric'], gameVersions: [MC_VERSION] },
   { slug: 'cobblemon_expeditions', loaders: ['fabric'], gameVersions: [MC_VERSION] },
   { slug: 'cobblemonoptimizer', loaders: ['fabric'], gameVersions: [MC_VERSION] },
-  { slug: 'trainer-pass', loaders: ['fabric'], gameVersions: [MC_VERSION] },
   { slug: 'cobblemon-snap', loaders: ['fabric'], gameVersions: [MC_VERSION] },
   { slug: 'cobblemon-villager-overhaul', loaders: ['fabric'], gameVersions: [MC_VERSION] },
   { slug: 'tt20', loaders: ['fabric'], gameVersions: [MC_VERSION] },
@@ -552,7 +550,6 @@ const EXTRA_MODS = [
   { slug: 'wild-battle-api', loaders: ['fabric'], gameVersions: [MC_VERSION] },
   { slug: 'cloth-config', loaders: ['fabric'], gameVersions: [MC_VERSION] },
   { slug: 'expandability', loaders: ['fabric'], gameVersions: [MC_VERSION] },
-  { slug: 'trainerattributeslib', loaders: ['fabric'], gameVersions: [MC_VERSION] },
   { slug: 'geckolib', loaders: ['fabric'], gameVersions: [MC_VERSION] },
   { slug: 'collective', loaders: ['fabric'], gameVersions: [MC_VERSION] },
   { slug: 'glitchcore', loaders: ['fabric'], gameVersions: [MC_VERSION] },
