@@ -380,7 +380,7 @@ async function updateModsFromModrinth() {
   logInfo('[Modrinth] Modok frissítéseinek ellenőrzése (MC 1.21.1)...');
 
   // Rögzített modok listája a kizáráshoz
-  const pinnedSlugs = PINNED_MODRINTH_MODS.map(m => m.slug).map(s => s.toLowerCase());
+  const pinnedSlugs = PINNED_MODRINTH_MODS.map(m => m.filenamePart || m.slug).map(s => s.toLowerCase());
 
   try {
     const files = fs.readdirSync(MODS_DIR).filter(f => f.endsWith('.jar'));
@@ -502,8 +502,6 @@ const EXTRA_MODS = [
   { slug: 'particular', loaders: ['fabric'], gameVersions: [MC_VERSION] },
   { slug: 'particle_core', loaders: ['fabric'], gameVersions: [MC_VERSION] },
   { slug: 'accessories', loaders: ['fabric'], gameVersions: [MC_VERSION] },
-  { slug: 'xaeroworldmap', loaders: ['fabric'], gameVersions: [MC_VERSION] },
-  { slug: 'xaerominimap', loaders: ['fabric'], gameVersions: [MC_VERSION] },
   { slug: 'more-cobblemon-stats', loaders: ['fabric'], gameVersions: [MC_VERSION] },
   { slug: 'cobblemon-max-level-catch-cap', loaders: ['fabric'], gameVersions: [MC_VERSION] },
   { slug: 'cobblemon-capture-notification', loaders: ['fabric'], gameVersions: [MC_VERSION] },
@@ -596,6 +594,8 @@ const CUSTOM_DIRECT_MODS = [
  * Rögzített Modrinth modulok (ezek nem kerülnek frissítésre)
  */
 const PINNED_MODRINTH_MODS = [
+  { slug: 'xaeros-world-map', version: 'fabric-1.21.1-1.41.2', filenamePart: 'xaeroworldmap' },
+  { slug: 'xaeros-minimap', version: 'fabric-1.21.1-26.1.0', filenamePart: 'xaerominimap' }
 ];
 
 /**
@@ -648,7 +648,7 @@ async function ensurePinnedMods() {
 
   logInfo(`[Pinned] Rögzített Modrinth modok ellenőrzése: ${PINNED_MODRINTH_MODS.map(m => m.slug).join(', ')}...`);
 
-  for (const { slug, version } of PINNED_MODRINTH_MODS) {
+  for (const { slug, version, filenamePart } of PINNED_MODRINTH_MODS) {
     try {
       logInfo(`[Pinned] ${slug} (${version}) keresése...`);
 
@@ -667,10 +667,11 @@ async function ensurePinnedMods() {
       const dest = path.join(MODS_DIR, file.filename);
 
       // Eltávolítjuk az összes régi verziót ehhez a modhoz
+      const searchPattern = filenamePart || slug;
       if (fs.existsSync(MODS_DIR)) {
         const existingFiles = fs.readdirSync(MODS_DIR);
         for (const f of existingFiles) {
-          if (f.toLowerCase().includes(slug.toLowerCase()) && f !== file.filename) {
+          if (f.toLowerCase().includes(searchPattern.toLowerCase()) && f !== file.filename) {
             const oldPath = path.join(MODS_DIR, f);
             logInfo(`[Pinned] Régi verzió törlése: ${f}`);
             try {
