@@ -45,7 +45,7 @@ const BLACKLISTED_MODS = [
   'cobblemon-smartphone', 'cobblemon-tents', 'rechiseled',
   'sodium-core-shader-support', 'jade', 'jade-addons-fabric',
   'vulkanmod', 'beryl', 'not-enough-vulkan', 'rei', 'rad-gyms', 'music-notification', 'cobblemon-radiant',
-  'create-fabric', 'create-power-loader', 'farmers-delight', 'fusion', 'spark', 'servercore', 'cobble-contests', 'livelierpokemon'
+  'create-fabric', 'create-power-loader', 'farmers-delight', 'fusion', 'spark', 'servercore', 'cobble-contests', 'livelierpokemon', 'rctapi'
 ];
 
 // Minecraft benchmark szerint chunk-generálásban 20%+ gyorsabb a standard Temurin-nél.
@@ -512,6 +512,7 @@ const EXTRA_MODS = [
   { slug: 'seasonhud-fabric', loaders: ['fabric'], gameVersions: [MC_VERSION] },
   { slug: 'easywhitelist', loaders: ['fabric'], gameVersions: [MC_VERSION] },
   // Új modok (felhasználói kérés)
+  { slug: 'cobblemon-recobbled-(advanced-trainer-ai)', loaders: ['fabric'], gameVersions: [MC_VERSION] },
   { slug: 'fix-cobblemon-pokemon-experience', loaders: ['fabric'], gameVersions: [MC_VERSION] },
   { slug: 'cobblemon-pokestops', loaders: ['fabric'], gameVersions: [MC_VERSION] },
   { slug: 'cobblemon-pet-a-poke', loaders: ['fabric'], gameVersions: [MC_VERSION] },
