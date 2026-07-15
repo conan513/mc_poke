@@ -536,7 +536,7 @@ const EXTRA_MODS = [
   { slug: 'lootr', loaders: ['fabric'], gameVersions: [MC_VERSION] },
   { slug: 'lootrmon', loaders: ['fabric'], gameVersions: [MC_VERSION] },
   { slug: 'cobblemon-farmers', loaders: ['fabric'], gameVersions: [MC_VERSION] },
-  { slug: 'cobblemonoptimizer', loaders: ['fabric'], gameVersions: [MC_VERSION] },
+  { slug: 'cobblemonoptimizer', loaders: ['fabric'], gameVersions: [MC_VERSION] }
   { slug: 'cobblemon-snap', loaders: ['fabric'], gameVersions: [MC_VERSION] },
   { slug: 'cobblemon-villager-overhaul', loaders: ['fabric'], gameVersions: [MC_VERSION] },
   { slug: 'tt20', loaders: ['fabric'], gameVersions: [MC_VERSION] },
